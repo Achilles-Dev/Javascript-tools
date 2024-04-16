@@ -77,7 +77,7 @@
         if (numerator < divisor) {
           value = numerator + value
         } else {
-          while (numerator > divisor) {
+          while (numerator >= divisor) {
             let item = Number(numerator) % divisor
             numerator = Math.floor(Number(numerator) / divisor)   
             value = item + value
@@ -94,7 +94,7 @@
         if (numerator % 1 != 0) {
           let item1 = Math.floor(numerator)
           let valueA = baseTenToOctalHelper(item1, divisor)
-          let item2 = (numerator % 1 ) * 8
+          let item2 = (numerator % 1 ) * divisor
           let valueB = baseTenToOctalHelper2(item2, divisor)
           value = valueA + valueB
         } else {
@@ -111,7 +111,7 @@
           let item1 = Math.floor(numerator)
           console.log(item1)
           let valueA = baseTenToOctalHelper(item1, divisor)
-          let item2 = (numerator % 1 ) * 8
+          let item2 = (numerator % 1 ) * divisor
           let valueB = baseTenToOctalHelper2(item2, divisor)
           
           value = valueA + '.' + valueB

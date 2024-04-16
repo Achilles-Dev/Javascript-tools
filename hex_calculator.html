@@ -112,7 +112,7 @@
         } else if (numerator < 10) {
           value = numerator + value
         } else {
-          while (numerator > divisor) {
+          while (numerator >= divisor) {
             let item = Number(numerator) % divisor
             numerator = Math.floor(Number(numerator) / divisor)   
             if (item >= 10) {
@@ -136,7 +136,7 @@
         if (numerator % 1 != 0) {
           let item1 = Math.floor(numerator)
           let valueA = baseTenToHexHelper(item1, divisor)
-          let item2 = (numerator % 1 ) * 16
+          let item2 = (numerator % 1 ) * divisor
           let valueB = baseTenToHexHelper2(item2, divisor)
           value = valueA + valueB
         } else {
@@ -146,13 +146,13 @@
       }
 
       function baseTenToHex(num) {
-        let divisor = 16
+        let divisor = 16;
         let numerator = num
         let value = ''
         if (numerator % 1 != 0) {
           let item1 = Math.floor(numerator)
           let valueA = baseTenToHexHelper(item1, divisor)
-          let item2 = (numerator % 1 ) * 16
+          let item2 = (numerator % 1 ) * divisor
           let valueB = baseTenToHexHelper2(item2, divisor)
           
           value = valueA + '.' + valueB   

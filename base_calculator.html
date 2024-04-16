@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,12 +9,13 @@
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.6.5/dist/sweetalert2.all.min.js"></script>
   <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11.6.5/dist/sweetalert2.min.css" rel="stylesheet">
 </head>
+
 <body>
   <div>
     <h1>Base Calculator - Add or Subtract Numbers of Any Base</h1>
     <p>Add, subtract, multiply, or divide numbers of any base using the calculator below.</p>
     <p>
-      <label for="baseUnit">Base:</label>    
+      <label for="baseUnit">Base:</label>
       <select id="baseUnit">
         <option value="2">2 (binary)</option>
         <option value="3">3 (ternary)</option>
@@ -53,8 +55,8 @@
       </select>
     </p>
     <p>
-    <label for="numberOne">Number One:</label>
-    <input type="number" id="numberOne" placeholder="Number One">
+      <label for="numberOne">Number One:</label>
+      <input type="text" id="numberOne" placeholder="Number One">
     </p>
     <p>
       <label for="operationUnit">Operation:</label>
@@ -63,20 +65,20 @@
         <option value="-"> - &nbsp;&nbsp;</option>
         <option value="*"> &#215; &nbsp;&nbsp;</option>
         <option value="/"> &#247; &nbsp;&nbsp;</option>
-      </select> 
+      </select>
     </p>
     <p>
       <label for="numberTwo">Number Two:</label>
-      <input type="number" id="numberTwo" placeholder="Number Two">
+      <input type="text" id="numberTwo" placeholder="Number Two">
     </p>
     <p>
       <button id="calcBtn">Calculate</button>
       <button id="resetBtn">Reset</button>
     </p>
-      <hr>
+    <hr>
     <p>
-      <h3>Result:</h3>
-      <h3 id="calcResults"></h3> 
+    <h3>Result:</h3>
+    <h3 id="calcResults"></h3>
     </p>
   </div>
   <script>
@@ -84,73 +86,202 @@
     /********************************** ELEMENTS **********************************/
     const baseUnitEl = document.getElementById('baseUnit');
     const numberOneEl = document.getElementById('numberOne');
-    const operationUnitEl = document.getElementById('OperationUnit')
+    const operationUnitEl = document.getElementById('operationUnit')
     const numberTwoEl = document.getElementById('numberTwo');
     const calcBtnEl = document.getElementById('calcBtn');
     const resetBtnEl = document.getElementById('resetBtn');
     const calcResultsEl = document.getElementById('calcResults')
-    
-     /********************************** FUNCTIONS **********************************/
-      // Conversion functions
-      function greatestCommonDivisor(num, den) {
-        return den ? greatestCommonDivisor(den, num%den) : num
-      }
 
-      function calculateResults() {
-        // Retrieve input values
-        const baseUnit = baseUnitEl.value;
-        const numberOne = parseFloat(numberOneEl.value)
-        const operationUnit = operationUnitEl.value;
-        const numberTwo = parseFloat(numberTwoEl.value)
-        
-        if (
-          numberOne == undefined || numberOne == '' || numberTwo == undefined || numberTwo == ''
-        ) {
-          showError("Please Enter All Details.");
-          clearResult()
-          return;
+    /********************************** FUNCTIONS **********************************/
+    // Conversion functions
+
+    function convertNumberToSymbol(item) {
+      const values = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n',
+        'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z']
+      item = item.toString()
+      if (item[0] == '1') {
+        let index = Number(item[1])
+        return values[index]
+      } else if (item[0] == '2') {
+        let index = 10 + Number(item[1])
+        return values[index]
+      } else {
+        let index = 20 + Number(item[1])
+        return values[index]
+      }
+    }
+
+    function convertSymbolToNumber(item) {
+      const values = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n',
+        'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z']
+      item = item.toLowerCase()
+      let index = values.indexOf(item)
+      if (index > 20) {
+        let value = 30 + index
+        return value
+      } else if (index > 10) {
+        let value = 20 + index
+        return value
+      } else {
+        let value = 10 + index
+        return value
+      }
+    }
+
+    function otherBaseToBaseTen(num, base) {
+      let index = 0
+      let value = 0
+      while (index < num.length) {
+        let item = num[num.length - (index + 1)]
+        if (Number(item) || item == 0) {
+          value += Number(item) * Number(base) ** index
+        } else {
+          const newItem = convertSymbolToNumber(item)
+          if (Number(newItem)) {
+            value += Number(newItem) * Number(base) ** index
+          } else {
+            return;
+          }
         }
-
-        try {
-          
-        } catch (error) {
-          showError("Something Went Wrong!!!");
-          clearResult()
-        }       
+        index += 1
       }
-    
-      /********************************* HELPER FUNCTIONS **********************************/
+      return value
+    }
 
-      function showError(errorMessage) {
-        Swal.fire({
-            icon: "error",
-            title: "Error",
-            text: errorMessage,
-        });
+    function baseTenToOtherBaseHelper(numerator, divisor) {
+      let value = ''
+      if (numerator >= 10 && numerator < divisor) {
+        numerator = convertNumberToSymbol(numerator)
+        value = numerator + value
+      } else if (numerator < 10) {
+        value = numerator + value
+      } else {
+        while (numerator >= divisor) {
+          let item = Number(numerator) % divisor
+          numerator = Math.floor(Number(numerator) / divisor)
+          if (item >= 10) {
+            item = convertNumberToSymbol(item)
+          }
+          value = item + value
+          if (numerator < divisor) {
+            if (numerator >= 10) {
+              numerator = Math.floor(Number(numerator))
+              numerator = convertNumberToSymbol(numerator)
+            }
+            value = numerator + value
+          }
+        }
+      }
+      return value
+    }
+
+    function baseTenToOtherBaseHelper2(numerator, divisor) {
+      let value = ''
+      if (numerator % 1 != 0) {
+        let item1 = Math.floor(numerator)
+        let valueA = baseTenToOtherBaseHelper(item1, divisor)
+        let item2 = (numerator % 1) * divisor
+        let valueB = baseTenToOtherBaseHelper2(item2, divisor)
+        value = valueA + valueB
+      } else {
+        value = baseTenToOtherBaseHelper(numerator, divisor)
+      }
+      return value;
+    }
+
+    function baseTenToOtherBase(num, base) {
+      let divisor = Number(base)
+      let numerator = num
+      let value = ''
+      console.log(divisor, numerator)
+      if (numerator % 1 != 0) {
+        let item1 = Math.floor(numerator)
+        let valueA = baseTenToOtherBaseHelper(item1, divisor)
+        let item2 = (numerator % 1) * divisor
+        let valueB = baseTenToOtherBaseHelper2(item2, divisor)
+
+        value = valueA + '.' + valueB
+      } else {
+        value = baseTenToOtherBaseHelper(numerator, divisor)
+      }
+      return value
+    }
+
+    function solveOperation(operation, a, b) {
+      if (operation == '+') {
+        return a + b;
+      } else if (operation == "-") {
+        return a - b;
+      } else if (operation == "*") {
+        return a * b
+      } else {
+        return a / b
+      }
+    }
+
+    function calculateResults() {
+      // Retrieve input values
+      const baseUnit = baseUnitEl.value;
+      const numberOne = numberOneEl.value
+      let operationUnit = operationUnitEl.value;
+      const numberTwo = numberTwoEl.value
+
+      if (
+        numberOne == undefined || numberOne == '' || numberTwo == undefined || numberTwo == ''
+      ) {
+        showError("Please Enter All Details.");
+        return;
       }
 
-      function resetForm() {
-        numberOneEl.value = "";
-        numberTwoEl.value = "";
-        operationUnitEl.selectedIndex = 0;
-        baseUnitEl.selectedIndex = 8;
+      try {
+        const baseTenTotal = solveOperation(operationUnit, otherBaseToBaseTen(numberOne, baseUnit), otherBaseToBaseTen(numberTwo, baseUnit))
+        console.log(otherBaseToBaseTen(numberOne, baseUnit), otherBaseToBaseTen(numberTwo, baseUnit))
+        if (operationUnit == "*") {
+          operationUnit = '&#215;';
+        } else if (operationUnit == "/") {
+          operationUnit = '&#247;';
+        }
+        const otherBaseTotal = baseTenToOtherBase(baseTenTotal, baseUnit)
+        calcResultsEl.innerHTML = `${numberOne} ${operationUnit}  ${numberTwo} =  ${otherBaseTotal}`
+      } catch (error) {
+        showError("Something Went Wrong!!!");
+        resethandler()
       }
+    }
 
-      function resetResult() {
-        calcResultsEl.innerHTML = "<p>Result will appear here...</p>";
-      }
+    /********************************* HELPER FUNCTIONS **********************************/
 
-      function resethandler() {
-        resetForm();
-        resetResult();
-      }
-
-      /********************************** EVENT LISTENERS **********************************/
-      resetBtnEl.addEventListener("click", resethandler);
-      [numberOneEl, numberTwoEl, operationUnitEl, baseUnitEl].forEach((el) => {
-        el.addEventListener("change", resetResult);
+    function showError(errorMessage) {
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: errorMessage,
       });
-      calcBtnEl.addEventListener("click", calculateResults);
+    }
+
+    function resetForm() {
+      numberOneEl.value = "";
+      numberTwoEl.value = "";
+      operationUnitEl.selectedIndex = 0;
+      baseUnitEl.selectedIndex = 8;
+    }
+
+    function resetResult() {
+      calcResultsEl.innerHTML = "<p>Result will appear here...</p>";
+    }
+
+    function resethandler() {
+      resetForm();
+      resetResult();
+    }
+
+    /********************************** EVENT LISTENERS **********************************/
+    resetBtnEl.addEventListener("click", resethandler);
+    [numberOneEl, numberTwoEl, operationUnitEl, baseUnitEl].forEach((el) => {
+      el.addEventListener("change", resetResult);
+    });
+    calcBtnEl.addEventListener("click", calculateResults);
   </script>
 </body>
+
 </html>
