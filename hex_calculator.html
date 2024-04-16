@@ -109,28 +109,9 @@
         return value
       }
 
-      function baseTenToHex(num) {
-        let divisor = 16
-        let numerator = num
+      function baseTenToHexHelper(numerator, divisor) {
         let value = ''
-        if (numerator % 1 != 0) {
-          let item1 = Math.floor(numerator)
-          let valueA = baseTenToHex(item1)
-          let item2 = (numerator % 1 ) * 16
-          let valueB = baseTenToHex(item2)
-          console.log(valueA, valueB)
-          if (value == '') {
-            console.log(value)   
-            value = valueA + valueB
-            
-          } else {
-            
-            value = value + valueA + valueB
-            console.log("NextV",value)
-          }
-        
-        } else {
-          if (numerator >= 10 && numerator < divisor) {
+        if (numerator >= 10 && numerator < divisor) {
             numerator = convertNumberToSymbol(numerator)           
             value = numerator + value
           } else if (numerator < 10) {
@@ -150,12 +131,39 @@
                 }
                 value = numerator + value
               }
-              console.log(numerator, item , value)
             }
           }
-          
+          return value
+      }
+
+      function baseTenToHexHelper2(numerator, divisor) {
+        let value = ''
+        if (numerator % 1 != 0) {
+          let item1 = Math.floor(numerator)
+          let valueA = baseTenToHexHelper(item1, divisor)
+          let item2 = (numerator % 1 ) * 16
+          let valueB = baseTenToHexHelper2(item2, divisor)
+          value = valueA + valueB
+        } else {
+          value = baseTenToHexHelper(numerator, divisor) 
         }
-        
+        return value;
+      }
+
+      function baseTenToHex(num) {
+        let divisor = 16
+        let numerator = num
+        let value = ''
+        if (numerator % 1 != 0) {
+          let item1 = Math.floor(numerator)
+          let valueA = baseTenToHexHelper(item1, divisor)
+          let item2 = (numerator % 1 ) * 16
+          let valueB = baseTenToHexHelper2(item2, divisor)
+          
+          value = valueA + '.' + valueB   
+        } else {
+          value = baseTenToHexHelper(numerator, divisor)       
+        }      
         return value
       }
 
@@ -174,7 +182,7 @@
       function calculateResults() {
         // Retrieve input values
         const numberOne = numberOneEl.value
-        const operationUnit = operationUnitEl.value;
+        let operationUnit = operationUnitEl.value;
         const numberTwo = numberTwoEl.value
        
         if (numberOne == undefined || numberOne == '' || numberTwo == undefined || numberTwo == ''
@@ -185,6 +193,11 @@
         
         try {
           const baseTenTotal = solveOperation(operationUnit, hexToBaseTen(numberOne) , hexToBaseTen(numberTwo))
+          if (operationUnit == "*") {
+            operationUnit = '&#215;';
+          } else if (operationUnit == "/") {
+            operationUnit = '&#247;';
+          }
           const hexTotal = baseTenToHex(baseTenTotal)
           calcResultsEl.innerHTML = `${numberOne} ${operationUnit}  ${numberTwo} =  ${hexTotal}`
           
