@@ -57,12 +57,12 @@
     <input type="number" id="numberOne" placeholder="Number One">
     </p>
     <p>
-      <label for="opertionUnit">Operation:</label>
-      <select id="opertionUnit">
-        <option value="+"> + &nbsp;</option>
-        <option value="-"> - &nbsp;</option>
-        <option value="*"> &#215; &nbsp;</option>
-        <option value="/"> &#247; &nbsp;</option>
+      <label for="operationUnit">Operation:</label>
+      <select id="operationUnit">
+        <option value="+"> + &nbsp;&nbsp;</option>
+        <option value="-"> - &nbsp;&nbsp;</option>
+        <option value="*"> &#215; &nbsp;&nbsp;</option>
+        <option value="/"> &#247; &nbsp;&nbsp;</option>
       </select> 
     </p>
     <p>
@@ -96,17 +96,15 @@
         return den ? greatestCommonDivisor(den, num%den) : num
       }
 
-      function simplifyFraction() {
+      function calculateResults() {
         // Retrieve input values
         const baseUnit = baseUnitEl.value;
         const numberOne = parseFloat(numberOneEl.value)
         const operationUnit = operationUnitEl.value;
         const numberTwo = parseFloat(numberTwoEl.value)
-        const fraction = `${numerator} / ${denominator}`
         
         if (
-          isNaN(numerator) || numerator <= 0 ||
-          isNaN(denominator) || denominator <= 0
+          numberOne == undefined || numberOne == '' || numberTwo == undefined || numberTwo == ''
         ) {
           showError("Please Enter All Details.");
           clearResult()
@@ -114,28 +112,11 @@
         }
 
         try {
-          const gcd = greatestCommonDivisor(numerator, denominator)
           
-          const simplifiedNum = numerator / Number(gcd)
-          const simplifiedDen = denominator / Number(gcd)
-          let result = ''
-          if (simplifiedDen == 1 || simplifiedNum == simplifiedDen) {
-            result = `${fraction} = (${simplifiedNum} * ${gcd}) / (${simplifiedDen} * ${gcd}) = ${simplifiedNum}`
-          } else if (simplifiedNum > simplifiedDen) {
-            const remainder = simplifiedNum % simplifiedDen
-            const multiplier = Math.floor(simplifiedNum / simplifiedDen)
-            result = `${fraction} = (${simplifiedNum} * ${gcd}) / (${simplifiedDen} * ${gcd}) = ${simplifiedNum} / ${simplifiedDen} = ${multiplier} (${remainder} / ${simplifiedDen})`
-          } else {
-            result = `${fraction} = (${simplifiedNum} * ${gcd}) / (${simplifiedDen} * ${gcd}) = ${simplifiedNum} / ${simplifiedDen}`
-          }
-          
-          fractionEl.textContent = fraction.toString()
-          calcResultsEl.textContent = result
         } catch (error) {
           showError("Something Went Wrong!!!");
           clearResult()
-        }
-        
+        }       
       }
     
       /********************************* HELPER FUNCTIONS **********************************/
@@ -148,13 +129,28 @@
         });
       }
 
-      function clearResult() {
-        fractionEl.innerHTML = ''
-        calcResultsEl.innerHTML = ''
+      function resetForm() {
+        numberOneEl.value = "";
+        numberTwoEl.value = "";
+        operationUnitEl.selectedIndex = 0;
+        baseUnitEl.selectedIndex = 8;
+      }
+
+      function resetResult() {
+        calcResultsEl.innerHTML = "<p>Result will appear here...</p>";
+      }
+
+      function resethandler() {
+        resetForm();
+        resetResult();
       }
 
       /********************************** EVENT LISTENERS **********************************/
-      simplifyBtnEl.addEventListener("click", simplifyFraction);
+      resetBtnEl.addEventListener("click", resethandler);
+      [numberOneEl, numberTwoEl, operationUnitEl, baseUnitEl].forEach((el) => {
+        el.addEventListener("change", resetResult);
+      });
+      calcBtnEl.addEventListener("click", calculateResults);
   </script>
 </body>
 </html>
