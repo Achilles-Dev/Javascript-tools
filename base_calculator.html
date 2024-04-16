@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Base Calculator</title>
+
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.6.5/dist/sweetalert2.all.min.js"></script>
+  <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11.6.5/dist/sweetalert2.min.css" rel="stylesheet">
+</head>
+<body>
+  <div>
+    <h1>Base Calculator - Add or Subtract Numbers of Any Base</h1>
+    <p>Add, subtract, multiply, or divide numbers of any base using the calculator below.</p>
+    <p>
+      <label for="baseUnit">Base:</label>    
+      <select id="baseUnit">
+        <option value="2">2 (binary)</option>
+        <option value="3">3 (ternary)</option>
+        <option value="4">4 (quaternary)</option>
+        <option value="5">5 (quinary)</option>
+        <option value="6">6 (senary)</option>
+        <option value="7">7 (septenary)</option>
+        <option value="8">8 (octal)</option>
+        <option value="9">9 (nonary)</option>
+        <option value="10" selected>10 (decimal)</option>
+        <option value="11">11 (undecimal)</option>
+        <option value="12">12 (duodecimal)</option>
+        <option value="13">13 (tridecimal)</option>
+        <option value="14">14 (tetradecimal)</option>
+        <option value="15">15 (pentadecimal)</option>
+        <option value="16">16 (hexadecimal)</option>
+        <option value="17">17 (heptadecimal)</option>
+        <option value="18">18 (octodecimal)</option>
+        <option value="19">19 (enneadecimal)</option>
+        <option value="20">20 (vigesimal)</option>
+        <option value="21">21 (unvigesimal)</option>
+        <option value="22">22 (duovigesimal)</option>
+        <option value="23">23 (trivigesimal)</option>
+        <option value="24">24 (tetravigesimal)</option>
+        <option value="25">25 (pentavigesimal)</option>
+        <option value="26">26 (hexavigesimal)</option>
+        <option value="27">27 (heptavigesimal)</option>
+        <option value="28">28 (octovigesimal)</option>
+        <option value="29">29 (enneavigesimal)</option>
+        <option value="20">30 (trigesimal)</option>
+        <option value="31">31 (untrigesimal)</option>
+        <option value="32">32 (duotrigesimal)</option>
+        <option value="33">33 (tritrigesimal)</option>
+        <option value="34">34 (tetratrigesimal)</option>
+        <option value="35">35 (pentatrigesimal)</option>
+        <option value="36">36 (heptatrigesimal)</option>
+      </select>
+    </p>
+    <p>
+    <label for="numberOne">Number One:</label>
+    <input type="number" id="numberOne" placeholder="Number One">
+    </p>
+    <p>
+      <label for="opertionUnit">Operation:</label>
+      <select id="opertionUnit">
+        <option value="+"> + &nbsp;</option>
+        <option value="-"> - &nbsp;</option>
+        <option value="*"> &#215; &nbsp;</option>
+        <option value="/"> &#247; &nbsp;</option>
+      </select> 
+    </p>
+    <p>
+      <label for="numberTwo">Number Two:</label>
+      <input type="number" id="numberTwo" placeholder="Number Two">
+    </p>
+    <p>
+      <button id="calcBtn">Calculate</button>
+      <button id="resetBtn">Reset</button>
+    </p>
+      <hr>
+    <p>
+      <h3>Result:</h3>
+      <h3 id="calcResults"></h3> 
+    </p>
+  </div>
+  <script>
+
+    /********************************** ELEMENTS **********************************/
+    const baseUnitEl = document.getElementById('baseUnit');
+    const numberOneEl = document.getElementById('numberOne');
+    const operationUnitEl = document.getElementById('OperationUnit')
+    const numberTwoEl = document.getElementById('numberTwo');
+    const calcBtnEl = document.getElementById('calcBtn');
+    const resetBtnEl = document.getElementById('resetBtn');
+    const calcResultsEl = document.getElementById('calcResults')
+    
+     /********************************** FUNCTIONS **********************************/
+      // Conversion functions
+      function greatestCommonDivisor(num, den) {
+        return den ? greatestCommonDivisor(den, num%den) : num
+      }
+
+      function simplifyFraction() {
+        // Retrieve input values
+        const baseUnit = baseUnitEl.value;
+        const numberOne = parseFloat(numberOneEl.value)
+        const operationUnit = operationUnitEl.value;
+        const numberTwo = parseFloat(numberTwoEl.value)
+        const fraction = `${numerator} / ${denominator}`
+        
+        if (
+          isNaN(numerator) || numerator <= 0 ||
+          isNaN(denominator) || denominator <= 0
+        ) {
+          showError("Please Enter All Details.");
+          clearResult()
+          return;
+        }
+
+        try {
+          const gcd = greatestCommonDivisor(numerator, denominator)
+          
+          const simplifiedNum = numerator / Number(gcd)
+          const simplifiedDen = denominator / Number(gcd)
+          let result = ''
+          if (simplifiedDen == 1 || simplifiedNum == simplifiedDen) {
+            result = `${fraction} = (${simplifiedNum} * ${gcd}) / (${simplifiedDen} * ${gcd}) = ${simplifiedNum}`
+          } else if (simplifiedNum > simplifiedDen) {
+            const remainder = simplifiedNum % simplifiedDen
+            const multiplier = Math.floor(simplifiedNum / simplifiedDen)
+            result = `${fraction} = (${simplifiedNum} * ${gcd}) / (${simplifiedDen} * ${gcd}) = ${simplifiedNum} / ${simplifiedDen} = ${multiplier} (${remainder} / ${simplifiedDen})`
+          } else {
+            result = `${fraction} = (${simplifiedNum} * ${gcd}) / (${simplifiedDen} * ${gcd}) = ${simplifiedNum} / ${simplifiedDen}`
+          }
+          
+          fractionEl.textContent = fraction.toString()
+          calcResultsEl.textContent = result
+        } catch (error) {
+          showError("Something Went Wrong!!!");
+          clearResult()
+        }
+        
+      }
+    
+      /********************************* HELPER FUNCTIONS **********************************/
+
+      function showError(errorMessage) {
+        Swal.fire({
+            icon: "error",
+            title: "Error",
+            text: errorMessage,
+        });
+      }
+
+      function clearResult() {
+        fractionEl.innerHTML = ''
+        calcResultsEl.innerHTML = ''
+      }
+
+      /********************************** EVENT LISTENERS **********************************/
+      simplifyBtnEl.addEventListener("click", simplifyFraction);
+  </script>
+</body>
+</html>

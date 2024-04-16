@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Hex Calculator</title>
+
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.6.5/dist/sweetalert2.all.min.js"></script>
+  <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11.6.5/dist/sweetalert2.min.css" rel="stylesheet">
+</head>
+<body>
+  <div>
+    <h1>Hex Calculator</h1>
+    <p>Enter two hexadecimal numbers to perform calculation:</p>
+    <p>
+    <input type="text" id="numberOne" placeholder="ABC">
+    </p>
+    <p>
+      <label for="operationUnit">Operation:</label>
+      <select id="operationUnit">
+        <option value="+"> + &nbsp;</option>
+        <option value="-"> - &nbsp;</option>
+        <option value="*"> &#215; &nbsp;</option>
+        <option value="/"> &#247; &nbsp;</option>
+      </select> 
+    </p>
+    <p>
+      <input type="text" id="numberTwo" placeholder="DEF">
+    </p>
+    <p>
+      <button id="calcBtn">Calculate</button>
+      <button id="resetBtn">Reset</button>
+    </p>
+      <hr>
+    <p>
+      <h3>Result:</h3>
+      <h4>Note: Outputs are all in Hexadecimal.</h4>
+      <h3 id="calcResults"></h3> 
+    </p>
+  </div>
+  <script>
+
+    /********************************** ELEMENTS **********************************/
+    const numberOneEl = document.getElementById('numberOne');
+    const operationUnitEl = document.getElementById('operationUnit')
+    const numberTwoEl = document.getElementById('numberTwo');
+    const calcBtnEl = document.getElementById('calcBtn');
+    const resetBtnEl = document.getElementById('resetBtn');
+    const calcResultsEl = document.getElementById('calcResults')
+    
+     /********************************** FUNCTIONS **********************************/
+      // Conversion functions
+      function greatestCommonDivisor(num, den) {
+        return den ? greatestCommonDivisor(den, num%den) : num
+      }
+
+      function convertSymbolToNumber(item) {
+        if (item.toUpperCase() == "A") {
+          return 10
+        } else if (item.toUpperCase() == "B") {
+          return 11
+        } else if (item.toUpperCase() == "C") {
+          return 12
+        } else if (item.toUpperCase() == "D"){
+          return 13
+        } else if (item.toUpperCase() == "E") {
+          return 14
+        } else if (item.toUpperCase() == "F") {
+          return 15
+        } else {
+          return item
+        }
+      }
+
+      function convertNumberToSymbol(item) {
+        if (item == 10) {
+          return 'a'
+        } else if (item == 11) {
+          return 'b'
+        } else if (item == 12) {
+          return 'c'
+        } else if (item == 13){
+          return 'd'
+        } else if (item == 14) {
+          return 'e'
+        } else if (item == 15) {
+          return 'f'
+        }
+      }
+
+      function hexToBaseTen(num) {
+        let index = 0
+        let value = 0
+        while (index < num.length) {
+          let item = num[num.length - (index + 1)]    
+          if (Number(item) || item == 0) {
+            value += Number(item) * 16 ** index 
+            console.log(Number(value))      
+          } else {
+            const newItem = convertSymbolToNumber(item)
+            if (Number(newItem)) {
+              value += Number(newItem) * 16 ** index  
+            } else {
+              return;
+            }
+          }
+          index += 1
+        }
+        return value
+      }
+
+      function baseTenToHex(num) {
+        let divisor = 16
+        let numerator = num
+        let value = ''
+        if (numerator % 1 != 0) {
+          let item1 = Math.floor(numerator)
+          let valueA = baseTenToHex(item1)
+          let item2 = (numerator % 1 ) * 16
+          let valueB = baseTenToHex(item2)
+          console.log(valueA, valueB)
+          if (value == '') {
+            console.log(value)   
+            value = valueA + valueB
+            
+          } else {
+            
+            value = value + valueA + valueB
+            console.log("NextV",value)
+          }
+        
+        } else {
+          if (numerator >= 10 && numerator < divisor) {
+            numerator = convertNumberToSymbol(numerator)           
+            value = numerator + value
+          } else if (numerator < 10) {
+            value = numerator + value
+          } else {
+            while (numerator > divisor) {
+              let item = Number(numerator) % divisor
+              numerator = Math.floor(Number(numerator) / divisor)   
+              if (item >= 10) {
+                item = convertNumberToSymbol(item)
+              } 
+              value = item + value
+              if (numerator < divisor) {
+                if (numerator >= 10) {
+                  numerator = Math.floor(Number(numerator))
+                  numerator = convertNumberToSymbol(numerator)
+                }
+                value = numerator + value
+              }
+              console.log(numerator, item , value)
+            }
+          }
+          
+        }
+        
+        return value
+      }
+
+      function solveOperation (operation, a, b) {
+        if (operation == '+') {
+          return a + b;
+        } else if (operation == "-") {
+          return a - b;
+        } else if (operation == "*") {
+          return a * b
+        } else {
+          return a / b
+        }
+      }
+
+      function calculateResults() {
+        // Retrieve input values
+        const numberOne = numberOneEl.value
+        const operationUnit = operationUnitEl.value;
+        const numberTwo = numberTwoEl.value
+       
+        if (numberOne == undefined || numberOne == '' || numberTwo == undefined || numberTwo == ''
+        ) {
+          showError("Please Enter All Details.");
+          return;
+        }
+        
+        try {
+          const baseTenTotal = solveOperation(operationUnit, hexToBaseTen(numberOne) , hexToBaseTen(numberTwo))
+          const hexTotal = baseTenToHex(baseTenTotal)
+          calcResultsEl.innerHTML = `${numberOne} ${operationUnit}  ${numberTwo} =  ${hexTotal}`
+          
+        } catch (error) {
+          showError("Something Went Wrong!!!");
+          resethandler()
+        }
+        
+      }
+    
+      /********************************* HELPER FUNCTIONS **********************************/
+
+      function showError(errorMessage) {
+        Swal.fire({
+            icon: "error",
+            title: "Error",
+            text: errorMessage,
+        });
+      }
+
+      function resetForm() {
+        numberOneEl.value = "";
+        numberTwoEl.value = "";
+      }
+
+      function resetResult() {
+        calcResultsEl.innerHTML = "<p>Result will appear here...</p>";
+      }
+
+      function resethandler() {
+        resetForm();
+        resetResult();
+      }
+
+      /********************************** EVENT LISTENERS **********************************/
+      resetBtnEl.addEventListener("click", resethandler);
+      [numberOneEl, numberTwoEl, operationUnitEl].forEach((el) => {
+        el.addEventListener("change", resetResult);
+      });
+      calcBtnEl.addEventListener("click", calculateResults);
+  </script>
+</body>
+</html>
