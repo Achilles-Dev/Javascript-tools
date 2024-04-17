@@ -3,18 +3,23 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Decimal to Percent Calculator</title>
+  <title>Percent Difference Calculator</title>
 
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.6.5/dist/sweetalert2.all.min.js"></script>
   <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11.6.5/dist/sweetalert2.min.css" rel="stylesheet">
 </head>
 <body>
   <div>
-    <h1>Decimal to Percent Calculator
-    </h1>
+    <h1>Percent Difference Calculator</h1>
+    <p>Calculate the percent difference between two numbers by entering them below.</p>
     <p>
-      <label for="decimal">Num:</label>
-      <input type="number" id="decimal" placeholder="0.25">
+      <label for="valueA">Value A:</label>
+      <input type="number" id="valueA" placeholder="70">
+    </p>
+
+    <p>
+      <label for="valueB">Value B:</label>
+      <input type="number" id="valueB" placeholder="120">
     </p>
   
     <p>
@@ -30,7 +35,8 @@
   <script>
 
     /********************************** ELEMENTS **********************************/
-    const decimalEl = document.getElementById('decimal');
+    const valueAEl = document.getElementById('valueA');
+    const valueBEl = document.getElementById('valueB');
     const calcBtnEl = document.getElementById('calcBtn');
     const resetBtnEl = document.getElementById('resetBtn');
     const calcResultsEl = document.getElementById('calcResults')
@@ -38,27 +44,33 @@
      /********************************** FUNCTIONS **********************************/
       // Conversion functions
 
-      function convertDecimal(num) {
+      function percentIncrease(valueA, valueB) {
         let results = 0;
-        results = num * 100;
+        results = (Math.abs(valueA - valueB) / ((valueA + valueB)/ 2)) * 100
         return results;
       }
 
       function calculateResults() {
         // Retrieve input values
-        const decimal = parseFloat(decimalEl.value)
-        
+        const valueA = parseFloat(valueAEl.value)
+        const valueB = parseFloat(valueBEl.value)
        
         if (
-          isNaN(decimal)
+          isNaN(valueA) || isNaN(valueB) || valueA <= 0 || valueB <= 0
         ) {
           showError("Please Enter All Details.");
           return;
         }
         
         try {
-          const percentage = convertDecimal(decimal)
-          calcResultsEl.innerHTML = `${percentage.toFixed(2)}%`
+          const percentageDiff = percentIncrease(valueA, valueB)
+          let change = ''
+          if (percentageDiff > 0) {
+            change = 'increase'
+          } else {
+            change = 'decrease'
+          }
+          calcResultsEl.innerHTML = `${Math.abs(percentageDiff.toFixed(3))}% ${change}`
           
         } catch (error) {
           showError("Something Went Wrong!!!");
@@ -78,7 +90,8 @@
       }
 
       function resetForm() {
-        decimalEl.value = "";
+        valueAEl.value = "";
+        valueBEl.value = "";
       }
 
       function resetResult() {
@@ -92,7 +105,9 @@
 
       /********************************** EVENT LISTENERS **********************************/
       resetBtnEl.addEventListener("click", resethandler);
-      decimalEl.addEventListener("input", resetResult);
+      [valueAEl, valueBEl].forEach((el) => {
+        el.addEventListener("input", resetResult);
+      });
       calcBtnEl.addEventListener("click", calculateResults);
   </script>
 </body>

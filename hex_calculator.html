@@ -35,7 +35,7 @@
     <p>
       <h3>Result:</h3>
       <h4>Note: Outputs are all in Hexadecimal.</h4>
-      <h3 id="calcResults"></h3> 
+      <h3 id="calcResults">Result will appear here...</h3> 
     </p>
   </div>
   <script>
@@ -87,6 +87,11 @@
       function hexToBaseTen(num) {
         let index = 0
         let value = 0
+        let negative = false
+        if (num[0] == '-') {
+          num = num.substring(1) 
+          negative = true      
+        }
         while (index < num.length) {
           let item = num[num.length - (index + 1)]    
           if (Number(item) || item == 0) {
@@ -101,7 +106,7 @@
           }
           index += 1
         }
-        return value
+        return negative ? (value * -1) : value
       }
 
       function baseTenToHexHelper(numerator, divisor) {
@@ -179,13 +184,13 @@
         const numberOne = numberOneEl.value
         let operationUnit = operationUnitEl.value;
         const numberTwo = numberTwoEl.value
-       
+        
         if (numberOne == undefined || numberOne == '' || numberTwo == undefined || numberTwo == ''
         ) {
           showError("Please input valid hex integers.");
           return;
         }
-        
+
         try {
           const baseTenTotal = solveOperation(operationUnit, hexToBaseTen(numberOne) , hexToBaseTen(numberTwo))
           if (operationUnit == "*") {
@@ -230,8 +235,9 @@
 
       /********************************** EVENT LISTENERS **********************************/
       resetBtnEl.addEventListener("click", resethandler);
-      [numberOneEl, numberTwoEl, operationUnitEl].forEach((el) => {
-        el.addEventListener("change", resetResult);
+      operationUnitEl.addEventListener("change", resetResult);
+      [numberOneEl, numberTwoEl].forEach((el) => {
+        el.addEventListener("input", resetResult);
       });
       calcBtnEl.addEventListener("click", calculateResults);
   </script>

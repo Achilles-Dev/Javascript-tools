@@ -78,7 +78,7 @@
     <hr>
     <p>
     <h3>Result:</h3>
-    <h3 id="calcResults"></h3>
+    <h3 id="calcResults">Result will appear here...</h3>
     </p>
   </div>
   <script>
@@ -131,6 +131,11 @@
     function otherBaseToBaseTen(num, base) {
       let index = 0
       let value = 0
+      let negative = false
+      if (num[0] == '-') {
+          num = num.substring(1) 
+          negative = true      
+        }
       while (index < num.length) {
         let item = num[num.length - (index + 1)]
         if (Number(item) || item == 0) {
@@ -145,7 +150,7 @@
         }
         index += 1
       }
-      return value
+      return negative ? (value * -1) : value
     }
 
     function baseTenToOtherBaseHelper(numerator, divisor) {
@@ -277,7 +282,10 @@
 
     /********************************** EVENT LISTENERS **********************************/
     resetBtnEl.addEventListener("click", resethandler);
-    [numberOneEl, numberTwoEl, operationUnitEl, baseUnitEl].forEach((el) => {
+    [numberOneEl, numberTwoEl].forEach((el) => {
+      el.addEventListener("input", resetResult);
+    });
+    [operationUnitEl, baseUnitEl].forEach((el) => {
       el.addEventListener("change", resetResult);
     });
     calcBtnEl.addEventListener("click", calculateResults);

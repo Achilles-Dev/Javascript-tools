@@ -36,7 +36,7 @@
     <p>
       <h3>Result:</h3>
       <h4>Note: Note: Outputs are all in Octal.</h4>
-      <h3 id="calcResults"></h3> 
+      <h3 id="calcResults">Result will appear here...</h3> 
     </p>
   </div>
   <script>
@@ -190,8 +190,9 @@
 
       /********************************** EVENT LISTENERS **********************************/
       resetBtnEl.addEventListener("click", resethandler);
-      [numberOneEl, numberTwoEl, operationUnitEl].forEach((el) => {
-        el.addEventListener("change", resetResult);
+      operationUnitEl.addEventListener("change", resetResult);
+      [numberOneEl, numberTwoEl].forEach((el) => {
+        el.addEventListener("input", resetResult);
       });
       calcBtnEl.addEventListener("click", calculateResults);
   </script>

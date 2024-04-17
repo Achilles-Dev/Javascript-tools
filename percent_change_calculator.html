@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Decimal to Percent Calculator</title>
+  <title>Percent Change Calculator</title>
 
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.6.5/dist/sweetalert2.all.min.js"></script>
   <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11.6.5/dist/sweetalert2.min.css" rel="stylesheet">
@@ -30,7 +30,7 @@
       <hr>
     <p>
       <h3>Result:</h3>
-      <h3 id="calcResults"></h3> 
+      <h3 id="calcResults">Result will appear here...</h3> 
     </p>
   </div>
   <script>
@@ -47,7 +47,6 @@
 
       function percentChange(fromPercent, toPercent) {
         let results = 0;
-        console.log(fromPercent, toPercent)
         results = ((fromPercent - toPercent) / (Math.abs(fromPercent))) * 100
         return results;
       }
@@ -108,7 +107,7 @@
       /********************************** EVENT LISTENERS **********************************/
       resetBtnEl.addEventListener("click", resethandler);
       [fromPercentEl, toPercentEl].forEach((el) => {
-        el.addEventListener("change", resetResult);
+        el.addEventListener("input", resetResult);
       });
       calcBtnEl.addEventListener("click", calculateResults);
   </script>
