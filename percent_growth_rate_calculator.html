@@ -3,23 +3,28 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Percent Decrease Calculator</title>
+  <title>Percent Error Calculator</title>
 
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.6.5/dist/sweetalert2.all.min.js"></script>
   <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11.6.5/dist/sweetalert2.min.css" rel="stylesheet">
 </head>
 <body>
   <div>
-    <h1>Percent Decrease Calculator</h1>
-    <p>Find the percent decrease or the decrease in a value by entering the known values below.</p>
+    <h1>Percent Growth Rate Calculator</h1>
+    <p>Calculate the annual percentage growth rate.</p>
     <p>
-      <label for="initialValue">Initial Value:</label>
-      <input type="number" id="initialValue" placeholder="200">
+      <label for="pastPresVal">Past or Present Value:</label>
+      <input type="number" id="pastPresVal">
     </p>
 
     <p>
-      <label for="finalValue">Final Value:</label>
-      <input type="number" id="finalValue" placeholder="120">
+      <label for="presFutVal">Present or Future Value:</label>
+      <input type="number" id="presFutVal">
+    </p>
+
+    <p>
+      <label for="numYears">Number of years:</label>
+      <input type="number" id="numYears">
     </p>
   
     <p>
@@ -35,8 +40,9 @@
   <script>
 
     /********************************** ELEMENTS **********************************/
-    const initialValueEl = document.getElementById('initialValue');
-    const finalValueEl = document.getElementById('finalValue');
+    const pastPresValEl = document.getElementById('pastPresVal');
+    const presFutValEl = document.getElementById('presFutVal');
+    const numYearsEl = document.getElementById('numYears');
     const calcBtnEl = document.getElementById('calcBtn');
     const resetBtnEl = document.getElementById('resetBtn');
     const calcResultsEl = document.getElementById('calcResults')
@@ -44,33 +50,31 @@
      /********************************** FUNCTIONS **********************************/
       // Conversion functions
 
-      function percentDecrease(initialValue, finalValue) {
+      function percentChange(pastPresVal, presFutVal) {
         let results = 0;
-        results = ((initialValue - finalValue) / (Math.abs(initialValue))) * 100
+        results = ((presFutVal - pastPresVal) / pastPresVal) * 100
         return results;
       }
 
       function calculateResults() {
         // Retrieve input values
-        const initialValue = parseFloat(initialValueEl.value)
-        const finalValue = parseFloat(finalValueEl.value)
-       
+        const pastPresVal = parseFloat(pastPresValEl.value)
+        const presFutVal = parseFloat(presFutValEl.value)
+        const numYears = parseFloat(numYearsEl.value)
+        
         if (
-          isNaN(initialValue) || isNaN(finalValue) || initialValue == 0 || finalValue == 0
+          isNaN(pastPresVal) || isNaN(presFutVal) || isNaN(numYears) 
+          || pastPresVal == 0 || presFutVal == 0 || numYears <= 0 || presFutVal == pastPresVal
         ) {
           showError("Please Enter All Details.");
           return;
         }
         
         try {
-          const percentageDecrease = percentDecrease(initialValue, finalValue)
-          let change = ''
-          if (percentageDecrease > 0) {
-            change = 'increase'
-          } else {
-            change = 'decrease'
-          }
-          calcResultsEl.innerHTML = `${Math.abs(percentageDecrease.toFixed(4))}% ${change}`
+          const percentageChange = percentChange(pastPresVal, presFutVal)
+          
+          const percentGrowthRate = percentageChange / numYears
+          calcResultsEl.innerHTML = `${percentGrowthRate}%`
           
         } catch (error) {
           showError("Something Went Wrong!!!");
@@ -90,8 +94,9 @@
       }
 
       function resetForm() {
-        initialValueEl.value = "";
-        finalValueEl.value = "";
+        pastPresValEl.value = "";
+        presFutValEl.value = "";
+        numYearsEl.value = "";
       }
 
       function resetResult() {
@@ -105,7 +110,7 @@
 
       /********************************** EVENT LISTENERS **********************************/
       resetBtnEl.addEventListener("click", resethandler);
-      [initialValueEl, finalValueEl].forEach((el) => {
+      [pastPresValEl, presFutValEl, numYearsEl].forEach((el) => {
         el.addEventListener("input", resetResult);
       });
       calcBtnEl.addEventListener("click", calculateResults);

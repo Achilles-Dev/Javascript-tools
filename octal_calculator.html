@@ -55,6 +55,11 @@
       function octalToBaseTen(num) {
         let index = 0
         let value = 0
+        let negative = false
+        if (num[0] == '-') {
+          num = num.substring(1) 
+          negative = true      
+        }
         while (index < num.length) {
           let item = num[num.length - (index + 1)]    
           if (Number(item) || item == 0) {
@@ -69,7 +74,7 @@
           }
           index += 1
         }
-        return value
+        return negative ? (value * -1) : value
       }
 
       function baseTenToOctalHelper(numerator, divisor) {

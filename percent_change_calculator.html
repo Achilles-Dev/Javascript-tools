@@ -57,7 +57,7 @@
         const toPercent = parseFloat(toPercentEl.value)
        
         if (
-          isNaN(fromPercent) || isNaN(toPercent)
+          isNaN(fromPercent) || isNaN(toPercent) || fromPercent == 0 || toPercent == 0
         ) {
           showError("Please Enter All Details.");
           return;

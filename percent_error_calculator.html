@@ -3,23 +3,24 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Percent Decrease Calculator</title>
+  <title>Percent Error Calculator</title>
 
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.6.5/dist/sweetalert2.all.min.js"></script>
   <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11.6.5/dist/sweetalert2.min.css" rel="stylesheet">
 </head>
 <body>
   <div>
-    <h1>Percent Decrease Calculator</h1>
-    <p>Find the percent decrease or the decrease in a value by entering the known values below.</p>
+    <h1>Percent Error Calculator</h1>
+    <p>Calculate the percent error between a theoretical and experimental value, expressed as a percentage. 
+      The theoretical value is the expected value of measurement, while the experimental value is the actual value measured.</p>
     <p>
-      <label for="initialValue">Initial Value:</label>
-      <input type="number" id="initialValue" placeholder="200">
+      <label for="theoVal">Theoretical Value:</label>
+      <input type="number" id="theoVal" placeholder="70">
     </p>
 
     <p>
-      <label for="finalValue">Final Value:</label>
-      <input type="number" id="finalValue" placeholder="120">
+      <label for="expVal">Experimental Value:</label>
+      <input type="number" id="expVal" placeholder="100">
     </p>
   
     <p>
@@ -35,8 +36,8 @@
   <script>
 
     /********************************** ELEMENTS **********************************/
-    const initialValueEl = document.getElementById('initialValue');
-    const finalValueEl = document.getElementById('finalValue');
+    const theoValEl = document.getElementById('theoVal');
+    const expValEl = document.getElementById('expVal');
     const calcBtnEl = document.getElementById('calcBtn');
     const resetBtnEl = document.getElementById('resetBtn');
     const calcResultsEl = document.getElementById('calcResults')
@@ -44,33 +45,28 @@
      /********************************** FUNCTIONS **********************************/
       // Conversion functions
 
-      function percentDecrease(initialValue, finalValue) {
+      function percentError(theoVal, expVal) {
         let results = 0;
-        results = ((initialValue - finalValue) / (Math.abs(initialValue))) * 100
+        results = (Math.abs(theoVal - expVal) / Math.abs(theoVal) ) * 100
         return results;
       }
 
       function calculateResults() {
         // Retrieve input values
-        const initialValue = parseFloat(initialValueEl.value)
-        const finalValue = parseFloat(finalValueEl.value)
+        const theoVal = parseFloat(theoValEl.value)
+        const expVal = parseFloat(expValEl.value)
        
         if (
-          isNaN(initialValue) || isNaN(finalValue) || initialValue == 0 || finalValue == 0
+          isNaN(theoVal) || isNaN(expVal) || theoVal == 0 || expVal == 0
         ) {
           showError("Please Enter All Details.");
           return;
         }
         
         try {
-          const percentageDecrease = percentDecrease(initialValue, finalValue)
-          let change = ''
-          if (percentageDecrease > 0) {
-            change = 'increase'
-          } else {
-            change = 'decrease'
-          }
-          calcResultsEl.innerHTML = `${Math.abs(percentageDecrease.toFixed(4))}% ${change}`
+          const percentageError = percentError(theoVal, expVal)
+          
+          calcResultsEl.innerHTML = `${Math.abs(percentageError.toFixed(3))}%`
           
         } catch (error) {
           showError("Something Went Wrong!!!");
@@ -90,8 +86,8 @@
       }
 
       function resetForm() {
-        initialValueEl.value = "";
-        finalValueEl.value = "";
+        theoValEl.value = "";
+        expValEl.value = "";
       }
 
       function resetResult() {
@@ -105,7 +101,7 @@
 
       /********************************** EVENT LISTENERS **********************************/
       resetBtnEl.addEventListener("click", resethandler);
-      [initialValueEl, finalValueEl].forEach((el) => {
+      [theoValEl, expValEl].forEach((el) => {
         el.addEventListener("input", resetResult);
       });
       calcBtnEl.addEventListener("click", calculateResults);

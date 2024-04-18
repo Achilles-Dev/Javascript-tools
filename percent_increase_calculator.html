@@ -56,7 +56,7 @@
         const finalValue = parseFloat(finalValueEl.value)
        
         if (
-          isNaN(initialValue) || isNaN(finalValue)
+          isNaN(initialValue) || isNaN(finalValue) || initialValue == 0 || finalValue == 0
         ) {
           showError("Please Enter All Details.");
           return;
