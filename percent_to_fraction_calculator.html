@@ -3,23 +3,18 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Percent of a Percent Calculator</title>
+  <title>Percent to Fraction Calculator</title>
 
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.6.5/dist/sweetalert2.all.min.js"></script>
   <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11.6.5/dist/sweetalert2.min.css" rel="stylesheet">
 </head>
 <body>
   <div>
-    <h1>Percent of a Percent Calculator</h1>
-    <p>Find the percentage of a percentage by entering them below.</p>
+    <h1>Percent to Fraction Calculator</h1>
+    <p>Enter a percentage below to convert it to a fraction.</p>
     <p>
-      <label for="percent1">Percent 1:</label>
-      <input type="number" id="percent1" placeholder="15"><span> %</span>
-    </p>
-
-    <p>
-      <label for="percent2">Percent 2:</label>
-      <input type="number" id="percent2" placeholder="40"><span> %</span>
+      <label for="percent">Percent:</label>
+      <input type="number" id="percent" placeholder="50"><span> %</span>
     </p>
   
     <p>
@@ -35,8 +30,7 @@
   <script>
 
     /********************************** ELEMENTS **********************************/
-    const percent1El = document.getElementById('percent1');
-    const percent2El = document.getElementById('percent2');
+    const percentEl = document.getElementById('percent');
     const calcBtnEl = document.getElementById('calcBtn');
     const resetBtnEl = document.getElementById('resetBtn');
     const calcResultsEl = document.getElementById('calcResults')
@@ -44,28 +38,44 @@
      /********************************** FUNCTIONS **********************************/
       // Conversion functions
 
-      function calcPercentOfPercent(percent1, percent2) {
+      function greatestCommonDivisor(num, den) {
+        return den ? greatestCommonDivisor(den, num%den) : num
+      }
+
+      function percentToDecimal(percent) {
         let results = 0;
-        results = ((percent1 / 100) * (percent2 / 100)) * 100
+        results = percent / 100
         return results;
+      }
+
+      function decimalToFraction(decimal) {
+        let decimalLength = (decimal.toString().length - 1) - Math.floor(decimal).toString().length
+        
+        let numerator = decimalLength > 0 ? (decimal * 10 ** decimalLength).toFixed() : decimal
+        let denominator = decimalLength > 0 ? 10 ** decimalLength : 1
+        let gcd = greatestCommonDivisor(numerator, denominator )
+        const simplifiedNum = numerator / Number(gcd)
+        const simplifiedDen = denominator / Number(gcd)
+        return {simplifiedNum, simplifiedDen};
       }
 
       function calculateResults() {
         // Retrieve input values
-        const percent1 = parseFloat(percent1El.value)
-        const percent2 = parseFloat(percent2El.value)
+        const percent = parseFloat(percentEl.value)
        
         if (
-          isNaN(percent1) || isNaN(percent2)
+          isNaN(percent) || percent < 0
         ) {
           showError("Please Enter All Details.");
           return;
         }
         
         try {
-          let percentOfPercent = calcPercentOfPercent(percent1, percent2)
-          percentOfPercent = percentOfPercent.toFixed(4) * 1
-          calcResultsEl.innerHTML = `${percent1}% of ${percent2}% = ${percentOfPercent}%`
+          let percentToDec = percentToDecimal(percent)
+          const {simplifiedNum, simplifiedDen} = decimalToFraction(percentToDec)
+          const result = `${simplifiedNum} / ${simplifiedDen}`
+         
+          calcResultsEl.innerHTML = `${result}`
           
         } catch (error) {
           showError("Something Went Wrong!!!");
@@ -85,8 +95,7 @@
       }
 
       function resetForm() {
-        percent1El.value = "";
-        percent2El.value = "";
+        percentEl.value = "";
       }
 
       function resetResult() {
@@ -100,9 +109,7 @@
 
       /********************************** EVENT LISTENERS **********************************/
       resetBtnEl.addEventListener("click", resethandler);
-      [percent1El, percent2El].forEach((el) => {
-        el.addEventListener("input", resetResult);
-      });
+      percentEl.addEventListener("input", resetResult);
       calcBtnEl.addEventListener("click", calculateResults);
   </script>
 </body>

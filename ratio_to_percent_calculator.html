@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ratio to Percentage Calculator</title>
+
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.6.5/dist/sweetalert2.all.min.js"></script>
+  <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11.6.5/dist/sweetalert2.min.css" rel="stylesheet">
+</head>
+
+<body>
+  <div>
+    <h1>Ratio to Percentage Calculator</h1>
+    <p>Convert a ratio into a percentage by entering the ratio in the fields below.</p>
+    <p>
+      <span for="ratio">Ratio:</span>
+      <input type="number" id="ratio1" placeholder="3">
+      <span> : </span>
+      <input type="number" id="ratio2" placeholder="2">
+    </p>
+
+    <p>
+      <button id="calcBtn">Calculate</button>
+      <button id="resetBtn">Reset</button>
+    </p>
+    <hr>
+    <p>
+    <h3>Result:</h3>
+    <h3 id="calcResults">Result will appear here...</h3>
+    </p>
+  </div>
+  <script>
+
+    /********************************** ELEMENTS **********************************/
+    const ratio1El = document.getElementById('ratio1');
+    const ratio2El = document.getElementById('ratio2');
+    const calcBtnEl = document.getElementById('calcBtn');
+    const resetBtnEl = document.getElementById('resetBtn');
+    const calcResultsEl = document.getElementById('calcResults')
+
+    /********************************** FUNCTIONS **********************************/
+    // Conversion functions
+
+    function ratioToPercent(ratio1, ratio2) {
+      let results = 0;
+      results = (ratio1 / ratio2) * 100;
+      return results
+    }
+
+    function calculateResults() {
+      // Retrieve input values
+      const ratio1 = parseFloat(ratio1El.value)
+      const ratio2 = parseFloat(ratio2El.value)
+
+      if (
+        isNaN(ratio1) || ratio1 == 0 || isNaN(ratio2) || ratio2 == 0
+      ) {
+        showError("Please Enter All Details.");
+        return;
+      }
+
+      try {
+        let ratioToPerc = ratioToPercent(ratio1, ratio2)
+        ratioToPerc = ratioToPerc.toFixed(4) * 1
+        calcResultsEl.innerHTML = `${ratioToPerc}%`
+
+      } catch (error) {
+        showError("Something Went Wrong!!!");
+        resethandler()
+      }
+
+    }
+
+    /********************************* HELPER FUNCTIONS **********************************/
+
+    function showError(errorMessage) {
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: errorMessage,
+      });
+    }
+
+    function resetForm() {
+      ratio1El.value = "";
+      ratio2El.value = "";
+    }
+
+    function resetResult() {
+      calcResultsEl.innerHTML = "<p>Result will appear here...</p>";
+    }
+
+    function resethandler() {
+      resetForm();
+      resetResult();
+    }
+
+    /********************************** EVENT LISTENERS **********************************/
+    resetBtnEl.addEventListener("click", resethandler);
+    [ratio1El, ratio2El].forEach((el) => {
+      el.addEventListener("input", resetResult);
+    });
+  calcBtnEl.addEventListener("click", calculateResults);
+</script>
+</body>
+
+</html>
