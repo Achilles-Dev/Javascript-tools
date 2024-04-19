@@ -44,9 +44,9 @@
      /********************************** FUNCTIONS **********************************/
       // Conversion functions
 
-      function percentIncrease(valueA, valueB) {
+      function percentDiff(valueA, valueB) {
         let results = 0;
-        results = (Math.abs(valueA - valueB) / ((valueA + valueB)/ 2)) * 100
+        results = (Math.abs(valueA - valueB) / ((valueA + valueB) / 2)) * 100
         return results;
       }
 
@@ -56,16 +56,16 @@
         const valueB = parseFloat(valueBEl.value)
        
         if (
-          isNaN(valueA) || isNaN(valueB) || valueA == 0 || valueB == 0
+          isNaN(valueA) || isNaN(valueB) || valueA <= 0 || valueB <= 0
         ) {
           showError("Please Enter All Details.");
           return;
         }
         
         try {
-          const percentageDiff = percentIncrease(valueA, valueB)
+          const percentageDiff = percentDiff(valueA, valueB)
           
-          calcResultsEl.innerHTML = `${Math.abs(percentageDiff.toFixed(3))}%`
+          calcResultsEl.innerHTML = `${percentageDiff.toFixed(3)}%`
           
         } catch (error) {
           showError("Something Went Wrong!!!");
