@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Volume of a Rectangular Prism Calculator</title>
+
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.6.5/dist/sweetalert2.all.min.js"></script>
+  <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11.6.5/dist/sweetalert2.min.css" rel="stylesheet">
+</head>
+
+<body>
+  <div>
+    <h1>Volume of a Rectangular Prism Calculator</h1>
+    <p>Calculate the volume of a rectangular prism.</p>
+    <p>
+      <label for="width">Width:</label>
+      <input type="number" id="width" placeholder="10">
+    </p>
+    <p>
+      <label for="length">Length:</label>
+      <input type="number" id="length" placeholder="10">
+    </p>
+    <p>
+      <label for="height">Height:</label>
+      <input type="number" id="height" placeholder="10">
+    </p>
+
+    <p>
+      <button id="calcBtn">Calculate</button>
+      <button id="resetBtn">Reset</button>
+    </p>
+    <hr>
+    <p>
+    <h3>Result:</h3>
+    <h3 id="calcResults">Result will appear here...</h3>
+    </p>
+  </div>
+  <script>
+
+    /********************************** ELEMENTS **********************************/
+    const widthEl = document.getElementById('width');
+    const lengthEl = document.getElementById('length');
+    const heightEl = document.getElementById('height');
+    const calcBtnEl = document.getElementById('calcBtn');
+    const resetBtnEl = document.getElementById('resetBtn');
+    const calcResultsEl = document.getElementById('calcResults')
+
+    /********************************** FUNCTIONS **********************************/
+    // Conversion functions
+
+    function volumeOfRectangularPrism(width, length, height) {
+      let results = 0;
+      results = width * length * height;
+      return results
+    }
+
+    function calculateResults() {
+      // Retrieve input values
+      const width = parseFloat(widthEl.value)
+      const length = parseFloat(lengthEl.value)
+      const height = parseFloat(heightEl.value)
+
+      if (
+        isNaN(width) || width < 0 || isNaN(length) || length < 0 || isNaN(height) || height < 0
+      ) {
+        showError("Please Enter All Details.");
+        return;
+      }
+
+      try {
+        let rectPrismVolume = volumeOfRectangularPrism(width, length, height)
+        rectPrismVolume = rectPrismVolume.toFixed(10) * 1
+        calcResultsEl.innerHTML = `Volume = ${rectPrismVolume}`
+
+      } catch (error) {
+        showError("Something Went Wrong!!!");
+        resethandler()
+      }
+
+    }
+
+    /********************************* HELPER FUNCTIONS **********************************/
+
+    function showError(errorMessage) {
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: errorMessage,
+      });
+    }
+
+    function resetForm() {
+      widthEl.value = "";
+      lengthEl.value = "";
+      heightEl.value = "";
+    }
+
+    function resetResult() {
+      calcResultsEl.innerHTML = "<p>Result will appear here...</p>";
+    }
+
+    function resethandler() {
+      resetForm();
+      resetResult();
+    }
+
+    /********************************** EVENT LISTENERS **********************************/
+    resetBtnEl.addEventListener("click", resethandler);
+    [widthEl, heightEl, lengthEl].forEach((el) => {
+      el.addEventListener("input", resetResult);
+    });
+    calcBtnEl.addEventListener("click", calculateResults);
+  </script>
+</body>
+
+</html> 
