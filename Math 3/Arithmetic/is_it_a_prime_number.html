@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Find Minimum And Maximum </title>
+  <title>Is it a Prime Number?</title>
 
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.6.5/dist/sweetalert2.all.min.js"></script>
   <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11.6.5/dist/sweetalert2.min.css" rel="stylesheet">
@@ -12,11 +12,11 @@
 
 <body>
   <div>
-    <h1>Find Minimum And Maximum </h1>
-    <p>Find minimum and maximum in number set.</p>
-    <h4>Enter numbers separated by comma 1.618,2,3.14,-8.5 space 1.618 2 3.14 -8.5 or line break</h4>
+    <h1>Is it a Prime Number?</h1>
+    <p>Check if a number is a prime number.</p>
     <p>
-      <textarea type="text" id="nums" cols="40" rows="10"></textarea>  
+      <label for="num">Number:</label>
+      <input type="number" id="num" />  
     </p>
 
     <p>
@@ -32,7 +32,7 @@
   <script>
 
     /********************************** ELEMENTS **********************************/
-    const numsEl = document.getElementById('nums');
+    const numEl = document.getElementById('num');
     const calcBtnEl = document.getElementById('calcBtn');
     const resetBtnEl = document.getElementById('resetBtn');
     const calcResultsEl = document.getElementById('calcResults')
@@ -40,33 +40,30 @@
     /********************************** FUNCTIONS **********************************/
     // Conversion functions
 
-    function findMinAndMax(nums) {
-      let minNum = 0
-      let maxNum = 0
-      nums = nums.replace(/[ ,\n]+/g, ",")
-      nums = nums.split(",")
-      minNum = Math.min(...nums)
-      maxNum = Math.max(...nums)
-      return { minNum, maxNum}
+    function checkPrime(num) {
+      let rootNum = Math.sqrt(num);
+      for(let i = 2; i <= rootNum; i++) {
+        if(num % i === 0) return "No.";
+      }
+      if (num > 1) {
+        return "Yes."
+      } 
     }
 
     function calculateResults() {
       // Retrieve input values
-      const nums = numsEl.value
+      const num = numEl.value
 
       if (
-        num == ''
+        isNaN(num) || num <= 0
       ) {
         showError("Please Enter All Details.");
         return;
       }
-
+      
       try {
-        const {minNum, maxNum} = findMinAndMax(nums)
-        calcResultsEl.innerHTML = `<p>maximum number = ${maxNum}</p>
-                                   <p>Minimum number = ${minNum}</p>
-                                  `
-
+        const primeNum = checkPrime(num)
+        calcResultsEl.innerHTML = `Is ${num} a Prime Number = ${primeNum}`
       } catch (error) {
         showError("Something Went Wrong!!!");
         resethandler()
@@ -85,7 +82,7 @@
     }
 
     function resetForm() {
-      numsEl.value = ""
+      numEl.value = ""
     }
 
     function resetResult() {
@@ -99,7 +96,7 @@
 
     /********************************** EVENT LISTENERS **********************************/
     resetBtnEl.addEventListener("click", resethandler);
-    numsEl.addEventListener("input", resetResult);
+    numEl.addEventListener("input", resetResult);
     calcBtnEl.addEventListener("click", calculateResults);
   </script>
 </body>

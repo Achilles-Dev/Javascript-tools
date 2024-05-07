@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Find Minimum And Maximum </title>
+  <title>Least Common Multiple (LCM) Calculator</title>
 
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.6.5/dist/sweetalert2.all.min.js"></script>
   <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11.6.5/dist/sweetalert2.min.css" rel="stylesheet">
@@ -12,11 +12,11 @@
 
 <body>
   <div>
-    <h1>Find Minimum And Maximum </h1>
-    <p>Find minimum and maximum in number set.</p>
-    <h4>Enter numbers separated by comma 1.618,2,3.14,-8.5 space 1.618 2 3.14 -8.5 or line break</h4>
+    <h1>Least Common Multiple (LCM) Calculator</h1>
+    <p>Calculate the greatest common factor.</p>
+    <h4>To find the least common multiple, enter all the positive integers separated by comma <strong></strong>5, 10 or space 75 90 135</h4>
     <p>
-      <textarea type="text" id="nums" cols="40" rows="10"></textarea>  
+      <input type="text" id="nums" />  
     </p>
 
     <p>
@@ -40,14 +40,43 @@
     /********************************** FUNCTIONS **********************************/
     // Conversion functions
 
-    function findMinAndMax(nums) {
-      let minNum = 0
-      let maxNum = 0
-      nums = nums.replace(/[ ,\n]+/g, ",")
+    function getPrimeFactors(num) {
+      if (num % 1 != 0) {
+        showError("Please Enter a whole number.");
+        return;
+      }
+      const factors = {};
+      for (let i = 2; i <= num; i++) {
+        // Count occurances of factor
+        while ((num % i) === 0) {
+          factors[i] = (factors[i]) ? factors[i] + 1 : 1;
+          num /= i;
+        }
+      }
+      return factors;
+    }
+
+    function calcLeastCommonMultiple(nums) {
+      nums = nums.replace(/[ ,]+/g, ",")
       nums = nums.split(",")
-      minNum = Math.min(...nums)
-      maxNum = Math.max(...nums)
-      return { minNum, maxNum}
+      const primeFactors = {};  
+      for (let i = 0; i < nums.length; i++) {
+        // Factorize number in nums array
+        const currentFactors = getPrimeFactors(nums[i]);     
+        for (let prime in currentFactors) {
+          // Add factor to set or update number of occurrences
+          if (!primeFactors[prime] || currentFactors[prime] > primeFactors[prime]) {
+            primeFactors[prime] = currentFactors[prime]
+          }
+        }
+      }
+      // Build LCM from factorization
+      let multiple = 1;
+      for (let prime in primeFactors) {
+        multiple *= prime ** primeFactors[prime];
+      }
+      
+      return multiple;
     }
 
     function calculateResults() {
@@ -55,18 +84,16 @@
       const nums = numsEl.value
 
       if (
-        num == ''
+        nums == ''
       ) {
         showError("Please Enter All Details.");
         return;
       }
 
       try {
-        const {minNum, maxNum} = findMinAndMax(nums)
-        calcResultsEl.innerHTML = `<p>maximum number = ${maxNum}</p>
-                                   <p>Minimum number = ${minNum}</p>
-                                  `
-
+        const lcm = calcLeastCommonMultiple(nums)
+        let newNums = nums.replace(/[ ,]+/g, ", ");
+        calcResultsEl.innerHTML = `The Greatest Common Factor of ${newNums} = ${lcm}`
       } catch (error) {
         showError("Something Went Wrong!!!");
         resethandler()
