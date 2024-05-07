@@ -94,9 +94,7 @@
 
     /********************************** EVENT LISTENERS **********************************/
     resetBtnEl.addEventListener("click", resethandler);
-    [edgeEl].forEach((el) => {
-      el.addEventListener("input", resetResult);
-    });
+    edgeEl.addEventListener("input", resetResult);
     calcBtnEl.addEventListener("click", calculateResults);
   </script>
 </body>

@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Surface Area of Sphere Calculator</title>
+  <title>Divisibility Test Calculator</title>
 
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.6.5/dist/sweetalert2.all.min.js"></script>
   <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11.6.5/dist/sweetalert2.min.css" rel="stylesheet">
@@ -12,11 +12,15 @@
 
 <body>
   <div>
-    <h1>Surface Area of Sphere Calculator</h1>
-    <p>Calculate the surface area of a sphere.</p>
+    <h1>Divisibility Test Calculator</h1>
+    <p>Determine if a number is divisible by another number.</p>
+    
+    <label for="num">Is:</label>
+    <p><input type="number" id="num" placeholder="10"></p>
+
+    <label for="divisor">divisible by:</label>
     <p>
-      <label for="radius">Radius:</label>
-      <input type="number" id="radius" placeholder="10">
+      <input type="number" id="divisor" placeholder="2">
     </p>
 
     <p>
@@ -32,7 +36,8 @@
   <script>
 
     /********************************** ELEMENTS **********************************/
-    const radiusEl = document.getElementById('radius');
+    const numEl = document.getElementById('num');
+    const divisorEl = document.getElementById('divisor');
     const calcBtnEl = document.getElementById('calcBtn');
     const resetBtnEl = document.getElementById('resetBtn');
     const calcResultsEl = document.getElementById('calcResults')
@@ -40,28 +45,37 @@
     /********************************** FUNCTIONS **********************************/
     // Conversion functions
 
-    function areaOfSphere(radius) {
-      let results = 0;
-      const PIE = 3.141592654;
-      results = 4 * PIE * (radius ** 2)
-      return results;
+    function testDivisibility(num, divisor) {
+      let value = -1;
+      let testStatus = false;
+      if (num % divisor == 0) {
+        value = num / divisor
+        testStatus = true
+      }
+      return {testStatus, value};
     }
 
     function calculateResults() {
       // Retrieve input values
-      const radius = parseFloat(radiusEl.value)
+      const num = parseFloat(numEl.value)
+      const divisor = parseFloat(divisorEl.value)
 
       if (
-        isNaN(radius) || radius < 0
+        isNaN(num) || isNaN(divisor) || divisor == 0
       ) {
         showError("Please Enter All Details.");
         return;
       }
 
       try {
-        let sphereArea = areaOfSphere(radius)
-        sphereArea = sphereArea.toFixed(10) * 1
-        calcResultsEl.innerHTML = `Total Surface Area = ${sphereArea}`
+        const {testStatus, value} = testDivisibility(num, divisor)
+        if (testStatus) {
+          calcResultsEl.innerHTML = `<p>${num} is divisible by ${divisor}.</p>
+                                     <p>${num} &divide ${divisor} = ${value}
+                                    `
+        } else {
+          calcResultsEl.innerHTML = `${num} is not divisible by ${divisor}`
+        }
 
       } catch (error) {
         showError("Something Went Wrong!!!");
@@ -81,7 +95,7 @@
     }
 
     function resetForm() {
-      radiusEl.value = "";
+      numEl.value = ""
     }
 
     function resetResult() {
@@ -95,7 +109,9 @@
 
     /********************************** EVENT LISTENERS **********************************/
     resetBtnEl.addEventListener("click", resethandler);
-    radiusEl.addEventListener("input", resetResult);
+    [numEl, divisorEl].forEach((el) => {
+      el.addEventListener("input", resetResult);
+    });
     calcBtnEl.addEventListener("click", calculateResults);
   </script>
 </body>

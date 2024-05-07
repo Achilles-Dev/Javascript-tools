@@ -64,7 +64,7 @@
     /********************************** FUNCTIONS **********************************/
     // Conversion functions
 
-    function volumeOBox(width, length, height) {
+    function volumeOfBox(width, length, height) {
       let results = 0;
       results = width * length * height;
       return results
@@ -85,7 +85,7 @@
       }
 
       try {
-        let boxVolume = volumeOBox(width, length, height)
+        let boxVolume = volumeOfBox(width, length, height)
         boxVolume = (boxVolume.toFixed(2) * 1).toLocaleString()
         calcResultsEl.innerHTML = `Box Volume = ${boxVolume} ${metricUnit}<sup>3</sup>`
 

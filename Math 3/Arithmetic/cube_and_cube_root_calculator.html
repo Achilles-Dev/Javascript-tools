@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Surface Area of Sphere Calculator</title>
+  <title>Cube and Cube Root Calculator</title>
 
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.6.5/dist/sweetalert2.all.min.js"></script>
   <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11.6.5/dist/sweetalert2.min.css" rel="stylesheet">
@@ -12,11 +12,11 @@
 
 <body>
   <div>
-    <h1>Surface Area of Sphere Calculator</h1>
-    <p>Calculate the surface area of a sphere.</p>
+    <h1>Cube and Cube Root Calculator</h1>
+    <p>Calculate the cube and cube root of a number.</p>
     <p>
-      <label for="radius">Radius:</label>
-      <input type="number" id="radius" placeholder="10">
+      <label for="num">Number:</label>
+      <input type="number" id="num" placeholder="10">
     </p>
 
     <p>
@@ -32,7 +32,7 @@
   <script>
 
     /********************************** ELEMENTS **********************************/
-    const radiusEl = document.getElementById('radius');
+    const numEl = document.getElementById('num');
     const calcBtnEl = document.getElementById('calcBtn');
     const resetBtnEl = document.getElementById('resetBtn');
     const calcResultsEl = document.getElementById('calcResults')
@@ -40,28 +40,32 @@
     /********************************** FUNCTIONS **********************************/
     // Conversion functions
 
-    function areaOfSphere(radius) {
-      let results = 0;
-      const PIE = 3.141592654;
-      results = 4 * PIE * (radius ** 2)
-      return results;
+    function cubeAndCubeRoot(num) {
+      let cube = 0;
+      let CubeRoot = 0
+      cube = num ** 3
+      cubeRoot = num ** (1/3)
+      cube = cube.toFixed(10) * 1
+      cubeRoot = cubeRoot.toFixed(10) * 1
+      return { cube, cubeRoot}
     }
 
     function calculateResults() {
       // Retrieve input values
-      const radius = parseFloat(radiusEl.value)
+      const num = parseFloat(numEl.value)
 
       if (
-        isNaN(radius) || radius < 0
+        isNaN(num)
       ) {
         showError("Please Enter All Details.");
         return;
       }
 
       try {
-        let sphereArea = areaOfSphere(radius)
-        sphereArea = sphereArea.toFixed(10) * 1
-        calcResultsEl.innerHTML = `Total Surface Area = ${sphereArea}`
+        const {cubeRoot, cube} = cubeAndCubeRoot(num)
+        calcResultsEl.innerHTML = `<p>Cube Root = ${cubeRoot} </p>
+                                  <p>Cube = ${cube}</p>
+                                  `
 
       } catch (error) {
         showError("Something Went Wrong!!!");
@@ -81,7 +85,7 @@
     }
 
     function resetForm() {
-      radiusEl.value = "";
+      numEl.value = ""
     }
 
     function resetResult() {
@@ -95,7 +99,7 @@
 
     /********************************** EVENT LISTENERS **********************************/
     resetBtnEl.addEventListener("click", resethandler);
-    radiusEl.addEventListener("input", resetResult);
+    numEl.addEventListener("input", resetResult);
     calcBtnEl.addEventListener("click", calculateResults);
   </script>
 </body>
