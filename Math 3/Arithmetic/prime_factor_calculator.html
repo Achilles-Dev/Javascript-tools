@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Factor Calculator</title>
+  <title>Prime Factor Calculator</title>
 
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.6.5/dist/sweetalert2.all.min.js"></script>
   <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11.6.5/dist/sweetalert2.min.css" rel="stylesheet">
@@ -12,11 +12,11 @@
 
 <body>
   <div>
-    <h1>Factor Calculator</h1>
-    <p>Calculate the factors of a number.</p>
+    <h1>Prime Factor Calculator</h1>
+    <p>Calculate the prime factors of a number.</p>
     <p>
       <label for="num">Number:</label>
-      <input type="number" id="num" placeholder="10">
+      <input type="number" id="num" />  
     </p>
 
     <p>
@@ -40,11 +40,24 @@
     /********************************** FUNCTIONS **********************************/
     // Conversion functions
 
-    function calcFactorsOfNum(num) {     
+    function checkPrime(num) {
+      let rootNum = Math.sqrt(num);
+      for(let i = 2; i <= rootNum; i++) {
+        if(num % i === 0) return false;
+      }
+      if (num > 1) {
+        return true;
+      } 
+    }
+
+    function calcPrimeFactor(num) {
       let results = []
       for (let i = 1; i <= num; i++) {
         if (num % i == 0) {
-          results.push(i)
+          let isPrime = checkPrime(i)
+          if (isPrime) {
+            results.push(i)
+          }
         }
       }
       return (results.toString()).replace(/,/g, ", ");
@@ -52,7 +65,7 @@
 
     function calculateResults() {
       // Retrieve input values
-      const num = parseFloat(numEl.value)
+      const num = numEl.value
 
       if (
         isNaN(num) || num <= 0
@@ -60,11 +73,10 @@
         showError("Please Enter All Details.");
         return;
       }
-
+      
       try {
-        const allFactors = calcFactorsOfNum(num)
-        calcResultsEl.innerHTML = `All factors of ${num} = ${allFactors}`
-
+        const primeFact = calcPrimeFactor(num)
+        calcResultsEl.innerHTML = `The Prime Factors of ${num} = ${primeFact}`
       } catch (error) {
         showError("Something Went Wrong!!!");
         resethandler()

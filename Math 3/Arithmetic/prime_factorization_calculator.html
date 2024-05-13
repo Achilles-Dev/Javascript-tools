@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Factor Calculator</title>
+  <title>Prime Factorization Calculator</title>
 
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.6.5/dist/sweetalert2.all.min.js"></script>
   <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11.6.5/dist/sweetalert2.min.css" rel="stylesheet">
@@ -12,11 +12,11 @@
 
 <body>
   <div>
-    <h1>Factor Calculator</h1>
-    <p>Calculate the factors of a number.</p>
+    <h1>Prime Factorization Calculator</h1>
+    <p>Calculate the prime factorization of a number.</p>
     <p>
       <label for="num">Number:</label>
-      <input type="number" id="num" placeholder="10">
+      <input type="number" id="num" />  
     </p>
 
     <p>
@@ -40,19 +40,35 @@
     /********************************** FUNCTIONS **********************************/
     // Conversion functions
 
-    function calcFactorsOfNum(num) {     
-      let results = []
-      for (let i = 1; i <= num; i++) {
-        if (num % i == 0) {
-          results.push(i)
-        }
+    function checkPrime(num) {
+      let rootNum = Math.sqrt(num);
+      for(let i = 2; i <= rootNum; i++) {
+        if(num % i === 0) return false;
       }
-      return (results.toString()).replace(/,/g, ", ");
+      if (num > 1) {
+        return true;
+      } 
+    }
+
+    function calcPrimeFactorization(num) {
+      let primeFacts = []
+      let isPrime = checkPrime(num)
+      if (isPrime) {
+        return {isPrime, primeFacts}
+      } else {
+        for (let i = 2; i <= num; i++) {
+          while (checkPrime(i) && num % i == 0) {
+            primeFacts.push(i)
+            num /= i;
+          }         
+        }
+        return {isPrime, primeFacts: (primeFacts.toString()).replace(/,/g, " &times; ")}
+      }
     }
 
     function calculateResults() {
       // Retrieve input values
-      const num = parseFloat(numEl.value)
+      const num = numEl.value
 
       if (
         isNaN(num) || num <= 0
@@ -60,11 +76,15 @@
         showError("Please Enter All Details.");
         return;
       }
-
+      
       try {
-        const allFactors = calcFactorsOfNum(num)
-        calcResultsEl.innerHTML = `All factors of ${num} = ${allFactors}`
-
+        const {primeFacts, isPrime} = calcPrimeFactorization(num)
+        if (isPrime) {
+          calcResultsEl.innerHTML = `${num} is a prime number`
+        } else {
+          calcResultsEl.innerHTML = `${num} = ${primeFacts}`
+        }
+        
       } catch (error) {
         showError("Something Went Wrong!!!");
         resethandler()
