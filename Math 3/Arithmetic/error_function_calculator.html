@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Find Minimum And Maximum </title>
+  <title>Error Function Calculator</title>
 
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.6.5/dist/sweetalert2.all.min.js"></script>
   <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11.6.5/dist/sweetalert2.min.css" rel="stylesheet">
@@ -12,13 +12,13 @@
 
 <body>
   <div>
-    <h1>Find Minimum And Maximum </h1>
-    <p>Find minimum and maximum in number set.</p>
-    <h4>Enter numbers separated by comma 1.618,2,3.14,-8.5 space 1.618 2 3.14 -8.5 or line break</h4>
+    <h1>Error Function Calculator</h1>
+    <p>Calculate the error function.</p>
     <p>
-      <textarea type="text" id="nums" cols="40" rows="10"></textarea>  
+      <label for="num">Number:</label>
+      <input type="text" id="num" />  
     </p>
-
+    
     <p>
       <button id="calcBtn">Calculate</button>
       <button id="resetBtn">Reset</button>
@@ -32,7 +32,7 @@
   <script>
 
     /********************************** ELEMENTS **********************************/
-    const numsEl = document.getElementById('nums');
+    const numEl = document.getElementById('num');
     const calcBtnEl = document.getElementById('calcBtn');
     const resetBtnEl = document.getElementById('resetBtn');
     const calcResultsEl = document.getElementById('calcResults')
@@ -40,38 +40,31 @@
     /********************************** FUNCTIONS **********************************/
     // Conversion functions
 
-    function findMinAndMax(nums) {
-      let minNum = 0
-      let maxNum = 0
-      nums = nums.replace(/[ ,\n]+/g, ",")
-      nums = nums.split(",")
-      minNum = Math.min(...nums)
-      maxNum = Math.max(...nums)
-      return { minNum, maxNum}
+    function calcErrorFunc(num) {
+      let results = 0;
+      return results;
     }
 
     function calculateResults() {
       // Retrieve input values
-      const nums = numsEl.value
-
+      const num = numEl.value
+      const numN = numNEl.value
+      console.log("Test",(/^\d.*$/.test(num)))
+      
       if (
-        nums == ''
+        isNaN(num) || isNaN(numN)
       ) {
         showError("Please Enter All Details.");
         return;
       }
-
+      
       try {
-        const {minNum, maxNum} = findMinAndMax(nums)
-        calcResultsEl.innerHTML = `<p>maximum number = ${maxNum}</p>
-                                   <p>Minimum number = ${minNum}</p>
-                                  `
-
+        const mod = calcErrorFunc(num, numN)
+        calcResultsEl.innerHTML = `${num} mod ${numN} = ${mod}`
       } catch (error) {
         showError("Something Went Wrong!!!");
         resethandler()
       }
-
     }
 
     /********************************* HELPER FUNCTIONS **********************************/
@@ -85,7 +78,7 @@
     }
 
     function resetForm() {
-      numsEl.value = ""
+      numEl.value = ""
     }
 
     function resetResult() {
@@ -99,7 +92,7 @@
 
     /********************************** EVENT LISTENERS **********************************/
     resetBtnEl.addEventListener("click", resethandler);
-    numsEl.addEventListener("input", resetResult);
+    numEl.addEventListener("input", resetResult);
     calcBtnEl.addEventListener("click", calculateResults);
   </script>
 </body>
