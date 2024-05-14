@@ -11,7 +11,7 @@
 </head>
 
 <body>
-  <div>
+  <div> 
     <h1>Modulo Calculator</h1>
     <p>Supports real, negative, and scientific notation numbers</p>
     <p>
@@ -48,30 +48,15 @@
     // Conversion functions
 
     function getMod(numA, numN) {
-      let newNumA = numA
-      let newNmN = numN
-      if (numA.includes('e')) {
-        let eIndex = numA.indexOf('e')
-        
-        let exponent = newNumA.substr(eIndex+1, (numA.length - 1) - eIndex)
-        let numPart = newNumA.substr(0, eIndex)
-        newNumA = parseFloat(numPart) * 10 ** parseFloat(exponent)
-      } else if (numN.includes('e')) {
-        let eIndex = numN.indexOf('e')
-        
-        let exponent = newNumN.substr(eIndex+1, (numA.length - 1) - eIndex)
-        let numPart = newNumN.substr(0, eIndex)
-        newNumN = parseFloat(numPart) * 10 ** parseFloat(exponent)
-      }
       let results = 0
-      results = parseFloat(newNumA) % parseFloat(newNmN)
+      results = numA % numN
       return results
     }
 
     function calculateResults() {
       // Retrieve input values
-      const numA = numAEl.value
-      const numN = numNEl.value
+      const numA = parseFloat(numAEl.value)
+      const numN = parseFloat(numNEl.value)
       
       if (
         isNaN(numA) || isNaN(numN)

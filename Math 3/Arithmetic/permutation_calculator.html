@@ -15,11 +15,9 @@
     <h1>Permutation Calculator</h1>
     <p>calculate the permutation.</p>
     <p>
-      <p>a mod n = ?</p>
       <label for="numN">Total number of items (n):</label>
       <input type="text" id="numN" placeholder="9" />  
     </p>
-    <p>mod</p>
     <p>
       <label for="numK">Number of items chosen (k):</label>
       <input type="text" id="numK" placeholder="3" />  
@@ -63,8 +61,8 @@
 
     function calculateResults() {
       // Retrieve input values
-      const numN = numNEl.value
-      const numK = numKEl.value
+      const numN = parseFloat(numNEl.value)
+      const numK = parseFloat(numKEl.value)
       
       if (
         isNaN(numN) || isNaN(numK) || numN < numK || numN < 0 || numK < 0

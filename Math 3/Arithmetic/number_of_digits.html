@@ -42,13 +42,13 @@
 
     function calcNumOfDigits(num) {
       let results = 0
-      results = (num * 1).toString()
+      results = (num).toString()
       return results.length
     }
 
     function calculateResults() {
       // Retrieve input values
-      const num = numEl.value
+      const num = parseFloat(numEl.value)
 
       if (
         isNaN(num) || num < 0

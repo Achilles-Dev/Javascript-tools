@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Prime Factor Calculator</title>
+  <title>Scientific Notation Calculator</title>
 
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.6.5/dist/sweetalert2.all.min.js"></script>
   <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11.6.5/dist/sweetalert2.min.css" rel="stylesheet">
@@ -12,11 +12,18 @@
 
 <body>
   <div>
-    <h1>Prime Factor Calculator</h1>
-    <p>Calculate the prime factors of a number.</p>
+    <h1>Scientific Notation Calculator</h1>
+    <p>Perform addition, subtraction, multiplication and division calculations in scientific notation.</p>
     <p>
-      <label for="num">Number:</label>
-      <input type="number" id="num" />  
+      <p>Enter numbers in scientific notation (e.g. -3.34e5, 1.1E-7, 6.78, etc)</p>
+      <input type="number" id="numA" /> 
+      <select id="signUnit" >
+        <option value="+">+&nbsp;&nbsp;&nbsp;</option>
+        <option value="-">-</option>
+        <option value="*">&times;</option>
+        <option value="/">&divide;</option>
+      </select> 
+      <input type="number" id="numB" />  
     </p>
 
     <p>
@@ -32,7 +39,9 @@
   <script>
 
     /********************************** ELEMENTS **********************************/
-    const numEl = document.getElementById('num');
+    const numAEl = document.getElementById('numA');
+    const numBEl = document.getElementById('numB');
+    const signUnitEl = document.getElementById('signUnit');
     const calcBtnEl = document.getElementById('calcBtn');
     const resetBtnEl = document.getElementById('resetBtn');
     const calcResultsEl = document.getElementById('calcResults')
@@ -40,52 +49,46 @@
     /********************************** FUNCTIONS **********************************/
     // Conversion functions
 
-    function checkPrime(num) {
-      let rootNum = Math.sqrt(num);
-      for(let i = 2; i <= rootNum; i++) {
-        if(num % i === 0) return false;
+    function calcSciNotation(numA, numB, signUnit) {
+      let results = 0
+      if (signUnit == '-') {
+        results = parseFloat(numA) - parseFloat(numB)
+      } else if (signUnit == '*') {
+        results = parseFloat(numA) * parseFloat(numB)
+      } else if (signUnit == '/') {
+        results = parseFloat(numA) / parseFloat(numB)
+      } else {
+        results = parseFloat(numA) + parseFloat(numB)
       }
-      if (num > 1) {
-        return true;
-      } 
-    }
-
-    function calcPrimeFactor(num) {
-      let results = []
-      for (let i = 1; i <= num; i++) {
-        if (num % i == 0) {
-          let isPrime = checkPrime(i)
-          if (isPrime) {
-            results.push(i)
-          }
-        }
-      }
-      return (results.toString()).replace(/,/g, ", ");
+      return results
     }
 
     function calculateResults() {
       // Retrieve input values
-      const num = parseFloat(numEl.value)
+      const numA = numAEl.value
+      const numB = numBEl.value
+      const signUnit = signUnitEl.value
 
       if (
-        isNaN(num) || num <= 1
+        isNaN(numA) || isNaN(numB)
       ) {
         showError("Please Enter All Details.");
         return;
       }
       
       try {
-        const primeFact = calcPrimeFactor(num)
-        if (primeFact == num) {
-          calcResultsEl.innerHTML = `${num} is a Prime Number`
-        } else {
-          calcResultsEl.innerHTML = `The Prime Factors of ${num} = ${primeFact}`
+        const results = calcSciNotation(numA, numB, signUnit)
+        let mySign = signUnit
+        if (signUnit == '*') {
+          mySign = '&times;'
+        } else if (signUnit == '/') {
+          mySign = '&divide;'
         }
+        calcResultsEl.innerHTML = `${numA} ${mySign} ${numB} = ${results}`
       } catch (error) {
         showError("Something Went Wrong!!!");
         resethandler()
       }
-
     }
 
     /********************************* HELPER FUNCTIONS **********************************/
@@ -99,7 +102,9 @@
     }
 
     function resetForm() {
-      numEl.value = ""
+      numAEl.value = ""
+      numBEl.value = ""
+      signUnitEl.selectedIndex = 0
     }
 
     function resetResult() {
@@ -113,9 +118,11 @@
 
     /********************************** EVENT LISTENERS **********************************/
     resetBtnEl.addEventListener("click", resethandler);
-    numEl.addEventListener("input", resetResult);
+    [numAEl, numBEl].forEach((el) => {
+      el.addEventListener("input", resetResult);
+    });
+    signUnitEl.addEventListener("change", resetResult)
     calcBtnEl.addEventListener("click", calculateResults);
   </script>
 </body>
-
 </html> 

@@ -68,10 +68,10 @@
 
     function calculateResults() {
       // Retrieve input values
-      const num = numEl.value
+      const num = parseFloat(numEl.value)
 
       if (
-        isNaN(num) || num <= 0
+        isNaN(num) || num <= 1
       ) {
         showError("Please Enter All Details.");
         return;

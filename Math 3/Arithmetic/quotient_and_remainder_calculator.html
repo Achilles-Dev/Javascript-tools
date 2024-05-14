@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Prime Factor Calculator</title>
+  <title>Quotient and Remainder Calculator</title>
 
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.6.5/dist/sweetalert2.all.min.js"></script>
   <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11.6.5/dist/sweetalert2.min.css" rel="stylesheet">
@@ -12,11 +12,14 @@
 
 <body>
   <div>
-    <h1>Prime Factor Calculator</h1>
-    <p>Calculate the prime factors of a number.</p>
+    <h1>Quotient and Remainder Calculator</h1>
     <p>
-      <label for="num">Number:</label>
-      <input type="number" id="num" />  
+      <label for="quotient">Dividend:</label>
+      <input type="text" id="quotient" />  
+    </p>
+    <p>
+      <label for="remainder">Divisor:</label>
+      <input type="text" id="remainder" />  
     </p>
 
     <p>
@@ -32,7 +35,8 @@
   <script>
 
     /********************************** ELEMENTS **********************************/
-    const numEl = document.getElementById('num');
+    const quotientEl = document.getElementById('quotient');
+    const remainderEl = document.getElementById('remainder');
     const calcBtnEl = document.getElementById('calcBtn');
     const resetBtnEl = document.getElementById('resetBtn');
     const calcResultsEl = document.getElementById('calcResults')
@@ -40,52 +44,34 @@
     /********************************** FUNCTIONS **********************************/
     // Conversion functions
 
-    function checkPrime(num) {
-      let rootNum = Math.sqrt(num);
-      for(let i = 2; i <= rootNum; i++) {
-        if(num % i === 0) return false;
-      }
-      if (num > 1) {
-        return true;
-      } 
-    }
-
-    function calcPrimeFactor(num) {
-      let results = []
-      for (let i = 1; i <= num; i++) {
-        if (num % i == 0) {
-          let isPrime = checkPrime(i)
-          if (isPrime) {
-            results.push(i)
-          }
-        }
-      }
-      return (results.toString()).replace(/,/g, ", ");
+    function calcQuotAndRemain(quotient, remainder) {
+      let quotVal = 1
+      let remainVal = 0
+      quotVal = Math.floor(quotient / remainder)
+      remainVal = quotient % remainder
+      return {quotVal, remainVal}
     }
 
     function calculateResults() {
       // Retrieve input values
-      const num = parseFloat(numEl.value)
-
+      const quotient = parseFloat(quotientEl.value)
+      const remainder = parseFloat(remainderEl.value)
+      
       if (
-        isNaN(num) || num <= 1
+        isNaN(quotient) || isNaN(remainder) ||  quotient <= 0 || remainder <= 0
       ) {
         showError("Please Enter All Details.");
         return;
       }
       
       try {
-        const primeFact = calcPrimeFactor(num)
-        if (primeFact == num) {
-          calcResultsEl.innerHTML = `${num} is a Prime Number`
-        } else {
-          calcResultsEl.innerHTML = `The Prime Factors of ${num} = ${primeFact}`
-        }
+        const {quotVal, remainVal} = calcQuotAndRemain(quotient, remainder)
+        calcResultsEl.innerHTML = `<p>quotient = ${quotVal}</p>
+                                   <p>remainder = ${remainVal}</p>`
       } catch (error) {
         showError("Something Went Wrong!!!");
         resethandler()
       }
-
     }
 
     /********************************* HELPER FUNCTIONS **********************************/
@@ -99,7 +85,8 @@
     }
 
     function resetForm() {
-      numEl.value = ""
+      quotientEl.value = ""
+      remainderEl.value = ""
     }
 
     function resetResult() {
@@ -113,7 +100,9 @@
 
     /********************************** EVENT LISTENERS **********************************/
     resetBtnEl.addEventListener("click", resethandler);
-    numEl.addEventListener("input", resetResult);
+    [quotientEl, remainderEl].forEach((el) => {
+      el.addEventListener("input", resetResult);
+    });
     calcBtnEl.addEventListener("click", calculateResults);
   </script>
 </body>
