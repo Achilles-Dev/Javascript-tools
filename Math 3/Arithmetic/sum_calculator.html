@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sum Calculator</title>
+
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.6.5/dist/sweetalert2.all.min.js"></script>
+  <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11.6.5/dist/sweetalert2.min.css" rel="stylesheet">
+</head>
+
+<body>
+  <div>
+    <h1>Sum Calculator</h1>
+    <h4>Enter numbers separated by comma 1.618,2,3.14,5.382,-8.5 space 1.618,2,3.14,5.382,-8.5 or line break</h4>
+    <p>
+      <textarea type="text" id="nums" cols="40" rows="10"></textarea>  
+    </p>
+    <p>
+      <button id="calcBtn">Calculate</button>
+      <button id="resetBtn">Reset</button>
+    </p>
+    <hr>
+    <p>
+    <h3>Result:</h3>
+    <h3 id="calcResults">Result will appear here...</h3>
+    </p>
+  </div>
+  <script>
+
+    /********************************** ELEMENTS **********************************/
+    const numsEl = document.getElementById('nums');
+    const calcBtnEl = document.getElementById('calcBtn');
+    const resetBtnEl = document.getElementById('resetBtn');
+    const calcResultsEl = document.getElementById('calcResults')
+
+    /********************************** FUNCTIONS **********************************/
+    // Conversion functions
+
+    function addNumbers(nums) {
+      let results = 0
+      let totalNums = 0
+      nums = nums.replace(/[ ,\n]+/g, ",")
+      nums = nums.split(",")
+      totalNums = nums.length
+      results = nums.reduce((a, b) => parseFloat(a) + parseFloat(b))
+      return {totalNums, results: (results.toFixed(10) * 1).toLocaleString()}
+    }
+
+    function calculateResults() {
+      // Retrieve input values
+      const nums = numsEl.value
+
+      if (
+        nums == ''
+      ) {
+        showError("Please Enter All Details.");
+        return;
+      }
+
+      try {
+        const {totalNums, results} = addNumbers(nums)
+        calcResultsEl.innerHTML = `<p>Total numbers = ${totalNums}</p>
+                                   <p>Sum of numbers = ${results}</p>
+                                  `
+      } catch (error) {
+        showError("Something Went Wrong!!!");
+        resethandler()
+      }
+
+    }
+
+    /********************************* HELPER FUNCTIONS **********************************/
+
+    function showError(errorMessage) {
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: errorMessage,
+      });
+    }
+
+    function resetForm() {
+      numsEl.value = ""
+    }
+
+    function resetResult() {
+      calcResultsEl.innerHTML = "<p>Result will appear here...</p>";
+    }
+
+    function resethandler() {
+      resetForm();
+      resetResult();
+    }
+
+    /********************************** EVENT LISTENERS **********************************/
+    resetBtnEl.addEventListener("click", resethandler);
+    numsEl.addEventListener("input", resetResult); 
+    calcBtnEl.addEventListener("click", calculateResults);
+  </script>
+</body>
+
+</html> 
