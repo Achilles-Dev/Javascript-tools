@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Error Function Calculator</title>
+  <title>Rounding Numbers Calculator</title>
 
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.6.5/dist/sweetalert2.all.min.js"></script>
   <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11.6.5/dist/sweetalert2.min.css" rel="stylesheet">
@@ -12,11 +12,29 @@
 
 <body>
   <div>
-    <h1>Error Function Calculator</h1>
-    <p>Calculate the error function.</p>
+    <h1>Rounding Numbers Calculator</h1>
     <p>
       <label for="num">Number:</label>
-      <input type="text" id="num" />  
+      <input type="number" id="num" />  
+    </p>
+    <p>
+      <label for="roundUnit">Round to:</label>
+      <select id="roundUnit">
+        <option value="1000000">Millions (1,000,000)</option>
+        <option value="100000">Hundred Thousands (100,000)</option>
+        <option value="10000">Ten Thousands (10,000)</option>
+        <option value="1000">Thousands (1,000)</option>
+        <option value="100">Hundred (100)</option>
+        <option value="10">Tens (10)</option>
+        <option value="1">Ones (1)</option>
+        <option value="0.1">Tenths (0.1)</option>
+        <option value="0.01" selected>Hundredths (0.01)</option>
+        <option value="0.001">Thousandths (0.001)</option>
+        <option value="0.0001">Ten Thousandths (0.0001)</option>
+        <option value="0.00001">Hundred Thousandths (0.00001)</option>
+        <option value="0.000001">Millionths (0.000001)</option>
+        <option value="1">Custom precision</option>
+      </select> 
     </p>
     
     <p>
@@ -33,6 +51,7 @@
 
     /********************************** ELEMENTS **********************************/
     const numEl = document.getElementById('num');
+    const roundUnitEl = document.getElementById('roundUnit');
     const calcBtnEl = document.getElementById('calcBtn');
     const resetBtnEl = document.getElementById('resetBtn');
     const calcResultsEl = document.getElementById('calcResults')
@@ -40,31 +59,32 @@
     /********************************** FUNCTIONS **********************************/
     // Conversion functions
 
-    function calcErrorFunc(num) {
+    function roundNum(num, roundUnit) {
       let results = 0;
-      return results;
+      results = (((num / roundUnit).toFixed()) * roundUnit).toFixed(10) * 1
+      return results
     }
 
     function calculateResults() {
       // Retrieve input values
-      const num = numEl.value
-      const numN = numNEl.value
-      console.log("Test",(/^\d.*$/.test(num)))
-      
+      const num = parseFloat(numEl.value)
+      const roundUnit = parseFloat(roundUnitEl.value)
+
       if (
-        isNaN(num) || isNaN(numN)
+        isNaN(num) 
       ) {
         showError("Please Enter All Details.");
         return;
       }
       
       try {
-        const mod = calcErrorFunc(num, numN)
-        calcResultsEl.innerHTML = `${num} mod ${numN} = ${mod}`
+        const results = roundNum(num, roundUnit)
+        calcResultsEl.innerHTML = `${results}`
       } catch (error) {
         showError("Something Went Wrong!!!");
         resethandler()
       }
+
     }
 
     /********************************* HELPER FUNCTIONS **********************************/
@@ -79,6 +99,7 @@
 
     function resetForm() {
       numEl.value = ""
+      roundUnitEl.selectedIndex = 8
     }
 
     function resetResult() {
@@ -93,6 +114,7 @@
     /********************************** EVENT LISTENERS **********************************/
     resetBtnEl.addEventListener("click", resethandler);
     numEl.addEventListener("input", resetResult);
+    roundUnitEl.addEventListener("change", resetResult)
     calcBtnEl.addEventListener("click", calculateResults);
   </script>
 </body>

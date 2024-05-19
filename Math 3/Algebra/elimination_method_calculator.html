@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Elimination Method Calculator</title>
+
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.6.5/dist/sweetalert2.all.min.js"></script>
+  <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11.6.5/dist/sweetalert2.min.css" rel="stylesheet">
+</head>
+
+<body>
+  <div>
+    <h1>Elimination Method Calculator</h1>
+    <p>We solve the system of linear equations:</p>
+    <span>a₁x + b₁y = c₁</span><br />
+    <span>a₂x + b₂y = c₂</span>
+    <p>Enter the coefficients into the fields below.</p>
+    <p>First equation</p>
+      <p>
+        <label for="a1">a₁</label>
+        <input type="number" id="a1" />  
+      </p>
+      <p>
+        <label for="b1">b₁</label>
+        <input type="number" id="b1" />  
+      </p>
+      <p>
+        <label for="c1">c₁</label>
+        <input type="number" id="c1" />  
+      </p>
+    <p>Second equation</p>
+      <p>
+        <label for="a2">a₂</label>
+        <input type="number" id="a2" />  
+      </p>
+      <p>
+        <label for="b2">b₂</label>
+        <input type="number" id="b2" />  
+      </p>
+      <p>
+        <label for="c2">c₂</label>
+        <input type="number" id="c2" />  
+      </p>
+    
+    <p>
+      <button id="calcBtn">Calculate</button>
+      <button id="resetBtn">Reset</button>
+    </p>
+    <hr>
+    <p>
+    <h3>Result:</h3>
+    <h3 id="calcResults">Result will appear here...</h3>
+    </p>
+  </div>
+  <script>
+
+    /********************************** ELEMENTS **********************************/
+    const a1El = document.getElementById('a1');
+    const b1El = document.getElementById('b1');
+    const c1El = document.getElementById('c1');
+    const a2El = document.getElementById('a2');
+    const b2El = document.getElementById('b2');
+    const c2El = document.getElementById('c2');
+    const calcBtnEl = document.getElementById('calcBtn');
+    const resetBtnEl = document.getElementById('resetBtn');
+    const calcResultsEl = document.getElementById('calcResults')
+
+    /********************************** FUNCTIONS **********************************/
+    // Conversion functions
+
+
+    function solveEquation(a1, b1, c1, a2, b2, c2) {
+      let message = '';
+      let xValue = 0;
+      let yValue = 0
+      if ((a1 == b1 && a1 == a2 && b1 == b2 && a2 == b2) && c1 == c2) {      
+        message = 'There are infinitely many solutions.'
+      } else if (a1 == b1 && a2 == b2 && c1 == c2) {
+        message = 'Contradiction! There is no solution.'
+      } else if (a1 + a2 == 0) {
+        yValue = (c1 + c2) / (b1 + b2)
+        xValue = (c1 - (b1 * yValue)) / a1
+      } else if (a1 - a2 == 0) {
+        yValue = (c1 - c2) / (b1 - b2)
+        xValue = (c1 - (b1 * yValue)) / a1
+      } else if (b1 + b2 == 0) {
+        xValue = (c1 + c2) / (a1 + a2)
+        yValue = (c1 - (a1 * xValue)) / b1
+      } else if (b1 - b2 == 0) {
+        xValue = (c1 - c2) / (a1 - a2)
+        xValue = (c1 - (a1 * xValue)) / b1
+      } else {
+        let multiplier = a1 / a2
+        if (multiplier < 1) {
+          a2 = multiplier * a2
+          c2 = multiplier * c2
+          b2 = multiplier * b2
+          if (a1 + a2 == 0) {
+            yValue = (c1 + c2) / (b1 + b2)
+            xValue = (c1 - (b1 * yValue)) / a1
+          } else if (a1 - a2 == 0) {
+            yValue = (c1 - c2) / (b1 - b2)
+            xValue = (c1 - (b1 * yValue)) / a1
+          }
+        } else {
+          let multiplier = a2 / a1        
+          a1 = multiplier * a1
+          c1 = multiplier * c1
+          b1 = multiplier * b1
+          if (a1 + a2 == 0) {
+            yValue = (c1 + c2) / (b1 + b2)
+            xValue = (c1 - (b1 * yValue)) / a1
+          } else if (a1 - a2 == 0) {
+            yValue = (c1 - c2) / (b1 - b2)
+            xValue = (c1 - (b1 * yValue)) / a1
+          }
+        }                     
+      }
+      return {xValue, yValue, message};
+    }
+
+    function calculateResults() {
+      // Retrieve input values
+      const a1 = parseFloat(a1El.value)
+      const b1 = parseFloat(b1El.value)
+      const c1 = parseFloat(c1El.value)
+      const a2 = parseFloat(a2El.value)
+      const b2 = parseFloat(b2El.value)
+      const c2 = parseFloat(c2El.value)
+      
+      if (
+        isNaN(a1) || isNaN(b1) || isNaN(c1) || isNaN(a2) || isNaN(b2) || isNaN(c2)
+      ) {
+        showError("Please Enter All Details.");
+        return;
+      }
+      
+      
+      try {
+        const results = solveEquation(a1, b1, c1, a2, b2, c2)
+        if (results.message != '') {
+          calcResultsEl.innerHTML = `${results.message}`
+        } else {
+          calcResultsEl.innerHTML = `<p> x = ${results.xValue}</p>
+                                    <p>y = ${results.yValue}</p>`
+        }
+      } catch (error) {
+        showError("Something Went Wrong!!!");
+        resethandler()
+      }
+    }
+
+    /********************************* HELPER FUNCTIONS **********************************/
+
+    function showError(errorMessage) {
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: errorMessage,
+      });
+    }
+
+    function resetForm() {
+      a1El.value = ""
+      b1El.value = ""
+      c1El.value = ""
+      a2El.value = ""
+      b2El.value = ""
+      c2El.value = ""
+    }
+
+    function resetResult() {
+      calcResultsEl.innerHTML = "<p>Result will appear here...</p>";
+    }
+
+    function resethandler() {
+      resetForm();
+      resetResult();
+    }
+
+    /********************************** EVENT LISTENERS **********************************/
+    resetBtnEl.addEventListener("click", resethandler);
+    [a1El, a2El, b1El, b2El, c1El, c2El].forEach((el) => {
+      el.addEventListener("change", resetResult);
+    });   
+    calcBtnEl.addEventListener("click", calculateResults);
+  </script>
+</body>
+
+</html> 
