@@ -47,7 +47,6 @@
       nums = nums.split(",")
       totalNums = nums.length
       nums = nums.map((num) => num ** 2)
-      console.log(nums)
       let meanSqaureVal = (nums.reduce((a, b) => parseFloat(a) + parseFloat(b))) / totalNums
       rmsVal = meanSqaureVal ** (1/2)
       return { totalNums, rmsVal}

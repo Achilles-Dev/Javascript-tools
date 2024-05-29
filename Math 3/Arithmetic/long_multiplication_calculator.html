@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Number of Digits</title>
+
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.6.5/dist/sweetalert2.all.min.js"></script>
+  <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11.6.5/dist/sweetalert2.min.css" rel="stylesheet">
+</head>
+
+<body>
+  <div>
+    <h1>Number of Digits</h1>
+    <p>Find the number of digits in a number.</p>
+    <p>
+      <label for="numA">1<sup>st</sup> number (Multiplier):</label>
+      <input type="number" id="numA" />  
+    </p>
+    <p>
+      <label for="numB">2<sup>nd</sup> number (Multiplicand):</label>
+      <input type="number" id="numB" />  
+    </p>
+
+    <p>
+      <button id="calcBtn">Calculate</button>
+      <button id="resetBtn">Reset</button>
+    </p>
+    <hr>
+    <p>
+    <h3>Result:</h3>
+    <h3 id="calcResults">Result will appear here...</h3>
+    </p>
+  </div>
+  <script>
+
+    /********************************** ELEMENTS **********************************/
+    const numAEl = document.getElementById('numA');
+    const numBEl = document.getElementById('numB');
+    const calcBtnEl = document.getElementById('calcBtn');
+    const resetBtnEl = document.getElementById('resetBtn');
+    const calcResultsEl = document.getElementById('calcResults')
+
+    /********************************** FUNCTIONS **********************************/
+    // Conversion functions
+
+    function multiplyNumbers(numA, numB) {
+      let results = 0
+      let initResults = []
+      let newNumB = numB < 0 ? (numB * -1) : numB
+      let newNumA = numA < 0 ? (numA * -1) : numA
+      let numBLen = newNumB.toString().length      
+      for (let i = (numBLen - 1); i >= 0; i--) {
+        let multipland = parseFloat((newNumB.toString())[i])
+        if (numA < 0) {
+          numA = numA * -1
+          initResults.push(numA * multipland * (10 ** (numBLen - i - 1)))
+        } else  {
+          initResults.push(numA * multipland * (10 ** (numBLen - i - 1)))
+        } 
+      }
+      results = newNumA * newNumB
+      return {results, initResults}
+    }
+
+    function calculateResults() {
+      // Retrieve input values
+      const numA = parseFloat(numAEl.value)
+      const numB = parseFloat(numBEl.value)
+      if (
+        isNaN(numA) || isNaN(numB)
+      ) {
+        showError("Please Enter All Details.");
+        return;
+      }
+      
+      try {
+        const {results, initResults} = multiplyNumbers(numA, numB)
+        let div = document.createElement('div')
+        for (let i = 0; i < initResults.length; i++) {
+          let para = document.createElement('p')
+          let space = '&nbsp;'
+          if (i + 1 == initResults.length) {
+            para.innerHTML = `<span><u>+ ${initResults[i]}</u></span>`
+          } else {
+            para.innerHTML = `<span>${space + space} ${initResults[i]}</span>`
+          }        
+          div.appendChild(para)
+        }
+        let para1 = document.createElement('p')
+        let para2 = document.createElement('p')
+        if ((numA < 0 && numB >= 0) || (numA >= 0 && numB < 0)) {
+          para2.innerHTML = `<span>Adding the minus sign, the final answer =  ${results * -1}</span>`
+        }
+        para1.innerHTML = `<span>= ${results}</span>`
+        div.appendChild(para1)
+        div.appendChild(para2)
+        calcResultsEl.innerHTML = `<p>&nbsp;&nbsp; ${numA < 0 ? numA * -1 : numA}</p>
+                                  <p><u>&times; ${numB < 0 ? numB * -1 : numB}</u></p>
+                                  `
+        calcResultsEl.appendChild(div)
+      } catch (error) {
+        showError("Something Went Wrong!!!");
+        resethandler()
+      }
+    }
+
+    /********************************* HELPER FUNCTIONS **********************************/
+
+    function showError(errorMessage) {
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: errorMessage,
+      });
+    }
+
+    function resetForm() {
+      numAEl.value = ""
+      numBEl.value = ""
+    }
+
+    function resetResult() {
+      calcResultsEl.innerHTML = "<p>Result will appear here...</p>";
+    }
+
+    function resethandler() {
+      resetForm();
+      resetResult();
+    }
+
+    /********************************** EVENT LISTENERS **********************************/
+    resetBtnEl.addEventListener("click", resethandler);
+    [numAEl, numBEl].forEach((el) => {
+      el.addEventListener("input", resetResult);
+    });    calcBtnEl.addEventListener("click", calculateResults);
+  </script>
+</body>
+
+</html> 

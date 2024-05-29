@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Surface Area Calculator</title>
+
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.6.5/dist/sweetalert2.all.min.js"></script>
+  <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11.6.5/dist/sweetalert2.min.css" rel="stylesheet">
+</head>
+
+<body>
+  <div>
+    <h1>Surface Area Calculator</h1>
+    <p>
+      <label for="areaOfShape">Surface area of:</label>
+      <select id="areaOfShape">
+        <option value="cone" selected>Cone</option>
+        <option value="cube">Cube</option>
+        <option value="cylinder">Cylinder</option>
+        <option value="rectPrism">Rectangular Prism</option>
+        <option value="sphere">Sphere</option>
+      </select>
+    </p>
+    <p>
+      <label for="metricUnit">Metric:</label>
+      <select id="metricUnit">
+        <option value="mm">mm</option>
+        <option value="cm" selected>cm</option>
+        <option value="dm">dm</option>
+        <option value="m">m</option>
+        <option value="km">km</option>
+        <option value="in">in</option>
+        <option value="ft">ft</option>
+        <option value="yd">yd</option>
+        <option value="mi">mi</option>
+      </select>
+    </p>
+    <div id="inputParams">
+      <p>
+        <label for="radius">Radius:</label>
+        <input type="number" id="radius" placeholder="10">
+      </p>
+      <p>
+        <label for="height">Height:</label>
+        <input type="number" id="height" placeholder="20">
+      </p>
+    </div>
+
+      <p>
+        <button id="calcBtn">Calculate</button>
+        <button id="resetBtn">Reset</button>
+      </p>
+    
+    <hr>
+    <p>
+    <h3>Result:</h3>
+    <h3 id="calcResults">Result will appear here...</h3>
+    </p>
+  </div>
+  <script>
+
+    /********************************** ELEMENTS **********************************/
+    const areaOfShapeEl = document.getElementById('areaOfShape')
+    const inputParamsEl = document.getElementById('inputParams')
+    const metricUnitEl = document.getElementById('metricUnit');
+    const calcBtnEl = document.getElementById('calcBtn');
+    const resetBtnEl = document.getElementById('resetBtn');
+    const calcResultsEl = document.getElementById('calcResults')
+    let firstInputEl = document.getElementById('radius');
+    let secondInputEl = document.getElementById('height');
+    let thirdInputEl = '';
+
+    /********************************** FUNCTIONS **********************************/
+    // Conversion functions
+
+    function handleAreaOfShapeChange(e) {
+      let shape = e.target.value
+      if (shape == 'cone') {
+        inputParamsEl.innerHTML = `<p>
+                                    <label for="radius">Radius:</label>
+                                    <input type="number" id="radius" placeholder="10">
+                                   </p>
+                                   <p>
+                                    <label for="height">Height:</label>
+                                    <input type="number" id="height" placeholder="20">
+                                   </p>
+                                  `
+        firstInputEl = document.getElementById('radius');
+        secondInputEl = document.getElementById('height');
+        thirdInputEl = ''
+      } else if (shape == 'cube') {
+        inputParamsEl.innerHTML = `<p>
+                                    <label for="edge">Edge length:</label>
+                                    <input type="number" id="edge" placeholder="10">
+                                   </p>
+                                  `
+        firstInputEl = document.getElementById('edge');
+      } else if (shape == 'cylinder') {
+        inputParamsEl.innerHTML = `<p>
+                                    <label for="radius">Radius:</label>
+                                    <input type="number" id="radius" placeholder="10">
+                                   </p>
+                                   <p>
+                                    <label for="height">Height:</label>
+                                    <input type="number" id="height" placeholder="20">
+                                   </p>
+                                  `
+        firstInputEl = document.getElementById('radius');
+        secondInputEl = document.getElementById('height');
+        thirdInputEl = ''
+      } else if (shape == 'rectPrism') {
+        inputParamsEl.innerHTML = `<p>
+                                    <label for="width">Width:</label>
+                                    <input type="number" id="width" placeholder="10">
+                                   </p>
+                                   <p>
+                                    <label for="length">Length:</label>
+                                    <input type="number" id="length" placeholder="10">
+                                   </p>
+                                   <p>
+                                    <label for="height">Height:</label>
+                                    <input type="number" id="height" placeholder="10">
+                                   </p>
+                                  `
+        firstInputEl = document.getElementById('width');
+        secondInputEl = document.getElementById('length');
+        thirdInputEl = document.getElementById('height');
+      } else if (shape == 'sphere') {
+        inputParamsEl.innerHTML = `<p>
+                                    <label for="radius">Radius:</label>
+                                    <input type="number" id="radius" placeholder="10">
+                                   </p>
+                                  `
+        firstInputEl = document.getElementById('radius');
+        secondInputEl = '';
+        thirdInputEl = ''
+      }
+    }
+
+    function surfaceAreaOfCone(radius, height) {
+      let baseArea = 0;
+      let lateralArea = 0;
+      const PIE = 3.141592654;
+      let coneArea = 0
+
+      baseArea = PIE * radius ** 2
+      lateralArea = (PIE * radius) * (((radius ** 2) + (height ** 2)) ** (1/2))
+      coneArea = baseArea + lateralArea
+
+      return coneArea = coneArea.toFixed(10) * 1
+    }
+
+    function areaOfCube(edge) {
+      let results = 0;
+      results = 6 * (edge ** 2)
+      return results
+    }
+
+    function surfaceAreaOfCylinder(radius, height) {
+      let topBottomArea = 0;
+      let sideArea = 0;
+      const PIE = 3.141592654;
+      let cylinderArea = 0
+
+      topBottomArea = 2 * PIE * (radius ** 2);
+      sideArea = 2 * PIE * radius * height;
+      cylinderArea = topBottomArea + sideArea
+
+      return cylinderArea = cylinderArea.toFixed(10) * 1
+    }
+
+    function areaOfRectangularPrism(width, length, height) {
+      let results = 0;
+      results = 2 * ((width * length) + (length * height) + (width * height))
+      return results
+    }
+
+    function areaOfSphere(radius) {
+      let results = 0;
+      const PIE = 3.141592654;
+      results = 4 * PIE * (radius ** 2)
+      return results;
+    }
+
+    function calculateResults() {
+      // Retrieve input values
+      const areaOfShape = areaOfShapeEl.value
+      const firstInput = firstInputEl ? parseFloat(firstInputEl.value) : undefined
+      const secondInput = secondInputEl ? parseFloat(secondInputEl.value) : undefined
+      const thirdInput = thirdInputEl ? parseFloat(thirdInputEl.value) : undefined
+      const metricUnit = metricUnitEl.value;
+
+      if (
+        ((firstInput && isNaN(firstInput)) || (firstInput && firstInput < 0)) || 
+        ((secondInput && isNaN(secondInput)) || (secondInput && secondInput < 0)) || 
+        ((thirdInput && isNaN(thirdInput)) || (thirdInput && thirdInput < 0))
+      ) {
+        showError("Please Enter All Details.");
+        return;
+      }
+
+      try {
+        let surfaceArea = 0;
+        if (areaOfShape == 'cone') {        
+          surfaceArea = surfaceAreaOfCone(firstInput, secondInput)
+
+        } else if (areaOfShape == 'cube') {
+          surfaceArea = areaOfCube(firstInput)
+          surfaceArea = surfaceArea.toFixed(4) * 1
+        } else if (areaOfShape == 'cylinder') {
+          surfaceArea = surfaceAreaOfCylinder(firstInput, secondInput)
+        } else if (areaOfShape == 'rectPrism') {
+          surfaceArea = areaOfRectangularPrism(firstInput, secondInput, thirdInput)
+          surfaceArea = surfaceArea.toFixed(10) * 1
+        } else {
+          surfaceArea = areaOfSphere(firstInput)
+          surfaceArea = surfaceArea.toFixed(10) * 1
+        }
+        calcResultsEl.innerHTML = `Total Surface Area = ${surfaceArea} ${metricUnit}<sup>2</sup>`
+      } catch (error) {
+        showError("Something Went Wrong!!!");
+        resethandler()
+      }
+
+    }
+
+    /********************************* HELPER FUNCTIONS **********************************/
+
+    function showError(errorMessage) {
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: errorMessage,
+      });
+    }
+
+    function resetForm() {
+      firstInputEl.value = "";
+      secondInputEl.value = "";
+      thirdInputEl.value = "";
+      metricUnitEl.selectedIndex = '1';
+    }
+
+    function resetResult() {
+      calcResultsEl.innerHTML = "<p>Result will appear here...</p>";
+    }
+
+    function resethandler() {
+      resetForm();
+      resetResult();
+    }
+
+    /********************************** EVENT LISTENERS **********************************/
+    resetBtnEl.addEventListener("click", resethandler);
+    [firstInputEl, secondInputEl, thirdInputEl].forEach((el) => {
+      if (el) {
+        el.addEventListener("input", resetResult);
+      }
+    });
+    areaOfShapeEl.addEventListener("change", (e) => {
+      handleAreaOfShapeChange(e);
+      resethandler();
+    })
+    calcBtnEl.addEventListener("click", calculateResults);
+  </script>
+</body>
+
+</html> 

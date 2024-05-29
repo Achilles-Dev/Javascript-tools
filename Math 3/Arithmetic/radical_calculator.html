@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Absolute Value Equation Calculator</title>
+  <title>Radical Calculator</title>
 
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.6.5/dist/sweetalert2.all.min.js"></script>
   <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11.6.5/dist/sweetalert2.min.css" rel="stylesheet">
@@ -12,32 +12,14 @@
 
 <body>
   <div>
-    <h1>Absolute Value Equation Calculator</h1>
-    <span>Example:  <strong>a ∙ |b∙x + c| + d = e∙x + f</strong></span>
-    
+    <h1>Radical Calculator</h1>
     <p>
-      <label for="a">a</label>
-      <input type="number" id="a" />  
+      <label for="numA">Number:</label>
+      <input type="number" id="numA" />  
     </p>
     <p>
-      <label for="b">b</label>
-      <input type="number" id="b" />  
-    </p>
-    <p>
-      <label for="c">c</label>
-      <input type="number" id="c" />  
-    </p>
-    <p>
-      <label for="d">d</label>
-      <input type="number" id="d" />  
-    </p>
-    <p>
-      <label for="e">e</label>
-      <input type="number" id="e" />  
-    </p>
-    <p>
-      <label for="f">f</label>
-      <input type="number" id="f" />  
+      <label for="numN">Radical degree (n):</label>
+      <input type="number" id="numN" />  
     </p>
     
     <p>
@@ -53,12 +35,8 @@
   <script>
 
     /********************************** ELEMENTS **********************************/
-    const aEl = document.getElementById('a');
-    const bEl = document.getElementById('b');
-    const cEl = document.getElementById('c');
-    const dEl = document.getElementById('d');
-    const eEl = document.getElementById('e');
-    const fEl = document.getElementById('f');
+    const numAEl = document.getElementById('numA');
+    const numNEl = document.getElementById('numN');
     const calcBtnEl = document.getElementById('calcBtn');
     const resetBtnEl = document.getElementById('resetBtn');
     const calcResultsEl = document.getElementById('calcResults')
@@ -66,40 +44,34 @@
     /********************************** FUNCTIONS **********************************/
     // Conversion functions
 
-
-    function solveEquation(a, b, c, d, e, f) {
+    function calcNthRadical(numA, numN) {
+      let results = 0;
+      results = numA ** (1 / numN)
       
+      return (results.toFixed(5) * 1)
     }
 
     function calculateResults() {
       // Retrieve input values
-      const a = parseFloat(aEl.value)
-      const b = parseFloat(bEl.value)
-      const c = parseFloat(cEl.value)
-      const d = parseFloat(dEl.value)
-      const e = parseFloat(eEl.value)
-      const f = parseFloat(fEl.value)
-      
+      const numA = parseFloat(numAEl.value)
+      const numN = parseFloat(numNEl.value)
+
       if (
-        isNaN(a) || isNaN(b) || isNaN(c) || isNaN(d) || isNaN(e) || isNaN(f)
+        isNaN(numA) || isNaN(numN) || numN == 0 || numA < 0
       ) {
         showError("Please Enter All Details.");
         return;
       }
       
-      
       try {
-        const results = solveEquation(a, b, c, d, e, f)
-        if (results.message != '') {
-          calcResultsEl.innerHTML = `${results.message}`
-        } else {
-          calcResultsEl.innerHTML = `<p> x = ${results.xValue}</p>
-                                    <p>y = ${results.yValue}</p>`
-        }
+        const results = calcNthRadical(numA, numN)
+        let finalResults = `${numN == 2 ? `√${numA} ` : `<sup>${numN}</sup>√${numA}`} = ${results}`
+        calcResultsEl.innerHTML = finalResults
       } catch (error) {
         showError("Something Went Wrong!!!");
         resethandler()
       }
+
     }
 
     /********************************* HELPER FUNCTIONS **********************************/
@@ -113,12 +85,8 @@
     }
 
     function resetForm() {
-      aEl.value = ""
-      bEl.value = ""
-      cEl.value = ""
-      dEl.value = ""
-      eEl.value = ""
-      fEl.value = ""
+      numAEl.value = ""
+      numNEl.value = ""
     }
 
     function resetResult() {
@@ -132,9 +100,9 @@
 
     /********************************** EVENT LISTENERS **********************************/
     resetBtnEl.addEventListener("click", resethandler);
-    [aEl, bEl, cEl, dEl, eEl, fEl].forEach((el) => {
-      el.addEventListener("change", resetResult);
-    });   
+    [numAEl, numNEl].forEach((el) => {
+      el.addEventListener("input", resetResult);
+    });
     calcBtnEl.addEventListener("click", calculateResults);
   </script>
 </body>
