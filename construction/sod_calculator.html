@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sod Calculator</title>
+
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.6.5/dist/sweetalert2.all.min.js"></script>
+  <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11.6.5/dist/sweetalert2.min.css" rel="stylesheet">
+</head>
+<body>
+  <div>
+    <h1>Sod Calculator</h1>
+    <p>Lawn Size:</p>
+    <p>
+      <label for="width">Width:</label>
+      <input type="number" id="width" placeholder="Width">
+      <select id="widthUnit">
+        <option value="ft" selected>ft</option>
+        <option value="in">in</option>
+        <option value="yd">yd</option>
+        <option value="cm">cm</option>
+        <option value="m">m</option>
+      </select>
+    </p>
+    <p>
+      <label for="length">Length:</label>
+      <input type="number" id="length" placeholder="Length">
+      <select id="lengthUnit">
+        <option value="ft" selected>ft</option>
+        <option value="in">in</option>
+        <option value="yd">yd</option>
+        <option value="cm">cm</option>
+        <option value="m">m</option>
+      </select>
+    </p>
+    <p>Optionally enter the price per roll of sod - average is $3 to $5 per roll.</p>
+    <p>
+      <label for="price">Price: $</label>
+      <input type="number" id="price" placeholder="Optional">
+    </p>
+    <p>
+      <button id="calcBtn">Calculate</button>
+      <button id="resetBtn">Reset</button>
+    </p>
+    
+    <hr>
+    <p>
+    <h3>Result:</h3>
+    <h3 id="calcResults">Result will appear here...</h3>
+    </p>
+  </div>
+  <script>
+
+    /********************************** ELEMENTS **********************************/
+    const lengthEl = document.getElementById('length');
+    const lengthUnitEl = document.getElementById('lengthUnit');
+    const widthEl = document.getElementById('width')
+    const widthUnitEl = document.getElementById('widthUnit')
+    const priceEl = document.getElementById('price'); 
+    const calcBtnEl = document.getElementById('calcBtn');
+    const resetBtnEl = document.getElementById('resetBtn');
+    const calcResultsEl = document.getElementById('calcResults')
+
+     /********************************** FUNCTIONS **********************************/
+            // Conversion functions
+      const convertWidthAndLength = (value, unit) => {
+        const toFeet = {
+          'cm': 0.03281,
+          'in': 0.08333,
+          'yd': 3,
+          'm': 3.281,
+          'ft': 1
+        };
+        const conversionFactor = toFeet[unit];
+        if (conversionFactor !== undefined) {
+          return value * conversionFactor;
+        } else {
+          showError(`Unsupported unit: ${unit}`);
+          return;
+        }
+      }
+        
+      function calculateSod(length, width) {
+        let areaFeet = 0;
+        let areaAcres = 0;
+        let rollsFeet = 0
+        let palletsFeet = 0;
+        areaFeet = length * width
+        areaAcres = areaFeet / 45000
+        rollsFeet = areaFeet / 10
+        palletsFeet = areaFeet / 450
+        return {
+          areaFeet: areaFeet.toFixed(),
+          areaAcres: areaAcres.toFixed(4),
+          rollsFeet: Math.ceil(rollsFeet),
+          palletsFeet: palletsFeet.toFixed(2) * 1
+        }
+      }
+
+      function calculateResults() {
+        // Retrieve input values
+        const width = parseFloat(widthEl.value)
+        const widthUnit = widthUnitEl.value;
+        const length = parseFloat(lengthEl.value)
+        const lengthUnit = lengthUnitEl.value
+        const price = parseFloat(priceEl.value)
+
+        if (
+          isNaN(width) || width <= 0 ||
+          isNaN(length) || length <= 0
+        ) {
+          showError("Please Enter All Details.");
+          return;
+        }
+
+        try {
+          // Convert input values
+          const W = convertWidthAndLength(width, widthUnit);
+          const L = convertWidthAndLength(length, lengthUnit);
+          const {areaAcres, areaFeet, rollsFeet, palletsFeet} = calculateSod(L, W)
+
+          if (price) {
+            let totalCost = rollsFeet * price
+            let costPerSF = totalCost / areaFeet
+            totalCost = totalCost.toFixed(2) * 1
+            costPerSF = costPerSF.toFixed(2) * 1
+
+            calcResultsEl.innerHTML = `<p>Sod Estimate: </p>
+                                      <p>${rollsFeet} Rolls (10 ft<sup>2</sup>)</p>
+                                      <p>${palletsFeet} Pallets (450 ft<sup>2</sup>)</p>
+                                      <p>Total Area</p>
+                                      <p>${areaFeet} Ft<sup>2</sup></p>
+                                      <p>${areaAcres} Acres</p>
+                                      <p>Cost</p>
+                                      <p>$${totalCost} Total cost</p>
+                                      <p>$${costPerSF} Cost per sq ft</p>
+                                     `
+          } else {
+            calcResultsEl.innerHTML = `<p>Sod Estimate: </p>
+                                      <p>${rollsFeet} Rolls (10 ft<sup>2</sup>)</p>
+                                      <p>${palletsFeet} Pallets (450 ft<sup>2</sup>)</p>
+                                      <p>Total Area</p>
+                                      <p>${areaFeet} Ft<sup>2</sup></p>
+                                      <p>${areaAcres} Acres</p>
+                                     `
+          }
+
+          
+        } catch (error) {
+          showError("Something Went Wrong!!!");
+          resethandler()
+        }
+        
+      }
+    /********************************* HELPER FUNCTIONS **********************************/
+
+    function showError(errorMessage) {
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: errorMessage,
+      });
+    }
+
+    function resetForm() {
+      lengthEl.value = "";
+      widthEl.value = "";
+      priceEl.value = "";
+      lengthUnitEl.selectedIndex = "0";
+      widthUnitEl.selectedIndex = "0";
+    }
+
+    function resetResult() {
+      calcResultsEl.innerHTML = "<p>Result will appear here...</p>";
+    }
+
+    function resethandler() {
+      resetForm();
+      resetResult();
+    }
+
+    /********************************** EVENT LISTENERS **********************************/
+    [lengthEl, widthEl, priceEl].forEach((el) => {
+      el.addEventListener("input", resetResult);
+    });
+    resetBtnEl.addEventListener("click", resethandler);
+    calcBtnEl.addEventListener("click", calculateResults);
+  </script>
+</body>
+</html>

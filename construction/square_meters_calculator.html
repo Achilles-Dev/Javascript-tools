@@ -335,6 +335,9 @@
       thirdInputEl.value = "";
       quantityEl.value = "";
       priceEl.value = "";
+      firstInputUnitEl.selectedIndex = "2";
+      secondInputUnitEl.selectedIndex = "2";
+      thirdInputUnitEl.selectedIndex = "2";
     }
 
     function resetResult() {
@@ -348,7 +351,7 @@
 
     /********************************** EVENT LISTENERS **********************************/
     resetBtnEl.addEventListener("click", resethandler);
-    [firstInputEl, secondInputEl].forEach((el) => {
+    [firstInputEl, secondInputEl, thirdInputEl].forEach((el) => {
       if (el) {
         el.addEventListener("input", resetResult);
       }

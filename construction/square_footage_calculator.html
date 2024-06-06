@@ -409,6 +409,10 @@
       quantityEl.value = "";
       priceEl.value = "";
       borderWidthEl.value = "";
+      borderWidthUnitEl.selectedIndex = "4";
+      firstInputUnitEl.selectedIndex = "4";
+      secondInputUnitEl.selectedIndex = "4";
+      thirdInputUnitEl.selectedIndex = "4";
     }
 
     function resetResult() {
@@ -422,7 +426,7 @@
 
     /********************************** EVENT LISTENERS **********************************/
     resetBtnEl.addEventListener("click", resethandler);
-    [firstInputEl, secondInputEl].forEach((el) => {
+    [firstInputEl, secondInputEl, thirdInputEl].forEach((el) => {
       if (el) {
         el.addEventListener("input", resetResult);
       }
