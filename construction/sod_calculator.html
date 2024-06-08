@@ -11,6 +11,8 @@
 <body>
   <div>
     <h1>Sod Calculator</h1>
+    <p>Enter the size of your lawn to estimate how much sod you need, and add the price per <br />
+       roll to estimate how much it will cost.</p>
     <p>Lawn Size:</p>
     <p>
       <label for="width">Width:</label>
@@ -67,7 +69,7 @@
       const convertWidthAndLength = (value, unit) => {
         const toFeet = {
           'cm': 0.03281,
-          'in': 0.08333,
+          'in': 1/12,
           'yd': 3,
           'm': 3.281,
           'ft': 1

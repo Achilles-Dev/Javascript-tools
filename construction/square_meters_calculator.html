@@ -23,7 +23,7 @@
         <option value="trian">Triangle</option>
       </select>
     </p>
-    <div id="inputParams">
+    <div id="rectInputParams">
       <p>
         <label for="length">Length:</label>
         <input type="number" id="length">
@@ -40,6 +40,72 @@
         <label for="width">Width:</label>
         <input type="number" id="width">
         <select id="widthUnit">
+          <option value="mm">mm</option>
+          <option value="cm">cm</option>
+          <option value="m" selected>m</option>
+          <option value="in">in</option>
+          <option value="ft">ft</option>
+          <option value="yd">yd</option>
+        </select>
+      </p>
+    </div>
+    <div id="squareInputParams" style="display: none;">
+      <p>
+        <label for="width">Width:</label>
+        <input type="number" id="width">
+        <select id="widthUnit">
+          <option value="mm">mm</option>
+          <option value="cm">cm</option>
+          <option value="m" selected>m</option>
+          <option value="in">in</option>
+          <option value="ft">ft</option>
+          <option value="yd">yd</option>
+        </select>
+      </p>
+    </div>
+    <div id="circleInputParams" style="display: none;">
+      <p>
+        <label for="diameter">Diameter::</label>
+        <input type="number" id="diameter">
+        <select id="diameterUnit">
+          <option value="mm">mm</option>
+          <option value="cm">cm</option>
+          <option value="m" selected>m</option>
+          <option value="in">in</option>
+          <option value="ft">ft</option>
+          <option value="yd">yd</option>
+        </select>
+      </p>
+    </div>
+    <div id="trianInputParams" style="display: none;">
+      <p>
+        <label for="sideA">Side A:</label>
+        <input type="number" id="sideA">
+        <select id="sideAUnit">
+          <option value="mm">mm</option>
+          <option value="cm">cm</option>
+          <option value="m" selected>m</option>
+          <option value="in">in</option>
+          <option value="ft">ft</option>
+          <option value="yd">yd</option>
+        </select>
+      </p>
+      <p>
+        <label for="sideB">Side B:</label>
+        <input type="number" id="sideB">
+        <select id="sideBUnit">
+          <option value="mm">mm</option>
+          <option value="cm">cm</option>
+          <option value="m" selected>m</option>
+          <option value="in">in</option>
+          <option value="ft">ft</option>
+          <option value="yd">yd</option>
+        </select>
+      </p>
+      <p>
+        <label for="sideC">Side C:</label>
+        <input type="number" id="sideC">
+        <select id="sideCUnit">
           <option value="mm">mm</option>
           <option value="cm">cm</option>
           <option value="m" selected>m</option>
@@ -76,7 +142,10 @@
 
     /********************************** ELEMENTS **********************************/
     const shapeSelectEl = document.getElementById('shapeSelect')
-    const inputParamsEl = document.getElementById('inputParams')
+    const rectInputParamsEl= document.getElementById('rectInputParams')
+    const squareInputParamsEl = document.getElementById('squareInputParams')
+    const circleInputParamsEl = document.getElementById('circleInputParams')
+    const trianInputParamsEl = document.getElementById('trianInputParams')
     const quantityEl = document.getElementById('quantity');
     const priceEl = document.getElementById('price');
     const calcBtnEl = document.getElementById('calcBtn');
@@ -95,51 +164,21 @@
     function handleSquareMeterShapeChange(e) {
       let shape = e.target.value
       if (shape == 'rect') {
-        inputParamsEl.innerHTML = `<p>
-                                      <label for="secondInput">secondInput:</label>
-                                      <input type="number" id="secondInput">
-                                      <select id="secondInputUnit">
-                                        <option value="mm">mm</option>
-                                        <option value="cm">cm</option>
-                                        <option value="m" selected>m</option>
-                                        <option value="in">in</option>
-                                        <option value="ft">ft</option>
-                                        <option value="yd">yd</option>
-                                      </select>
-                                    </p>
-                                    <p>
-                                      <label for="firstInput">firstInput:</label>
-                                      <input type="number" id="firstInput">
-                                      <select id="firstInputUnit">
-                                        <option value="mm">mm</option>
-                                        <option value="cm">cm</option>
-                                        <option value="m" selected>m</option>
-                                        <option value="in">in</option>
-                                        <option value="ft">ft</option>
-                                        <option value="yd">yd</option>
-                                      </select>
-                                    </p>
-                                  `
-        firstInputEl = document.getElementById('firstInput');
-        firstInputUnitEl = document.getElementById('firstInputUnit');
-        secondInputEl = document.getElementById('secondInput');
-        secondInputUnitEl = document.getElementById('secondInputUnit');
+        rectInputParamsEl.style.display = "block"
+        squareInputParamsEl.style.display = "none"
+        circleInputParamsEl.style.display = "none"
+        trianInputParamsEl.style.display = "none"
+        firstInputEl = document.getElementById('length');
+        firstInputUnitEl = document.getElementById('lengthUnit');
+        secondInputEl = document.getElementById('width');
+        secondInputUnitEl = document.getElementById('widthUnit');
         thirdInputEl = ''
         thirdInputUnitEl = ''
       } else if (shape == 'square') {
-        inputParamsEl.innerHTML = `<p>
-                                      <label for="width">Width:</label>
-                                      <input type="number" id="width">
-                                      <select id="widthUnit">
-                                        <option value="mm">mm</option>
-                                        <option value="cm">cm</option>
-                                        <option value="m" selected>m</option>
-                                        <option value="in">in</option>
-                                        <option value="ft">ft</option>
-                                        <option value="yd">yd</option>
-                                      </select>
-                                    </p>
-                                  `
+        rectInputParamsEl.style.display = "none"
+        squareInputParamsEl.style.display = "block"
+        circleInputParamsEl.style.display = "none"
+        trianInputParamsEl.style.display = "none"
         firstInputEl = document.getElementById('width');
         firstInputUnitEl = document.getElementById('widthUnit');
         secondInputEl = ''
@@ -147,19 +186,10 @@
         thirdInputEl = ''
         thirdInputUnitEl = ''
       } else if (shape == 'circle') {
-        inputParamsEl.innerHTML = `<p>
-                                      <label for="diameter">Diameter::</label>
-                                      <input type="number" id="diameter">
-                                      <select id="diameterUnit">
-                                        <option value="mm">mm</option>
-                                        <option value="cm">cm</option>
-                                        <option value="m" selected>m</option>
-                                        <option value="in">in</option>
-                                        <option value="ft">ft</option>
-                                        <option value="yd">yd</option>
-                                      </select>
-                                    </p>
-                                  `
+        rectInputParamsEl.style.display = "none"
+        squareInputParamsEl.style.display = "none"
+        circleInputParamsEl.style.display = "block"
+        trianInputParamsEl.style.display = "none"
         firstInputEl = document.getElementById('diameter');
         firstInputUnitEl = document.getElementById('diameterUnit');
         secondInputEl = '';
@@ -167,43 +197,10 @@
         thirdInputEl = ''
         thirdInputUnitEl = ''
       } else if (shape == 'trian') {
-        inputParamsEl.innerHTML = `<p>
-                                      <label for="sideA">Side A:</label>
-                                      <input type="number" id="sideA">
-                                      <select id="sideAUnit">
-                                        <option value="mm">mm</option>
-                                        <option value="cm">cm</option>
-                                        <option value="m" selected>m</option>
-                                        <option value="in">in</option>
-                                        <option value="ft">ft</option>
-                                        <option value="yd">yd</option>
-                                      </select>
-                                    </p>
-                                    <p>
-                                      <label for="sideB">Side B:</label>
-                                      <input type="number" id="sideB">
-                                      <select id="sideBUnit">
-                                        <option value="mm">mm</option>
-                                        <option value="cm">cm</option>
-                                        <option value="m" selected>m</option>
-                                        <option value="in">in</option>
-                                        <option value="ft">ft</option>
-                                        <option value="yd">yd</option>
-                                      </select>
-                                    </p>
-                                    <p>
-                                      <label for="sideC">Side C:</label>
-                                      <input type="number" id="sideC">
-                                      <select id="sideCUnit">
-                                        <option value="mm">mm</option>
-                                        <option value="cm">cm</option>
-                                        <option value="m" selected>m</option>
-                                        <option value="in">in</option>
-                                        <option value="ft">ft</option>
-                                        <option value="yd">yd</option>
-                                      </select>
-                                    </p>
-                                  `
+        rectInputParamsEl.style.display = "none"
+        squareInputParamsEl.style.display = "none"
+        circleInputParamsEl.style.display = "none"
+        trianInputParamsEl.style.display = "block"
         firstInputEl = document.getElementById('sideA');
         firstInputUnitEl = document.getElementById('sideAUnit');
         secondInputEl = document.getElementById('sideB');

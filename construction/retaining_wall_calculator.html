@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Retaining Wall Calculator</title>
+
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.6.5/dist/sweetalert2.all.min.js"></script>
+  <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11.6.5/dist/sweetalert2.min.css" rel="stylesheet">
+</head>
+<body>
+  <div>
+    <h1>Retaining Wall Calculator</h1>
+    <p>Calculate how many retaining wall blocks you’ll need and how much base and backfill <br/> 
+      gravel is required to build a wall. Optionally enter the price per block to get a cost estimate.
+    </p>
+    <h3>Wall Dimensions</h3>
+    <p>
+      <label for="width">Width:</label>
+      <input type="number" id="width">
+      <select id="widthUnit">
+        <option value="in">in</option>
+        <option value="ft" selected>ft</option>
+        <option value="yd">yd</option>
+        <option value="cm">cm</option>
+        <option value="m">m</option>   
+      </select>
+    </p>
+    <p>
+      <label for="height">Room Height:</label>
+      <input type="number" id="height">
+      <select id="heightUnit">
+        <option value="in">in</option>
+        <option value="ft" selected>ft</option>
+        <option value="yd">yd</option>
+        <option value="cm">cm</option>
+        <option value="m">m</option>
+      </select>
+    </p>
+    <h3>Block Dimensions</h3>
+    <p>
+      <label for="blockWidth">Width:</label>
+      <input type="number" id="blockWidth"> <span>inches</span> 
+    </p>
+    <p>
+      <label for="blockHeight">Height:</label>
+      <input type="number" id="blockHeight"> <span>inches</span>
+    </p>
+    <span>Optionally enter the price per block</span>
+    <p>
+      <label for="blockPrice">Price $</label>
+      <input type="number" id="blockPrice" placeholder="$">
+    </p>
+    <h3>Cap Block Dimensions (optional)</h3>
+    <p>
+      <label for="capBlockWidth">Width:</label>
+      <input type="number" id="capBlockWidth"> <span>inches</span>
+    </p>
+    <p>
+      <label for="capBlockHeight">Height:</label>
+      <input type="number" id="capBlockHeight"> <span>inches</span>
+    </p>
+    <span>Optionally enter the price per cap block</span>
+    <p>
+      <label for="capBlockPrice">Price $</label>
+      <input type="number" id="capBlockPrice" placeholder="$">
+    </p>
+    <p>
+      <button id="calcBtn">Calculate</button>
+      <button id="resetBtn">Reset</button>
+    </p>
+    
+    <hr>
+    <p>
+    <h3>Result:</h3>
+    <h3 id="calcResults">Result will appear here...</h3>
+    </p>
+  </div>
+  <script>
+
+    /********************************** ELEMENTS **********************************/
+    const widthEl = document.getElementById('width') 
+    const widthUnitEl = document.getElementById('widthUnit')
+    const heightEl = document.getElementById('height')
+    const heightUnitEl = document.getElementById('heightUnit')
+    const blockWidthEl = document.getElementById('blockWidth') 
+    const blockHeightEl = document.getElementById('blockHeight')
+    const blockPriceEl = document.getElementById('blockPrice')
+    const capBlockWidthEl = document.getElementById('capBlockWidth')
+    const capBlockHeightEl = document.getElementById('capBlockHeight')
+    const capBlockPriceEl = document.getElementById('capBlockPrice')
+    const calcBtnEl = document.getElementById('calcBtn');
+    const resetBtnEl = document.getElementById('resetBtn');
+    const calcResultsEl = document.getElementById('calcResults');
+
+     /********************************** FUNCTIONS **********************************/
+            // Conversion functions
+      const convertWidthAndLength = (value, unit) => {
+        const toFeet = {
+          'cm': 0.03281,
+          'in': 1/12,
+          'yd': 3,
+          'm': 3.281,
+          'ft': 1
+        };
+        const conversionFactor = toFeet[unit];
+        if (conversionFactor !== undefined) {
+          return value * conversionFactor;
+        } else {
+          showError(`Unsupported unit: ${unit}`);
+          return;
+        }
+      }
+
+      function wallBlockMatEstimate(width, height, blockWidth, blockHeight, capBlockWidth, capBlockHeight) {
+        let squareFeet = 0;
+        let blocks = 0;
+        let baseGravel = 0;
+        let backFillGavel = 0;
+        let capBlocks = 0;
+        squareFeet = width * height
+        let wallColumns = width / blockWidth
+        let wallRows = height / blockHeight
+        blocks = Math.ceil(wallColumns) * Math.ceil(wallRows)
+        if (capBlockWidth && capBlockHeight) {
+          capBlocks = Math.ceil(width / capBlockWidth)
+          blocks = blocks -  Math.ceil(wallColumns)
+        }
+
+        /* TO DO*/
+        // baseGravel
+        // backFillGavel
+
+        return {
+          squareFeet: squareFeet.toFixed(2) * 1,
+          blocks,
+          capBlocks,
+        }
+      }
+
+      function calculateResults() {
+        // Retrieve input values
+        const width = parseFloat(widthEl.value)
+        const widthUnit = widthUnitEl.value
+        const height = parseFloat(heightEl.value)
+        const heightUnit = heightUnitEl.value;
+        const blockWidth = parseFloat(blockWidthEl.value);
+        const blockHeight = parseFloat(blockHeightEl.value);
+        const blockPrice = parseFloat(blockPriceEl.value);
+        const capBlockWidth= parseFloat(capBlockWidthEl.value);
+        const capBlockHeight = parseFloat(capBlockHeightEl.value);
+        const capBlockPrice = parseFloat(capBlockPriceEl.value);
+
+        if (
+          isNaN(width) || width <= 0 ||
+          isNaN(height) || height <= 0 ||
+          isNaN(blockWidth) || blockWidth <= 0 ||
+          isNaN(blockHeight) || blockHeight <= 0
+
+        ) {
+          showError("Please Enter All Details.");
+          return;
+        }
+
+        try {
+          // Convert input values
+          const W = convertWidthAndLength(width, widthUnit);
+          const H = convertWidthAndLength(height, heightUnit);
+          const BW = convertWidthAndLength(blockWidth, 'in');
+          const BH = convertWidthAndLength(blockHeight, 'in');
+          const CBW = convertWidthAndLength(capBlockWidth, 'in');
+          const CBH = convertWidthAndLength(capBlockHeight, 'in');
+          const results = wallBlockMatEstimate(W, H, BW, BH, CBW, CBH)
+          
+          if (blockPrice) {
+            const totalBlockPrice = blockPrice * results.blocks
+            const totalCapBlockPrice = (capBlockWidth && capBlockHeight && capBlockPrice) ? (results.capBlocks * capBlockPrice) : 0
+            const estimatedCost = totalBlockPrice + totalCapBlockPrice
+            calcResultsEl.innerHTML = ` <p>${results.blocks} Blocks (${blockWidth}" x ${blockHeight}")</p>
+                                        ${capBlockWidth && capBlockHeight ? `<p>${results.capBlocks} Cap Blocks (${capBlockWidth}" x ${capBlockHeight}")</p>`: ''} 
+                                        <p>Wall Area: ${results.squareFeet}ft<sup>2</sup></p>
+                                        <p>Estimated Material Cost:</p>
+                                        <p>$${totalBlockPrice} blocks</p>
+                                        ${capBlockWidth && capBlockHeight && capBlockPrice ? `<p>$${totalCapBlockPrice} Cap Blocks</p>`: ''} 
+                                        <p>$${estimatedCost} Estimated Total</p>
+                                      `
+          } else {
+            calcResultsEl.innerHTML = `
+                                        <p>${results.blocks} Blocks (${blockWidth}" x ${blockHeight}")</p>
+                                        ${capBlockWidth && capBlockHeight ? `<p>${results.capBlocks} Cap Blocks (${capBlockWidth}" x ${capBlockHeight}")</p>`: ''} 
+                                        <p>Wall Area: ${results.squareFeet}ft<sup>2</sup></p>
+                                      `
+          }
+                                  
+        } catch (error) {
+          showError("Something Went Wrong!!!");
+          resethandler()
+        }
+      
+      }
+    /********************************* HELPER FUNCTIONS **********************************/
+
+    function showError(errorMessage) {
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: errorMessage,
+      });
+    }
+
+    function resetForm() {
+      widthEl.value = "";
+      heightEl.value = "";
+      blockWidthEl.value = "";
+      blockHeightEl.value = "";
+      blockPriceEl.value = "";
+      capBlockWidthEl.value = "";
+      capBlockHeightEl.value = "";
+      capBlockPriceEl.value = "";     
+      widthUnitEl.selectedIndex = "1";
+      heightUnitEl.selectedIndex = "1";
+    }
+
+    function resetResult() {
+      calcResultsEl.innerHTML = "<p>Result will appear here...</p>";
+    }
+
+    function resethandler() {
+      resetForm();
+      resetResult();
+    }
+
+    /********************************** EVENT LISTENERS **********************************/
+    [widthEl, heightEl, blockWidthEl, blockHeightEl, blockPriceEl, capBlockWidthEl, capBlockHeightEl, capBlockPriceEl].forEach((el) => {
+      el.addEventListener("input", resetResult);
+    });
+    resetBtnEl.addEventListener("click", resethandler);
+    calcBtnEl.addEventListener("click", calculateResults);
+  </script>
+</body>
+</html>

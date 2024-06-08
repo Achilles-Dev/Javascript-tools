@@ -11,6 +11,10 @@
 <body>
   <div>
     <h1>Sand Calculator</h1>
+    <p>Use this calculator to estimate how much sand in volume (cubic ft, cubic yards, or cubic meters) or weight <br/>
+      (tons & pounds, tonnes and kilograms) you would need. It uses conventional sand density to convert sand volume <br/>
+      to sand weight.
+    </p>
     <p>
       <label>The area to fill is &nbsp;&nbsp;&nbsp;</label>
       <input type="radio" id="rectangle" name="areaToFill" value="rectangle" checked>
@@ -18,7 +22,7 @@
       <input type="radio" id="circle" name="areaToFill" value="circle">
       <label for="circle">Circular</label>
     </p>
-    <div id="areaInput">
+    <div id="rectangularreaInput">
       <p>
         <label for="width">Width:</label>
         <input type="number" id="width" placeholder="Width">
@@ -43,8 +47,32 @@
       </p>
       <p>
         <label for="depth">Depth / Height:</label>
-        <input type="number" id="depth" placeholder="Depth">
+        <input type="number" id="depth">
         <select id="depthUnit">
+          <option value="in" selected>in</option>
+          <option value="ft">ft</option>
+          <option value="yd">yd</option>
+          <option value="cm">cm</option>
+          <option value="m">m</option>
+        </select>
+      </p>
+    </div>
+    <div id="circularAreaInput" style="display: none;">
+      <p>
+        <label for="circleDepth">Depth / Height:</label>
+        <input type="number" id="circleDepth">
+        <select id="circleDepthUnit">
+          <option value="in" selected>in</option>
+          <option value="ft">ft</option>
+          <option value="yd">yd</option>
+          <option value="cm">cm</option>
+          <option value="m">m</option>
+        </select>
+      </p>   
+      <p>
+        <label for="diameter">Diameter:</label>
+        <input type="number" id="diameter" placeholder="Diameter">
+        <select id="diameterUnit">
           <option value="in" selected>in</option>
           <option value="ft">ft</option>
           <option value="yd">yd</option>
@@ -72,7 +100,8 @@
 
     /********************************** ELEMENTS **********************************/
     const areaToFillEl = document.querySelectorAll("input[name='areaToFill']");
-    const areaInputEl = document.getElementById('areaInput')
+    const rectangularreaInputEl = document.getElementById('rectangularreaInput')
+    const circularAreaInputEl = document.getElementById('circularAreaInput')
     const priceEl = document.getElementById('price'); 
     const calcBtnEl = document.getElementById('calcBtn');
     const resetBtnEl = document.getElementById('resetBtn');
@@ -90,7 +119,7 @@
       const convertWidthAndLength = (value, unit) => {
         const toFeet = {
           'cm': 0.03281,
-          'in': 0.08333,
+          'in': 1/12,
           'yd': 3,
           'm': 3.281,
           'ft': 1
@@ -124,82 +153,25 @@
       function changeAreaToFill(e) {
         const area = e.target.value
         if (area == 'rectangle') {
-          areaInputEl.innerHTML = `
-                                    <p>
-                                      <label for="width">Width:</label>
-                                      <input type="number" id="width" placeholder="Width">
-                                      <select id="widthUnit">
-                                        <option value="ft" selected>ft</option>
-                                        <option value="in">in</option>
-                                        <option value="yd">yd</option>
-                                        <option value="cm">cm</option>
-                                        <option value="m">m</option>
-                                      </select>
-                                    </p>
-                                    <p>
-                                      <label for="length">Length:</label>
-                                      <input type="number" id="length" placeholder="Length">
-                                      <select id="lengthUnit">
-                                        <option value="ft" selected>ft</option>
-                                        <option value="in">in</option>
-                                        <option value="yd">yd</option>
-                                        <option value="cm">cm</option>
-                                        <option value="m">m</option>
-                                      </select>
-                                    </p>
-                                    <p>
-                                      <label for="depth">Depth / Height:</label>
-                                      <input type="number" id="depth" placeholder="Depth">
-                                      <select id="depthUnit">
-                                        <option value="in" selected>in</option>
-                                        <option value="ft">ft</option>
-                                        <option value="yd">yd</option>
-                                        <option value="cm">cm</option>
-                                        <option value="m">m</option>
-                                      </select>
-                                    </p>
-                                  `
-        firstInputEl = document.getElementById('length');
-        firstInputUnitEl = document.getElementById('lengthUnit');
-        secondInputEl = document.getElementById('width');
-        secondInputUnitEl = document.getElementById('widthUnit');
-        thirdInputEl = document.getElementById('depth');
-        thirdInputUnitEl = document.getElementById('depthUnit');
-        selectedArea = area
+          rectangularreaInputEl.style.display = 'block'
+          circularAreaInputEl.style.display = 'none'
+          firstInputEl = document.getElementById('length');
+          firstInputUnitEl = document.getElementById('lengthUnit');
+          secondInputEl = document.getElementById('width');
+          secondInputUnitEl = document.getElementById('widthUnit');
+          thirdInputEl = document.getElementById('depth');
+          thirdInputUnitEl = document.getElementById('depthUnit');
+          selectedArea = area
         } else if (area == 'circle') {
-          areaInputEl.innerHTML = `
-                                    <p>
-                                      <label for="depth">Depth / Height:</label>
-                                      <input type="number" id="depth" placeholder="Depth">
-                                      <select id="depthUnit">
-                                        <option value="in" selected>in</option>
-                                        <option value="ft">ft</option>
-                                        <option value="yd">yd</option>
-                                        <option value="cm">cm</option>
-                                        <option value="m">m</option>
-                                      </select>
-                                    </p>   
-                                    <p>
-                                      <label for="diameter">Diameter:</label>
-                                      <input type="number" id="diameter" placeholder="Diameter">
-                                      <select id="diameterUnit">
-                                        <option value="in" selected>in</option>
-                                        <option value="ft">ft</option>
-                                        <option value="yd">yd</option>
-                                        <option value="cm">cm</option>
-                                        <option value="m">m</option>
-                                      </select>
-                                    </p>
-                                  `
-        firstInputEl = document.getElementById('diameter');
-        firstInputUnitEl = document.getElementById('diameterUnit');
-        secondInputEl = document.getElementById('depth');
-        secondInputUnitEl = document.getElementById('depthUnit');
-        selectedArea = area
+          rectangularreaInputEl.style.display = 'none'
+          circularAreaInputEl.style.display = 'block'
+          firstInputEl = document.getElementById('diameter');
+          firstInputUnitEl = document.getElementById('diameterUnit');
+          secondInputEl = document.getElementById('circleDepth');
+          secondInputUnitEl = document.getElementById('circleDepthUnit');
+          selectedArea = area
         }
       }
-
-
 
       function calculateRectangularArea(length, width, depth) {
         let cubicFeet = 0;
@@ -223,13 +195,14 @@
         let cubicYards = 0
         let weightTons = 0;
         let weightPounds = 0;
-        cubicFeet = 3.142 * diameter * depth
+        console.log(diameter, depth)
+        cubicFeet = (3.142 * ((diameter / 2) / 12) ** 2) * (depth / 12)
         cubicYards = cubicFeet / 27
         weightTons = 1.35 * cubicYards
         weightPounds = cubicYards * 2696.981;
         return {
           cubicYards: cubicYards.toFixed(3) * 1, 
-          cubicFeet: cubicFeet.toFixed() * 1,
+          cubicFeet: cubicFeet.toFixed(3) * 1,
           weightTons: weightTons,
           weightPounds: weightPounds.toFixed()
         }

@@ -11,6 +11,8 @@
 <body>
   <div>
     <h1>Soil Calculator</h1>
+    <p>Calculate the soil, topsoil, or fill dirt needed by entering the length, width, <br />
+      and depth of the space you want to fill.</p>
     <p>
       <label for="length">Length:</label>
       <input type="number" id="length" placeholder="Length">
@@ -74,7 +76,7 @@
       const convertWidthAndLength = (value, unit) => {
         const toFeet = {
           'cm': 0.03281,
-          'in': 0.08333,
+          'in': 1/12,
           'yd': 3,
           'm': 3.281,
           'ft': 1
