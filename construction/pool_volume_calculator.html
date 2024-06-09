@@ -13,13 +13,16 @@
     <h1>Pool Volume Calculator</h1>
     <p>Calculate how many gallons or liters of water are needed to fill a swimming pool <br />
       by selecting the pool shape and size below.</p>
-    <p>Pool Shape:</p>
-    <div>
-      <button id="rectButton">Rectangular</button>
-      <button id="circleButton">Circular</button>
-      <button id="ovalButton">Oval</button>
-      <button id="oblongButton">Oblong</button>
-    </div>
+    <p>
+      <label for="shapeSelect">Pool Shape:</label>
+      <select id="shapeSelect">
+        <option value="rect" selected>Rectangle</option>
+        <option value="circle">Circle</option>
+        <option value="oval">Oval</option>
+        <option value="oblong">Oblong</option>
+      </select>
+    </p>
+    
     <div id="rectInput">
       <p>
         <label for="rectLength">Length:</label>
@@ -207,10 +210,7 @@
   <script>
 
     /********************************** ELEMENTS **********************************/
-    const rectButtonEl = document.getElementById('rectButton');
-    const circleButtonEl = document.getElementById('circleButton');
-    const ovalButtonEl = document.getElementById('ovalButton');
-    const oblongButtonEl = document.getElementById('oblongButton');
+    const shapeSelectEl = document.getElementById('shapeSelect')
     const rectInputEl = document.getElementById('rectInput');
     const circleIputEl = document.getElementById('circleIput');
     const ovalInputEl = document.getElementById('ovalInput');
@@ -229,16 +229,16 @@
     let fourthInputUnitEl = document.getElementById('rectDeepDepthUnit');
     let fifthInputEl = ''
     let fifthInputUnitEl = ''
-    let selectedVolume = 'rectButton'
+    let selectedVolume = 'rect'
 
      /********************************** FUNCTIONS **********************************/
             // Conversion functions
       const convertWidthAndLength = (value, unit) => {
         const toFeet = {
-          'cm': 0.03281,
+          'cm': 0.0328084,
           'in': 1/12,
           'yd': 3,
-          'm': 3.281,
+          'm': 3.28084,
           'ft': 1
         };
         const conversionFactor = toFeet[unit];
@@ -250,19 +250,15 @@
         }
       }
 
-      function handleShapeButton(e) {
-        const poolShape = e.target.id
-        rectButtonEl.style.color = poolShape ==  'rectButton' ? 'red' : 'black'
-        circleButtonEl.style.color = poolShape ==  'circleButton' ? 'red' : 'black'
-        ovalButtonEl.style.color = poolShape ==  'ovalButton' ? 'red' : 'black'
-        oblongButtonEl.style.color = poolShape ==  'oblongButton' ? 'red' : 'black'
+      function handleShapeChange(e) {
+        const poolShape = e.target.value
 
-        rectInputEl.style.display = poolShape ==  'rectButton' ? 'block' : 'none'
-        circleIputEl.style.display = poolShape ==  'circleButton' ? 'block' : 'none'
-        ovalInputEl.style.display = poolShape ==  'ovalButton' ? 'block' : 'none'
-        oblongInputEl.style.display = poolShape ==  'oblongButton' ? 'block' : 'none'
+        rectInputEl.style.display = poolShape ==  'rect' ? 'block' : 'none'
+        circleIputEl.style.display = poolShape ==  'circle' ? 'block' : 'none'
+        ovalInputEl.style.display = poolShape ==  'oval' ? 'block' : 'none'
+        oblongInputEl.style.display = poolShape ==  'oblong' ? 'block' : 'none'
         
-        if (poolShape == 'rectButton') {
+        if (poolShape == 'rect') {
           
           firstInputEl = document.getElementById('rectLength');
           firstInputUnitEl = document.getElementById('rectLengthUnit');
@@ -273,14 +269,14 @@
           fourthInputEl = document.getElementById('rectDeepDepth');
           fourthInputUnitEl = document.getElementById('rectDeepDepthUnit');
           selectedVolume = poolShape
-        } else if (poolShape == 'circleButton') {
+        } else if (poolShape == 'circle') {
           
           firstInputEl = document.getElementById('diameter');
           firstInputUnitEl = document.getElementById('diameterUnit');
           secondInputEl = document.getElementById('circleShaDepth');
           secondInputUnitEl = document.getElementById('circleShaDepthUnit');
           selectedVolume = poolShape
-        } else if (poolShape == 'ovalButton') {
+        } else if (poolShape == 'oval') {
 
           firstInputEl = document.getElementById('ovalLength');
           firstInputUnitEl = document.getElementById('ovalLengthUnit');
@@ -291,7 +287,7 @@
           fourthInputEl = document.getElementById('ovalDeepDepth');
           fourthInputUnitEl = document.getElementById('ovalDeepDepthUnit');
           selectedVolume = poolShape
-        } else if (poolShape  == 'oblongButton') {
+        } else if (poolShape  == 'oblong') {
 
           firstInputEl = document.getElementById('oblongLength');
           firstInputUnitEl = document.getElementById('oblongLengthUnit');
@@ -326,7 +322,7 @@
         let cubicFeet = 0;
         let gallons = 0;
         let litres = 0
-        cubicFeet = 3.14 * ((diameter / 2) ** 2) * shaDepth
+        cubicFeet = Math.PI * ((diameter / 2) ** 2) * shaDepth
         gallons = cubicFeet * 7.48
         litres = gallons * 3.78541
         return {
@@ -341,7 +337,7 @@
         let gallons = 0;
         let litres = 0
         let avgDepth = deepDepth ? (deepDepth + shaDepth) / 2 : shaDepth
-        cubicFeet = length * width * (3.14 / 4) * avgDepth
+        cubicFeet = length * width * (Math.PI / 4) * avgDepth
         gallons = cubicFeet * 7.48
         litres = gallons * 3.78541
         return {
@@ -382,7 +378,7 @@
           ((firstInput && isNaN(firstInput)) || (firstInput <= 0)) || 
           ((secondInput && isNaN(secondInput)) || (secondInput <= 0)) || 
           ((thirdInput && isNaN(thirdInput)) || (thirdInput <= 0)) || 
-          ((fourthInput && isNaN(fourthInput)) || (fourthInput <= 0 && selectedVolume == 'oblongButton'))
+          ((fourthInput && isNaN(fourthInput)) || (fourthInput <= 0 && selectedVolume == 'oblong'))
         ) {
           showError("Please Enter All Details.");
           return;
@@ -394,7 +390,7 @@
           let cubicFeet = 0;
           let gallons = 0;
           let litres = 0;
-          if (selectedVolume == 'rectButton') {
+          if (selectedVolume == 'rect') {
             const length = convertWidthAndLength(firstInput, firstInputUnit);
             const width = convertWidthAndLength(secondInput, secondInputUnit);
             const shaDepth = convertWidthAndLength(thirdInput, thirdInputUnit);
@@ -403,14 +399,14 @@
             cubicFeet = results.cubicFeet
             gallons = results.gallons
             litres = results.litres
-          } else if (selectedVolume == 'circleButton') {
+          } else if (selectedVolume == 'circle') {
             const diameter = convertWidthAndLength(firstInput, firstInputUnit);
             const shaDepth = convertWidthAndLength(secondInput, secondInputUnit);
             const results = circularVolume(diameter, shaDepth);
             cubicFeet = results.cubicFeet
             gallons = results.gallons
             litres = results.litres
-          } else if (selectedVolume == 'ovalButton') {
+          } else if (selectedVolume == 'oval') {
             const length = convertWidthAndLength(firstInput, firstInputUnit);
             const width = convertWidthAndLength(secondInput, secondInputUnit);
             const shaDepth = convertWidthAndLength(thirdInput, thirdInputUnit);
@@ -419,7 +415,7 @@
             cubicFeet = results.cubicFeet
             gallons = results.gallons
             litres = results.litres
-          } else if (selectedVolume == 'oblongButton') {
+          } else if (selectedVolume == 'oblong') {
             const length = convertWidthAndLength(firstInput, firstInputUnit);
             const width = convertWidthAndLength(secondInput, secondInputUnit);
             const shortWidth = convertWidthAndLength(thirdInput, thirdInputUnit);
@@ -482,9 +478,11 @@
         el.addEventListener("input", resetResult);
       }
     });
-    [rectButtonEl, circleButtonEl, ovalButtonEl, oblongButtonEl].forEach((el) => {
-      el.addEventListener("click", (e) => handleShapeButton(e));
-    });
+    shapeSelectEl.addEventListener("change", (e) => {
+      handleShapeChange(e);
+      resethandler();
+    })
+    
     resetBtnEl.addEventListener("click", resethandler);
     calcBtnEl.addEventListener("click", calculateResults);
   </script>

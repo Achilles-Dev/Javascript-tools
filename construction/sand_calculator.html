@@ -22,7 +22,7 @@
       <input type="radio" id="circle" name="areaToFill" value="circle">
       <label for="circle">Circular</label>
     </p>
-    <div id="rectangularreaInput">
+    <div id="rectangularAreaInput">
       <p>
         <label for="width">Width:</label>
         <input type="number" id="width" placeholder="Width">
@@ -100,7 +100,7 @@
 
     /********************************** ELEMENTS **********************************/
     const areaToFillEl = document.querySelectorAll("input[name='areaToFill']");
-    const rectangularreaInputEl = document.getElementById('rectangularreaInput')
+    const rectangularAreaInputEl = document.getElementById('rectangularAreaInput')
     const circularAreaInputEl = document.getElementById('circularAreaInput')
     const priceEl = document.getElementById('price'); 
     const calcBtnEl = document.getElementById('calcBtn');
@@ -118,10 +118,10 @@
             // Conversion functions
       const convertWidthAndLength = (value, unit) => {
         const toFeet = {
-          'cm': 0.03281,
+          'cm': 0.0328084,
           'in': 1/12,
           'yd': 3,
-          'm': 3.281,
+          'm': 3.28084,
           'ft': 1
         };
         const conversionFactor = toFeet[unit];
@@ -135,12 +135,14 @@
         
       const convertDepth = (value, unit) => {
         const toInch = {
-          'cm': 0.3937,
-          'yd': 0.02778,
-          'm': 39.37,
+          'cm': 0.393701,
+          'yd': 36,
+          'm': 39.3701,
           'ft': 12,
           'in': 1
         };
+
+
         const conversionFactor = toInch[unit];
         if (conversionFactor !== undefined) {
           return value * conversionFactor;
@@ -153,7 +155,7 @@
       function changeAreaToFill(e) {
         const area = e.target.value
         if (area == 'rectangle') {
-          rectangularreaInputEl.style.display = 'block'
+          rectangularAreaInputEl.style.display = 'block'
           circularAreaInputEl.style.display = 'none'
           firstInputEl = document.getElementById('length');
           firstInputUnitEl = document.getElementById('lengthUnit');
@@ -163,7 +165,7 @@
           thirdInputUnitEl = document.getElementById('depthUnit');
           selectedArea = area
         } else if (area == 'circle') {
-          rectangularreaInputEl.style.display = 'none'
+          rectangularAreaInputEl.style.display = 'none'
           circularAreaInputEl.style.display = 'block'
           firstInputEl = document.getElementById('diameter');
           firstInputUnitEl = document.getElementById('diameterUnit');
@@ -180,11 +182,11 @@
         let weightPounds = 0;
         cubicFeet = (length * width * (depth / 12))
         cubicYards = cubicFeet / 27
-        weightTons = 1.35 * cubicYards
+        weightTons = (4 / 3) * cubicYards
         weightPounds = cubicYards * 2696.981;
         return {
           cubicYards: cubicYards.toFixed(3) * 1, 
-          cubicFeet: cubicFeet.toFixed() * 1,
+          cubicFeet: cubicFeet.toFixed(3) * 1,
           weightTons: weightTons,
           weightPounds: weightPounds.toFixed()
         }
@@ -195,11 +197,10 @@
         let cubicYards = 0
         let weightTons = 0;
         let weightPounds = 0;
-        console.log(diameter, depth)
-        cubicFeet = (3.142 * ((diameter / 2) / 12) ** 2) * (depth / 12)
+        cubicFeet = (Math.PI * ((diameter / 2) / 12) ** 2) * (depth / 12)
         cubicYards = cubicFeet / 27
-        weightTons = 1.35 * cubicYards
-        weightPounds = cubicYards * 2696.981;
+        weightTons = (4 / 3) * cubicYards
+        weightPounds = cubicYards * 2696.981;;
         return {
           cubicYards: cubicYards.toFixed(3) * 1, 
           cubicFeet: cubicFeet.toFixed(3) * 1,

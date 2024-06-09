@@ -75,10 +75,10 @@
             // Conversion functions
       const convertWidthAndLength = (value, unit) => {
         const toFeet = {
-          'cm': 0.03281,
+          'cm': 0.0328084,
           'in': 1/12,
           'yd': 3,
-          'm': 3.281,
+          'm': 3.28084,
           'ft': 1
         };
         const conversionFactor = toFeet[unit];
@@ -110,10 +110,16 @@
 
       function calculateSoil(length, width, depth) {
         let cubicFeet = 0;
-        let cubicYards = 0
+        let cubicYards = 0;
+        let totalBags = 0;
         cubicFeet = (length * width * (depth / 12))
         cubicYards = cubicFeet / 27
-        return {cubicYards: cubicYards.toFixed(2) * 1, cubicFeet: cubicFeet.toFixed() * 1}
+        totalBags = (4/3) * cubicFeet
+        return {
+          cubicYards: cubicYards.toFixed(2) * 1, 
+          cubicFeet: cubicFeet.toFixed() * 1,
+          totalBags: Math.ceil(totalBags)
+        }
       }
 
       function calculateResults() {
@@ -139,11 +145,13 @@
           const W = convertWidthAndLength(width, widthUnit);
           const L = convertWidthAndLength(length, lengthUnit);
           const D = convertDepth(depth, depthUnit);
-          const {cubicFeet, cubicYards} = calculateSoil(W, L, D)
+          const {cubicFeet, cubicYards, totalBags} = calculateSoil(W, L, D)
 
           calcResultsEl.innerHTML = `<p>How Much Soil You Need:</p>
                                       <span>${cubicYards} Cubic yards</span>
                                       <p>${cubicFeet} Cubic feet</p>
+                                      <p>Number of Soil Bags:</p>
+                                      <p>${totalBags} (0.75 cu. ft. bags)</p>
                                     `
         } catch (error) {
           showError("Something Went Wrong!!!");

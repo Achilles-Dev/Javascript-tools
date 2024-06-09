@@ -27,7 +27,7 @@
       </select>
     </p>
     <p>
-      <label for="height">Room Height:</label>
+      <label for="height">Height:</label>
       <input type="number" id="height">
       <select id="heightUnit">
         <option value="in">in</option>
@@ -97,10 +97,10 @@
             // Conversion functions
       const convertWidthAndLength = (value, unit) => {
         const toFeet = {
-          'cm': 0.03281,
+          'cm': 0.0328084,
           'in': 1/12,
           'yd': 3,
-          'm': 3.281,
+          'm': 3.28084,
           'ft': 1
         };
         const conversionFactor = toFeet[unit];
@@ -112,19 +112,25 @@
         }
       }
 
-      function wallBlockMatEstimate(width, height, blockWidth, blockHeight, capBlockWidth, capBlockHeight) {
+      function wallBlockMathEstimate(width, height, blockWidth, blockHeight, capBlockWidth, capBlockHeight) {
         let squareFeet = 0;
         let blocks = 0;
         let baseGravel = 0;
         let backFillGavel = 0;
         let capBlocks = 0;
         squareFeet = width * height
-        let wallColumns = width / blockWidth
-        let wallRows = height / blockHeight
+        let wallColumns = (width / blockWidth).toFixed(4)
+        let wallRows = (height / blockHeight).toFixed(4)
         blocks = Math.ceil(wallColumns) * Math.ceil(wallRows)
         if (capBlockWidth && capBlockHeight) {
           capBlocks = Math.ceil(width / capBlockWidth)
-          blocks = blocks -  Math.ceil(wallColumns)
+          let capHeight = 1
+          if (capBlockHeight < blockHeight) {
+            capHeight = 0;
+          } else {
+            capHeight = Math.floor(capBlockHeight / blockHeight)
+          }
+          blocks = Math.ceil(wallColumns) * (Math.ceil(wallRows) - capHeight)
         }
 
         /* TO DO*/
@@ -170,7 +176,7 @@
           const BH = convertWidthAndLength(blockHeight, 'in');
           const CBW = convertWidthAndLength(capBlockWidth, 'in');
           const CBH = convertWidthAndLength(capBlockHeight, 'in');
-          const results = wallBlockMatEstimate(W, H, BW, BH, CBW, CBH)
+          const results = wallBlockMathEstimate(W, H, BW, BH, CBW, CBH)
           
           if (blockPrice) {
             const totalBlockPrice = blockPrice * results.blocks

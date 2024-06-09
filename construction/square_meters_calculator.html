@@ -51,9 +51,9 @@
     </div>
     <div id="squareInputParams" style="display: none;">
       <p>
-        <label for="width">Width:</label>
-        <input type="number" id="width">
-        <select id="widthUnit">
+        <label for="squareWidth">Width:</label>
+        <input type="number" id="squareWidth">
+        <select id="squareWidthUnit">
           <option value="mm">mm</option>
           <option value="cm">cm</option>
           <option value="m" selected>m</option>
@@ -163,11 +163,11 @@
 
     function handleSquareMeterShapeChange(e) {
       let shape = e.target.value
+      rectInputParamsEl.style.display = shape ==  'rect' ? 'block' : 'none'
+      squareInputParamsEl.style.display = shape ==  'square' ? 'block' : 'none'
+      circleInputParamsEl.style.display = shape ==  'circle' ? 'block' : 'none'
+      trianInputParamsEl.style.display = shape ==  'trian' ? 'block' : 'none'
       if (shape == 'rect') {
-        rectInputParamsEl.style.display = "block"
-        squareInputParamsEl.style.display = "none"
-        circleInputParamsEl.style.display = "none"
-        trianInputParamsEl.style.display = "none"
         firstInputEl = document.getElementById('length');
         firstInputUnitEl = document.getElementById('lengthUnit');
         secondInputEl = document.getElementById('width');
@@ -175,21 +175,13 @@
         thirdInputEl = ''
         thirdInputUnitEl = ''
       } else if (shape == 'square') {
-        rectInputParamsEl.style.display = "none"
-        squareInputParamsEl.style.display = "block"
-        circleInputParamsEl.style.display = "none"
-        trianInputParamsEl.style.display = "none"
-        firstInputEl = document.getElementById('width');
-        firstInputUnitEl = document.getElementById('widthUnit');
+        firstInputEl = document.getElementById('squareWidth');
+        firstInputUnitEl = document.getElementById('squareWidthUnit');
         secondInputEl = ''
         secondInputUnitEl = ''
         thirdInputEl = ''
         thirdInputUnitEl = ''
       } else if (shape == 'circle') {
-        rectInputParamsEl.style.display = "none"
-        squareInputParamsEl.style.display = "none"
-        circleInputParamsEl.style.display = "block"
-        trianInputParamsEl.style.display = "none"
         firstInputEl = document.getElementById('diameter');
         firstInputUnitEl = document.getElementById('diameterUnit');
         secondInputEl = '';
@@ -197,14 +189,10 @@
         thirdInputEl = ''
         thirdInputUnitEl = ''
       } else if (shape == 'trian') {
-        rectInputParamsEl.style.display = "none"
-        squareInputParamsEl.style.display = "none"
-        circleInputParamsEl.style.display = "none"
-        trianInputParamsEl.style.display = "block"
         firstInputEl = document.getElementById('sideA');
         firstInputUnitEl = document.getElementById('sideAUnit');
         secondInputEl = document.getElementById('sideB');
-        firstInputUnitEl = document.getElementById('sideBUnit');
+        secondInputUnitEl = document.getElementById('sideBUnit');
         thirdInputEl = document.getElementById('sideC');
         thirdInputUnitEl = document.getElementById('sideCUnit');
       }
@@ -242,7 +230,7 @@
 
     function circlularSquareMeter(firstInput) {
       let results = 0;
-      results = 3.142 * (firstInput / 2) ** 2
+      results = Math.PI * (firstInput / 2) ** 2
       return results = results.toFixed(3) * 1;
     }
 
@@ -348,7 +336,7 @@
 
     /********************************** EVENT LISTENERS **********************************/
     resetBtnEl.addEventListener("click", resethandler);
-    [firstInputEl, secondInputEl, thirdInputEl].forEach((el) => {
+    [firstInputEl, secondInputEl, thirdInputEl, quantityEl, priceEl ].forEach((el) => {
       if (el) {
         el.addEventListener("input", resetResult);
       }
