@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>X and Y Intercept Calculator</title>
+
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.6.5/dist/sweetalert2.all.min.js"></script>
+  <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11.6.5/dist/sweetalert2.min.css" rel="stylesheet">
+</head>
+
+<body>
+  <div>
+    <h1>X and Y Intercept Calculator</h1>
+    <p>Find the x and y intercepts of a line using the intercept calculator below.</p>
+    <p>
+      <select id="knownPoints">
+        <option value="twoPoints" selected>&nbsp;Using 2 Points &nbsp;</option>
+        <option value="onePointSlope">&nbsp;Using 1 Point and Slope &nbsp;</option>
+        <option value="yInterceptSlope">&nbsp;Using y-intercept and Slope &nbsp;</option>
+        <option value="pointSlope">&nbsp;Using Point-Slope Form &nbsp;</option>
+        <option value="sdForm">&nbsp;Using Standard Form &nbsp;</option>
+      </select>
+    </p>
+    <div id="twoPointsInputs">
+      <p>Point #1 Coordinates:</p>
+      <p>
+        <label for="x1">x₁:</label>
+        <input type="number" id="x1" />  
+      </p>
+      <p>
+        <label for="y1">y₁:</label>
+        <input type="number" id="y1" />  
+      </p>
+      <p>Point #2 Coordinates:</p>
+      <p>
+        <label for="x2">x₂:</label>
+        <input type="number" id="x2" />  
+      </p>
+      <p>
+        <label for="y2">y₂:</label>
+        <input type="number" id="y2" />  
+      </p>  
+    </div>
+    <div id="onePointSlopeInputs" style="display: none;">
+      <p>
+        <label for="slope1">m:</label>
+        <input type="number" id="slope1" />  
+      </p>
+
+      <p>Point Coordinates:</p>
+      <p>
+        <label for="x11">x₁:</label>
+        <input type="number" id="x11" />  
+      </p>
+      <p>
+        <label for="y11">y₁:</label>
+        <input type="number" id="y11" />  
+      </p>
+    </div>
+    <div id="yInterceptSlopeInputs" style="display: none;">
+      <p>Slope-Intercept Form Equation:</p>
+      <span>y = mx + b</span>
+      <p>
+        <label for="slope2">m:</label>
+        <input type="number" id="slope2" />  
+      </p>
+      <p>
+        <label for="x12">b:</label>
+        <input type="number" id="x12" />  
+      </p>
+    </div> 
+    <div id="pointSlopeInputs" style="display: none;">
+      <p>Point-Slope Form Equation:</p>
+      <span>y - y₁ = m(x - x₁)</span>
+      <p>
+        <label for="slope3">m:</label>
+        <input type="number" id="slope3" />  
+      </p>
+
+      <p>Point Coordinates:</p>
+      <p>
+        <label for="x13">x₁:</label>
+        <input type="number" id="x13" />  
+      </p>
+      <p>
+        <label for="y13">y₁:</label>
+        <input type="number" id="y13" />  
+      </p>
+    </div>
+    <div id="sdFormInputs" style="display: none;">
+      <p>Standard Form Equation:</p>
+      <span>Ax + By = C</span>
+      <p>
+        <label for="formA">A:</label>
+        <input type="number" id="formA" />  
+      </p>
+      <p>
+        <label for="formB">B:</label>
+        <input type="number" id="formB" />  
+      </p>
+      <p>
+        <label for="formC">C:</label>
+        <input type="number" id="formC" />  
+      </p>
+    </div>
+    <p>
+      <button id="calcBtn">Calculate</button>
+      <button id="resetBtn">Reset</button>
+    </p>
+    <hr>
+    <p>
+    <h3>Result:</h3>
+    <h3 id="calcResults">Result will appear here...</h3>
+    </p>
+  </div>
+  <script>
+
+    /********************************** ELEMENTS **********************************/
+    const knownPointsEl = document.getElementById('knownPoints');
+    const twoPointsInputsEl = document.getElementById('twoPointsInputs');
+    const onePointSlopeInputsEl = document.getElementById('onePointSlopeInputs');
+    const yInterceptSlopeInputsEl = document.getElementById('yInterceptSlopeInputs');
+    const pointSlopeInputsEl = document.getElementById('pointSlopeInputs');
+    const sdFormInputsEl = document.getElementById('sdFormInputs');
+    const calcBtnEl = document.getElementById('calcBtn');
+    const resetBtnEl = document.getElementById('resetBtn');
+    const calcResultsEl = document.getElementById('calcResults')
+
+    let x1El = document.getElementById('x1');
+    let y1El = document.getElementById('y1');
+    let x2EL = document.getElementById('x2');
+    let y2El = document.getElementById('y2');
+    let slopeEl = document.getElementById('slope1');
+    let pointSelected = 'twoPoints';
+
+    /********************************** FUNCTIONS **********************************/
+    // Conversion functions
+
+    function handlePointsChange(e) {
+      const points = e.target.value
+      pointSelected = points
+      twoPointsInputsEl.style.display = points ==  'twoPoints' ? 'block' : 'none'
+      onePointSlopeInputsEl.style.display = points ==  'onePointSlope' ? 'block' : 'none'
+      yInterceptSlopeInputsEl.style.display = points ==  'yInterceptSlope' ? 'block' : 'none'
+      pointSlopeInputsEl.style.display = points ==  'pointSlope' ? 'block' : 'none'
+      sdFormInputsEl.style.display = points ==  'sdForm' ? 'block' : 'none'
+
+      if (points == 'twoPoints') {
+        x1El = document.getElementById('x1');
+        y1El = document.getElementById('y1');
+        x2EL = document.getElementById('x2');
+        y2El = document.getElementById('y2');     
+      } else if (points == 'onePointSlope') {
+        slopeEl = document.getElementById('slope1');
+        x1El = document.getElementById('x11');
+        y1El = document.getElementById('y11');      
+      } else if (points == 'yInterceptSlope') {
+        slopeEl = document.getElementById('slope2');
+        x1El = document.getElementById('x12');
+      } else if (points == 'pointSlope') {
+        slopeEl = document.getElementById('slope3');
+        x1El = document.getElementById('x13');
+        y1El = document.getElementById('y13');  
+      } else if (points == 'sdForm') {
+        x1El = document.getElementById('formA');
+        y1El = document.getElementById('formB');
+        x2EL = document.getElementById('formC');
+      }
+    }
+
+    function greatestCommonDivisor(num, den) {
+      return den ? greatestCommonDivisor(den, num%den) : num
+    }
+
+    function simplifyFraction(num, den) {
+      const gcd = greatestCommonDivisor(num, den)
+      const simplifiedNum = num / Number(gcd)
+      const simplifiedDen = den / Number(gcd)
+      return {
+        midNum: simplifiedNum, midDen: simplifiedDen
+      }
+    }
+
+    function xyIntercept(x1, y1, x2, y2, slope) {
+      let xIntercept = 0;
+      let yIntercept = 0;
+      let midpoint = slope;
+      if (pointSelected == 'twoPoints') {
+        const {midNum, midDen} = simplifyFraction((y2 - y1), (x2 - x1))
+        midpoint = midNum / midDen
+        let constant = (y1 - (midpoint * x1))      
+        if (midDen == 0 || isNaN(midDen)) {
+          return {
+            xIntercept: x1,
+            yIntercept: undefined,
+            midpoint: undefined
+          }      
+        } else if (midpoint == 0) { 
+          return {
+              xIntercept: undefined,
+              yIntercept: y1,
+              midpoint
+          }
+        } else {
+          xIntercept = (-1 * constant) / midpoint
+          yIntercept = constant
+        }
+               
+      } else if (pointSelected == 'onePointSlope') {
+        let constant = (y1 - (midpoint * x1))
+        if (midpoint == 0) {
+          return {
+            xIntercept: undefined,
+            yIntercept: y1,
+            midpoint
+          }
+        } else {
+          xIntercept = (-1 * constant) / midpoint
+          yIntercept = constant
+        }
+      } else if (pointSelected == 'yInterceptSlope') {
+        let constant = x1;
+        if (midpoint == 0) {
+          return {
+            xIntercept: undefined,
+            yIntercept: constant,
+            midpoint
+          }
+        } else {
+          xIntercept = (-1 * constant) / midpoint
+          yIntercept = constant
+        }
+      } else if (pointSelected == 'pointSlope') {
+        let constant = (y1 - (midpoint * x1)) 
+        if (midpoint == 0) {
+          return {
+            xIntercept: undefined,
+            yIntercept: y1,
+            midpoint
+          }
+        } else {
+          xIntercept = (-1 * constant) / midpoint
+          yIntercept = constant
+        }
+      } else if (pointSelected == 'sdForm') {
+        if (x1 == 0) {
+          return {
+            xIntercept: undefined,
+            yIntercept: x2 / y1,
+            midpoint: ((x2 / y1) * -1) / (x2 / x1)
+          }       
+        } else if (y1 == 0) {
+          return {
+            xIntercept: x2 / x1,
+            yIntercept: undefined,
+            midpoint: undefined
+          }   
+        } else if (x2 == 0) {
+          return {
+            xIntercept: x2 / x1,
+            yIntercept: x2 / y1,
+            midpoint: -1
+          }   
+        } else {
+          xIntercept = x2 / x1
+          yIntercept = x2 / y1
+          midpoint = ((x2 / y1) * -1) / (x2 / x1)
+        }
+      } 
+      
+      return {
+        xIntercept: xIntercept.toFixed(4) * 1,
+        yIntercept: yIntercept.toFixed(4) * 1,
+        midpoint
+      }
+    }
+
+    function calculateResults() {
+      // Retrieve input values
+      const x1 = parseFloat(x1El.value)
+      const y1 = parseFloat(y1El.value)
+      const x2 = parseFloat(x2EL.value)
+      const y2 = parseFloat(y2El.value)
+      const slope = parseFloat(slopeEl.value)
+
+      if (
+        isNaN(x1) || (y1 && isNaN(y1)) || (x2 && isNaN(x2)) || (y2 && isNaN(y2)) || (slope && isNaN(slope)) 
+      ) {
+        showError("Please Enter All Details.");
+        return;
+      }    
+      
+      try {
+        const {xIntercept, yIntercept, midpoint} = xyIntercept(x1, y1, x2, y2, slope)
+        
+        calcResultsEl.innerHTML = `<p> X and Y Intercepts:</p>
+                                     <p>x-intercept:	${xIntercept}</p>
+                                     <p>y-intercept:	${yIntercept}</p>
+                                     <p>slope (m):		${midpoint}</p>
+                                    `
+      } catch (error) {
+        showError("Something Went Wrong!!!");
+        resethandler()
+      }
+    }
+
+    /********************************* HELPER FUNCTIONS **********************************/
+
+    function showError(errorMessage) {
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: errorMessage,
+      });
+    }
+
+    function resetForm() {
+      x1El.value = ""
+      x2EL.value = ""
+      y1El.value = ""
+      y2El.value = ""
+      slopeEl.value = ""
+    }
+
+    function resetResult() {
+      calcResultsEl.innerHTML = "<p>Result will appear here...</p>";
+    }
+
+    function resethandler() {
+      resetForm();
+      resetResult();
+    }
+
+    /********************************** EVENT LISTENERS **********************************/
+    resetBtnEl.addEventListener("click", resethandler);
+    [x1El, y1El, x2EL, y2El, slopeEl].forEach((el) => {
+      if (el) {
+        el.addEventListener("input", resetResult);
+      }
+    });   
+
+    knownPointsEl.addEventListener("change", (e) => {
+      handlePointsChange(e);
+      resethandler();
+    })
+    calcBtnEl.addEventListener("click", calculateResults);
+  </script>
+</body>
+
+</html> 
