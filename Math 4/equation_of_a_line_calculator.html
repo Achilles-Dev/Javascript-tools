@@ -273,30 +273,70 @@
       let sdForm = '';
       const slopeInterceptValue = slopeInterceptForm(x1, y1, x2, y2, slope)
       const pointSlopeValue = pointSlopeForm(x1, y1, x2, y2, slope)
-      let midpoint = 0;
-      const {midNum, midDen} = simplifyFraction((y2 - y1), (x2 - x1))
-      midpoint = midNum / midDen
-      if (midDen == 0 || isNaN(midDen)) {
-        sdForm = `x = ${x1}`;
-      } else {
-        let constant = (y1 - (midpoint * x1))
-        let newMidNum = midNum;
-        let newMidDen = midDen;
-        console.log("First:",midNum, midDen, midpoint)
-        if ((midpoint < 0 && midDen < 0) || (midpoint >= 0 && midDen < 0)) {
-          newMidDen *= -1;
-          newMidNum *= -1;
+      let midpoint = slope;
+      if (pointSelected == 'twoPoints') {
+        const {midNum, midDen} = simplifyFraction((y2 - y1), (x2 - x1))
+        midpoint = midNum / midDen
+        if (midDen == 0 || isNaN(midDen)) {
+          sdForm = `x = ${x1}`;
+        } else {
+          let constant = (y1 - (midpoint * x1))
+          let newMidNum = midNum;
+          let newMidDen = midDen;
+          if ((midpoint < 0 && midDen < 0) || (midpoint >= 0 && midDen < 0)) {
+            newMidDen *= -1;
+            newMidNum *= -1;
+          }
+          let yCoeff = newMidDen;
+          let xCoeff = newMidNum * -1;
+          constant *= newMidDen;
+          if (xCoeff < 0) {
+            xCoeff *= -1;
+            yCoeff *= -1;
+            constant *= -1;
+          }
+          if (xCoeff < 1) {
+            let multiplier = 1 / xCoeff
+            console.log(multiplier)
+            xCoeff *= multiplier
+            yCoeff *= multiplier
+            constant *= multiplier
+          }
+          sdForm = `${xCoeff}x ${yCoeff < 0 ? `- ${yCoeff * -1}y` : `+ ${yCoeff}y`} = ${constant} `;
         }
-        let yCoeff = newMidDen;
-        let xCoeff = newMidNum;
-        constant *= newMidDen;
-        console.log("First:",xCoeff, yCoeff, constant)
+      } else if (pointSelected == 'onePointSlope') {
+        let constant = (y1 - (slope * x1))
+        let yCoeff = 1;
+        let xCoeff = slope * -1;
         if (xCoeff < 0) {
           xCoeff *= -1;
           yCoeff *= -1;
           constant *= -1;
         }
-        console.log(xCoeff, yCoeff, constant)
+        if (xCoeff < 1) {
+          let multiplier = 1 / xCoeff
+          console.log(multiplier)
+          xCoeff *= multiplier
+          yCoeff *= multiplier
+          constant *= multiplier
+        }
+        sdForm = `${xCoeff}x ${yCoeff < 0 ? `- ${yCoeff * -1}y` : `+ ${yCoeff}y`} = ${constant} `;
+      } else if (pointSelected == 'yInterceptSlope') {
+        let constant = x1;
+        let yCoeff = 1;
+        let xCoeff = slope * -1;
+        if (xCoeff < 0) {
+          xCoeff *= -1;
+          yCoeff *= -1;
+          constant *= -1;
+        }
+        if (xCoeff < 1) {
+          let multiplier = 1 / xCoeff
+          console.log(multiplier)
+          xCoeff *= multiplier
+          yCoeff *= multiplier
+          constant *= multiplier
+        }
         sdForm = `${xCoeff}x ${yCoeff < 0 ? `- ${yCoeff * -1}y` : `+ ${yCoeff}y`} = ${constant} `;
       }
       
