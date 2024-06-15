@@ -98,6 +98,11 @@
         vectBXEl = document.getElementById('vectBX');
         vectBYEl = document.getElementById('vectBY');
         vectBZEl = document.getElementById('vectBZ');
+        [vectAZEl, vectBZEl].forEach((el) => {
+          if (el) {
+            el.addEventListener("input", resetResult);
+          }
+        });
       }
     }
 
@@ -121,7 +126,7 @@
       const vectBZ = parseFloat(vectBZEl.value)
       
       if (
-        isNaN(vectAX) || isNaN(vectAY) || isNaN(vectBX) || isNaN(vectBY) || ((vectAZ && isNaN(vectAZ)) || (vectBZ && isNaN(vectBZ)))
+        isNaN(vectAX) || isNaN(vectAY) || isNaN(vectBX) || isNaN(vectBY) || ((vectAZEl != '' && isNaN(vectAZ)) || (vectBZEl != '' && isNaN(vectBZ)))
       ) {
         showError("Please Enter All Details.");
         return;
@@ -156,9 +161,9 @@
 
     function resetForm() {
       vectAXEl.value = ""
+      vectAYEl.value = ""
       vectAZEl.value = ""
       vectBYEl.value = ""
-      vectAYEl.value = ""
       vectBXEl.value = ""
       vectBZEl.value = ""
     }
@@ -174,10 +179,8 @@
 
     /********************************** EVENT LISTENERS **********************************/
     resetBtnEl.addEventListener("click", resethandler);
-    [vectAXEl, vectAYEl, vectAZEl, vectBXEl, vectBYEl, vectBZEl].forEach((el) => {
-      if (el) {
+    [vectAXEl, vectAYEl, vectBXEl, vectBYEl].forEach((el) => {
         el.addEventListener("input", resetResult);
-      }
     });   
     dimensionEl.addEventListener("change", (e) => {
       handleDimensionChange(e);

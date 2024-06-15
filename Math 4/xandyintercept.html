@@ -130,7 +130,7 @@
 
     let x1El = document.getElementById('x1');
     let y1El = document.getElementById('y1');
-    let x2EL = document.getElementById('x2');
+    let x2El = document.getElementById('x2');
     let y2El = document.getElementById('y2');
     let slopeEl = document.getElementById('slope1');
     let pointSelected = 'twoPoints';
@@ -150,23 +150,49 @@
       if (points == 'twoPoints') {
         x1El = document.getElementById('x1');
         y1El = document.getElementById('y1');
-        x2EL = document.getElementById('x2');
-        y2El = document.getElementById('y2');     
+        x2El = document.getElementById('x2');
+        y2El = document.getElementById('y2');
+        slopeEl = '';     
       } else if (points == 'onePointSlope') {
         slopeEl = document.getElementById('slope1');
         x1El = document.getElementById('x11');
-        y1El = document.getElementById('y11');      
+        y1El = document.getElementById('y11'); 
+        x2El = '';
+        y2El = '';
+        
+        [x1El, y1El, slopeEl].forEach((el) => {
+          el.addEventListener("input", resetResult);
+        });
       } else if (points == 'yInterceptSlope') {
         slopeEl = document.getElementById('slope2');
         x1El = document.getElementById('x12');
+        y1El = '';
+        x2El = '';
+        y2El = '';
+
+        [x1El, slopeEl].forEach((el) => {
+          el.addEventListener("input", resetResult);
+        });
       } else if (points == 'pointSlope') {
         slopeEl = document.getElementById('slope3');
         x1El = document.getElementById('x13');
         y1El = document.getElementById('y13');  
+        x2El = '';
+        y2El = '';
+
+        [x1El, y1El, slopeEl].forEach((el) => {
+          el.addEventListener("input", resetResult);
+        });
       } else if (points == 'sdForm') {
         x1El = document.getElementById('formA');
         y1El = document.getElementById('formB');
-        x2EL = document.getElementById('formC');
+        x2El = document.getElementById('formC');
+        y2El = '';
+        slopeEl = '';
+
+        [x1El, y1El, x2El].forEach((el) => {
+          el.addEventListener("input", resetResult);
+        });
       }
     }
 
@@ -281,12 +307,12 @@
       // Retrieve input values
       const x1 = parseFloat(x1El.value)
       const y1 = parseFloat(y1El.value)
-      const x2 = parseFloat(x2EL.value)
+      const x2 = parseFloat(x2El.value)
       const y2 = parseFloat(y2El.value)
       const slope = parseFloat(slopeEl.value)
 
       if (
-        isNaN(x1) || (y1 && isNaN(y1)) || (x2 && isNaN(x2)) || (y2 && isNaN(y2)) || (slope && isNaN(slope)) 
+        isNaN(x1) || (y1El != '' && isNaN(y1)) || (x2El != '' && isNaN(x2)) || (y2El != '' && isNaN(y2)) || (slopeEl != '' && isNaN(slope)) 
       ) {
         showError("Please Enter All Details.");
         return;
@@ -318,7 +344,7 @@
 
     function resetForm() {
       x1El.value = ""
-      x2EL.value = ""
+      x2El.value = ""
       y1El.value = ""
       y2El.value = ""
       slopeEl.value = ""
@@ -335,10 +361,8 @@
 
     /********************************** EVENT LISTENERS **********************************/
     resetBtnEl.addEventListener("click", resethandler);
-    [x1El, y1El, x2EL, y2El, slopeEl].forEach((el) => {
-      if (el) {
-        el.addEventListener("input", resetResult);
-      }
+    [x1El, y1El, x2El, y2El].forEach((el) => {
+      el.addEventListener("input", resetResult);
     });   
 
     knownPointsEl.addEventListener("change", (e) => {

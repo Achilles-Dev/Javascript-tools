@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Vector Calculator</title>
+
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.6.5/dist/sweetalert2.all.min.js"></script>
+  <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11.6.5/dist/sweetalert2.min.css" rel="stylesheet">
+</head>
+
+<body>
+  <div>
+    <h1>Vector Calculator</h1>
+    <p>Perform an operation on one or more vectors using our vector calculator below.</p>
+    <p>
+      <select id="dimension">
+        <option value="2d" selected>&nbsp;2D &nbsp;</option>
+        <option value="3d">&nbsp;3D &nbsp;</option>  
+      </select>
+    </p>
+    <p>
+      <label for="operationType">Operation:</label>
+      <select id="operationType">
+        <option value="dotProduct" selected="selected">Dot product a · b</option>
+        <option value="crossProduct" id="cross3d" style="display: none;">Cross product a x b</option>
+        <option value="add">Addition a + b</option>
+        <option value="subtract">Subtraction a - b</option>
+        <option value="anglebtwn">Find angle between a and b</option>
+        <option value="project">Projection of a onto b</option>
+        <option value="magnitude">Magnitude ||a||</option>
+        <option value="normalize">Normalize vector â</option>
+      </select>
+      
+    </p>
+    <p>Vector a</p>
+      <p>
+        <label for="vectAX">x:</label>
+        <input type="number" id="vectAX"/>  
+      </p>
+      <p>
+        <label for="vectAY">y:</label>
+        <input type="number" id="vectAY"/>  
+      </p>
+      <p id="threeDInputsA" style="display: none;">
+        <label for="vectAZ">z:</label>
+        <input type="number" id="vectAZ" />  
+      </p>
+    <div id="vectorBInputs">
+    <p>Vector b:</p>
+      <p>
+        <label for="vectBX">x:</label>
+        <input type="number" id="vectBX" />  
+      </p>
+      <p>
+        <label for="vectBY">y:</label>
+        <input type="number" id="vectBY" />  
+      </p>
+      <p id="threeDInputsB" style="display: none;">
+        <label for="vectBZ">z:</label>
+        <input type="number" id="vectBZ" />  
+      </p>
+    </div>  
+    <p>
+      <button id="calcBtn">Calculate</button>
+      <button id="resetBtn">Reset</button>
+    </p>
+    <hr>
+    <p>
+    <h3>Result:</h3>
+    <h3 id="calcResults">Result will appear here...</h3>
+    </p>
+  </div>
+  <script>
+
+    /********************************** ELEMENTS **********************************/
+
+    const dimensionEl = document.getElementById('dimension');
+    const operationTypeEl = document.getElementById('operationType');
+    const vectorBInputsEl = document.getElementById('vectorBInputs');
+    const threeDInputsAEl = document.getElementById('threeDInputsA');
+    const threeDInputsBEl = document.getElementById('threeDInputsB');
+    const cross3dEl = document.getElementById('cross3d');
+    const calcBtnEl = document.getElementById('calcBtn');
+    const resetBtnEl = document.getElementById('resetBtn');
+    const calcResultsEl = document.getElementById('calcResults')
+
+    let vectAXEl = document.getElementById('vectAX');
+    let vectAYEl = document.getElementById('vectAY');
+    let vectAZEl = '';
+    let vectBXEl = document.getElementById('vectBX');
+    let vectBYEl = document.getElementById('vectBY');
+    let vectBZEl = '';
+    let dimSelected = '2d'
+    let operationSelected = 'dotProduct'
+
+    /********************************** FUNCTIONS **********************************/
+    // Conversion functions
+
+    function handleVectorBRemoval(operation) {
+      if ((operation == 'magnitude' || operation == 'normalize') && dimSelected == '2d') {
+        vectAXEl = document.getElementById('vectAX');
+        vectAYEl = document.getElementById('vectAY');
+        vectAZEl = '';
+        vectBXEl = '';
+        vectBYEl = '';
+        vectBZEl = '';
+      } else if ((operation == 'magnitude' || operation == 'normalize') && dimSelected == '3d') {
+        vectAXEl = document.getElementById('vectAX');
+        vectAYEl = document.getElementById('vectAY');
+        vectAZEl = document.getElementById('vectAZ');
+        vectBXEl = '';
+        vectBYEl = '';
+        vectBZEl = '';
+      } 
+    }
+
+    function handleDimensionChange(e) {
+      const dimension = e.target.value
+      dimSelected = dimension
+      threeDInputsAEl.style.display = dimension ==  '3d' ? 'block' : 'none'
+      threeDInputsBEl.style.display = dimension ==  '3d' ? 'block' : 'none'
+      cross3dEl.style.display = dimension ==  '3d' ? 'block' : 'none'
+      if (dimension == '2d') {
+        vectAXEl = document.getElementById('vectAX');
+        vectAYEl = document.getElementById('vectAY');
+        vectAZEl = '';
+        vectBXEl = document.getElementById('vectBX');
+        vectBYEl = document.getElementById('vectBY');
+        vectBZEl = '';
+        operationTypeEl.selectedIndex = operationSelected == 'crossProduct' ? '0' : operationTypeEl.selectedIndex
+        operationSelected = operationSelected == 'crossProduct' ? 'dotProduct' : operationSelected
+      } else if (dimension == '3d') {
+        vectAXEl = document.getElementById('vectAX');
+        vectAYEl = document.getElementById('vectAY');
+        vectAZEl = document.getElementById('vectAZ');
+        vectBXEl = document.getElementById('vectBX');
+        vectBYEl = document.getElementById('vectBY');
+        vectBZEl = document.getElementById('vectBZ');
+        [vectAZEl, vectBZEl].forEach((el) => {
+          el.addEventListener("input", resetResult);
+        });  
+      }
+      handleVectorBRemoval(operationSelected)
+    }
+
+    function handleOperationChange(e) {
+      const operation = e.target.value
+      operationSelected = operation
+      vectorBInputsEl.style.display = (operation == 'magnitude' || operation == 'normalize')  ? 'none' : 'block'
+      handleVectorBRemoval(operation)
+    }
+
+    function dotProduct(vectAX, vectAY, vectAZ, vectBX, vectBY, vectBZ) {
+      let results = 0; 
+      if (dimSelected == '2d') {
+        results = (vectAX * vectBX) + (vectAY * vectBY)
+      } else if (dimSelected == '3d') {
+        results = (vectAX * vectBX) + (vectAY * vectBY) + (vectAZ * vectBZ)
+      }
+      return results
+    }
+
+    function crossProduct(vectAX, vectAY, vectAZ, vectBX, vectBY, vectBZ) {
+      let results = '';
+      let a = 0;
+      let b = 0;
+      let c = 0;
+      a = (vectAY * vectBZ) - (vectAZ * vectBY)
+      b = (vectAX * vectBZ) - (vectAZ * vectBX)
+      c = (vectAX * vectBY) - (vectAY * vectBX)
+      if (b < 0) {
+        b = b * -1
+      } else {
+        b = `-${b}`
+      }
+      results = `(${a}, ${b}, ${c})`
+      return results
+    }
+
+    function addition(vectAX, vectAY, vectAZ, vectBX, vectBY, vectBZ) {
+      let results = ''; 
+      if (dimSelected == '2d') {
+        let vectX = vectAX + vectBX
+        let vectY = vectAY + vectBY
+        results = `(${vectX}, ${vectY})`
+      } else if (dimSelected == '3d') {
+        let vectX = vectAX + vectBX
+        let vectY = vectAY + vectBY
+        let vectZ = vectAZ + vectBZ
+        results = `(${vectX}, ${vectY}, ${vectZ})`
+      }
+      return results
+    }
+
+    function subtraction(vectAX, vectAY, vectAZ, vectBX, vectBY, vectBZ) {
+      let results = ''; 
+      if (dimSelected == '2d') {
+        let vectX = vectAX - vectBX
+        let vectY = vectAY - vectBY
+        results = `(${vectX}, ${vectY})`
+      } else if (dimSelected == '3d') {
+        let vectX = vectAX - vectBX
+        let vectY = vectAY - vectBY
+        let vectZ = vectAZ - vectBZ
+        results = `(${vectX}, ${vectY}, ${vectZ})`
+      }
+      return results
+    }
+
+    function angleBtwn(vectAX, vectAY, vectAZ, vectBX, vectBY, vectBZ) {
+      let results = 0; 
+      let dotProd = dotProduct(vectAX, vectAY, vectAZ, vectBX, vectBY, vectBZ)
+      let magnitudeAB = 0;
+      if (dimSelected == '2d') {
+        let magnitudeA = Math.sqrt((vectAX ** 2) + (vectAY ** 2))
+        let magnitudeB = Math.sqrt((vectBX ** 2) + (vectBY ** 2))
+        magnitudeAB = magnitudeA * magnitudeB
+        results = Math.acos(dotProd / magnitudeAB)
+      } else if (dimSelected == '3d') {
+        let magnitudeA = Math.sqrt((vectAX ** 2) + (vectAY ** 2) + (vectAZ ** 2))
+        let magnitudeB = Math.sqrt((vectBX ** 2) + (vectBY ** 2) + (vectBZ ** 2))
+        magnitudeAB = magnitudeA * magnitudeB
+        results = Math.acos(dotProd / magnitudeAB)
+      }
+      return {
+        radian: results.toFixed(4) * 1,
+        degrees: (results * (180 / Math.PI)).toFixed(4) * 1
+      }
+    }
+
+    function projection(vectAX, vectAY, vectAZ, vectBX, vectBY, vectBZ) {
+      let results = ''; 
+      let dotProd = dotProduct(vectAX, vectAY, vectAZ, vectBX, vectBY, vectBZ)
+      let projectionFactor = 0;
+      if (dimSelected == '2d') {
+        let magnitudeB = Math.sqrt((vectBX ** 2) + (vectBY ** 2))
+        projectionFactor = dotProd / (magnitudeB ** 2)
+        results = `(${(vectBX * projectionFactor).toFixed(4) * 1}, ${(vectBY * projectionFactor).toFixed(4) * 1})`
+      } else if (dimSelected == '3d') {
+        let magnitudeB = Math.sqrt((vectBX ** 2) + (vectBY ** 2) + (vectBZ ** 2))
+        projectionFactor = dotProd / (magnitudeB ** 2)
+        results = `(${(vectBX * projectionFactor).toFixed(4) * 1}, ${(vectBY * projectionFactor).toFixed(4) * 1}, ${(vectBZ * projectionFactor).toFixed(4) * 1})`
+      }
+      return results
+    }
+
+    function magnitudeA(vectAX, vectAY, vectAZ) {
+      let results = 0; 
+      if (dimSelected == '2d') {
+        results = Math.sqrt((vectAX ** 2) + (vectAY ** 2))
+      } else if (dimSelected == '3d') {
+        results = Math.sqrt((vectAX ** 2) + (vectAY ** 2) + (vectAZ ** 2))
+      }
+      return results
+    }
+
+    function normalize(vectAX, vectAY, vectAZ) {
+      let results = ''; 
+      let magA = magnitudeA(vectAX, vectAY, vectAZ)
+      if (dimSelected == '2d') {
+        results = `(${(vectAX / magA).toFixed(4) * 1}, ${(vectAY / magA).toFixed(4) * 1})`
+      } else if (dimSelected == '3d') {
+        results = `(${(vectAX / magA).toFixed(4) * 1}, ${(vectAY / magA).toFixed(4) * 1}, ${(vectAZ / magA).toFixed(4) * 1})`
+      }
+      return {
+        magnitude: magA.toFixed(4) * 1,
+        normalizeValue: results
+      }
+    }
+
+    function calculateResults() {
+      // Retrieve input values
+      const vectAX = parseFloat(vectAXEl.value)
+      const vectAY = parseFloat(vectAYEl.value)
+      const vectAZ = parseFloat(vectAZEl.value)
+      const vectBX = parseFloat(vectBXEl.value)
+      const vectBY = parseFloat(vectBYEl.value)
+      const vectBZ = parseFloat(vectBZEl.value)
+      
+      if (
+        isNaN(vectAX) || isNaN(vectAY) || (vectBXEl != '' && isNaN(vectBX)) || (vectBYEl != '' && isNaN(vectBY)) || (vectAZEl != '' && isNaN(vectAZ)) || (vectBZEl != '' && isNaN(vectBZ))
+      ) {
+        showError("Please Enter All Details.");
+        return;
+      }
+      
+      
+      try {
+        let results = 0;
+        if (operationSelected == 'dotProduct') {
+          results = dotProduct(vectAX, vectAY, vectAZ, vectBX, vectBY, vectBZ)
+          calcResultsEl.innerHTML = `<p>${results}</p>
+                                    ` 
+        } else if (operationSelected == 'crossProduct') {
+          results = crossProduct(vectAX, vectAY, vectAZ, vectBX, vectBY, vectBZ)
+          calcResultsEl.innerHTML = `<p>${results}</p>
+                                    ` 
+        } else if (operationSelected == 'add') {
+          results = addition(vectAX, vectAY, vectAZ, vectBX, vectBY, vectBZ)
+          calcResultsEl.innerHTML = `<p>${results}</p>
+                                    ` 
+        } else if (operationSelected == 'subtract') {
+          results = subtraction(vectAX, vectAY, vectAZ, vectBX, vectBY, vectBZ)
+          calcResultsEl.innerHTML = `<p>${results}</p>
+                                    ` 
+        } else if (operationSelected == 'anglebtwn') {
+          results = angleBtwn(vectAX, vectAY, vectAZ, vectBX, vectBY, vectBZ)
+          calcResultsEl.innerHTML = `<p>Degrees: ${results.degrees}&deg;</p>
+                                     <p>Radians: ${results.radian} rad</p>
+                                    ` 
+        } else if (operationSelected == 'project') {
+          results = projection(vectAX, vectAY, vectAZ, vectBX, vectBY, vectBZ)
+          calcResultsEl.innerHTML = `<p>${results}</p>` 
+        } else if (operationSelected == 'magnitude') {
+          results = magnitudeA(vectAX, vectAY, vectAZ)
+          results = results.toFixed(4) * 1;
+          calcResultsEl.innerHTML = `<p>${results}</p>
+                                    ` 
+        } else if (operationSelected == 'normalize') {
+          results = normalize(vectAX, vectAY, vectAZ)
+          calcResultsEl.innerHTML = `<p>${results.normalizeValue}</p>
+                                     <p>Magnitude: ${results.magnitude}</p>
+                                    ` 
+        }
+            
+      } catch (error) {
+        showError("Something Went Wrong!!!");
+        resethandler()
+      }
+    }
+
+    /********************************* HELPER FUNCTIONS **********************************/
+
+    function showError(errorMessage) {
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: errorMessage,
+      });
+    }
+
+    function resetForm() {
+      vectAXEl.value = ""
+      vectAZEl.value = ""
+      vectBYEl.value = ""
+      vectAYEl.value = ""
+      vectBXEl.value = ""
+      vectBZEl.value = ""
+    }
+
+    function resetResult() {
+      calcResultsEl.innerHTML = "<p>Result will appear here...</p>";
+    }
+
+    function resethandler() {
+      resetForm();
+      resetResult();
+    }
+
+    /********************************** EVENT LISTENERS **********************************/
+    resetBtnEl.addEventListener("click", resethandler);
+    [vectAXEl, vectAYEl, vectBXEl, vectBYEl].forEach((el) => {
+      el.addEventListener("input", resetResult);
+    });   
+    dimensionEl.addEventListener("change", (e) => {
+      handleDimensionChange(e);
+      resethandler();
+    })
+
+    operationTypeEl.addEventListener("change", (e) => {
+      handleOperationChange(e);
+      resethandler();
+    })
+    calcBtnEl.addEventListener("click", calculateResults);
+  </script>
+</body>
+
+</html> 

@@ -48,7 +48,7 @@
     /********************************** ELEMENTS **********************************/
     const x1El = document.getElementById('x1');
     const y1El = document.getElementById('y1');
-    const x2EL = document.getElementById('x2');
+    const x2El = document.getElementById('x2');
     const y2El = document.getElementById('y2');
     const calcBtnEl = document.getElementById('calcBtn');
     const resetBtnEl = document.getElementById('resetBtn');
@@ -98,7 +98,7 @@
       // Retrieve input values
       const x1 = parseFloat(x1El.value)
       const y1 = parseFloat(y1El.value)
-      const x2 = parseFloat(x2EL.value)
+      const x2 = parseFloat(x2El.value)
       const y2 = parseFloat(y2El.value)
 
       if (
@@ -135,7 +135,7 @@
 
     function resetForm() {
       x1El.value = ""
-      x2EL.value = ""
+      x2El.value = ""
       y1El.value = ""
       y2El.value = ""
     }
@@ -151,7 +151,7 @@
 
     /********************************** EVENT LISTENERS **********************************/
     resetBtnEl.addEventListener("click", resethandler);
-    [x1El, y1El, x2EL, y2El].forEach((el) => {
+    [x1El, y1El, x2El, y2El].forEach((el) => {
       el.addEventListener("input", resetResult);
     });   
 
