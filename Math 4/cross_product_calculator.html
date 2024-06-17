@@ -145,7 +145,7 @@
     /********************************** EVENT LISTENERS **********************************/
     resetBtnEl.addEventListener("click", resethandler);
     [vectAXEl, vectAYEl, vectAZEl, vectBXEl, vectBYEl, vectBZEl].forEach((el) => {
-      el.addEventListener("change", resetResult);
+      el.addEventListener("input", resetResult);
     });   
     calcBtnEl.addEventListener("click", calculateResults);
   </script>

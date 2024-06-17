@@ -118,7 +118,7 @@
     /********************************** EVENT LISTENERS **********************************/
     resetBtnEl.addEventListener("click", resethandler);
     [x1El, y1El, x2El, y2El].forEach((el) => {
-      el.addEventListener("change", resetResult);
+      el.addEventListener("input", resetResult);
     });   
     calcBtnEl.addEventListener("click", calculateResults);
   </script>

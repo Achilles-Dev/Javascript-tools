@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Matrix Determinant Calculator</title>
+
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.6.5/dist/sweetalert2.all.min.js"></script>
+  <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11.6.5/dist/sweetalert2.min.css" rel="stylesheet">
+</head>
+
+<body>
+  <div>
+    <h1>Matrix Determinant Calculator</h1>
+    <p>
+      <label for="matSize">Matrix size: </label>
+      <select id="matSize">
+        <option value="two" selected>&nbsp;2x2 &nbsp;</option>
+        <option value="three">&nbsp;3x3 &nbsp;</option>
+        <option value="four">&nbsp;4x4 &nbsp;</option>  
+      </select>
+    </p>
+    
+    <p>First row</p>
+      <p>
+        <label for="a1">a₁:</label>
+        <input type="number" id="a1" />  
+      </p>
+      <p>
+        <label for="b1">b₁:</label>
+        <input type="number" id="b1" />  
+      </p>
+      <p id="first3DInput" style="display: none;">
+        <label for="c1">c₁:</label>
+        <input type="number" id="c1" />  
+      </p>
+      <p id="first4DInput" style="display: none;">
+        <label for="d1">d₁:</label>
+        <input type="number" id="d1" />  
+      </p>         
+      
+    <p>Second row</p>
+      <p>
+        <label for="a2">a₂:</label>
+        <input type="number" id="a2" />  
+      </p>
+      <p>
+        <label for="b2">b₂:</label>
+        <input type="number" id="b2" />  
+      </p>
+      <p id="second3DInput" style="display: none;">
+        <label for="c2">c₂:</label>
+        <input type="number" id="c2" />  
+      </p>  
+      <p id="second4DInput" style="display: none;">
+        <label for="d2">d₂:</label>
+        <input type="number" id="d2" />  
+      </p> 
+     <div id="thirdRowInputs" style="display: none;">
+      <p>Third row</p>
+      <p>
+        <label for="a3">a₃:</label>
+        <input type="number" id="a3" />  
+      </p>
+      <p>
+        <label for="b3">b₃:</label>
+        <input type="number" id="b3" />  
+      </p>                 
+      <p>
+        <label for="c3">c₃:</label>
+        <input type="number" id="c3" />  
+      </p>
+      <p id="third4DInput" style="display: none;">
+        <label for="d3">d₃:</label>
+        <input type="number" id="d3" />  
+      </p>   
+    </div>
+    <div id="fourthRowInputs" style="display: none;">
+      <p>Fourth row</p>
+      <p>
+        <label for="a4">a₄:</label>
+        <input type="number" id="a4" />  
+      </p>
+      <p>
+        <label for="b4">b₄:</label>
+        <input type="number" id="b4" />  
+      </p>    
+      <p>
+        <label for="c4">c₄:</label>
+        <input type="number" id="c4" /> 
+      </p>
+      <p>
+        <label for="d4">d₄:</label>
+        <input type="number" id="d4" />  
+      </p>
+    </div>
+    
+    <p>
+      <button id="calcBtn">Calculate</button>
+      <button id="resetBtn">Reset</button>
+    </p>
+    <hr>
+    <p>
+    <h3>Result:</h3>
+    <h3 id="calcResults">Result will appear here...</h3>
+    </p>
+  </div>
+  <script>
+
+    /********************************** ELEMENTS **********************************/
+    const matSizeEl = document.getElementById('matSize');
+    const first3DInputEl = document.getElementById('first3DInput');
+    const first4DInputEl = document.getElementById('first4DInput');
+    const second3DInputEl = document.getElementById('second3DInput');
+    const second4DInputEl = document.getElementById('second4DInput');
+    const third4DInputEl = document.getElementById('third4DInput');
+    const thirdRowInputsEl = document.getElementById('thirdRowInputs');
+    const fourthRowInputsEl = document.getElementById('fourthRowInputs');
+    const calcBtnEl = document.getElementById('calcBtn');
+    const resetBtnEl = document.getElementById('resetBtn');
+    const calcResultsEl = document.getElementById('calcResults')
+
+    let a1El = document.getElementById('a1');
+    let a2El = document.getElementById('a2');
+    let a3El = '';
+    let a4El = '';
+    let b1El = document.getElementById('b1');
+    let b2El = document.getElementById('b2');
+    let b3El = '';
+    let b4El = '';
+    let c1El = '';
+    let c2El = '';
+    let c3El = '';
+    let c4El = '';
+    let d1El = '';
+    let d2El = '';
+    let d3El = '';
+    let d4El = '';
+    let matSizeSelected = 'two';
+
+    /********************************** FUNCTIONS **********************************/
+    // Conversion functions
+
+    function handleMatrixSizeChange(e) {
+      const matrixSize = e.target.value
+      first3DInputEl.style.display = (matrixSize ==  'three' || matrixSize ==  'four') ? 'block' : 'none'
+      second3DInputEl.style.display = (matrixSize ==  'three' || matrixSize ==  'four') ? 'block' : 'none'
+      thirdRowInputs.style.display = (matrixSize ==  'three' || matrixSize ==  'four') ? 'block' : 'none'
+
+      first4DInputEl.style.display = matrixSize ==  'four' ? 'block' : 'none'
+      second4DInputEl.style.display = matrixSize ==  'four' ? 'block' : 'none'
+      third4DInputEl.style.display = matrixSize ==  'four' ? 'block' : 'none'
+      fourthRowInputsEl.style.display = matrixSize ==  'four' ? 'block' : 'none'
+
+      a1El = document.getElementById('a1');
+      a2El = document.getElementById('a2');
+      a3El = (matrixSize ==  'three' || matrixSize ==  'four') ? document.getElementById('a3') : '';
+      a4El = matrixSize ==  'four' ? document.getElementById('a4') : '';
+      b1El = document.getElementById('b1');
+      b2El = document.getElementById('b2');
+      b3El = (matrixSize ==  'three' || matrixSize ==  'four') ? document.getElementById('b3') : '';
+      b4El = matrixSize ==  'four' ? document.getElementById('b4') : '';
+      c1El = (matrixSize ==  'three' || matrixSize ==  'four') ? document.getElementById('c1') : '';
+      c2El = (matrixSize ==  'three' || matrixSize ==  'four') ? document.getElementById('c2') : '';
+      c3El = (matrixSize ==  'three' || matrixSize ==  'four') ? document.getElementById('c3') : '';
+      c4El = matrixSize ==  'four' ? document.getElementById('c4') : '';
+      d1El = matrixSize ==  'four' ? document.getElementById('d1') : '';
+      d2El = matrixSize ==  'four' ? document.getElementById('d2') : '';
+      d3El = matrixSize ==  'four' ? document.getElementById('d3') : '';
+      d4El = matrixSize ==  'four' ? document.getElementById('d4') : '';
+
+      matSizeSelected = matrixSize;
+      if (matrixSize == 'three') {
+        [a3El, b3El, c1El, c2El, c3El].forEach((el) => {
+          el.addEventListener("input", resetResult);
+        });
+      } else if (matrixSize == 'four') {
+        [a3El, b3El, c1El, c2El, c3El, a4El, b4El, c4El, d1El, d2El, d3El, d4El].forEach((el) => {
+          el.addEventListener("input", resetResult);
+        });
+      }
+    }
+
+    function matrixDeterminant(a1, a2, a3, a4, b1, b2, b3, b4, c1, c2, c3, c4, d1, d2, d3, d4) {
+      let results = 0;
+      if (matSizeSelected == 'two') {
+        results = (a1 * b2) - (b1 * a2)
+      } else if (matSizeSelected == 'three') {
+        results = (a1 * b2 * c3) + (b1 * c2 * a3) + (c1 * a2 * b3) - (c1 * b2 * a3) - (b1 * a2 * c3) - (a1 * c2 * b3)
+      } else if (matSizeSelected == 'four') {
+        results = (a1 * b2 * c3 * d4) - (a2 * b1 * c3 * d4) + (a3 * b1 * c2 * d4) - (a1 * b3 * c2 * d4) + 
+        (a2 * b3 * c1 * d4) - (a3 * b2 * c1 * d4)  + (a3 * b2 * c4 * d1) - (a2 * b3 * c4 * d1) + (a4 * b3 * c2 * d1) -
+        (a3 * b4 * c2 * d1) + (a2 * b4 * c3 * d1) - (a4 * b2 * c3 * d1) + (a4 * b1 * c3 * d2) - (a1 * b4 * c3 * d2) +
+        (a3 * b4 * c1 * d2) - (a4 * b3 * c1 * d2) + (a1 * b3 * c4 * d2) - (a3 * b1 * c4 * d2) + (a2 * b1 * c4 * d3) - 
+        (a1 * b2 * c4 * d3) + (a4 * b2 * c1 * d3) - (a2 * b4 * c1 * d3) + (a1 * b4 * c2 * d3) - (a4 * b1 * c2 * d3)
+      }
+      return results
+    }
+
+    function calculateResults() {
+      // Retrieve input values
+      const a1 = parseFloat(a1El.value)
+      const a2 = parseFloat(a2El.value)
+      const a3 = parseFloat(a3El.value)
+      const a4 = parseFloat(a4El.value)
+      const b1 = parseFloat(b1El.value)
+      const b2 = parseFloat(b2El.value)
+      const b3 = parseFloat(b3El.value)
+      const b4 = parseFloat(b4El.value)
+      const c1 = parseFloat(c1El.value)
+      const c2 = parseFloat(c2El.value)
+      const c3 = parseFloat(c3El.value)
+      const c4 = parseFloat(c4El.value)
+      const d1 = parseFloat(d1El.value)
+      const d2 = parseFloat(d2El.value)
+      const d3 = parseFloat(d3El.value)
+      const d4 = parseFloat(d4El.value)
+      
+      
+      if (
+        isNaN(a1) || isNaN(b1) || isNaN(a2) || isNaN(b2) || (a3El != '' && isNaN(a3)) || (b3El != '' && isNaN(b3)) ||
+        (c1El != '' && isNaN(c1)) || (c2El != '' && isNaN(c2)) || (c3El != '' && isNaN(c3)) ||
+        (d1El != '' && isNaN(d1)) || (d2El != '' && isNaN(d2)) || (d3El != '' && isNaN(d3)) ||
+        (a4El != '' && isNaN(a4)) || (b4El != '' && isNaN(b4)) || (c4El != '' && isNaN(c4)) || (d4El != '' && isNaN(d4))
+      ) {
+        showError("Please Enter All Details.");
+        return;
+      }
+      
+      
+      try {
+        const results = matrixDeterminant(a1, a2, a3, a4, b1, b2, b3, b4, c1, c2, c3, c4, d1, d2, d3, d4)
+        
+        calcResultsEl.innerHTML = `<p> Determinant |A|</p>
+                                     <p>${results}</p>
+                                    `
+      } catch (error) {
+        showError("Something Went Wrong!!!");
+        resethandler()
+      }
+    }
+
+    /********************************* HELPER FUNCTIONS **********************************/
+
+    function showError(errorMessage) {
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: errorMessage,
+      });
+    }
+
+    function resetForm() {
+      a1El.value = ""
+      a2El.value = ""
+      a3El.value = ""
+      a4El.value = ""
+      b1El.value = ""
+      b2El.value = ""
+      b3El.value = ""
+      b4El.value = ""
+      c1El.value = ""
+      c2El.value = ""
+      c3El.value = ""
+      c4El.value = ""
+      d1El.value = ""
+      d2El.value = ""
+      d3El.value = ""
+      d4El.value = ""
+    }
+
+    function resetResult() {
+      calcResultsEl.innerHTML = "<p>Result will appear here...</p>";
+    }
+
+    function resethandler() {
+      resetForm();
+      resetResult();
+    }
+
+    /********************************** EVENT LISTENERS **********************************/
+    resetBtnEl.addEventListener("click", resethandler);
+    [a1El, a2El, b1El, b2El].forEach((el) => {
+      el.addEventListener("input", resetResult);
+    });   
+
+    matSizeEl.addEventListener("change", (e) => {
+      handleMatrixSizeChange(e);
+      resethandler();
+    })
+    calcBtnEl.addEventListener("click", calculateResults);
+  </script>
+</body>
+
+</html> 

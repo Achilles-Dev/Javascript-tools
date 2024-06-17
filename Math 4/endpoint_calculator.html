@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Midpoint Calculator</title>
+  <title>Endpoint Calculator</title>
 
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.6.5/dist/sweetalert2.all.min.js"></script>
   <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11.6.5/dist/sweetalert2.min.css" rel="stylesheet">
@@ -12,25 +12,22 @@
 
 <body>
   <div>
-    <h1>Midpoint Calculator</h1>
-    <p>From Two Points to One Central Coordinate</p>
-    <p>Enter two points (x₁, y₁) and (x₂, y₂):</p>
-      <p>
-        <label for="x1">x₁:</label>
-        <input type="number" id="x1" placeholder="eg. 1.23e4, 1234, 123.4, -123"/>  
-      </p>
-      <p>
-        <label for="y1">y₁:</label>
-        <input type="number" id="y1" placeholder="eg. 1.23e4, 1234, 123.4, -123"/>  
-      </p>
-      <p>
-        <label for="x2">x₂:</label>
-        <input type="number" id="x2" placeholder="eg. 1.23e4, 1234, 123.4, -123"/>  
-      </p>
-      <p>
-        <label for="y2">y₂:</label>
-        <input type="number" id="y2" placeholder="eg. 1.23e4, 1234, 123.4, -123"/>  
-      </p>  
+    <h1>Endpoint Calculator</h1>
+    <p>Use this calculator to determine the coordinates of one endpoint (B) of a line segment <br />
+      determined by its midpoint and its other endpoint (A). Find the endpoint of a line segment.
+    </p>
+    <p>
+      <label for="startPtX">Starting point coordinates:&nbsp;&nbsp;&nbsp;&nbsp;</label>
+      <input type="number" id="startPtX" placeholder="x"/> 
+      <span>&nbsp;&nbsp;&nbsp;&nbsp;,&nbsp;&nbsp;&nbsp;&nbsp;</span>
+      <input type="number" id="startPtY" placeholder="y"/>  
+    </p>
+    <p>
+      <label for="midPointX">Midpoint coordinates:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label>
+      <input type="number" id="midPointX" placeholder="x"/> 
+      <span>&nbsp;&nbsp;&nbsp;&nbsp;,&nbsp;&nbsp;&nbsp;&nbsp;</span>
+      <input type="number" id="midPointY" placeholder="y"/>  
+    </p>
     <p>
       <button id="calcBtn">Calculate</button>
       <button id="resetBtn">Reset</button>
@@ -44,10 +41,10 @@
   <script>
 
     /********************************** ELEMENTS **********************************/
-    const x1El = document.getElementById('x1');
-    const y1El = document.getElementById('y1');
-    const x2El = document.getElementById('x2');
-    const y2El = document.getElementById('y2');
+    const startPtXEl = document.getElementById('startPtX');
+    const startPtYEl = document.getElementById('startPtY');
+    const midPointXEl = document.getElementById('midPointX');
+    const midPointYEl = document.getElementById('midPointY');
     const calcBtnEl = document.getElementById('calcBtn');
     const resetBtnEl = document.getElementById('resetBtn');
     const calcResultsEl = document.getElementById('calcResults')
@@ -56,36 +53,34 @@
     // Conversion functions
 
 
-    function xyMidpoint(x1, y1, x2, y2) {
-      let xm = 0;
-      let ym = 0;
-      xm = (x2 + x1) / 2;
-      ym = (y2 + y1) / 2;
-      return {
-        xm: xm.toFixed(1) * 1,
-        ym: ym.toFixed(1) * 1
-      }
+    function endPoint(stX, stY, midX, midY) {
+      let results = '';
+      let xVal = (2 * midX) - stX;
+      let yVal = (2 * midY) - stY;
+
+      results = `${xVal}, ${yVal}`
+      return results
     }
 
     function calculateResults() {
       // Retrieve input values
-      const x1 = parseFloat(x1El.value)
-      const y1 = parseFloat(y1El.value)
-      const x2 = parseFloat(x2El.value)
-      const y2 = parseFloat(y2El.value)
+      const startPtX = parseFloat(startPtXEl.value)
+      const startPtY = parseFloat(startPtYEl.value)
+      const midPointX = parseFloat(midPointXEl.value)
+      const midPointY = parseFloat(midPointYEl.value)
       
       if (
-        isNaN(x1) || isNaN(y1) || isNaN(x2) || isNaN(y2)
+        isNaN(startPtX) || isNaN(startPtY) || isNaN(midPointX) || isNaN(midPointY)
       ) {
         showError("Please Enter All Details.");
         return;
       }
       
       try {
-        const {xm, ym} = xyMidpoint(x1, y1, x2, y2)
+        const results = endPoint(startPtX, startPtY, midPointX, midPointY)
         
-        calcResultsEl.innerHTML = `<p> Midpoint between (${x1}, ${x2}) and (${y1}, ${y2}): </p>
-                                     <p>d = (${xm}, ${ym})</p>
+        calcResultsEl.innerHTML = `<p> Endpoint coordinates (x, y)</p>
+                                     <p>(${results})</p>
                                     `
       } catch (error) {
         showError("Something Went Wrong!!!");
@@ -104,10 +99,10 @@
     }
 
     function resetForm() {
-      x1El.value = ""
-      x2El.value = ""
-      y1El.value = ""
-      y2El.value = ""
+      startPtXEl.value = ""
+      startPtYEl.value = ""
+      midPointXEl.value = ""
+      midPointYEl.value = ""
     }
 
     function resetResult() {
@@ -121,9 +116,10 @@
 
     /********************************** EVENT LISTENERS **********************************/
     resetBtnEl.addEventListener("click", resethandler);
-    [x1El, y1El, x2El, y2El].forEach((el) => {
+    [startPtXEl, startPtYEl, midPointXEl, midPointYEl].forEach((el) => {
       el.addEventListener("input", resetResult);
-    });   
+    });  
+
     calcBtnEl.addEventListener("click", calculateResults);
   </script>
 </body>
