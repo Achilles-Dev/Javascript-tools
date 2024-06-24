@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Cramer's Rule Calculator</title>
+  <title>(Reduced) Row Echelon Form Calculator</title>
 
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.6.5/dist/sweetalert2.all.min.js"></script>
   <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11.6.5/dist/sweetalert2.min.css" rel="stylesheet">
@@ -12,7 +12,14 @@
 
 <body>
   <div>
-    <h1>Cramer's Rule Calculator</h1>
+    <h1>(Reduced) Row Echelon Form Calculator</h1>
+    <p>
+      <label for="isReducedForm">Use the reduced form?</label>
+      <select id="isReducedForm">
+        <option value="yes" selected>&nbsp;Yes &nbsp;</option>
+        <option value="no">&nbsp;No &nbsp;</option>  
+      </select>
+    </p>
     <p>
       <label for="eqnNo">Number of equations: </label>
       <select id="eqnNo">
@@ -97,6 +104,7 @@
 
     /********************************** ELEMENTS **********************************/
     const eqnNoEl = document.getElementById('eqnNo');
+    const isReducedFormEl = document.getElementById('isReducedForm');
     const twoEqnsEl = document.getElementById('twoEqns');
     const threeEqnsEl = document.getElementById('threeEqns');
     const first3DInputEl = document.getElementById('first3DInput');
@@ -118,6 +126,7 @@
     let c3El = '';
     let d3El = '';
     let eqnNoSelected = 'two'
+    let reducedFormSelected = 'yes'
 
     /********************************** FUNCTIONS **********************************/
     // Conversion functions
@@ -132,6 +141,7 @@
       threeEqnsEl.style.display = equationNo ==  'three' ? 'block' : 'none'
 
       eqnNoSelected = equationNo
+      
       if (equationNo == 'two') {
         a1El = document.getElementById('a1');
         b1El = document.getElementById('b1');
@@ -158,7 +168,6 @@
         b3El = document.getElementById('b3');
         c3El = document.getElementById('c3');
         d3El = document.getElementById('d3');
-
         [d1El, d2El, a3El, b3El, c3El, d3El].forEach((el) => {
           el.addEventListener("input", resetResult);
         });
@@ -196,6 +205,124 @@
       return results
     }
 
+    function ReducedRowEchelonForm(a1, b1, c1, d1, a2, b2, c2, d2, a3, b3, c3, d3) {
+      let results = {};
+      
+      if (eqnNoSelected == 'two') {
+        const {xValue, yValue} = cramersRule(a1, b1, c1, d1, a2, b2, c2, d2, a3, b3, c3, d3)
+        let refb2 = b2;
+        let refc2 = c2;
+        if (a1 && (Math.abs(a1) == Math.abs(a2))) {
+          if (a1 == a2) {
+            refb2 -= b1
+            refc2 -= c1
+          } else {
+            refb2 += b1
+            refc2 += c1
+          }
+         
+        } else if (a1 && (a1 != a2)) {
+          if ((a1 < 0 && a2 < 0) || (a1 > 0 && a2 > 0)) {
+            refb2 -= ((a2 / a1) * b1)
+            refc2 -= ((a2 / a1) * c1)
+          } else {
+            refb2 += ((a2 / a1) * b1)
+            refc2 += ((a2 / a1) * c1)
+          }
+        }
+        results = {
+          b2: refb2.toFixed(3) * 1,
+          c2: refc2.toFixed(3) * 1,
+          xValue,
+          yValue
+        }
+        
+      } else if (eqnNoSelected == 'three') {
+        const {xValue, yValue, zValue} = cramersRule(a1, b1, c1, d1, a2, b2, c2, d2, a3, b3, c3, d3)
+        let refb2 = b2;
+        let refc2 = c2;
+        let refd2 = d2;
+        let refb3 = b3;
+        let refc3 = c3;
+        let refd3 = d3;
+        if (a1 && (Math.abs(a1) == Math.abs(a2))) {
+          if (a1 == a2) {
+            refb2 -= b1
+            refc2 -= c1
+            refd2 -= d1
+          } else {
+            refb2 += b1
+            refc2 += c1
+            refd2 += d1
+          }
+         
+        } else if (a1 && (a1 != a2)) {
+          if ((a1 < 0 && a2 < 0) || (a1 > 0 && a2 > 0)) {
+            refb2 -= ((a2 / a1) * b1)
+            refc2 -= ((a2 / a1) * c1)
+            refd2 -= ((a2 / a1) * d1)
+          } else {
+            refb2 += ((a2 / a1) * b1)
+            refc2 += ((a2 / a1) * c1)
+            refd2 += ((a2 / a1) * d1)
+          }
+        }
+
+        if (a1 && (Math.abs(a1) == Math.abs(a3))) {
+          if (a1 == a3) {
+            refb3 -= b1
+            refc3 -= c1
+            refd3 -= d1
+          } else {
+            refb3 += b1
+            refc3 += c1
+            refd3 += d1
+          }
+         
+        } else if (a1 && (a1 != a3)) {
+          if ((a1 < 0 && a3 < 0) || (a1 > 0 && a3 > 0)) {
+            refb3 -= ((a3 / a1) * b1)
+            refc3 -= ((a3 / a1) * c1)
+            refd3 -= ((a3 / a1) * d1)
+          } else {
+            refb3 += ((a3 / a1) * b1)
+            refc3 += ((a3 / a1) * c1)
+            refd3 += ((a3 / a1) * d1)
+          }
+        }
+
+        if (refb2 && (Math.abs(refb2) == Math.abs(refb3))) {
+          if (refb2 == refb3) {
+            refc3 -= c1
+            refd3 -= d1
+          } else {
+            refc3 += c1
+            refd3 += d1
+          }
+         
+        } else if (refb2 && (refb2 != refb3)) {
+          if ((refb2 < 0 && refb3 < 0) || (refb2 > 0 && refb3 > 0)) {
+            refc3 -= ((refb3 / refb2) * refc2)
+            refd3 -= ((refb3 / refb2) * refd2)
+          } else {
+            refc3 += ((refb3 / refb2) * refc2)
+            refd3 += ((refb3 / refb2) * refd2)
+          }
+        }
+        results = {
+          b2: refb2.toFixed(3) * 1,
+          c2: refc2.toFixed(3) * 1,
+          d2: refd2.toFixed(3) * 1,
+          c3: refc3.toFixed(3) * 1,
+          d3: refd3.toFixed(3) * 1,
+          xValue,
+          yValue,
+          zValue
+        }
+      }
+      return results
+    }
+
     function calculateResults() {
       // Retrieve input values
       const a1 = parseFloat(a1El.value)
@@ -210,7 +337,7 @@
       const b3 = parseFloat(b3El.value)
       const c3 = parseFloat(c3El.value)
       const d3 = parseFloat(d3El.value)
-
+      
       if (
         isNaN(a1) || isNaN(b1) || isNaN(c1) || isNaN(a2) || isNaN(b2) || isNaN(c2) ||
         (a3El != '' && isNaN(a3)) || (b3El != '' && isNaN(b3)) || (c3El != '' && isNaN(c3)) ||
@@ -222,45 +349,61 @@
       
       
       try {
-        const results = cramersRule(a1, b1, c1, d1, a2, b2, c2, d2, a3, b3, c3, d3)
+        const results = ReducedRowEchelonForm(a1, b1, c1, d1, a2, b2, c2, d2, a3, b3, c3, d3)
+        if (reducedFormSelected == 'yes') {
+          let rrefb1 = (b1 / a1).toFixed(3) * 1;
+          let rrefc1 = (c1 / a1).toFixed(3) * 1;
+          let rrefc2 = (results.c2 / results.b2).toFixed(3) * 1;
+          if (eqnNoSelected == 'three') {           
+            let rrefd1 = (b1 / a1).toFixed(3) * 1;           
+            let rrefd2 = (results.d2 / results.b2).toFixed(3) * 1;
+            let rrefd3 = (results.d3 / results.c3).toFixed(3) * 1;
 
-        if (eqnNoSelected == 'three') {
-          calcResultsEl.innerHTML = `<p>The values of the system's determinants are:</p>
-                                    <p>W = ${results.W}</p>
-                                    <p>W<sub>x</sub> = ${results.Wx}</p>
-                                    <p>W<sub>y</sub> = ${results.Wy}</p>
-                                    <p>W<sub>z</sub> = ${results.Wz}</p>
-                                    ${(results.W == 0 && results.Wx == 0 && results.Wy == 0 && results.Wz == 0 ) ?
-                                      `<p>Your system of equations has an infinite number of solutions.</p>
-                                      <p>It is satisfied by any triple of the form x = t, y = 0.333, z = -0.333t0.111,
-                                          where t is an arbitary real number.</p>` 
-                                     : `${results.W == 0 ?  `<p>Your system of equations has no solutions.</p>` :
-                                      `<p> The unique solution to your system is.</p>
-                                      <p>x = ${results.xValue}</p>
-                                      <p>y = ${results.yValue}</p>
-                                      <p>z = ${results.zValue}</p>
-                                      `}
-                                    `}
-                                    `
+            calcResultsEl.innerHTML = `
+            <p>After Gauss elimination, your system of equations takes the form:</p>
+            <p>⎛ x &nbsp;&nbsp;${rrefb1 < 0 ? rrefb1 : `+${rrefb1}`}y&nbsp;&nbsp;
+              ${rrefc1 < 0 ? rrefc1 : `+${rrefc1}`}z&nbsp;&nbsp;&nbsp; = &nbsp;${rrefd1} 
+            </p>
+            <p>⎨ &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; y &nbsp;&nbsp;
+              ${rrefc2 < 0 ? rrefc2 : `+${rrefc2}`}z
+              &nbsp;&nbsp;&nbsp; = &nbsp;${rrefd2} 
+            </p>
+            <p>⎝	&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;y&nbsp;y&nbsp;&nbsp; z &nbsp;&nbsp;&nbsp; = &nbsp;${rrefd3} </p>
+            <p>The unique solution to the system is</p>
+            <p>x = ${results.xValue}, y = ${results.yValue}, z = ${results.zValue} </p>
+            `
+          } else {
+            calcResultsEl.innerHTML = `
+            <p>After Gauss elimination, your system of equations takes the form:</p>
+            <p>⎰ x&nbsp;&nbsp;${rrefb1 < 0 ? rrefb1 : `+${rrefb1}`}y&nbsp;&nbsp; = &nbsp;${rrefc1} </p>
+            <p>⎱ &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; y = &nbsp;${rrefc2} </p>
+
+            <p>The unique solution to the system is</p>
+            <p>x = ${results.xValue}, y = ${results.yValue}</p>
+            `
+          }
         } else {
-          calcResultsEl.innerHTML = `<p>The values of the system's determinants are:</p>
-                                    <p>W = ${results.W}</p>
-                                    <p>W<sub>x</sub> = ${results.Wx}</p>
-                                    <p>W<sub>y</sub> = ${results.Wy}</p>
-                                    ${(results.W == 0 && results.Wx == 0 && results.Wy == 0 ) ?
-                                      `<p>Your system of equations has an infinite number of solutions.</p>
-                                      <p>It is satisfied by any pair of the form x = t, y = t+2,
-                                        where t is an arbitary real number.` 
-                                     : 
-                                      `${results.W == 0 ?  `<p>Your system of equations has no solutions.</p>` 
-                                     :
-                                      `<p> The unique solution to your system is.</p>
-                                      <p>x = ${results.xValue}</p>
-                                      <p>y = ${results.yValue}</p>
-                                      `}
-                                    `}
-                                    `
+          if (eqnNoSelected == 'three') {
+            calcResultsEl.innerHTML = `
+            <p>After Gauss elimination, your system of equations takes the form:</p>
+            <p>⎛ ${a1}x &nbsp;&nbsp;${b1 < 0 ? b1 : `+${b1}`}y&nbsp;&nbsp;${c1 < 0 ? c1 : `+${c1}`}z&nbsp;&nbsp;&nbsp; = &nbsp;${d1} </p>
+            <p>⎨ &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;${results.b2}y&nbsp;&nbsp;${results.c2 < 0 ? results.c2 : `+${results.c2}`}z&nbsp;&nbsp;&nbsp; = &nbsp;${results.d2} </p>
+            <p>⎝	 &nbsp;&nbsp;&nbsp;&nbsp;y&nbsp;y&nbsp;y&nbsp;&nbsp;${results.c3}z&nbsp;&nbsp;&nbsp; = &nbsp;${results.d3} </p>
+            <p>The unique solution to the system is</p>
+            <p>x = ${results.xValue}, y = ${results.yValue}, z = ${results.zValue} </p>
+            `
+          } else {
+            calcResultsEl.innerHTML = `
+            <p>After Gauss elimination, your system of equations takes the form:</p>
+            <p>⎰ ${a1}x&nbsp;&nbsp;${b1 < 0 ? b1 : `+${b1}`}y&nbsp;&nbsp; = &nbsp;${c1} </p>
+            <p>⎱ &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;${results.b2}y = &nbsp;${results.c2} </p>
+
+            <p>The unique solution to the system is</p>
+            <p>x = ${results.xValue}, y = ${results.yValue}</p>
+            `
+          }
         }
+        
         
       } catch (error) {
         showError("Something Went Wrong!!!");
@@ -306,9 +449,15 @@
     resetBtnEl.addEventListener("click", resethandler);
     [a1El, a2El, b1El, b2El, c1El, c2El].forEach((el) => {
       el.addEventListener("input", resetResult);
-    });   
+    });
+      
     eqnNoEl.addEventListener("change", (e) => {
       handleEquationNoChange(e);
+      resetResult();
+    })
+
+    isReducedFormEl.addEventListener("change", (e) => {
+      reducedFormSelected = e.target.value
       resetResult();
     })
     calcBtnEl.addEventListener("click", calculateResults);

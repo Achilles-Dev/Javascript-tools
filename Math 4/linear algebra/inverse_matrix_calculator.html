@@ -46,7 +46,7 @@
       </p>
       <p>
         <label for="b2">b₂:</label>
-        <input type="number" id="b2" />  
+        <input type="number" id="b2" /> 
       </p>
       <p id="second3DInput" style="display: none;">
         <label for="b3">b₃:</label>
@@ -145,7 +145,7 @@
       const matrixSize = e.target.value
       first3DInputEl.style.display = (matrixSize ==  'three' || matrixSize ==  'four') ? 'block' : 'none'
       second3DInputEl.style.display = (matrixSize ==  'three' || matrixSize ==  'four') ? 'block' : 'none'
-      thirdRowInputs.style.display = (matrixSize ==  'three' || matrixSize ==  'four') ? 'block' : 'none'
+      thirdRowInputsEl.style.display = (matrixSize ==  'three' || matrixSize ==  'four') ? 'block' : 'none'
 
       first4DInputEl.style.display = matrixSize ==  'four' ? 'block' : 'none'
       second4DInputEl.style.display = matrixSize ==  'four' ? 'block' : 'none'
@@ -213,8 +213,69 @@
       }
     }
 
+    function matrixDeterminant(a1, a2, a3, a4, b1, b2, b3, b4, c1, c2, c3, c4, d1, d2, d3, d4) {
+      let results = 0;
+      if (matSizeSelected == 'two') {
+        results = (a1 * b2) - (b1 * a2)
+      } else if (matSizeSelected == 'three') {
+        results = (a1 * b2 * c3) + (b1 * c2 * a3) + (c1 * a2 * b3) - (c1 * b2 * a3) - (b1 * a2 * c3) - (a1 * c2 * b3)
+      } else if (matSizeSelected == 'four') {
+        results = (a1 * b2 * c3 * d4) - (a2 * b1 * c3 * d4) + (a3 * b1 * c2 * d4) - (a1 * b3 * c2 * d4) + 
+        (a2 * b3 * c1 * d4) - (a3 * b2 * c1 * d4)  + (a3 * b2 * c4 * d1) - (a2 * b3 * c4 * d1) + (a4 * b3 * c2 * d1) -
+        (a3 * b4 * c2 * d1) + (a2 * b4 * c3 * d1) - (a4 * b2 * c3 * d1) + (a4 * b1 * c3 * d2) - (a1 * b4 * c3 * d2) +
+        (a3 * b4 * c1 * d2) - (a4 * b3 * c1 * d2) + (a1 * b3 * c4 * d2) - (a3 * b1 * c4 * d2) + (a2 * b1 * c4 * d3) - 
+        (a1 * b2 * c4 * d3) + (a4 * b2 * c1 * d3) - (a2 * b4 * c1 * d3) + (a1 * b4 * c2 * d3) - (a4 * b1 * c2 * d3)
+      }
+      return results
+    }
+
     function inverseMatrix(a1, a2, a3, a4, b1, b2, b3, b4, c1, c2, c3, c4, d1, d2, d3, d4) {
-      let results = '';
+      let results = {};
+      let detA = matrixDeterminant(a1, a2, a3, a4, b1, b2, b3, b4, c1, c2, c3, c4, d1, d2, d3, d4);
+      if (matSizeSelected == 'two') {      
+        results = {
+          r1c1: ((1 / detA) * (b2)).toFixed(4) * 1,
+          r1c2: ((1 / detA) * (a2 * -1)).toFixed(4) * 1,
+          r2c1: ((1 / detA) * (b1 * -1)).toFixed(4) * 1,
+          r2c2: ((1 / detA) * (a1)).toFixed(4) * 1,
+          detA: detA
+        } 
+      } 
+      else if (matSizeSelected == 'three') {      
+        results = {
+          r1c1: ((1 / detA) * ((b2 * c3) - (c2 * b3))).toFixed(4) * 1,
+          r1c2: ((1 / detA) * (((a2 * c3) - (c2 * a3)) * -1)).toFixed(4) * 1,
+          r1c3: ((1 / detA) * ((a2 * b3) - (b2 * a3))).toFixed(4) * 1,
+          r2c1: ((1 / detA) * (((b1 * c3) - (c1 * b3)) * -1)).toFixed(4) * 1,
+          r2c2: ((1 / detA) * ((a1 * c3) - (c1 * a3))).toFixed(4) * 1,
+          r2c3: ((1 / detA) * (((a1 * b3) - (b1 * a3)) * -1)).toFixed(4) * 1,
+          r3c1: ((1 / detA) * ((b1 * c2) - (c1 * b2))).toFixed(4) * 1,
+          r3c2: ((1 / detA) * (((a1 * c2) - (c1 * a2)) * -1)).toFixed(4) * 1,
+          r3c3: ((1 / detA) * ((a1 * b2) - (b1 * a2))).toFixed(4) * 1,
+          detA: detA
+        }
+      } 
+      else if (matSizeSelected == 'four') {      
+          results = {
+            r1c1: ((1 / detA) * ((b2 * c3 * d4) + (c2 * d3 * b4) + (d2 * b3 * c4) - (d2 * c3 * b4) - (c2 * b3 * d4) - (b2 * d3 * c4))).toFixed(4) * 1,
+            r1c2: ((1 / detA) * ((a2 * c3 * d4) + (c2 * d3 * a4) + (d2 * a3 * c4) - (d2 * c3 * a4) - (c2 * a3 * d4) - (a2 * d3 * c4)) * -1).toFixed(4) * 1,
+            r1c3: ((1 / detA) * ((a2 * b3 * d4) + (b2 * d3 * a4) + (d2 * a3 * b4) - (d2 * b3 * a4) - (b2 * a3 * d4) - (a2 * d3 * b4))).toFixed(4) * 1,
+            r1c4: ((1 / detA) * ((a2 * b3 * c4) + (b2 * c3 * a4) + (c2 * a3 * b4) - (c2 * b3 * a4) - (b2 * a3 * c4) - (a2 * c3 * b4)) * -1).toFixed(4) * 1,
+            r2c1: ((1 / detA) * ((b1 * c3 * d4) + (c1 * d3 * b4) + (d1 * b3 * c4) - (d1 * c3 * b4) - (c1 * b3 * d4) - (b1 * d3 * c4)) * -1).toFixed(4) * 1,
+            r2c2: ((1 / detA) * ((a1 * c3 * d4) + (c1 * d3 * a4) + (d1 * a3 * c4) - (d1 * c3 * a4) - (c1 * a3 * d4) - (a1 * d3 * c4))).toFixed(4) * 1,
+            r2c3: ((1 / detA) * ((a1 * b3 * d4) + (b1 * d3 * a4) + (d1 * a3 * b4) - (d1 * b3 * a4) - (b1 * a3 * d4) - (a1 * d3 * b4)) * -1).toFixed(4) * 1,
+            r2c4: ((1 / detA) * ((a1 * b3 * c4) + (b1 * c3 * a4) + (c1 * a3 * b4) - (c1 * b3 * a4) - (b1 * a3 * c4) - (a1 * c3 * b4))).toFixed(4) * 1,
+            r3c1: ((1 / detA) * ((b1 * c2 * d4) + (c1 * d2 * b4) + (d1 * b2 * c4) - (d1 * c2 * b4) - (c1 * b2 * d4) - (b1 * d2 * c4))).toFixed(4) * 1,
+            r3c2: ((1 / detA) * ((a1 * c2 * d4) + (c1 * d2 * a4) + (d1 * a2 * c4) - (d1 * c2 * a4) - (c1 * a2 * d4) - (a1 * d2 * c4)) * -1).toFixed(4) * 1,
+            r3c3: ((1 / detA) * ((a1 * b2 * d4) + (b1 * d2 * a4) + (d1 * a2 * b4) - (d1 * b2 * a4) - (b1 * a2 * d4) - (a1 * d2 * b4))).toFixed(4) * 1,
+            r3c4: ((1 / detA) * ((a1 * b2 * c4) + (b1 * c2 * a4) + (c1 * a2 * b4) - (c1 * b2 * a4) - (b1 * a2 * c4) - (a1 * c2 * b4)) * -1).toFixed(4) * 1,
+            r4c1: ((1 / detA) * ((b1 * c2 * d3) + (c1 * d2 * b3) + (d1 * b2 * c3) - (d1 * c2 * b3) - (c1 * b2 * d3) - (b1 * d2 * c3)) * -1).toFixed(4) * 1,
+            r4c2: ((1 / detA) * ((a1 * c2 * d3) + (c1 * d2 * a3) + (d1 * a2 * c3) - (d1 * c2 * a3) - (c1 * a2 * d3) - (a1 * d2 * c3))).toFixed(4) * 1,
+            r4c3: ((1 / detA) * ((a1 * b2 * d3) + (b1 * d2 * a3) + (d1 * a2 * b3) - (d1 * b2 * a3) - (b1 * a2 * d3) - (a1 * d2 * b3)) * -1).toFixed(4) * 1,
+            r4c4: ((1 / detA) * ((a1 * b2 * c3) + (b1 * c2 * a3) + (c1 * a2 * b3) - (c1 * b2 * a3) - (b1 * a2 * c3) - (a1 * c2 * b3))).toFixed(4) * 1,
+            detA: detA
+          }
+      }
       return results
     }
 
@@ -237,7 +298,6 @@
       const d3 = parseFloat(d3El.value)
       const d4 = parseFloat(d4El.value)
       
-      
       if (
         isNaN(a1) || isNaN(b1) || isNaN(a2) || isNaN(b2) || (a3El != '' && isNaN(a3)) || (b3El != '' && isNaN(b3)) ||
         (c1El != '' && isNaN(c1)) || (c2El != '' && isNaN(c2)) || (c3El != '' && isNaN(c3)) ||
@@ -250,11 +310,48 @@
       
       
       try {
-        const results = inverseMatrix(a1, a2, a3, a4, b1, b2, b3, b4, c1, c2, c3, c4, d1, d2, d3, d4)
+        const {
+          r1c1, r1c2, r1c3, r1c4, r2c1, r2c2, r2c3, r2c4, r3c1, r3c2, r3c3, r3c4, r4c1, r4c2, r4c3, r4c4, detA 
+        } = inverseMatrix(a1, a2, a3, a4, b1, b2, b3, b4, c1, c2, c3, c4, d1, d2, d3, d4)
+        let firstBracketOpen = '⌈'
+        let firstBracketClose = '⌉	'
+        let secondBracketOpen = matSizeSelected == 'two' ? '⌊' : '|&nbsp;';
+        let secondBracketClose = matSizeSelected == 'two' ? '⌋' : '&nbsp;|';
+
+        let thirdBracketOpen = matSizeSelected == 'three' ? '⌊' : matSizeSelected == 'four' ?  '|' : '';
+        let thirdBracketClose = matSizeSelected == 'three' ? '⌋' : matSizeSelected == 'four' ?  '|' : '';
+        let fourthBracketOpen = matSizeSelected == 'four' ? '⌊' :  '';
+        let fourthBracketClose = matSizeSelected == 'four' ? '⌋' : '';
+        if (detA ==  0) {
+          calcResultsEl.innerHTML = `
+           <p> Determinant |A|  =  ${detA} </p>
+           <p> The matrix inverse doesn't exist. </p>
+          `
+        } else {
+          calcResultsEl.innerHTML = `
+            <p> Determinant |A|  =  ${detA} </p>
+          
+            <p>A  =  ${firstBracketOpen} ${!isNaN(a1) ? `${a1} &nbsp;` : ''}  ${!isNaN(a2) ? `${a2} &nbsp;` : ''}  
+              ${!isNaN(a3) ? a3 : ''} ${!isNaN(a4) ? a4 : ''} ${firstBracketClose}</p>
+            <p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;${secondBracketOpen} ${!isNaN(b1) ? `${b1} &nbsp;` : ''} ${!isNaN(b2) ? `${b2} &nbsp;` : ''} 
+              ${!isNaN(b3) ? b3 : ''} ${!isNaN(b4) ? b4 : ''} ${secondBracketClose}</p>
+            <p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;${thirdBracketOpen} ${!isNaN(c1) ? `${c1} &nbsp;` : ''} ${!isNaN(c2) ? `${c2} &nbsp;` : ''} 
+              ${!isNaN(c3) ? c3 : ''} ${!isNaN(c4) ? c4 : ''} ${thirdBracketClose} </p>
+            <p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ${fourthBracketOpen} ${!isNaN(d1) ? `${d1} &nbsp;` : ''}  ${!isNaN(d2) ? `${d2} &nbsp;` : ''}  
+              ${!isNaN(d3) ? d3 : ''} ${!isNaN(d4) ? d4 : ''} ${fourthBracketClose}</p>
+            <p>=</p>
+
+            <p>${firstBracketOpen} ${r1c1 != undefined ? `${r1c1} &nbsp;` : ''}  ${r1c2 != undefined ? `${r1c2} &nbsp;` : ''}  
+              ${r1c3 != undefined ? `${r1c3} &nbsp;` : ''} ${r1c4 != undefined ? `${r1c4} &nbsp;` : ''} ${firstBracketClose}</p>
+            <p>${secondBracketOpen} ${r2c1 != undefined ? `${r2c1} &nbsp;` : ''} ${r2c2 != undefined ? `${r2c2} &nbsp;` : ''}
+              ${r2c3 != undefined ? `${r2c3} &nbsp;` : ''} ${r2c4 != undefined ? `${r2c4} &nbsp;` : ''} ${secondBracketClose}</p>
+            <p>${thirdBracketOpen} ${r3c1 != undefined ? `${r3c1} &nbsp;` : ''} ${r3c2 != undefined ? `${r3c2} &nbsp;` : ''}
+              ${r3c3 != undefined ? `${r3c3} &nbsp;` : ''} ${r3c4 != undefined ? `${r3c4} &nbsp;` : ''} ${thirdBracketClose} </p>
+            <p> ${fourthBracketOpen} ${r4c1 != undefined ? `${r4c1} &nbsp;` : ''} ${r4c2 != undefined ? `${r4c2} &nbsp;` : ''}  
+              ${r4c3 != undefined ? `${r4c3} &nbsp;` : ''} ${r4c4 != undefined ? `${r4c4} &nbsp;` : ''} ${fourthBracketClose}</p>
+          `
+        }
         
-        calcResultsEl.innerHTML = `<p> Determinant |A|</p>
-                                     <p>(${results})</p>
-                                    `
       } catch (error) {
         showError("Something Went Wrong!!!");
         resethandler()
@@ -307,7 +404,7 @@
 
     matSizeEl.addEventListener("change", (e) => {
       handleMatrixSizeChange(e);
-      resethandler();
+      resetResult();
     })
     calcBtnEl.addEventListener("click", calculateResults);
   </script>

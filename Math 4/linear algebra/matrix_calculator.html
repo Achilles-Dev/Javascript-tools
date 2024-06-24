@@ -1,0 +1,1076 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Matrix Calculator</title>
+
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.6.5/dist/sweetalert2.all.min.js"></script>
+  <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11.6.5/dist/sweetalert2.min.css" rel="stylesheet">
+</head>
+
+<body>
+  <div>
+    <h1>Matrix Calculator</h1>
+    <h3>Select a matrix operation:</h3>
+    <p>
+      <label for="matrixNum">Takes:</label>
+      <select id="matrixNum">
+        <option value="one" selected>&nbsp;One matrix &nbsp;</option>
+        <option value="two">&nbsp;Two matrices &nbsp;</option>  
+      </select>
+    </p>
+    <p id="returnSelect">
+      <label for="returnsOptions">Returns:</label>
+      <select id="returnsOptions">  
+        <option value="aMatrix">&nbsp;A matrix &nbsp;</option>
+        <option value="aNumber" selected>&nbsp;A number &nbsp;</option>  
+        <option value="aDecomp">&nbsp;A decomposition &nbsp;</option>
+        <option value="other">&nbsp;Other&nbsp;</option>  
+      </select>
+    </p>
+    <div id="aMatrixOperationSelect" style="display: none;">
+      <label for="operationOption">Operation:</label>
+      <select id="operationOption">    
+        <option value="adjoint">&nbsp;Adjoint(adjugate)&nbsp;</option>
+        <option value="cofactor">&nbsp;Cofactor matrix &nbsp;</option> 
+        <option value="diagonal">&nbsp;Diagonalization &nbsp;</option>
+        <option value="inverse" selected>&nbsp;Inverse &nbsp;</option> 
+        <option value="scalar">&nbsp;Multiplication by a scalar&nbsp;</option>
+        <option value="power">&nbsp;Power of a matrix &nbsp;</option> 
+        <option value="psuedoInv">&nbsp;Psuedoinverse(Moore-Penrose) &nbsp;</option>
+        <option value="transpose">&nbsp;Transpose &nbsp;</option>  
+      </select>
+    </div>            
+    <div id="aNumberOperationSelect">
+      <label for="operationOption">Operation:</label>
+      <select id="operationOption">
+        <option value="detmnt" selected>&nbsp;Determinant&nbsp;</option>
+        <option value="norms">&nbsp;Norms &nbsp;</option> 
+        <option value="rank">&nbsp;Rank &nbsp;</option>
+        <option value="trace">&nbsp;Trace &nbsp;</option>  
+      </select>
+    </div>
+    <div id="aDecompOperationSelect" style="display: none;">
+      <label for="operationOption">Decomposition type:</label>
+      <select id="operationOption">
+        <option value="lu" selected>&nbsp;LU&nbsp;</option>
+        <option value="qr">&nbsp;QR &nbsp;</option> 
+        <option value="svd">&nbsp;SVD &nbsp;</option>
+        <option value="cholesky">&nbsp;Cholesky &nbsp;</option>
+        <option value="polar">&nbsp;Polar &nbsp;</option>  
+      </select> 
+    </div>
+    <div id="otherOperationSelect" style="display: none;">
+      <label for="operationOption">Operation:</label>
+        <select id="operationOption">
+        <option value="chPoly">&nbsp;Characteristic polynomial&nbsp;</option>
+        <option value="eigValVect" selected>&nbsp;Eigenvalues and vectors &nbsp;</option> 
+        <option value="singular">&nbsp;Singular values &nbsp;</option>
+        <option value="detectMat">&nbsp;Detect matrix type &nbsp;</option>
+      </select>
+    </div>
+    <div id="twoMatOperationSelect" style="display: none;">
+      <label for="operationOption">Operation:</label>
+      <select id="operationOption">
+        <option value="add" selected>&nbsp;Addition of matrices&nbsp;</option>
+        <option value="subtract">&nbsp;Subtraction of matrices &nbsp;</option> 
+        <option value="multiply">&nbsp;Multiplication of matrices &nbsp;</option>
+        <option value="tenProduct">&nbsp;Kronecker (tensor) product &nbsp;</option>
+        <option value="entProduct">&nbsp;Hadamard (entrywise) product &nbsp;</option>   
+      </select>
+    </div>        
+    <p>
+      <label for="matSize">Select the Matrix size: </label>
+      <select id="matSize">
+        <option value="two" selected>&nbsp;2x2 &nbsp;</option>
+        <option value="three">&nbsp;3x3 &nbsp;</option>  
+      </select>
+    </p>   
+    <div id="scalarNumber" style="display: none;">
+      <h3>Number:</h3>
+      <input type="number" id="scalar" placeholder="k" />  
+    </div>
+    <div id="powerNumber" style="display: none;">
+      <h3>Power:</h3>
+      <input type="number" id="power" placeholder="Power" />  
+    </div>
+    <h3>Matrix entries</h3>
+      <p>
+        <label for="a1">a₁:</label>
+        <input type="number" id="a1" />  
+      </p>
+      <p>
+        <label for="a2">a₂:</label>
+        <input type="number" id="a2" />  
+      </p>
+      <p id="a3Input" style="display: none;">
+        <label for="a3">a₃:</label>
+        <input type="number" id="a3" />  
+      </p>
+      <p>
+        <label for="b1">b₁:</label>
+        <input type="number" id="b1" />  
+      </p>
+      <p>
+        <label for="b2">b₂:</label>
+        <input type="number" id="b2" />  
+      </p>
+      <p id="b3Input" style="display: none;">
+        <label for="b3">b₃:</label>
+        <input type="number" id="b3" />  
+      </p>
+    <div id="cRowInputs" style="display: none;">
+      <p>
+        <label for="c1">c₁:</label>
+        <input type="number" id="c1" />  
+      </p>
+      <p>
+        <label for="c2">c₂:</label>
+        <input type="number" id="c2" />  
+      </p>              
+      <p>
+        <label for="c3">c₃:</label>
+        <input type="number" id="c3" />  
+      </p>
+    </div>
+    <div id="secondMatrixInputs" style="display: none;">
+      <h3>Second matrix entries</h3>
+      <p>
+        <label for="x1">x₁:</label>
+        <input type="number" id="x1" />  
+      </p>
+      <p>
+        <label for="x2">x₂:</label>
+        <input type="number" id="x2" />  
+      </p>
+      <p id="x3Input" style="display: none;">
+        <label for="x3">x₃:</label>
+        <input type="number" id="x3" />  
+      </p>
+      <p>
+        <label for="y1">y₁:</label>
+        <input type="number" id="y1" />  
+      </p>
+      <p>
+        <label for="y2">y₂:</label>
+        <input type="number" id="y2" />  
+      </p>
+      <p id="y3Input" style="display: none;">
+        <label for="y3">y₃:</label>
+        <input type="number" id="y3" />  
+      </p>
+      <div id="zRowInputs" style="display: none;">
+        <p>
+          <label for="yz1">z₁:</label>
+          <input type="number" id="z1" />  
+        </p>
+        <p>
+          <label for="z2">z₂:</label>
+          <input type="number" id="z2" />  
+        </p>
+        <p>
+          <label for="z3">z₃:</label>
+          <input type="number" id="z3" />  
+        </p>
+      </div>
+    </div>
+    
+    <p>
+      <button id="calcBtn">Calculate</button>
+      <button id="resetBtn">Reset</button>
+    </p>
+    <hr>
+    <p>
+    <h3>Result:</h3>
+    <h3 id="calcResults">Result will appear here...</h3>
+    </p>
+  </div>
+  <script>
+
+    /********************************** ELEMENTS **********************************/
+    const matrixNumEl = document.getElementById('matrixNum');
+    const returnSelectEl = document.getElementById('returnSelect');
+    const returnsOptionsEl = document.getElementById('returnsOptions');
+    const aMatrixOperationSelectEl = document.getElementById('aMatrixOperationSelect');
+    const aNumberOperationSelectEl = document.getElementById('aNumberOperationSelect');
+    const aDecompOperationSelectEl = document.getElementById('aDecompOperationSelect');
+    const otherOperationSelectEl = document.getElementById('otherOperationSelect');
+    const twoMatOperationSelectEl = document.getElementById('twoMatOperationSelect');
+    const matSizeEl = document.getElementById('matSize');
+
+    const a3InputEl = document.getElementById('a3Input');
+    const b3InputEl = document.getElementById('b3Input');
+    const cRowInputsEl = document.getElementById('cRowInputs');
+    const secondMatrixInputsEl = document.getElementById('secondMatrixInputs');
+    const x3InputEl = document.getElementById('x3Input');
+    const y3InputEl = document.getElementById('y3Input');
+    const zRowInputsEl = document.getElementById('zRowInputs');
+    const calcBtnEl = document.getElementById('calcBtn');
+    const resetBtnEl = document.getElementById('resetBtn');
+    const calcResultsEl = document.getElementById('calcResults')
+
+    const scalarNumberEl = document.getElementById('scalarNumber');
+    const powerNumberEl = document.getElementById('powerNumber')
+    let scalarEl = '';
+    let powerEl = '';
+
+
+    let a1El = document.getElementById('a1');
+    let a2El = document.getElementById('a2');
+    let a3El = '';
+    let b1El = document.getElementById('b1');
+    let b2El = document.getElementById('b2');
+    let b3El = '';
+    let c1El = '';
+    let c2El = '';
+    let c3El = '';
+    let x1El = '';
+    let x2El = '';
+    let x3El = '';
+    let y1El = '';
+    let y2El = '';
+    let y3El = '';
+    let z1El = '';
+    let z2El = '';
+    let z3El = '';
+    let matSizeSelected = 'two';
+    let matNumSelected = 'one';
+    let lastReturnOptionSelected = 'aNumber';
+    let operationSelected = 'detmnt';
+    let operationOptionEl = document.querySelectorAll('#operationOption')[1];
+
+    /********************************** FUNCTIONS **********************************/
+    // Conversion functions
+
+    function handleMatrixSizeChange(e) {
+      const matrixSize = e.target.value
+      a3InputEl.style.display = matrixSize ==  'three' ? 'block' : 'none'
+      b3InputEl.style.display = matrixSize ==  'three' ? 'block' : 'none'
+      x3InputEl.style.display = (matrixSize ==  'three' && matNumSelected ==  'two') ? 'block' : 'none'
+      y3InputEl.style.display = (matrixSize ==  'three' && matNumSelected ==  'two') ? 'block' : 'none'
+      cRowInputsEl.style.display = matrixSize ==  'three' ? 'block' : 'none'
+      zRowInputsEl.style.display = (matrixSize ==  'three' && matNumSelected ==  'two') ? 'block' : 'none'
+      matSizeSelected = matrixSize;
+
+      a1El = document.getElementById('a1');
+      a2El = document.getElementById('a2') ;
+      a3El = matrixSize ==  'three' ? document.getElementById('a3') : '';
+      b1El = document.getElementById('b1');
+      b2El = document.getElementById('b2');
+      b3El = matrixSize ==  'three' ? document.getElementById('b3') : '';
+      c1El = matrixSize ==  'three' ? document.getElementById('c1') : '';
+      c2El = matrixSize ==  'three' ? document.getElementById('c2') : '';
+      c3El = matrixSize ==  'three' ? document.getElementById('c3') : '';
+
+      x1El = matNumSelected ==  'two' ? document.getElementById('x1') : '';
+      x2El = matNumSelected ==  'two' ? document.getElementById('x2') : '';
+      x3El = (matNumSelected ==  'two' && matrixSize ==  'three') ? document.getElementById('x3') : '';
+      y1El = matNumSelected ==  'two' ? document.getElementById('y1') : '';
+      y2El = matNumSelected ==  'two' ? document.getElementById('y2') : '';
+      y3El = (matNumSelected ==  'two' && matrixSize ==  'three') ? document.getElementById('y3') : '';
+      z1El = (matNumSelected ==  'two' && matrixSize ==  'three') ? document.getElementById('z1') : '';
+      z2El = (matNumSelected ==  'two' && matrixSize ==  'three') ? document.getElementById('z2') : '';
+      z3El = (matNumSelected ==  'two' && matrixSize ==  'three') ? document.getElementById('z3') : '';
+
+      if (matrixSize == 'three') {
+        [a3El, b3El, c1El, c2El, c3El].forEach((el) => {
+          el.addEventListener("input", resetResult);
+        });
+      }
+    }
+
+    function handleMatrixNumberChange(e) {
+      const maxtrixNum = e.target.value;
+      secondMatrixInputsEl.style.display = maxtrixNum ==  'two' ? 'block' : 'none'
+      returnSelectEl.style.display = maxtrixNum ==  'one' ? 'block' : 'none'
+      twoMatOperationSelectEl.style.display = maxtrixNum ==  'two' ? 'block' : 'none'
+      aNumberOperationSelectEl.style.display = (maxtrixNum ==  'two' || lastReturnOptionSelected !=  'aNumber') ? 'none' : 'block'
+      aMatrixOperationSelectEl.style.display = (maxtrixNum ==  'two' || lastReturnOptionSelected !=  'aMatrix') ? 'none' : 'block'
+      aDecompOperationSelectEl.style.display = (maxtrixNum ==  'two' || lastReturnOptionSelected !=  'aDecomp') ? 'none' : 'block'
+      otherOperationSelectEl.style.display = (maxtrixNum ==  'two' || lastReturnOptionSelected !=  'other') ? 'none' : 'block'
+
+      zRowInputsEl.style.display = (maxtrixNum ==  'two' && matSizeSelected ==  'three') ? 'block' : 'none'
+      x3InputEl.style.display =(maxtrixNum ==  'two' && matSizeSelected ==  'three') ? 'block' : 'none'
+      y3InputEl.style.display = (maxtrixNum ==  'two' && matSizeSelected ==  'three') ? 'block' : 'none'
+
+      matNumSelected = maxtrixNum
+
+      operationOptionEl = maxtrixNum == 'two' ? document.querySelectorAll('#operationOption')[4] : document.querySelectorAll('#operationOption')[1]
+      operationOptionEl.addEventListener('change', (e) => {
+        handleOperationOptionsChange(e);
+        resetResult();
+      });
+
+      x1El = maxtrixNum ==  'two' ? document.getElementById('x1') : '';
+      x2El = maxtrixNum ==  'two' ? document.getElementById('x2') : '';
+      x3El = (maxtrixNum ==  'two' && matSizeSelected ==  'three') ? document.getElementById('x3') : '';
+      y1El = maxtrixNum ==  'two' ? document.getElementById('y1') : '';
+      y2El = maxtrixNum ==  'two' ? document.getElementById('y2') : '';
+      y3El = (maxtrixNum ==  'two' && matSizeSelected ==  'three') ? document.getElementById('y3') : '';
+      z1El = (maxtrixNum ==  'two' && matSizeSelected ==  'three') ? document.getElementById('z1') : '';
+      z2El = (maxtrixNum ==  'two' && matSizeSelected ==  'three') ? document.getElementById('z2') : '';
+      z3El = (maxtrixNum ==  'two' && matSizeSelected ==  'three') ? document.getElementById('z3') : '';
+    }
+
+    function handleReturnOptionsChange(e) {
+      const returnOption = e.target.value;
+      aMatrixOperationSelectEl.style.display = returnOption ==  'aMatrix' ? 'block' : 'none'
+      aNumberOperationSelectEl.style.display = returnOption ==  'aNumber' ? 'block' : 'none'
+      aDecompOperationSelectEl.style.display = returnOption ==  'aDecomp' ? 'block' : 'none'
+      otherOperationSelectEl.style.display = returnOption ==  'other' ? 'block' : 'none'
+      twoMatOperationSelectEl.style.display = 'none';
+
+      lastReturnOptionSelected = returnOption;
+      operationOptionEl = document.getElementById("operationOption");
+
+      operationOptionEl.addEventListener('change', (e) => {
+        handleOperationOptionsChange(e);
+        resetResult();
+      });
+    }
+
+    function handleOperationOptionsChange(e) {
+      const operation = e.target.value;
+      scalarNumberEl.style.display = operation ==  'scalar' ? 'block' : 'none'
+      powerNumberEl.style.display = operation ==  'power' ? 'block' : 'none'
+      operationSelected = operation
+
+      scalarEl = operation ==  'scalar' ? document.getElementById('scalar'): '';
+      powerEl = operation ==  'power' ? document.getElementById('power'): '';
+    }
+
+    /** Operations that return a number **/
+
+    function traceMatrix(a1, a2, a3, b1, b2, b3, c1, c2, c3) {
+      let results = 0;
+      if (matSizeSelected == 'two') {
+        results = (a1 + b2)
+      } else if (matSizeSelected == 'three') {
+        results = (a1 + b2 + c3)
+      }
+      return results
+    }
+
+    function determinantMatrix(a1, a2, a3, a4, b1, b2, b3, c1, c2, c3) {
+      let results = 0;
+      if (matSizeSelected == 'two') {
+        results = (a1 * b2) - (b1 * a2)
+      } else if (matSizeSelected == 'three') {
+        results = (a1 * b2 * c3) + (b1 * c2 * a3) + (c1 * a2 * b3) - (c1 * b2 * a3) - (b1 * a2 * c3) - (a1 * c2 * b3)
+      } 
+      return results
+    }
+
+    function rankMatrix(a1, a2, a3, a4, b1, b2, b3, c1, c2, c3) {
+      let results = 0;
+      if (matSizeSelected == 'two') {
+        results = 0
+      } else if (matSizeSelected == 'three') {
+        results = 0
+      } 
+      return results
+    }
+
+    function normMatrix(a1, a2, a3, a4, b1, b2, b3, c1, c2, c3) {
+      let results = 0;
+      let traceA = traceMatrix(a1, a2, a3, a4, b1, b2, b3, c1, c2, c3)
+      let detA = determinantMatrix(a1, a2, a3, a4, b1, b2, b3, c1, c2, c3)
+      if (matSizeSelected == 'two') {
+        let norm1 = Math.max((a1 + b1), (a2 + b2))
+        let normInfty = Math.max((a1 + a2), (b1 + b2))
+        let tpATimesA = multiplyMatrix(a1, b1, null, a2, b2, null, null, null, null, a1, a2, null, b1, b2, null, null, null, null)
+        
+        let eigenVal1 = ''
+        let eigenVal2 = ''
+        let norm2 = Math.sqrt(Math.max(eigenVal1, eigenVal2))
+        results = 0
+      } 
+      else if (matSizeSelected == 'three') {
+        let norm1 = Math.max((a1 + b1 + c1), (a2 + b2 + c2), (a3 + b3 + c3))
+        let normInfty = Math.max((a1 + a2 + a3), (b1 + b2 + b3), (c1 + c2 + c3))
+        let tpAByA = 
+        results = 0
+      } 
+      return results
+    }
+
+    /** Operations that return a matrix **/
+
+    function inverseMatrix(a1, a2, a3, a4, b1, b2, b3, c1, c2, c3) {
+      let results = {};
+      if (matSizeSelected == 'two') {      
+        results = {
+          r1c1: (a1 * x1) + (a2 * y1),
+          r1c2: x2 ? (a1 * x2) + (a2 * y2) : '',
+          r2c1: (b1 * x1) + (b2 * y1),
+          r2c2: x2 ? (b1 * x2) + (b2 * y2) : '',
+      } 
+    } 
+      else if (matSizeSelected == 'three') {      
+          results = {
+            r1c1: (a1 * x1) + (a2 * y1) + (a3 * z1),
+            r1c2: x2 ? (a1 * x2) + (a2 * y2) + (a3 * z2) : '',
+            r1c3: x3 ? (a1 * x3) + (a2 * y3) + (a3 * z3) : '',
+            r2c1: (b1 * x1) + (b2 * y1) + (b3 * z1),
+            r2c2: x2 ? (b1 * x2) + (b2 * y2) + (b3 * z2) : '',
+            r2c3: x3 ? (b1 * x3) + (b2 * y3) + (b3 * z3) : '',
+            r3c1: (c1 * x1) + (c2 * y1) + (c3 * z1),
+            r3c2: x2 ? (c1 * x2) + (c2 * y2) + (c3 * z2) : '',
+            r3c3: x3 ? (c1 * x3) + (c2 * y3) + (c3 * z3) : '',
+          }
+      }
+      return results
+    }
+
+    function psuedoInverseMatrix(a1, a2, a3, a4, b1, b2, b3, c1, c2, c3) {
+      let results = {};
+      if (matSizeSelected == 'two') {      
+        results = {
+          r1c1: (a1 * x1) + (a2 * y1),
+          r1c2: x2 ? (a1 * x2) + (a2 * y2) : '',
+          r2c1: (b1 * x1) + (b2 * y1),
+          r2c2: x2 ? (b1 * x2) + (b2 * y2) : '',
+      } 
+    } 
+      else if (matSizeSelected == 'three') {      
+          results = {
+            r1c1: (a1 * x1) + (a2 * y1) + (a3 * z1),
+            r1c2: x2 ? (a1 * x2) + (a2 * y2) + (a3 * z2) : '',
+            r1c3: x3 ? (a1 * x3) + (a2 * y3) + (a3 * z3) : '',
+            r2c1: (b1 * x1) + (b2 * y1) + (b3 * z1),
+            r2c2: x2 ? (b1 * x2) + (b2 * y2) + (b3 * z2) : '',
+            r2c3: x3 ? (b1 * x3) + (b2 * y3) + (b3 * z3) : '',
+            r3c1: (c1 * x1) + (c2 * y1) + (c3 * z1),
+            r3c2: x2 ? (c1 * x2) + (c2 * y2) + (c3 * z2) : '',
+            r3c3: x3 ? (c1 * x3) + (c2 * y3) + (c3 * z3) : '',
+          }
+      }
+      return results
+    }
+
+    function adjointMatrix(a1, a2, a3, a4, b1, b2, b3, c1, c2, c3) {
+      let results = {};
+      if (matSizeSelected == 'two') {      
+        results = {
+          r1c1: b2,
+          r1c2: a2 * -1,
+          r2c1: b1 * -1,
+          r2c2: a1,
+      } 
+    } 
+      else if (matSizeSelected == 'three') {      
+        results = {
+          r1c1: ((b2 * c3) - (c2 * b3)),
+          r1c2: ((a2 * c3) - (c2 * a3)) * -1,
+          r1c3: ((a2 * b3) - (b2 * a3)),
+          r2c1: ((b1 * c3) - (c1 * b3)) * -1,
+          r2c2: ((a1 * c3) - (c1 * a3)),
+          r2c3: ((a1 * b3) - (b1 * a3)) * -1,
+          r3c1: ((b1 * c2) - (c1 * b2)),
+          r3c2: ((a1 * c2) - (c1 * a2)) * -1,
+          r3c3: ((a1 * b2) - (b1 * a2)),
+        }
+      }
+      return results
+    }
+
+    function cofactorMatrix(a1, a2, a3, a4, b1, b2, b3, c1, c2, c3) {
+      let results = {};
+      if (matSizeSelected == 'two') {      
+        results = {
+          r1c1: b2,
+          r1c2: b1 * -1,
+          r2c1: a2 * -1,
+          r2c2: a1,
+      } 
+    } 
+      else if (matSizeSelected == 'three') {      
+          results = {
+            r1c1: ((b2 * b3) - (c2 * b3)),
+            r1c2: ((b1 * c3) - (c1 * b3)) * -1,
+            r1c3: ((b1 * c2) - (c1 * b2)),
+            r2c1: ((a2 * c3) - (c2 * a3)) * -1,
+            r2c2: ((a1 * c3) - (c1 * a3)),
+            r2c3: ((a1 * c2) - (c1 * a2)) * -1,
+            r3c1: ((a2 * b3) - (b2 * a3)),
+            r3c2: ((a1 * b3) - (b1 * a3)) * -1,
+            r3c3: ((a1 * b2) - (b1 * a2)),
+          }
+      }
+      return results
+    }
+
+    function powerOfAMatrix(a1, a2, a3, a4, b1, b2, b3, c1, c2, c3) {
+      let results = {};
+      if (matSizeSelected == 'two') {      
+        results = {
+          r1c1: (a1 * x1) + (a2 * y1),
+          r1c2: x2 ? (a1 * x2) + (a2 * y2) : '',
+          r2c1: (b1 * x1) + (b2 * y1),
+          r2c2: x2 ? (b1 * x2) + (b2 * y2) : '',
+      } 
+    } 
+      else if (matSizeSelected == 'three') {      
+          results = {
+            r1c1: (a1 * x1) + (a2 * y1) + (a3 * z1),
+            r1c2: x2 ? (a1 * x2) + (a2 * y2) + (a3 * z2) : '',
+            r1c3: x3 ? (a1 * x3) + (a2 * y3) + (a3 * z3) : '',
+            r2c1: (b1 * x1) + (b2 * y1) + (b3 * z1),
+            r2c2: x2 ? (b1 * x2) + (b2 * y2) + (b3 * z2) : '',
+            r2c3: x3 ? (b1 * x3) + (b2 * y3) + (b3 * z3) : '',
+            r3c1: (c1 * x1) + (c2 * y1) + (c3 * z1),
+            r3c2: x2 ? (c1 * x2) + (c2 * y2) + (c3 * z2) : '',
+            r3c3: x3 ? (c1 * x3) + (c2 * y3) + (c3 * z3) : '',
+          }
+      }
+      return results
+    }
+
+    function transpose(a1, a2, a3, a4, b1, b2, b3, c1, c2, c3) {
+      let results = {};
+      if (matSizeSelected == 'two') {      
+        results = {
+          r1c1: a1,
+          r1c2: b1,
+          r2c1: a2,
+          r2c2: b2,
+      } 
+    } 
+      else if (matSizeSelected == 'three') {      
+          results = {
+            r1c1: a1,
+            r1c2: b1,
+            r1c3: c1,
+            r2c1: a2,
+            r2c2: b2,
+            r2c3: c2,
+            r3c1: a3,
+            r3c2: b3,
+            r3c3: c3,
+          }
+      }
+      return results
+    }
+
+    function multiplyByNumber(a1, a2, a3, a4, b1, b2, b3, c1, c2, c3, scalar) {
+      let results = {};
+      if (matSizeSelected == 'two') {      
+        results = {
+          r1c1: scalar * a1,
+          r1c2: scalar * a2,
+          r2c1: scalar * b1,
+          r2c2: scalar * b2,
+      } 
+    } 
+      else if (matSizeSelected == 'three') {      
+          results = {
+            r1c1: scalar * a1,
+            r1c2: scalar * a2,
+            r1c3: scalar * a3,
+            r2c1: scalar * b1,
+            r2c2: scalar * b2,
+            r2c3: scalar * b3,
+            r3c1: scalar * c1,
+            r3c2: scalar * c2,
+            r3c3: scalar * c3,
+          }
+      }
+      return results
+    }
+
+    function diagonalize(a1, a2, a3, a4, b1, b2, b3, c1, c2, c3) {
+      let results = {};
+      if (matSizeSelected == 'two') {      
+        results = {
+          r1c1: (a1 * x1) + (a2 * y1),
+          r1c2: x2 ? (a1 * x2) + (a2 * y2) : '',
+          r2c1: (b1 * x1) + (b2 * y1),
+          r2c2: x2 ? (b1 * x2) + (b2 * y2) : '',
+      } 
+    } 
+      else if (matSizeSelected == 'three') {      
+          results = {
+            r1c1: (a1 * x1) + (a2 * y1) + (a3 * z1),
+            r1c2: x2 ? (a1 * x2) + (a2 * y2) + (a3 * z2) : '',
+            r1c3: x3 ? (a1 * x3) + (a2 * y3) + (a3 * z3) : '',
+            r2c1: (b1 * x1) + (b2 * y1) + (b3 * z1),
+            r2c2: x2 ? (b1 * x2) + (b2 * y2) + (b3 * z2) : '',
+            r2c3: x3 ? (b1 * x3) + (b2 * y3) + (b3 * z3) : '',
+            r3c1: (c1 * x1) + (c2 * y1) + (c3 * z1),
+            r3c2: x2 ? (c1 * x2) + (c2 * y2) + (c3 * z2) : '',
+            r3c3: x3 ? (c1 * x3) + (c2 * y3) + (c3 * z3) : '',
+          }
+      }
+      return results
+    }
+
+    /** Decompositions **/
+
+    function luDecomp(a1, a2, a3, a4, b1, b2, b3, c1, c2, c3) {
+      let results = 0;
+      if (matSizeSelected == 'two') {
+        results = (a1 + b2)
+      } else if (matSizeSelected == 'three') {
+        results = (a1 + b2 + c3)
+      }
+      return results
+    }
+
+    function svdDecomp(a1, a2, a3, a4, b1, b2, b3, c1, c2, c3) {
+      let results = 0;
+      if (matSizeSelected == 'two') {
+        results = (a1 + b2)
+      } else if (matSizeSelected == 'three') {
+        results = (a1 + b2 + c3)
+      }
+      return results
+    }
+
+    function qrDecomp(a1, a2, a3, a4, b1, b2, b3, c1, c2, c3) {
+      let results = 0;
+      if (matSizeSelected == 'two') {
+        results = (a1 + b2)
+      } else if (matSizeSelected == 'three') {
+        results = (a1 + b2 + c3)
+      }
+      return results
+    }
+
+    function choleskyDecomp(a1, a2, a3, a4, b1, b2, b3, c1, c2, c3) {
+      let results = 0;
+      if (matSizeSelected == 'two') {
+        results = (a1 + b2)
+      } else if (matSizeSelected == 'three') {
+        results = (a1 + b2 + c3)
+      }
+      return results
+    }
+
+    function polarDecomp(a1, a2, a3, a4, b1, b2, b3, c1, c2, c3) {
+      let results = 0;
+      if (matSizeSelected == 'two') {
+        results = (a1 + b2)
+      } else if (matSizeSelected == 'three') {
+        results = (a1 + b2 + c3)
+      }
+      return results
+    }
+
+    /** Other Operations **/
+
+    function eigenValsAndVects(a1, a2, a3, a4, b1, b2, b3, c1, c2, c3) {
+      let results = 0;
+      if (matSizeSelected == 'two') {
+        results = (a1 + b2)
+      } else if (matSizeSelected == 'three') {
+        results = (a1 + b2 + c3)
+      }
+      return results
+    }
+
+    function charactPolynomials(a1, a2, a3, a4, b1, b2, b3, c1, c2, c3) {
+      let results = 0;
+      if (matSizeSelected == 'two') {
+        results = (a1 + b2)
+      } else if (matSizeSelected == 'three') {
+        results = (a1 + b2 + c3)
+      }
+      return results
+    }
+
+    function singularValues(a1, a2, a3, a4, b1, b2, b3, c1, c2, c3) {
+      let results = 0;
+      if (matSizeSelected == 'two') {
+        results = (a1 + b2)
+      } else if (matSizeSelected == 'three') {
+        results = (a1 + b2 + c3)
+      }
+      return results
+    }
+
+    function detectMatrixType(a1, a2, a3, a4, b1, b2, b3, c1, c2, c3) {
+      let results = 0;
+      if (matSizeSelected == 'two') {
+        results = (a1 + b2)
+      } else if (matSizeSelected == 'three') {
+        results = (a1 + b2 + c3)
+      }
+      return results
+    }
+
+    /** Operations that act on two matrices **/
+
+    function multiplyMatrix(a1, a2, a3, b1, b2, b3, c1, c2, c3, x1, x2, x3, y1, y2, y3, z1, z2, z3) {
+      let results = {};
+      if (matSizeSelected == 'two') {      
+        results = {
+          r1c1: (a1 * x1) + (a2 * y1),
+          r1c2: x2 ? (a1 * x2) + (a2 * y2) : '',
+          r2c1: (b1 * x1) + (b2 * y1),
+          r2c2: x2 ? (b1 * x2) + (b2 * y2) : '',
+      } 
+    } 
+      else if (matSizeSelected == 'three') {      
+          results = {
+            r1c1: (a1 * x1) + (a2 * y1) + (a3 * z1),
+            r1c2: x2 ? (a1 * x2) + (a2 * y2) + (a3 * z2) : '',
+            r1c3: x3 ? (a1 * x3) + (a2 * y3) + (a3 * z3) : '',
+            r2c1: (b1 * x1) + (b2 * y1) + (b3 * z1),
+            r2c2: x2 ? (b1 * x2) + (b2 * y2) + (b3 * z2) : '',
+            r2c3: x3 ? (b1 * x3) + (b2 * y3) + (b3 * z3) : '',
+            r3c1: (c1 * x1) + (c2 * y1) + (c3 * z1),
+            r3c2: x2 ? (c1 * x2) + (c2 * y2) + (c3 * z2) : '',
+            r3c3: x3 ? (c1 * x3) + (c2 * y3) + (c3 * z3) : '',
+          }
+      }
+      return results
+    }
+
+    function addMatrix(a1, a2, a3, b1, b2, b3, c1, c2, c3, x1, x2, x3, y1, y2, y3, z1, z2, z3) {
+      let results = {};
+      if (matSizeSelected == 'two') {      
+        results = {
+          r1c1: (a1 + x1),
+          r1c2: (a2 + x2),
+          r2c1: (b1 + y1),
+          r2c2: (b2 + y2),
+        } 
+      } 
+      else if (matSizeSelected == 'three') {      
+        results = {
+          r1c1: (a1 + x1),
+          r1c2: (a2 + x2),
+          r1c3: (a3 + x3),
+          r2c1: (b1 + y1),         
+          r2c2: (b2 + y2),
+          r2c3: (b3 + y3),
+          r3c1: (c1 + z1),
+          r3c2: (c2 + z2),
+          r3c3: (c3 + z3),
+        }
+      }
+      return results
+    }
+
+    function subtractMatrix(a1, a2, a3, b1, b2, b3, c1, c2, c3, x1, x2, x3, y1, y2, y3, z1, z2, z3) {
+      let results = {};
+      if (matSizeSelected == 'two') {      
+        results = {
+          r1c1: (a1 - x1),
+          r1c2: (a2 - x2),
+          r2c1: (b1 - y1),
+          r2c2: (b2 - y2),
+        } 
+      } 
+      else if (matSizeSelected == 'three') {      
+        results = {
+          r1c1: (a1 - x1),
+          r1c2: (a2 - x2),
+          r1c3: (a3 - x3),
+          r2c1: (b1 - y1),         
+          r2c2: (b2 - y2),
+          r2c3: (b3 - y3),
+          r3c1: (c1 - z1),
+          r3c2: (c2 - z2),
+          r3c3: (c3 - z3),
+        }
+      }
+      return results
+    }
+
+    function tensorProduct(a1, a2, a3, b1, b2, b3, c1, c2, c3, x1, x2, x3, y1, y2, y3, z1, z2, z3) {
+      let results = {};
+      if (matSizeSelected == 'two') {      
+        results = {
+          r1c1: (a1 * x1),
+          r1c2: (a1 * x2),
+          r1c3: (a2 * x1),
+          r1c4: (a2 * x2),
+          r2c1: (a1 * y1),
+          r2c2: (a1 * y2),
+          r2c3: (a2 * y1),
+          r2c4: (a2 * y2),
+          r3c1: (b2 * x1),
+          r3c2: (b2 * x2),
+          r3c3: (b1 * x1),
+          r3c4: (b1 * x2),
+          r4c1: (b1 * y1),
+          r4c2: (b2 * y2),
+          r4c3: (b1 * y1),
+          r4c4: (b1 * y2),
+        } 
+      } 
+      else if (matSizeSelected == 'three') {      
+        results = {
+          r1c1: (a1 * x1),
+          r1c2: (a1 * x2),
+          r1c3: (a1 * x3),
+          r1c4: (a2 * x1),         
+          r1c5: (a2 * x2),
+          r1c6: (a2 * x3),
+          r1c7: (a3 * x1),         
+          r1c8: (a3 * x2),
+          r1c9: (a3 * x3),
+          r2c1: (a1 * y1),
+          r2c2: (a1 * y2),
+          r2c3: (a1 * y3),
+          r2c4: (a2 * y1),
+          r2c5: (a2 * y2),
+          r2c6: (a2 * y3),   
+          r2c7: (a3 * y1),
+          r2c8: (a3 * y2),
+          r2c9: (a3 * y3),         
+          r3c1: (a1 * z1),
+          r3c2: (a1 * z2),
+          r3c3: (a1 * z3),
+          r3c4: (a2 * z1),
+          r3c5: (a2 * z2),
+          r3c6: (a2 * z3),
+          r3c7: (a3 * z1),
+          r3c8: (a3 * z2),
+          r3c9: (a3 * z3),
+          r4c1: (b1 * x1),
+          r4c2: (b1 * x2), 
+          r4c3: (b1 * x3),
+          r4c4: (b2 * x1),
+          r4c5: (b2 * x2),
+          r4c6: (b2 * x3),
+          r4c7: (b3 * x1),
+          r4c8: (b3 * x2),
+          r4c9: (b3 * x3),
+          r5c1: (b1 * y1),
+          r5c2: (b1 * y2),
+          r5c3: (b1 * y3),
+          r5c4: (b2 * y1),
+          r5c5: (b2 * y2),         
+          r5c6: (b2 * y3),
+          r5c7: (b3 * y1),
+          r5c8: (b3 * y2),         
+          r5c9: (b3 * y3),
+          r6c1: (b1 * z1),
+          r6c2: (b1 * z1),
+          r6c3: (b1 * z3),
+          r6c4: (b2 * z1),
+          r6c5: (b2 * z2),
+          r6c6: (b2 * z3),
+          r6c7: (b3 * z1),
+          r6c8: (b3 * z2),
+          r6c9: (b3 * z3),
+          r7c1: (c1 * x1),
+          r7c2: (c1 * x2),
+          r7c3: (c1 * x3),
+          r7c4: (c2 * x1),
+          r7c5: (c2 * x2),
+          r7c6: (c2 * x3),
+          r7c7: (c3 * x1),
+          r7c8: (c3 * x2),
+          r7c9: (c3 * x3),
+          r8c1: (c1 * y1),
+          r8c2: (c1 * y2),
+          r8c3: (c1 * y3),
+          r8c4: (c2 * y1),
+          r8c5: (c2 * y2),
+          r8c6: (c2 * y3),
+          r8c7: (c2 * y1),
+          r8c8: (c3 * y2),
+          r8c9: (c3 * y3),
+          r9c1: (c1 * z1),
+          r9c2: (c1 * z2),
+          r9c3: (c1 * z3),
+          r9c4: (c2 * z1),
+          r9c5: (c2 * z2),
+          r9c6: (c2 * z3),
+          r9c7: (c3 * z1),
+          r9c8: (c3 * z2),
+          r9c9: (c3 * z3),
+        }
+      }
+      return results
+    }
+
+
+    function matrixOperations(a1, a2, a3, b1, b2, b3, c1, c2, c3, x1, x2, x3, y1, y2, y3, z1, z2, z3, scalar, power) {
+      let results = {};
+      if (matNumSelected == 'one') {
+        if (operationSelected == 'adjoint') {
+          results = adjointMatrix(a1, a2, a3, b1, b2, b3, c1, c2, c3)
+        } else if (operationSelected == 'cofactor') {
+          results = cofactorMatrix(a1, a2, a3, b1, b2, b3, c1, c2, c3)
+        } else if (operationSelected == 'diagonal') {
+          results = diagonalize(a1, a2, a3, b1, b2, b3, c1, c2, c3)
+        } else if (operationSelected == 'inverse') {
+          results = inverseMatrix(a1, a2, a3, b1, b2, b3, c1, c2, c3)
+        } else if (operationSelected == 'scalar') {
+          results = multiplyByNumber(a1, a2, a3, b1, b2, b3, c1, c2, c3, scalar)
+        } else if (operationSelected == 'power') {
+          results = powerOfAMatrix(a1, a2, a3, b1, b2, b3, c1, c2, c3, power)
+        } else if (operationSelected == 'psuedoInv') {
+          results = psuedoInverseMatrix(a1, a2, a3, b1, b2, b3, c1, c2, c3)
+        } else if (operationSelected == 'transpose') {
+          results = transpose(a1, a2, a3, b1, b2, b3, c1, c2, c3)
+        } else if (operationSelected == 'detmnt') {
+          results = determinantMatrix(a1, a2, a3, b1, b2, b3, c1, c2, c3)
+        } else if (operationSelected == 'norms') {
+          results = normMatrix(a1, a2, a3, b1, b2, b3, c1, c2, c3)
+        } else if (operationSelected == 'rank') {
+          results = rankMatrix(a1, a2, a3, b1, b2, b3, c1, c2, c3)
+        } else if (operationSelected == 'trace') {
+          results = traceMatrix(a1, a2, a3, b1, b2, b3, c1, c2, c3)
+        } else if (operationSelected == 'lu') {
+          results = luDecomp(a1, a2, a3, b1, b2, b3, c1, c2, c3)
+        } else if (operationSelected == 'qr') {
+          results = qrDecomp(a1, a2, a3, b1, b2, b3, c1, c2, c3)
+        } else if (operationSelected == 'svd') {
+          results = svdDecomp(a1, a2, a3, b1, b2, b3, c1, c2, c3)
+        } else if (operationSelected == 'cholesky') {
+          results = choleskyDecomp(a1, a2, a3, b1, b2, b3, c1, c2, c3)
+        } else if (operationSelected == 'polar') {
+          results = polarDecomp(a1, a2, a3, b1, b2, b3, c1, c2, c3)
+        } else if (operationSelected == 'chPoly') {
+          results = charactPolynomials(a1, a2, a3, b1, b2, b3, c1, c2, c3)
+        } else if (operationSelected == 'eigValVect') {
+          results = eigenValsAndVects(a1, a2, a3, b1, b2, b3, c1, c2, c3)
+        } else if (operationSelected == 'singular') {
+          results = singularValues(a1, a2, a3, b1, b2, b3, c1, c2, c3)
+        } else if (operationSelected == 'detectMat') {
+          results = detectMatrixType(a1, a2, a3, b1, b2, b3, c1, c2, c3)
+        } 
+      } else if (matNumSelected == 'two') {
+        if (operationSelected == 'add') {
+          results = addMatrix(a1, a2, a3, b1, b2, b3, c1, c2, c3, x1, x2, x3, y1, y2, y3, z1, z2, z3)
+        } else if (operationSelected == 'subtract') {
+          results = subtractMatrix(a1, a2, a3, b1, b2, b3, c1, c2, c3, x1, x2, x3, y1, y2, y3, z1, z2, z3)
+        } else if (operationSelected == 'multiply') {
+          results = multiplyMatrix(a1, a2, a3, b1, b2, b3, c1, c2, c3, x1, x2, x3, y1, y2, y3, z1, z2, z3)
+        } else if (operationSelected == 'tenProduct') {
+          results = tensorProduct(a1, a2, a3, b1, b2, b3, c1, c2, c3, x1, x2, x3, y1, y2, y3, z1, z2, z3)
+        } else if (operationSelected == 'entProduct') {
+          results = multiplyMatrix(a1, a2, a3, b1, b2, b3, c1, c2, c3, x1, x2, x3, y1, y2, y3, z1, z2, z3)
+        } 
+      }
+      return results
+    }
+
+    function calculateResults() {
+      // Retrieve input values
+      const a1 = parseFloat(a1El.value)
+      const a2 = parseFloat(a2El.value)
+      const a3 = parseFloat(a3El.value)
+      const b1 = parseFloat(b1El.value)
+      const b2 = parseFloat(b2El.value)
+      const b3 = parseFloat(b3El.value)
+      const c1 = parseFloat(c1El.value)
+      const c2 = parseFloat(c2El.value)
+      const c3 = parseFloat(c3El.value)
+
+      const x1 = parseFloat(x1El.value)
+      const x2 = parseFloat(x2El.value)
+      const x3 = parseFloat(x3El.value)
+      const y1 = parseFloat(y1El.value)
+      const y2 = parseFloat(y2El.value)
+      const y3 = parseFloat(y3El.value)
+      const z1 = parseFloat(z1El.value)
+      const z2 = parseFloat(z2El.value)
+      const z3 = parseFloat(z3El.value)
+
+      const power = parseFloat(powerEl.value)
+      const scalar = parseFloat(scalarEl.value)
+      
+      if (
+        isNaN(a1) || isNaN(b1) || isNaN(a2) || isNaN(b2) || (a3El != '' && isNaN(a3)) || 
+        (b3El != '' && isNaN(b3)) || (c1El != '' && isNaN(c1)) || (c2El != '' && isNaN(c2)) ||
+        (c3El != '' && isNaN(c3)) || (x1El != '' && isNaN(x1)) || (x2El != '' && isNaN(x2)) || 
+        (x3El != '' && isNaN(x3)) || (y1El != '' && isNaN(y1)) || (y2El != '' && isNaN(y2)) || 
+        (y3El != '' && isNaN(y3)) || (z1El != '' && isNaN(z1)) || (z2El != '' && isNaN(z2)) || 
+        (z3El != '' && isNaN(z3)) || (powerEl != '' && isNaN(power)) || (scalarEl != '' && isNaN(scalar)) 
+      ) {
+        showError("Please Enter All Details.");
+        return;
+      }
+      
+      
+      try {
+        const results = matrixOperations(a1, a2, a3, b1, b2, b3, c1, c2, c3, x1, x2, x3, y1, y2, y3, z1, z2, z3, scalar, power)
+        
+        calcResultsEl.innerHTML = `<p> Cross Product of Vectors (a x b):</p>
+                                     <p>(${results})</p>
+                                    `
+      } catch (error) {
+        showError("Something Went Wrong!!!");
+        resethandler()
+      }
+    }
+
+    /********************************* HELPER FUNCTIONS **********************************/
+
+    function showError(errorMessage) {
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: errorMessage,
+      });
+    }
+
+    function resetForm() {
+      a1El.value = ""
+      a2El.value = ""
+      a3El.value = ""
+      b1El.value = ""
+      b2El.value = ""
+      b3El.value = ""
+      c1El.value = ""
+      c2El.value = ""
+      c3El.value = ""
+
+      x1El.value = ""
+      x2El.value = ""
+      x3El.value = ""
+      y1El.value = ""
+      y2El.value = ""
+      y3El.value = ""
+      z1El.value = ""
+      z2El.value = ""
+      z3El.value = ""
+    }
+
+    function resetResult() {
+      calcResultsEl.innerHTML = "<p>Result will appear here...</p>";
+    }
+
+    function resethandler() {
+      resetForm();
+      resetResult();
+    }
+
+    /********************************** EVENT LISTENERS **********************************/
+    resetBtnEl.addEventListener("click", resethandler);
+    [a1El, a2El, b1El, b2El].forEach((el) => {
+      el.addEventListener("input", resetResult);
+    });   
+    matSizeEl.addEventListener("change", (e) => {
+      handleMatrixSizeChange(e);
+      resetResult();
+    })
+
+    matrixNumEl.addEventListener("change", (e) => {
+      handleMatrixNumberChange(e);
+      resetResult();
+    })
+
+    operationOptionEl.addEventListener('change', (e) => {
+      handleOperationOptionsChange(e);
+      resetResult();
+    });
+
+    returnsOptionsEl.addEventListener("change", (e) => {
+      handleReturnOptionsChange(e);
+      resetResult();
+    })
+
+    calcBtnEl.addEventListener("click", calculateResults);
+  </script>
+</body>
+
+</html> 
