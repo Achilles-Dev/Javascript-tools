@@ -35,11 +35,11 @@
       <select id="operationOption">    
         <option value="adjoint">&nbsp;Adjoint(adjugate)&nbsp;</option>
         <option value="cofactor">&nbsp;Cofactor matrix &nbsp;</option> 
-        <option value="diagonal">&nbsp;Diagonalization &nbsp;</option>
+        <option value="diagonal" disabled>&nbsp;Diagonalization* &nbsp;</option>
         <option value="inverse" selected>&nbsp;Inverse &nbsp;</option> 
         <option value="scalar">&nbsp;Multiplication by a scalar&nbsp;</option>
-        <option value="power">&nbsp;Power of a matrix &nbsp;</option> 
-        <option value="psuedoInv">&nbsp;Psuedoinverse(Moore-Penrose) &nbsp;</option>
+        <option value="power" disabled>&nbsp;(Power of a matrix)* &nbsp;</option> 
+        <option value="psuedoInv" disabled>&nbsp;Psuedoinverse(Moore-Penrose)* &nbsp;</option>
         <option value="transpose">&nbsp;Transpose &nbsp;</option>  
       </select>
     </div>            
@@ -47,28 +47,28 @@
       <label for="operationOption">Operation:</label>
       <select id="operationOption">
         <option value="detmnt" selected>&nbsp;Determinant&nbsp;</option>
-        <option value="norms">&nbsp;Norms &nbsp;</option> 
-        <option value="rank">&nbsp;Rank &nbsp;</option>
+        <option value="norms" disabled>&nbsp;Norms* &nbsp;</option> 
+        <option value="rank" disabled>&nbsp;Rank* &nbsp;</option>
         <option value="trace">&nbsp;Trace &nbsp;</option>  
       </select>
     </div>
     <div id="aDecompOperationSelect" style="display: none;">
       <label for="operationOption">Decomposition type:</label>
       <select id="operationOption">
-        <option value="lu" selected>&nbsp;LU&nbsp;</option>
-        <option value="qr">&nbsp;QR &nbsp;</option> 
-        <option value="svd">&nbsp;SVD &nbsp;</option>
-        <option value="cholesky">&nbsp;Cholesky &nbsp;</option>
-        <option value="polar">&nbsp;Polar &nbsp;</option>  
+        <option value="lu" disabled selected>&nbsp;LU*&nbsp;</option>
+        <option value="qr" disabled>&nbsp;QR* &nbsp;</option> 
+        <option value="svd" disabled>&nbsp;SVD* &nbsp;</option>
+        <option value="cholesky" disabled>&nbsp;Cholesky* &nbsp;</option>
+        <option value="polar" disabled>&nbsp;Polar* &nbsp;</option>  
       </select> 
     </div>
     <div id="otherOperationSelect" style="display: none;">
       <label for="operationOption">Operation:</label>
         <select id="operationOption">
-        <option value="chPoly">&nbsp;Characteristic polynomial&nbsp;</option>
-        <option value="eigValVect" selected>&nbsp;Eigenvalues and vectors &nbsp;</option> 
-        <option value="singular">&nbsp;Singular values &nbsp;</option>
-        <option value="detectMat">&nbsp;Detect matrix type &nbsp;</option>
+        <option value="chPoly" disabled>&nbsp;(Characteristic polynomial)*&nbsp;</option>
+        <option value="eigValVect" disabled selected>&nbsp;(Eigenvalues and vectors)* &nbsp;</option> 
+        <option value="singular" disabled>&nbsp;(Singular values)* &nbsp;</option>
+        <option value="detectMat" disabled>&nbsp;(Detect matrix type)* &nbsp;</option>
       </select>
     </div>
     <div id="twoMatOperationSelect" style="display: none;">
@@ -239,6 +239,7 @@
     let matNumSelected = 'one';
     let lastReturnOptionSelected = 'aNumber';
     let operationSelected = 'detmnt';
+    let operationName = 'Determinant'
     let operationOptionEl = document.querySelectorAll('#operationOption')[1];
 
     /********************************** FUNCTIONS **********************************/
@@ -291,6 +292,7 @@
       aDecompOperationSelectEl.style.display = (maxtrixNum ==  'two' || lastReturnOptionSelected !=  'aDecomp') ? 'none' : 'block'
       otherOperationSelectEl.style.display = (maxtrixNum ==  'two' || lastReturnOptionSelected !=  'other') ? 'none' : 'block'
 
+      lastReturnOptionSelected = maxtrixNum ==  'one' ? lastReturnOptionSelected : ''
       zRowInputsEl.style.display = (maxtrixNum ==  'two' && matSizeSelected ==  'three') ? 'block' : 'none'
       x3InputEl.style.display =(maxtrixNum ==  'two' && matSizeSelected ==  'three') ? 'block' : 'none'
       y3InputEl.style.display = (maxtrixNum ==  'two' && matSizeSelected ==  'three') ? 'block' : 'none'
@@ -298,6 +300,9 @@
       matNumSelected = maxtrixNum
 
       operationOptionEl = maxtrixNum == 'two' ? document.querySelectorAll('#operationOption')[4] : document.querySelectorAll('#operationOption')[1]
+
+      operationSelected = operationOptionEl.value
+
       operationOptionEl.addEventListener('change', (e) => {
         handleOperationOptionsChange(e);
         resetResult();
@@ -324,11 +329,12 @@
 
       lastReturnOptionSelected = returnOption;
       operationOptionEl = document.getElementById("operationOption");
+      operationSelected = operationOptionEl.value
 
-      operationOptionEl.addEventListener('change', (e) => {
+      operationOptionEl.addEventListener("change", (e) => {
         handleOperationOptionsChange(e);
         resetResult();
-      });
+      })
     }
 
     function handleOperationOptionsChange(e) {
@@ -336,7 +342,6 @@
       scalarNumberEl.style.display = operation ==  'scalar' ? 'block' : 'none'
       powerNumberEl.style.display = operation ==  'power' ? 'block' : 'none'
       operationSelected = operation
-
       scalarEl = operation ==  'scalar' ? document.getElementById('scalar'): '';
       powerEl = operation ==  'power' ? document.getElementById('power'): '';
     }
@@ -353,7 +358,7 @@
       return results
     }
 
-    function determinantMatrix(a1, a2, a3, a4, b1, b2, b3, c1, c2, c3) {
+    function determinantMatrix(a1, a2, a3, b1, b2, b3, c1, c2, c3) {
       let results = 0;
       if (matSizeSelected == 'two') {
         results = (a1 * b2) - (b1 * a2)
@@ -363,94 +368,54 @@
       return results
     }
 
-    function rankMatrix(a1, a2, a3, a4, b1, b2, b3, c1, c2, c3) {
+    function rankMatrix(a1, a2, a3, b1, b2, b3, c1, c2, c3) {
       let results = 0;
-      if (matSizeSelected == 'two') {
-        results = 0
-      } else if (matSizeSelected == 'three') {
-        results = 0
-      } 
+      
       return results
     }
 
-    function normMatrix(a1, a2, a3, a4, b1, b2, b3, c1, c2, c3) {
-      let results = 0;
-      let traceA = traceMatrix(a1, a2, a3, a4, b1, b2, b3, c1, c2, c3)
-      let detA = determinantMatrix(a1, a2, a3, a4, b1, b2, b3, c1, c2, c3)
-      if (matSizeSelected == 'two') {
-        let norm1 = Math.max((a1 + b1), (a2 + b2))
-        let normInfty = Math.max((a1 + a2), (b1 + b2))
-        let tpATimesA = multiplyMatrix(a1, b1, null, a2, b2, null, null, null, null, a1, a2, null, b1, b2, null, null, null, null)
-        
-        let eigenVal1 = ''
-        let eigenVal2 = ''
-        let norm2 = Math.sqrt(Math.max(eigenVal1, eigenVal2))
-        results = 0
-      } 
-      else if (matSizeSelected == 'three') {
-        let norm1 = Math.max((a1 + b1 + c1), (a2 + b2 + c2), (a3 + b3 + c3))
-        let normInfty = Math.max((a1 + a2 + a3), (b1 + b2 + b3), (c1 + c2 + c3))
-        let tpAByA = 
-        results = 0
-      } 
+    function normMatrix(a1, a2, a3, b1, b2, b3, c1, c2, c3) {
+      let results = 0; 
       return results
     }
 
     /** Operations that return a matrix **/
 
-    function inverseMatrix(a1, a2, a3, a4, b1, b2, b3, c1, c2, c3) {
+    function inverseMatrix(a1, a2, a3, b1, b2, b3, c1, c2, c3) {
       let results = {};
+      let detA = determinantMatrix(a1, a2, a3, b1, b2, b3, c1, c2, c3);
       if (matSizeSelected == 'two') {      
         results = {
-          r1c1: (a1 * x1) + (a2 * y1),
-          r1c2: x2 ? (a1 * x2) + (a2 * y2) : '',
-          r2c1: (b1 * x1) + (b2 * y1),
-          r2c2: x2 ? (b1 * x2) + (b2 * y2) : '',
+          r1c1: ((1 / detA) * (b2)).toFixed(6) * 1,
+          r1c2: ((1 / detA) * (a2 * -1)).toFixed(6) * 1,
+          r2c1: ((1 / detA) * (b1 * -1)).toFixed(6) * 1,
+          r2c2: ((1 / detA) * (a1)).toFixed(6) * 1,
+          detA,
+        } 
       } 
-    } 
       else if (matSizeSelected == 'three') {      
           results = {
-            r1c1: (a1 * x1) + (a2 * y1) + (a3 * z1),
-            r1c2: x2 ? (a1 * x2) + (a2 * y2) + (a3 * z2) : '',
-            r1c3: x3 ? (a1 * x3) + (a2 * y3) + (a3 * z3) : '',
-            r2c1: (b1 * x1) + (b2 * y1) + (b3 * z1),
-            r2c2: x2 ? (b1 * x2) + (b2 * y2) + (b3 * z2) : '',
-            r2c3: x3 ? (b1 * x3) + (b2 * y3) + (b3 * z3) : '',
-            r3c1: (c1 * x1) + (c2 * y1) + (c3 * z1),
-            r3c2: x2 ? (c1 * x2) + (c2 * y2) + (c3 * z2) : '',
-            r3c3: x3 ? (c1 * x3) + (c2 * y3) + (c3 * z3) : '',
+            r1c1: ((1 / detA) * ((b2 * c3) - (c2 * b3))).toFixed(6) * 1,
+            r1c2: ((1 / detA) * (((a2 * c3) - (c2 * a3)) * -1)).toFixed(6) * 1,
+            r1c3: ((1 / detA) * ((a2 * b3) - (b2 * a3))).toFixed(6) * 1,
+            r2c1: ((1 / detA) * (((b1 * c3) - (c1 * b3)) * -1)).toFixed(6) * 1,
+            r2c2: ((1 / detA) * ((a1 * c3) - (c1 * a3))).toFixed(6) * 1,
+            r2c3: ((1 / detA) * (((a1 * b3) - (b1 * a3)) * -1)).toFixed(6) * 1,
+            r3c1: ((1 / detA) * ((b1 * c2) - (c1 * b2))).toFixed(6) * 1,
+            r3c2: ((1 / detA) * (((a1 * c2) - (c1 * a2)) * -1)).toFixed(6) * 1,
+            r3c3: ((1 / detA) * ((a1 * b2) - (b1 * a2))).toFixed(6) * 1,
+            detA,
           }
       }
+        return results
+    }
+
+    function psuedoInverseMatrix(a1, a2, a3, b1, b2, b3, c1, c2, c3) {
+      let results = {};
       return results
     }
 
-    function psuedoInverseMatrix(a1, a2, a3, a4, b1, b2, b3, c1, c2, c3) {
-      let results = {};
-      if (matSizeSelected == 'two') {      
-        results = {
-          r1c1: (a1 * x1) + (a2 * y1),
-          r1c2: x2 ? (a1 * x2) + (a2 * y2) : '',
-          r2c1: (b1 * x1) + (b2 * y1),
-          r2c2: x2 ? (b1 * x2) + (b2 * y2) : '',
-      } 
-    } 
-      else if (matSizeSelected == 'three') {      
-          results = {
-            r1c1: (a1 * x1) + (a2 * y1) + (a3 * z1),
-            r1c2: x2 ? (a1 * x2) + (a2 * y2) + (a3 * z2) : '',
-            r1c3: x3 ? (a1 * x3) + (a2 * y3) + (a3 * z3) : '',
-            r2c1: (b1 * x1) + (b2 * y1) + (b3 * z1),
-            r2c2: x2 ? (b1 * x2) + (b2 * y2) + (b3 * z2) : '',
-            r2c3: x3 ? (b1 * x3) + (b2 * y3) + (b3 * z3) : '',
-            r3c1: (c1 * x1) + (c2 * y1) + (c3 * z1),
-            r3c2: x2 ? (c1 * x2) + (c2 * y2) + (c3 * z2) : '',
-            r3c3: x3 ? (c1 * x3) + (c2 * y3) + (c3 * z3) : '',
-          }
-      }
-      return results
-    }
-
-    function adjointMatrix(a1, a2, a3, a4, b1, b2, b3, c1, c2, c3) {
+    function adjointMatrix(a1, a2, a3, b1, b2, b3, c1, c2, c3) {
       let results = {};
       if (matSizeSelected == 'two') {      
         results = {
@@ -476,7 +441,7 @@
       return results
     }
 
-    function cofactorMatrix(a1, a2, a3, a4, b1, b2, b3, c1, c2, c3) {
+    function cofactorMatrix(a1, a2, a3, b1, b2, b3, c1, c2, c3) {
       let results = {};
       if (matSizeSelected == 'two') {      
         results = {
@@ -484,8 +449,8 @@
           r1c2: b1 * -1,
           r2c1: a2 * -1,
           r2c2: a1,
+        } 
       } 
-    } 
       else if (matSizeSelected == 'three') {      
           results = {
             r1c1: ((b2 * b3) - (c2 * b3)),
@@ -502,33 +467,12 @@
       return results
     }
 
-    function powerOfAMatrix(a1, a2, a3, a4, b1, b2, b3, c1, c2, c3) {
+    function powerOfAMatrix(a1, a2, a3, b1, b2, b3, c1, c2, c3) {
       let results = {};
-      if (matSizeSelected == 'two') {      
-        results = {
-          r1c1: (a1 * x1) + (a2 * y1),
-          r1c2: x2 ? (a1 * x2) + (a2 * y2) : '',
-          r2c1: (b1 * x1) + (b2 * y1),
-          r2c2: x2 ? (b1 * x2) + (b2 * y2) : '',
-      } 
-    } 
-      else if (matSizeSelected == 'three') {      
-          results = {
-            r1c1: (a1 * x1) + (a2 * y1) + (a3 * z1),
-            r1c2: x2 ? (a1 * x2) + (a2 * y2) + (a3 * z2) : '',
-            r1c3: x3 ? (a1 * x3) + (a2 * y3) + (a3 * z3) : '',
-            r2c1: (b1 * x1) + (b2 * y1) + (b3 * z1),
-            r2c2: x2 ? (b1 * x2) + (b2 * y2) + (b3 * z2) : '',
-            r2c3: x3 ? (b1 * x3) + (b2 * y3) + (b3 * z3) : '',
-            r3c1: (c1 * x1) + (c2 * y1) + (c3 * z1),
-            r3c2: x2 ? (c1 * x2) + (c2 * y2) + (c3 * z2) : '',
-            r3c3: x3 ? (c1 * x3) + (c2 * y3) + (c3 * z3) : '',
-          }
-      }
       return results
     }
 
-    function transpose(a1, a2, a3, a4, b1, b2, b3, c1, c2, c3) {
+    function transpose(a1, a2, a3, b1, b2, b3, c1, c2, c3) {
       let results = {};
       if (matSizeSelected == 'two') {      
         results = {
@@ -554,149 +498,88 @@
       return results
     }
 
-    function multiplyByNumber(a1, a2, a3, a4, b1, b2, b3, c1, c2, c3, scalar) {
-      let results = {};
-      if (matSizeSelected == 'two') {      
-        results = {
-          r1c1: scalar * a1,
-          r1c2: scalar * a2,
-          r2c1: scalar * b1,
-          r2c2: scalar * b2,
-      } 
-    } 
-      else if (matSizeSelected == 'three') {      
+    function multiplyByNumber(a1, a2, a3, b1, b2, b3, c1, c2, c3, scalar) {
+        let results = {};
+        if (matSizeSelected == 'two') {      
           results = {
             r1c1: scalar * a1,
             r1c2: scalar * a2,
-            r1c3: scalar * a3,
             r2c1: scalar * b1,
             r2c2: scalar * b2,
-            r2c3: scalar * b3,
-            r3c1: scalar * c1,
-            r3c2: scalar * c2,
-            r3c3: scalar * c3,
-          }
-      }
-      return results
-    }
-
-    function diagonalize(a1, a2, a3, a4, b1, b2, b3, c1, c2, c3) {
-      let results = {};
-      if (matSizeSelected == 'two') {      
-        results = {
-          r1c1: (a1 * x1) + (a2 * y1),
-          r1c2: x2 ? (a1 * x2) + (a2 * y2) : '',
-          r2c1: (b1 * x1) + (b2 * y1),
-          r2c2: x2 ? (b1 * x2) + (b2 * y2) : '',
+        } 
       } 
-    } 
-      else if (matSizeSelected == 'three') {      
-          results = {
-            r1c1: (a1 * x1) + (a2 * y1) + (a3 * z1),
-            r1c2: x2 ? (a1 * x2) + (a2 * y2) + (a3 * z2) : '',
-            r1c3: x3 ? (a1 * x3) + (a2 * y3) + (a3 * z3) : '',
-            r2c1: (b1 * x1) + (b2 * y1) + (b3 * z1),
-            r2c2: x2 ? (b1 * x2) + (b2 * y2) + (b3 * z2) : '',
-            r2c3: x3 ? (b1 * x3) + (b2 * y3) + (b3 * z3) : '',
-            r3c1: (c1 * x1) + (c2 * y1) + (c3 * z1),
-            r3c2: x2 ? (c1 * x2) + (c2 * y2) + (c3 * z2) : '',
-            r3c3: x3 ? (c1 * x3) + (c2 * y3) + (c3 * z3) : '',
-          }
+        else if (matSizeSelected == 'three') {      
+            results = {
+              r1c1: scalar * a1,
+              r1c2: scalar * a2,
+              r1c3: scalar * a3,
+              r2c1: scalar * b1,
+              r2c2: scalar * b2,
+              r2c3: scalar * b3,
+              r3c1: scalar * c1,
+              r3c2: scalar * c2,
+              r3c3: scalar * c3,
+            }
+        }
+        return results
       }
-      return results
-    }
 
+    function diagonalize(a1, a2, a3, b1, b2, b3, c1, c2, c3) {
+        let results = {};
+        return results
+      }
+    
     /** Decompositions **/
 
-    function luDecomp(a1, a2, a3, a4, b1, b2, b3, c1, c2, c3) {
+    function luDecomp(a1, a2, a3, b1, b2, b3, c1, c2, c3) {
       let results = 0;
-      if (matSizeSelected == 'two') {
-        results = (a1 + b2)
-      } else if (matSizeSelected == 'three') {
-        results = (a1 + b2 + c3)
-      }
+      
       return results
     }
 
-    function svdDecomp(a1, a2, a3, a4, b1, b2, b3, c1, c2, c3) {
+    function svdDecomp(a1, a2, a3, b1, b2, b3, c1, c2, c3) {
       let results = 0;
-      if (matSizeSelected == 'two') {
-        results = (a1 + b2)
-      } else if (matSizeSelected == 'three') {
-        results = (a1 + b2 + c3)
-      }
+      
       return results
     }
 
-    function qrDecomp(a1, a2, a3, a4, b1, b2, b3, c1, c2, c3) {
+    function qrDecomp(a1, a2, a3, b1, b2, b3, c1, c2, c3) {
       let results = 0;
-      if (matSizeSelected == 'two') {
-        results = (a1 + b2)
-      } else if (matSizeSelected == 'three') {
-        results = (a1 + b2 + c3)
-      }
+      
       return results
     }
 
-    function choleskyDecomp(a1, a2, a3, a4, b1, b2, b3, c1, c2, c3) {
+    function choleskyDecomp(a1, a2, a3, b1, b2, b3, c1, c2, c3) {
       let results = 0;
-      if (matSizeSelected == 'two') {
-        results = (a1 + b2)
-      } else if (matSizeSelected == 'three') {
-        results = (a1 + b2 + c3)
-      }
+     
       return results
     }
 
-    function polarDecomp(a1, a2, a3, a4, b1, b2, b3, c1, c2, c3) {
+    function polarDecomp(a1, a2, a3, b1, b2, b3, c1, c2, c3) {
       let results = 0;
-      if (matSizeSelected == 'two') {
-        results = (a1 + b2)
-      } else if (matSizeSelected == 'three') {
-        results = (a1 + b2 + c3)
-      }
+     
       return results
     }
 
     /** Other Operations **/
 
-    function eigenValsAndVects(a1, a2, a3, a4, b1, b2, b3, c1, c2, c3) {
+    function eigenValsAndVects(a1, a2, a3, b1, b2, b3, c1, c2, c3) {
       let results = 0;
-      if (matSizeSelected == 'two') {
-        results = (a1 + b2)
-      } else if (matSizeSelected == 'three') {
-        results = (a1 + b2 + c3)
-      }
       return results
     }
 
-    function charactPolynomials(a1, a2, a3, a4, b1, b2, b3, c1, c2, c3) {
+    function charactPolynomials(a1, a2, a3, b1, b2, b3, c1, c2, c3) {
       let results = 0;
-      if (matSizeSelected == 'two') {
-        results = (a1 + b2)
-      } else if (matSizeSelected == 'three') {
-        results = (a1 + b2 + c3)
-      }
       return results
     }
 
-    function singularValues(a1, a2, a3, a4, b1, b2, b3, c1, c2, c3) {
-      let results = 0;
-      if (matSizeSelected == 'two') {
-        results = (a1 + b2)
-      } else if (matSizeSelected == 'three') {
-        results = (a1 + b2 + c3)
-      }
+    function singularValues(a1, a2, a3, b1, b2, b3, c1, c2, c3) {
+      let results = 0;     
       return results
     }
 
-    function detectMatrixType(a1, a2, a3, a4, b1, b2, b3, c1, c2, c3) {
-      let results = 0;
-      if (matSizeSelected == 'two') {
-        results = (a1 + b2)
-      } else if (matSizeSelected == 'three') {
-        results = (a1 + b2 + c3)
-      }
+    function detectMatrixType(a1, a2, a3, b1, b2, b3, c1, c2, c3) {
+      let results = 0;    
       return results
     }
 
@@ -792,14 +675,14 @@
           r2c2: (a1 * y2),
           r2c3: (a2 * y1),
           r2c4: (a2 * y2),
-          r3c1: (b2 * x1),
-          r3c2: (b2 * x2),
-          r3c3: (b1 * x1),
-          r3c4: (b1 * x2),
+          r3c1: (b1 * x1),
+          r3c2: (b1 * x2),
+          r3c3: (b2 * x1),
+          r3c4: (b2 * x2),
           r4c1: (b1 * y1),
-          r4c2: (b2 * y2),
-          r4c3: (b1 * y1),
-          r4c4: (b1 * y2),
+          r4c2: (b1 * y2),
+          r4c3: (b2 * y1),
+          r4c4: (b2 * y2),
         } 
       } 
       else if (matSizeSelected == 'three') {      
@@ -850,7 +733,7 @@
           r5c8: (b3 * y2),         
           r5c9: (b3 * y3),
           r6c1: (b1 * z1),
-          r6c2: (b1 * z1),
+          r6c2: (b1 * z2),
           r6c3: (b1 * z3),
           r6c4: (b2 * z1),
           r6c5: (b2 * z2),
@@ -873,7 +756,7 @@
           r8c4: (c2 * y1),
           r8c5: (c2 * y2),
           r8c6: (c2 * y3),
-          r8c7: (c2 * y1),
+          r8c7: (c3 * y1),
           r8c8: (c3 * y2),
           r8c9: (c3 * y3),
           r9c1: (c1 * z1),
@@ -890,6 +773,31 @@
       return results
     }
 
+    function entrywiseProduct(a1, a2, a3, b1, b2, b3, c1, c2, c3, x1, x2, x3, y1, y2, y3, z1, z2, z3) {
+      let results = {};
+      if (matSizeSelected == 'two') {      
+        results = {
+          r1c1: (a1 * x1),
+          r1c2: (a2 * x2),
+          r2c1: (b1 * y1),
+          r2c2: (b2 * y2),
+      } 
+    } 
+      else if (matSizeSelected == 'three') {      
+          results = {
+            r1c1: (a1 * x1),
+            r1c2: (a2 * x2),
+            r1c3: (a3 * x3),
+            r2c1: (b1 * y1),
+            r2c2: (b2 * y2),
+            r2c3: (b3 * y3),
+            r3c1: (c1 * z1),
+            r3c2: (c2 * z2),
+            r3c3: (c3 * z3),
+          }
+      }
+      return results
+    }
 
     function matrixOperations(a1, a2, a3, b1, b2, b3, c1, c2, c3, x1, x2, x3, y1, y2, y3, z1, z2, z3, scalar, power) {
       let results = {};
@@ -911,12 +819,16 @@
         } else if (operationSelected == 'transpose') {
           results = transpose(a1, a2, a3, b1, b2, b3, c1, c2, c3)
         } else if (operationSelected == 'detmnt') {
+          operationName = 'Determinant'
           results = determinantMatrix(a1, a2, a3, b1, b2, b3, c1, c2, c3)
         } else if (operationSelected == 'norms') {
+          operationName = 'Norm'
           results = normMatrix(a1, a2, a3, b1, b2, b3, c1, c2, c3)
         } else if (operationSelected == 'rank') {
+          operationName = 'Your matrix has rank'
           results = rankMatrix(a1, a2, a3, b1, b2, b3, c1, c2, c3)
         } else if (operationSelected == 'trace') {
+          operationName = 'Trace'
           results = traceMatrix(a1, a2, a3, b1, b2, b3, c1, c2, c3)
         } else if (operationSelected == 'lu') {
           results = luDecomp(a1, a2, a3, b1, b2, b3, c1, c2, c3)
@@ -947,7 +859,7 @@
         } else if (operationSelected == 'tenProduct') {
           results = tensorProduct(a1, a2, a3, b1, b2, b3, c1, c2, c3, x1, x2, x3, y1, y2, y3, z1, z2, z3)
         } else if (operationSelected == 'entProduct') {
-          results = multiplyMatrix(a1, a2, a3, b1, b2, b3, c1, c2, c3, x1, x2, x3, y1, y2, y3, z1, z2, z3)
+          results = entrywiseProduct(a1, a2, a3, b1, b2, b3, c1, c2, c3, x1, x2, x3, y1, y2, y3, z1, z2, z3)
         } 
       }
       return results
@@ -993,10 +905,147 @@
       
       try {
         const results = matrixOperations(a1, a2, a3, b1, b2, b3, c1, c2, c3, x1, x2, x3, y1, y2, y3, z1, z2, z3, scalar, power)
-        
-        calcResultsEl.innerHTML = `<p> Cross Product of Vectors (a x b):</p>
-                                     <p>(${results})</p>
+        if (lastReturnOptionSelected == 'aNumber') {
+          calcResultsEl.innerHTML = `<p> ${operationName}:</p>
+                                     <p>${results}</p>
                                     `
+        } 
+        else if (lastReturnOptionSelected == 'aMatrix') {
+          let firstBracketOpen = '⌈'
+          let firstBracketClose = '⌉	'
+          let secondBracketOpen = matSizeSelected == 'two' ? '⌊' : '|&nbsp;';
+          let secondBracketClose = matSizeSelected == 'two' ? '⌋' : '&nbsp;|';
+
+          let thirdBracketOpen = matSizeSelected == 'three' ? '⌊' :  '';
+          let thirdBracketClose = matSizeSelected == 'three' ? '⌋' : '';
+
+          const matrixA = operationSelected == 'inverse' ?
+            `
+              <p>${firstBracketOpen} ${!isNaN(a1) ? `${a1} &nbsp;` : ''}  ${!isNaN(a2) ? `${a2} &nbsp;` : ''}  
+                ${!isNaN(a3) ? a3 : ''} ${firstBracketClose}<sup>-1</sup></p> 
+              <p>${secondBracketOpen} ${!isNaN(b1) ? `${b1} &nbsp;` : ''} ${!isNaN(b2) ? `${b2} &nbsp;` : ''} 
+                ${!isNaN(b3) ? b3 : ''} ${secondBracketClose}</p>
+              <p>${thirdBracketOpen} ${!isNaN(c1) ? `${c1} &nbsp;` : ''} ${!isNaN(c2) ? `${c2} &nbsp;` : ''} 
+                ${!isNaN(c3) ? c3 : ''} ${thirdBracketClose} </p>
+              <p>=</p>
+            ` : operationSelected == 'psuedoInv' ?
+            `
+              <p>Pseudoinverse of your matrix A (A<sup>+</sup>):</p>
+            ` : '';
+
+          if (operationSelected == 'inverse' && results.detA == 0) {
+            calcResultsEl.innerHTML = `
+              <p>Your matrix is not invertible! Try computing its pseudoinverse.</p>
+            `
+          } else {
+            const {r1c1, r1c2, r1c3, r2c1, r2c2, r2c3, r3c1, r3c2, r3c3} = results;
+            calcResultsEl.innerHTML = `
+              ${matrixA}
+              <p>${firstBracketOpen} ${r1c1 != undefined ? `${r1c1} &nbsp;` : ''}  ${r1c2 != undefined ? `${r1c2} &nbsp;` : ''}  
+                ${r1c3 != undefined ? `${r1c3} &nbsp;` : ''} ${firstBracketClose}</p>
+              <p>${secondBracketOpen} ${r2c1 != undefined ? `${r2c1} &nbsp;` : ''} ${r2c2 != undefined ? `${r2c2} &nbsp;` : ''}
+                ${r2c3 != undefined ? `${r2c3} &nbsp;` : ''} ${secondBracketClose}</p>
+              <p>${thirdBracketOpen} ${r3c1 != undefined ? `${r3c1} &nbsp;` : ''} ${r3c2 != undefined ? `${r3c2} &nbsp;` : ''}
+                ${r3c3 != undefined ? `${r3c3} &nbsp;` : ''} ${thirdBracketClose} </p>
+            `
+          }  
+          
+        } else if (matNumSelected == 'two') {
+          let firstBracketOpen = '⌈'
+          let firstBracketClose = '⌉	'
+          let secondBracketOpen = matSizeSelected == 'two' ? '⌊' : '|&nbsp;';
+          let secondBracketClose = matSizeSelected == 'two' ? '⌋' : '&nbsp;|';
+
+          let thirdBracketOpen = matSizeSelected == 'three' ? '⌊' :  '';
+          let thirdBracketClose = matSizeSelected == 'three' ? '⌋' : '';
+
+          let midBracketOpen = '|&nbsp;';
+          let midBracketClose = '&nbsp;|';
+
+          if (operationSelected == 'tenProduct') {
+            if (matSizeSelected == 'two') {
+              const {r1c1, r1c2, r1c3, r1c4, r2c1, r2c2, r2c3, r2c4, r3c1, r3c2, r3c3, r3c4, r4c1, r4c2, r4c3, r4c4} = results;
+              calcResultsEl.innerHTML = `
+                  <p>${firstBracketOpen} ${r1c1 != undefined ? `${r1c1} &nbsp;` : ''}  ${r1c2 != undefined ? `${r1c2} &nbsp;` : ''}  
+                    ${r1c3 != undefined ? `${r1c3} &nbsp;` : ''} ${r1c4 != undefined ? `${r1c4} &nbsp;` : ''} ${firstBracketClose}</p>
+                  <p>${midBracketOpen} ${r2c1 != undefined ? `${r2c1} &nbsp;` : ''}  ${r2c2 != undefined ? `${r2c2} &nbsp;` : ''}  
+                    ${r2c3 != undefined ? `${r2c3} &nbsp;` : ''} ${r2c4 != undefined ? `${r2c4} &nbsp;` : ''} ${midBracketClose}</p>
+                  <p>${midBracketOpen} ${r3c1 != undefined ? `${r3c1} &nbsp;` : ''}  ${r3c2 != undefined ? `${r3c2} &nbsp;` : ''}  
+                    ${r3c3 != undefined ? `${r3c3} &nbsp;` : ''} ${r3c4 != undefined ? `${r3c4} &nbsp;` : ''} ${midBracketClose}</p>
+                  <p>${secondBracketOpen} ${r4c1 != undefined ? `${r4c1} &nbsp;` : ''} ${r4c2 != undefined ? `${r4c2} &nbsp;` : ''}
+                    ${r4c3 != undefined ? `${r4c3} &nbsp;` : ''} ${r4c4 != undefined ? `${r4c4} &nbsp;` : ''} ${secondBracketClose}</p>
+              `
+            } else {
+              const {
+                r1c1, r1c2, r1c3, r1c4, r1c5, r1c6, r1c7, r1c8, r1c9, r2c1, r2c2, r2c3, r2c4, r2c5, r2c6, r2c7, r2c8, r2c9,
+                r3c1, r3c2, r3c3, r3c4, r3c5, r3c6, r3c7, r3c8, r3c9, r4c1, r4c2, r4c3, r4c4, r4c5, r4c6, r4c7, r4c8, r4c9,
+                r5c1, r5c2, r5c3, r5c4, r5c5, r5c6, r5c7, r5c8, r5c9, r6c1, r6c2, r6c3, r6c4, r6c5, r6c6, r6c7, r6c8, r6c9,
+                r7c1, r7c2, r7c3, r7c4, r7c5, r7c6, r7c7, r7c8, r7c9, r8c1, r8c2, r8c3, r8c4, r8c5, r8c6, r8c7, r8c8, r8c9,
+                r9c1, r9c2, r9c3, r9c4, r9c5, r9c6, r9c7, r9c8, r9c9
+              } = results;
+              calcResultsEl.innerHTML = `
+                  <p>${firstBracketOpen} ${r1c1 != undefined ? `${r1c1} &nbsp;` : ''}  ${r1c2 != undefined ? `${r1c2} &nbsp;` : ''}  
+                    ${r1c3 != undefined ? `${r1c3} &nbsp;` : ''} ${r1c4 != undefined ? `${r1c4} &nbsp;` : ''} 
+                    ${r1c5 != undefined ? `${r1c5} &nbsp;` : ''} ${r1c6 != undefined ? `${r1c6} &nbsp;` : ''} 
+                    ${r1c7 != undefined ? `${r1c7} &nbsp;` : ''} ${r1c8 != undefined ? `${r1c8} &nbsp;` : ''} 
+                    ${r1c9 != undefined ? `${r1c9} &nbsp;` : ''} ${firstBracketClose}</p>
+                  <p>${midBracketOpen} ${r2c1 != undefined ? `${r2c1} &nbsp;` : ''}  ${r2c2 != undefined ? `${r2c2} &nbsp;` : ''}  
+                    ${r2c3 != undefined ? `${r2c3} &nbsp;` : ''} ${r2c4 != undefined ? `${r2c4} &nbsp;` : ''} 
+                    ${r2c5 != undefined ? `${r2c5} &nbsp;` : ''} ${r2c6 != undefined ? `${r2c6} &nbsp;` : ''} 
+                    ${r2c7 != undefined ? `${r2c7} &nbsp;` : ''} ${r2c8 != undefined ? `${r2c8} &nbsp;` : ''} 
+                    ${r2c9 != undefined ? `${r2c9} &nbsp;` : ''} ${midBracketClose}</p>
+                  <p>${midBracketOpen} ${r3c1 != undefined ? `${r3c1} &nbsp;` : ''}  ${r3c2 != undefined ? `${r3c2} &nbsp;` : ''}  
+                    ${r3c3 != undefined ? `${r3c3} &nbsp;` : ''} ${r3c4 != undefined ? `${r3c4} &nbsp;` : ''} 
+                    ${r3c5 != undefined ? `${r3c5} &nbsp;` : ''} ${r3c6 != undefined ? `${r3c6} &nbsp;` : ''} 
+                    ${r3c7 != undefined ? `${r3c7} &nbsp;` : ''} ${r3c8 != undefined ? `${r3c8} &nbsp;` : ''} 
+                    ${r3c9 != undefined ? `${r3c9} &nbsp;` : ''} ${midBracketClose}</p>
+                  <p>${midBracketOpen} ${r4c1 != undefined ? `${r4c1} &nbsp;` : ''} ${r4c2 != undefined ? `${r4c2} &nbsp;` : ''}
+                    ${r4c3 != undefined ? `${r4c3} &nbsp;` : ''} ${r4c4 != undefined ? `${r4c4} &nbsp;` : ''}
+                    ${r4c5 != undefined ? `${r4c5} &nbsp;` : ''} ${r4c6 != undefined ? `${r4c6} &nbsp;` : ''} 
+                    ${r4c7 != undefined ? `${r4c7} &nbsp;` : ''} ${r4c8 != undefined ? `${r4c8} &nbsp;` : ''} 
+                    ${r4c9 != undefined ? `${r4c9} &nbsp;` : ''} ${midBracketClose}</p>
+
+                    <p>${midBracketOpen} ${r5c1 != undefined ? `${r5c1} &nbsp;` : ''}  ${r5c2 != undefined ? `${r5c2} &nbsp;` : ''}  
+                    ${r5c3 != undefined ? `${r5c3} &nbsp;` : ''} ${r5c4 != undefined ? `${r5c4} &nbsp;` : ''} 
+                    ${r5c5 != undefined ? `${r5c5} &nbsp;` : ''} ${r5c6 != undefined ? `${r5c6} &nbsp;` : ''} 
+                    ${r5c7 != undefined ? `${r5c7} &nbsp;` : ''} ${r5c8 != undefined ? `${r5c8} &nbsp;` : ''} 
+                    ${r5c9 != undefined ? `${r5c9} &nbsp;` : ''} ${midBracketClose}</p>
+                  <p>${midBracketOpen} ${r6c1 != undefined ? `${r6c1} &nbsp;` : ''}  ${r6c2 != undefined ? `${r6c2} &nbsp;` : ''}  
+                    ${r6c3 != undefined ? `${r6c3} &nbsp;` : ''} ${r6c4 != undefined ? `${r6c4} &nbsp;` : ''} 
+                    ${r6c5 != undefined ? `${r6c5} &nbsp;` : ''} ${r6c6 != undefined ? `${r6c6} &nbsp;` : ''} 
+                    ${r6c7 != undefined ? `${r6c7} &nbsp;` : ''} ${r6c8 != undefined ? `${r6c8} &nbsp;` : ''} 
+                    ${r6c9 != undefined ? `${r6c9} &nbsp;` : ''} ${midBracketClose}</p>
+                  <p>${midBracketOpen} ${r7c1 != undefined ? `${r7c1} &nbsp;` : ''} ${r7c2 != undefined ? `${r7c2} &nbsp;` : ''}
+                    ${r7c3 != undefined ? `${r7c3} &nbsp;` : ''} ${r7c4 != undefined ? `${r7c4} &nbsp;` : ''}
+                    ${r7c5 != undefined ? `${r7c5} &nbsp;` : ''} ${r7c6 != undefined ? `${r7c6} &nbsp;` : ''} 
+                    ${r7c7 != undefined ? `${r7c7} &nbsp;` : ''} ${r7c8 != undefined ? `${r7c8} &nbsp;` : ''} 
+                    ${r7c9 != undefined ? `${r7c9} &nbsp;` : ''} ${midBracketClose}</p>
+                  <p>${midBracketOpen} ${r8c1 != undefined ? `${r8c1} &nbsp;` : ''} ${r8c2 != undefined ? `${r8c2} &nbsp;` : ''}
+                    ${r8c3 != undefined ? `${r8c3} &nbsp;` : ''} ${r8c4 != undefined ? `${r8c4} &nbsp;` : ''}
+                    ${r8c5 != undefined ? `${r8c5} &nbsp;` : ''} ${r8c6 != undefined ? `${r8c6} &nbsp;` : ''} 
+                    ${r8c7 != undefined ? `${r8c7} &nbsp;` : ''} ${r8c8 != undefined ? `${r8c8} &nbsp;` : ''} 
+                    ${r8c9 != undefined ? `${r8c9} &nbsp;` : ''} ${midBracketClose}</p>
+                  <p>${thirdBracketOpen} ${r9c1 != undefined ? `${r9c1} &nbsp;` : ''} ${r9c2 != undefined ? `${r9c2} &nbsp;` : ''}
+                    ${r9c3 != undefined ? `${r9c3} &nbsp;` : ''} ${r9c4 != undefined ? `${r9c4} &nbsp;` : ''}
+                    ${r9c5 != undefined ? `${r9c5} &nbsp;` : ''} ${r9c6 != undefined ? `${r9c6} &nbsp;` : ''} 
+                    ${r9c7 != undefined ? `${r9c7} &nbsp;` : ''} ${r9c8 != undefined ? `${r9c8} &nbsp;` : ''} 
+                    ${r9c9 != undefined ? `${r9c9} &nbsp;` : ''} ${thirdBracketClose}</p>
+              `
+            }
+            
+          } else {
+            const {r1c1, r1c2, r1c3, r2c1, r2c2, r2c3, r3c1, r3c2, r3c3} = results;
+            calcResultsEl.innerHTML = `
+                <p>${firstBracketOpen} ${r1c1 != undefined ? `${r1c1} &nbsp;` : ''}  ${r1c2 != undefined ? `${r1c2} &nbsp;` : ''}  
+                  ${r1c3 != undefined ? `${r1c3} &nbsp;` : ''} ${firstBracketClose}</p>
+                <p>${secondBracketOpen} ${r2c1 != undefined ? `${r2c1} &nbsp;` : ''} ${r2c2 != undefined ? `${r2c2} &nbsp;` : ''}
+                  ${r2c3 != undefined ? `${r2c3} &nbsp;` : ''} ${secondBracketClose}</p>
+                <p>${thirdBracketOpen} ${r3c1 != undefined ? `${r3c1} &nbsp;` : ''} ${r3c2 != undefined ? `${r3c2} &nbsp;` : ''}
+                  ${r3c3 != undefined ? `${r3c3} &nbsp;` : ''} ${thirdBracketClose} </p>
+            `
+          }
+        }
+        
       } catch (error) {
         showError("Something Went Wrong!!!");
         resethandler()

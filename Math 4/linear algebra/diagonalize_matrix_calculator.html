@@ -80,7 +80,7 @@
     const matSizeEl = document.getElementById('matSize');
     const first3DInputEl = document.getElementById('first3DInput');
     const second3DInputEl = document.getElementById('second3DInput');
-    const thirdEqnInputsEl = document.getElementById('thirdEqnInputs');
+    const thirdRowInputsEl = document.getElementById('thirdRowInputs');
     const calcBtnEl = document.getElementById('calcBtn');
     const resetBtnEl = document.getElementById('resetBtn');
     const calcResultsEl = document.getElementById('calcResults')
@@ -103,7 +103,7 @@
       const matrixSize = e.target.value
       first3DInputEl.style.display = matrixSize ==  'three' ? 'block' : 'none'
       second3DInputEl.style.display = matrixSize ==  'three' ? 'block' : 'none'
-      thirdRowInputsEL.style.display = matrixSize ==  'three' ? 'block' : 'none'
+      thirdRowInputsEl.style.display = matrixSize ==  'three' ? 'block' : 'none'
       matSizeSelected = matrixSize;
       if (matrixSize == 'two') {
         a1El = document.getElementById('a1');
@@ -132,7 +132,7 @@
     }
 
     function diagonalizeMatrix(a1, a2, a3, b1, b2, b3, c1, c2, c3) {
-      let results = '';
+      let results = {};
       return results
     }
 
@@ -150,7 +150,7 @@
       
       
       if (
-        isNaN(a1) || isNaN(b1) || isNaN(c1) || isNaN(a2) || isNaN(b2) || isNaN(c2) ||
+        isNaN(a1) || isNaN(b1) || isNaN(a2) || isNaN(b2) ||  (c1El != '' && isNaN(c1)) ||  (c2El != '' && isNaN(c2)) ||
         (a3El != '' && isNaN(a3)) || (b3El != '' && isNaN(b3)) || (c3El != '' && isNaN(c3))
         
       ) {
@@ -162,9 +162,11 @@
       try {
         const results = diagonalizeMatrix(a1, a2, a3, b1, b2, b3, c1, c2, c3)
         
-        calcResultsEl.innerHTML = `<p> Cross Product of Vectors (a x b):</p>
-                                     <p>(${results})</p>
-                                    `
+        calcResultsEl.innerHTML = `<p>Your eigenvalues are:</p>
+                                     <p></p>
+                                     <p>The real eigenvectors are:</p>
+                                     <p></p>
+                                  `
       } catch (error) {
         showError("Something Went Wrong!!!");
         resethandler()
@@ -209,7 +211,7 @@
     });   
     matSizeEl.addEventListener("change", (e) => {
       handleMatrixSizeChange(e);
-      resethandler();
+      resetResult();
     })
     calcBtnEl.addEventListener("click", calculateResults);
   </script>
