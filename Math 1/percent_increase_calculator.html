@@ -65,12 +65,12 @@
         try {
           const percentageIncrease = percentIncrease(initialValue, finalValue)
           let change = ''
-          if (percentageIncrease > 0) {
+          if (initialValue < finalValue) {
             change = 'increase'
           } else {
             change = 'decrease'
           }
-          calcResultsEl.innerHTML = `${Math.abs(percentageIncrease.toFixed(4))}% ${change}`
+          calcResultsEl.innerHTML = `${Math.abs(percentageIncrease.toFixed(4) * 1)}% ${change}`
           
         } catch (error) {
           showError("Something Went Wrong!!!");
