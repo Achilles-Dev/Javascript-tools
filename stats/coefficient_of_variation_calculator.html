@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Coefficient of Variation Calculator</title>
+</head>
+<body>
+    <h1>Coefficient of Variation Calculator</h1>
+    <p>Enter numbers separated by comma [example1], space [example2] or line break [example3]:</p>
+    <textarea id="numbersInput" rows="5"></textarea>
+    <br>
+    <button id="calculateBtn">Calculate</button>
+    <br>
+    <label for="result">Coefficient of Variation:</label>
+    <span id="result"></span>
+    <br>
+    <span id="totalNumbers"></span>
+
+    <script>
+        // Get required elements from the HTML
+        const numbersInput = document.getElementById("numbersInput");
+        const calculateBtn = document.getElementById("calculateBtn");
+        const resultSpan = document.getElementById("result");
+        const totalNumbersSpan = document.getElementById("totalNumbers");
+        const errorSpan = document.getElementById("errorMessage");
+            
+        // Event listener for the Calculate button
+        calculateBtn.addEventListener("click", function() {
+            const numbers = extractNumbers(numbersInput.value);
+        
+            if (numbers.length < 2) {
+                displayError("Please enter at least two valid numbers.");
+            } else {
+                const coefficientOfVariation = calculateCoefficientOfVariation(numbers);
+                displayResult(coefficientOfVariation);
+            }
+        });
+        
+        // Function to extract numbers from the input text
+        function extractNumbers(inputText) {
+            const regex = /[+\-]?\d*\.?\d+(?:[Ee][+\-]?\d+)?/g;
+            const matches = inputText.match(regex);
+            const numbers = matches ? matches.map(Number) : [];
+            return numbers;
+        }
+        
+        // Function to calculate the Coefficient of Variation
+        function calculateCoefficientOfVariation(numbers) {
+            const mean = calculateMean(numbers);
+            const standardDeviation = calculateStandardDeviation(numbers, mean);
+            const coefficientOfVariation = (standardDeviation / mean);
+            return coefficientOfVariation;
+        }
+        
+        // Function to calculate the mean of an array of numbers
+        function calculateMean(numbers) {
+            const sum = numbers.reduce((acc, num) => acc + num, 0);
+            const mean = sum / numbers.length;
+            return mean;
+        }
+        
+        // Function to calculate the standard deviation of an array of numbers
+        function calculateStandardDeviation(numbers, mean) {
+            const squaredDifferences = numbers.map(num => Math.pow(num - mean, 2));
+            const sumSquaredDifferences = squaredDifferences.reduce((acc, num) => acc + num, 0);
+            const variance = sumSquaredDifferences / numbers.length;
+            const standardDeviation = Math.sqrt(variance);
+            return standardDeviation;
+        }
+        
+        // Function to display the calculated result
+        function displayResult(coefficientOfVariation) {
+            resultSpan.textContent = coefficientOfVariation;
+            totalNumbersSpan.textContent = "Total Numbers: " + numbersInput.value.split(/[,\s\n]+/).filter(Boolean).length;
+            errorSpan.textContent = "";
+        }
+        
+        // Function to display an error message
+        function displayError(message) {
+            resultSpan.textContent = "";
+            totalNumbersSpan.textContent = "";
+            errorSpan.textContent = message;
+        }
+
+    </script>
+</body>
+</html>
