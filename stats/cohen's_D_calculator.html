@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Cohen's D Calculator</title>
+</head>
+<body>
+    <h1>Cohen's D Calculator</h1>
+    <p>Data set A:</p>
+    <p>
+      <textarea id="setAInputs" rows="5"></textarea><br >
+      <span>Separate numbers using a comma (,)</span>
+    </p>
+
+    <p>Data set B:</p>
+    <p>
+      <textarea id="setBInputs" rows="5"></textarea><br >
+      <span>Separate numbers using a comma (,)</span>
+    </p>
+    <button id="calcBtn">Calculate</button>
+    <button id="resetBtn">Reset</button>
+    <hr>
+    <p>
+      <h3>Result:</h3>
+      <h3 id="calcResults">Result will appear here...</h3>
+    </p>
+
+    <script>
+      // Get required elements from the HTML
+      const setAInputsEl = document.getElementById("setAInputs");
+      const setBInputsEl = document.getElementById("setBInputs");
+
+      const calcBtnEl = document.getElementById('calcBtn');
+      const resetBtnEl = document.getElementById('resetBtn');
+      const calcResultsEl = document.getElementById('calcResults')
+
+      
+      // Function to extract numbers from the input text
+      function extractNumbers(inputText) {
+        const regex = /[+\-]?\d*\.?\d+(?:[Ee][+\-]?\d+)?/g;
+        const matches = inputText.match(regex);
+        const numbers = matches ? matches.map(Number) : [];
+        return numbers;
+      }
+
+      function calculateResults() {
+          // Retrieve input values
+          const setANums = extractNumbers(setAInputsEl.value);
+          const setBNums = extractNumbers(setBInputsEl.value);
+
+          if (setANums.length < 1 || setBNums.length < 1) {
+            alert("Please Enter All Details.");
+            return;
+          } else if (setANums.length < 2 ) {
+            alert("Data set A has too few entries to calculate its standard deviation (minimum two values needed)");
+            return;
+          } else if (setBNums.length < 2 ) {
+            alert("Data set B has too few entries to calculate its standard deviation (minimum two values needed)");
+            return;
+          }
+
+          try {   
+            const meanA =  (setANums.reduce((a, b) => a + b, 0)) / setANums.length
+            const meanB =  (setBNums.reduce((a, b) => a + b, 0)) / setBNums.length
+
+            const SDSetAVals = setANums.map((numA) => ((numA - meanA) ** 2))
+            const SDSetBVals = setBNums.map((numB) => ((numB - meanB) ** 2))
+            const SDA = Math.sqrt((SDSetAVals.reduce((a, b) => a + b, 0)) / (setANums.length - 1))
+            const SDB = Math.sqrt((SDSetBVals.reduce((a, b) => a + b, 0)) / (setBNums.length - 1))
+
+            const pooledSD = Math.sqrt((((setANums.length - 1) * (SDA ** 2)) + ((setBNums.length - 1) * (SDB ** 2))) / 
+                          (setANums.length + setBNums.length - 2))
+              
+            const results = (meanA - meanB) / pooledSD
+            
+            calcResultsEl.innerHTML = `<p> Cohen's D</p>
+                <p> Means:</p>
+                <p> Mean (A): ${meanA} </p>
+                <p> Mean (B): ${meanB} </p>
+                <p> Standard Deviations:</p>
+                <p> S<sub>A</sub>: ${SDA} </p>
+                <p> S<sub>B</sub>: ${SDB} </p>
+                <p> Pooled standard deviation:</p>
+                <p> S<sub>p</sub>: ${pooledSD} </p>
+                <p> The Cohen's D of these data sets is d = ${results.toFixed(4)}</p>
+              `
+          } catch (error) {
+            alert("Something Went Wrong!!!");
+            resethandler()
+          }
+      }
+
+      function resetForm() {
+        setAInputsEl.value = ""
+        setBInputsEl.value = ""
+      }
+
+      function resetResult() {
+        calcResultsEl.innerHTML = "<p>Result will appear here...</p>";
+      } 
+
+      function resethandler() {
+        resetForm();
+        resetResult();
+      }
+
+      resetBtnEl.addEventListener("click", resethandler);
+      calcBtnEl.addEventListener("click", calculateResults);
+
+      [setAInputsEl, setBInputsEl].forEach((el) => {
+        el.addEventListener("input", resetResult);
+      });
+
+    </script>
+</body>
+</html>

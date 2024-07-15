@@ -31,7 +31,7 @@
       const resetBtnEl = document.getElementById('resetBtn');
       const calcResultsEl = document.getElementById('calcResults') 
 
-      function calculateAbsoluteUncertainty() {
+      function calculateResults() {
           // Retrieve input values
           const measuredVal = parseFloat(measuredValEl.value);
           const relUncertainty = parseFloat(relUncertaintyEl.value);
@@ -69,7 +69,7 @@
       }
 
       resetBtnEl.addEventListener("click", resethandler);
-      calcBtnEl.addEventListener("click", calculateAbsoluteUncertainty);
+      calcBtnEl.addEventListener("click", calculateResults);
 
       [measuredValEl, relUncertaintyEl].forEach((el) => {
         el.addEventListener("input", resetResult);

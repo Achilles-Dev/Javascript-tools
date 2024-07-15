@@ -35,9 +35,9 @@
         return numbers;
       }
 
-      function calculateAverage() {
+      function calculateResults() {
           // Retrieve input values
-          const numbers = extractNumbers(numbersInput.value);
+          const numbers = extractNumbers(numbersInputEl.value);
 
           if (numbers.length < 1) {
             alert("Please Enter All Details.");
@@ -73,7 +73,7 @@
       }
 
       resetBtnEl.addEventListener("click", resethandler);
-      calcBtnEl.addEventListener("click", calculateAverage);
+      calcBtnEl.addEventListener("click", calculateResults);
 
       [measuredValEl, relUncertaintyEl].forEach((el) => {
         el.addEventListener("input", resetResult);
