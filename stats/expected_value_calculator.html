@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Expected Value Calculator</title>
+  </head>
+  <body>
+    <h1>Expected Value Calculator</h1>
+    <h4>
+      You can enter up to 20 values (new rows will appear). Input the probabilities in their <br>
+      decimal form and make sure they all add up to 1.
+    </h4  >
+    <p>
+      X<sub>1</sub>: &nbsp;&nbsp;&nbsp;
+      <input type="number" id="x1" />
+    </p>
+    <p>
+      P(X<sub>1</sub>):
+      <input type="number" min="0" max="1" id="x1Prob" style="width: 180px;" />
+    </p>
+    <p>
+      X<sub>2</sub>: &nbsp;&nbsp;&nbsp;
+      <input type="number" id="x2" />
+    </p>
+    <p>
+      P(X<sub>2</sub>):
+      <input type="number" min="0" max="1" id="x2Prob" style="width: 180px;" />
+    </p>
+    <div id="additions"></div>
+    <p>
+      <button id="addInputs">Add Inputs</button>
+      <button id="removeInputs">Remove Inputs</button>
+    </p>
+    <button id="calcBtn">Calculate</button>
+    <button id="resetBtn">Reset</button>
+    <hr />
+    <div>
+      <h3>Result:</h3>
+      <h3 id="calcResults">Result will appear here...</h3>
+    </div>
+
+    <script>
+      // Get required elements from the HTML
+      const x1El = document.getElementById("x1");
+      const x1ProbEl = document.getElementById("x1Prob");
+      const x2El = document.getElementById("x2");
+      const x2ProbEl = document.getElementById("x2Prob");
+      const additionsEl = document.getElementById("additions");
+      const addInputsEl = document.getElementById("addInputs");
+      const removeInputsEl = document.getElementById("removeInputs");
+      let xnEl = {};
+      let xnProbsEl = {};
+
+      const calcBtnEl = document.getElementById("calcBtn");
+      const resetBtnEl = document.getElementById("resetBtn");
+      const calcResultsEl = document.getElementById("calcResults");
+
+      let index = 3;
+
+      function handleAddInputs() {
+        if (index > 20) {
+          return;
+        }
+        const newDiv = document.createElement('div');
+        newDiv.id = `input${index}`
+        let input = `
+          <p>
+            X<sub>${index}</sub> &nbsp;&nbsp;&nbsp;:
+            <input type="number" id="x${index}" />
+          </p>
+          <p>
+            P(X<sub>${index}</sub>):
+            <input type="number" min="0" max="1" id="x${index}Prob" style="width: 180px;" />
+          </p>
+        `
+        newDiv.innerHTML = input
+        
+        additionsEl.appendChild(newDiv);
+        xnEl[`x${index}El`] = document.getElementById(`x${index}`);
+        xnProbsEl[`x${index}ProbEl`] = document.getElementById(`x${index}Prob`);
+        [document.getElementById(`x${index}`), document.getElementById(`x${index}Prob`)].forEach((el) => {
+          el.addEventListener("input", resetResult);
+        });
+        index += 1;
+        resetResult()
+      }
+
+      function handleRemoveInputs() {
+        let removeIndex = index - 1;
+        const lastDiv = document.getElementById(`input${removeIndex}`)
+        if (removeIndex > 2) {
+          lastDiv.remove()
+          delete xnEl[`x${removeIndex}El`]
+          delete xnProbsEl[`x${removeIndex}ProbEl`]
+          index -=  1;
+          resetResult()
+        }
+      }
+
+      function calculateResults() {
+        // Retrieve input values
+        const x1 = parseFloat(x1El.value);
+        const x1Prob = parseFloat(x1ProbEl.value);
+        const x2 = parseFloat(x2El.value);
+        const x2Prob = parseFloat(x2ProbEl.value);
+
+        if (isNaN(x1) || isNaN(x1Prob) || isNaN(x2) || isNaN(x2Prob)) {
+          alert("Please Enter All Details.");
+          return;
+        } else if (Object.entries(xnEl).length < 1) {
+          let xProb = x1Prob + x2Prob;
+          if (xProb != 1) {
+            alert(`The sum of probabilities should equal 1. You are missing a total probability of ${1 - xProb}`)
+            return;
+          }
+        }
+        else {
+          let xProb = x1Prob + x2Prob;
+          for (const [key, value] of Object.entries(xnEl)) {
+            if (isNaN(parseFloat(value.value))) {
+              alert("Please Enter All Details.");
+              return;
+            }
+          }
+          for (const [key, value] of Object.entries(xnProbsEl)) {
+            if (isNaN(parseFloat(value.value))) {
+              alert("Please Enter All Details.");
+              return;
+            }
+            xProb += parseFloat(value.value);
+            
+          }
+          if (xProb != 1) {
+            alert(`The sum of probabilities should equal 1. You are missing a total probability of ${(1 - xProb).toFixed(1)}`)
+            return;
+          }
+        }
+
+        try {
+          let idx = index - 1;
+          let results = (x1 * x1Prob) + (x2 * x2Prob)
+          while (idx > 2) {
+            results += (xnEl[`x${idx}El`].value * (xnProbsEl[`x${idx}ProbEl`].value))
+            idx -= 1;
+          }
+         
+
+          calcResultsEl.innerHTML = `
+              <p>Expected value is equal to E(x): ${results.toFixed(2) * 1}</p>
+            `;
+        } catch (error) {
+          alert("Something Went Wrong!!!");
+          resethandler();
+        }
+      }
+
+      function resetForm() {
+        x1El.value = "";
+        x2El.value = "";
+        x1ProbEl.value = "";
+        x2ProbEl.value = "";
+      }
+
+      function resetResult() {
+        calcResultsEl.innerHTML = "<p>Result will appear here...</p>";
+      }
+
+      function resethandler() {
+        resetForm();
+        resetResult();
+      }
+
+      resetBtnEl.addEventListener("click", resethandler);
+      calcBtnEl.addEventListener("click", calculateResults);
+      addInputsEl.addEventListener("click", handleAddInputs);
+      removeInputsEl.addEventListener("click", handleRemoveInputs);
+
+      [x1El, x2El, x1ProbEl, x2ProbEl].forEach((el) => {
+        el.addEventListener("input", resetResult);
+      });
+    </script>
+  </body>
+</html>

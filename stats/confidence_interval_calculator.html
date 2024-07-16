@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>Confidence Level Calculator</title>
+    <title>Confidence Interval Calculator</title>
   </head>
   <body>
-    <h1>Confidence Level Calculator</h1>
+    <h1>Confidence Interval Calculator</h1>
     <p>
       Confidence Level:
       <select id="confidenceLevel">
@@ -91,7 +91,7 @@
       }
 
       function resetForm() {
-        confidenceLevelInputEl.value = "";
+        confidenceLevelInputEl.selectedIndex = "0";
         populationInputEl.value = "";
         percentageInputEl.value = "";
         sampleSizeInputEl.value = "";

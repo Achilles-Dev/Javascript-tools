@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Empirical Rule Calculator (68-95-99 Rule)</title>
+  </head>
+  <body>
+    <h1>Empirical Rule Calculator (68-95-99 Rule)</h1>
+    <h4>
+      Enter the mean and standard deviation for a standard normal distribution
+      to calculate the amount of data <br />
+      that will fall within 68%, 95%, and 99.7% of the mean using the empirical rule.
+    </h4>
+    <p>
+      Mean:
+      <input type="number" id="meanVal" />
+    </p>
+    <p>
+      Standard Deviation:
+      <input type="number" id="sdValue" />
+    </p>
+
+    <button id="calcBtn">Calculate</button>
+    <button id="resetBtn">Reset</button>
+    <hr />
+    <div>
+      <h3>Result:</h3>
+      <h3 id="calcResults">Result will appear here...</h3>
+    </div>
+
+    <script>
+      // Get required elements from the HTML
+      const meanValEl = document.getElementById("meanVal");
+      const sdValueEl = document.getElementById("sdValue");
+
+      const calcBtnEl = document.getElementById("calcBtn");
+      const resetBtnEl = document.getElementById("resetBtn");
+      const calcResultsEl = document.getElementById("calcResults");
+
+      function calculateResults() {
+        // Retrieve input values
+        const meanVal = parseFloat(meanValEl.value);
+        const sdValue = parseFloat(sdValueEl.value);
+
+        if (isNaN(meanVal) || isNaN(sdValue)) {
+          alert("Please Enter All Details.");
+          return;
+        }
+
+        try {
+          const results = {
+            sixtyEightFirst: meanVal - sdValue,
+            sixtyEightLast: meanVal + sdValue,
+            ninetyFiveFist: meanVal - 2 * sdValue,
+            ninetyFiveLast: meanVal + 2 * sdValue,
+            ninetyNineSevenFist: meanVal - 3 * sdValue,
+            ninetyNineSevenLast: meanVal + 3 * sdValue,
+          };
+
+          calcResultsEl.innerHTML = `
+              <p>68% of the data is between: ${results.sixtyEightFirst} and ${results.sixtyEightLast} </p>
+              <p>95% of the data is between: ${results.ninetyFiveFist} and ${results.ninetyFiveLast} </p>
+              <p>99.7% of the data is between: ${results.ninetyNineSevenFist} and ${results.ninetyNineSevenLast} </p>
+            `;
+        } catch (error) {
+          alert("Something Went Wrong!!!");
+          resethandler();
+        }
+      }
+
+      function resetForm() {
+        meanValEl.value = "";
+        sdValueEl.value = "";
+      }
+
+      function resetResult() {
+        calcResultsEl.innerHTML = "<p>Result will appear here...</p>";
+      }
+
+      function resethandler() {
+        resetForm();
+        resetResult();
+      }
+
+      resetBtnEl.addEventListener("click", resethandler);
+      calcBtnEl.addEventListener("click", calculateResults);
+
+      [meanValEl, sdValueEl].forEach((el) => {
+        el.addEventListener("input", resetResult);
+      });
+    </script>
+  </body>
+</html>

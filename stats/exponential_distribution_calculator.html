@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Exponential Distribution Calculator</title>
+  </head>
+  <body>
+    <h1>Exponential Distribution Calculator</h1>
+    <p>
+      Rate parameter (a):
+      <input type="number" id="rateParam" />
+      1 divided by the average number of events per time period.
+    </p>
+    <p>
+      Time between events (X):
+      <input type="number" id="timeBtnEvt" />
+    </p>
+
+    <button id="calcBtn">Calculate</button>
+    <button id="resetBtn">Reset</button>
+    <hr />
+    <div>
+      <h3>Result:</h3>
+      <h3 id="calcResults">Result will appear here...</h3>
+    </div>
+
+    <script>
+      // Get required elements from the HTML
+      const rateParamEl = document.getElementById("rateParam");
+      const timeBtnEvtEl = document.getElementById("timeBtnEvt");
+
+      const calcBtnEl = document.getElementById("calcBtn");
+      const resetBtnEl = document.getElementById("resetBtn");
+      const calcResultsEl = document.getElementById("calcResults");
+
+      function calculateResults() {
+        // Retrieve input values
+        const rateParam = parseFloat(rateParamEl.value);
+        const timeBtnEvt = parseFloat(timeBtnEvtEl.value);
+
+        if (isNaN(rateParam) || isNaN(timeBtnEvt)) {
+          alert("Please Enter All Details.");
+          return;
+        } else if (rateParam <= 0) {
+          alert("Rate parameter should be greater than zero.")
+          return;
+        } else if (timeBtnEvt <= 0) {
+          alert("Time between events should be greater than zero.")
+          return;
+        }
+
+        try {
+          const results = 2.718 ** (rateParam * timeBtnEvt * -1)
+          const mean = 1 / rateParam
+          const median = Math.log(2) / rateParam
+          const variance = 1 / (rateParam ** 2)
+          const sd = Math.sqrt((1 / (rateParam ** 2)))
+          calcResultsEl.innerHTML = `
+              <p>Exponential probabilities</p>
+              <p>P(x > X): ${results.toFixed(6) * 1} </p>
+              <p>P(x ≤ X): ${(1 - results).toFixed(6) * 1} </p>
+              <p>Other statistics</p>
+              <p>Mean: ${mean.toFixed(6) * 1} </p>
+              <p>Median: ${median.toFixed(6) * 1} </p>
+              <p>Variance: ${variance.toFixed(6) * 1} </p>
+              <p>Standard deviation: ${sd.toFixed(6) * 1} </p>
+            `;
+        } catch (error) {
+          alert("Something Went Wrong!!!");
+          resethandler();
+        }
+      }
+
+      function resetForm() {
+        rateParamEl.value = "";
+        timeBtnEvtEl.value = "";
+      }
+
+      function resetResult() {
+        calcResultsEl.innerHTML = "<p>Result will appear here...</p>";
+      }
+
+      function resethandler() {
+        resetForm();
+        resetResult();
+      }
+
+      resetBtnEl.addEventListener("click", resethandler);
+      calcBtnEl.addEventListener("click", calculateResults);
+
+      [rateParamEl, timeBtnEvtEl].forEach((el) => {
+        el.addEventListener("input", resetResult);
+      });
+    </script>
+  </body>
+</html>
