@@ -1,10 +1,11 @@
 <!DOCTYPE html>
 <html>
-<head>
-  <title>Average Calculator</title>
-</head>
-<body>
-    <h1>Average Calculator</h1>
+  <head>
+    <title>Mean Calculator</title>
+  </head>
+  <body>
+    <h1>Mean Calculator</h1>
+    <h4>Find the mean of a dataset by entering the numbers in the calculator below.</h4>
     <p>Number Set:</p>
     <p>
       <textarea id="numbersInput" rows="5"></textarea><br >
@@ -49,9 +50,15 @@
 
           try {   
             const numsSum =  numbers.reduce((a, b) => a + b, 0)  
-            const results = numsSum / numbers.length
+            const mean = numsSum / numbers.length
+            const sortedArray = (numbers.sort((a,b) => a - b)).toString().replace(/,/g, ", ");
             
-            calcResultsEl.innerHTML = `<p> Average:: ${results.toFixed(2) * 1}</p>`
+            calcResultsEl.innerHTML = `
+              <p>Mean: ${mean.toFixed(4) * 1} </p>
+              <p>Sum: ${numsSum.toFixed(4) * 1} </p>
+              <p>Count: ${numbers.length} </p>
+              <p>Sorted Data: ${sortedArray}</p>
+            `
           } catch (error) {
             alert("Something Went Wrong!!!");
             resethandler()
@@ -81,3 +88,4 @@
     </script>
 </body>
 </html>
+

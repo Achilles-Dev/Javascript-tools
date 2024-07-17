@@ -1,10 +1,11 @@
 <!DOCTYPE html>
 <html>
-<head>
-  <title>Average Calculator</title>
-</head>
-<body>
-    <h1>Average Calculator</h1>
+  <head>
+    <title>Mean Absolute Deviation Calculator</title>
+  </head>
+  <body>
+    <h1>Mean Absolute Deviation Calculator - Find MAD</h1>
+    <h4>Find the mean absolute deviation of a data set by entering the numbers below.</h4>
     <p>Number Set:</p>
     <p>
       <textarea id="numbersInput" rows="5"></textarea><br >
@@ -49,9 +50,16 @@
 
           try {   
             const numsSum =  numbers.reduce((a, b) => a + b, 0)  
-            const results = numsSum / numbers.length
+            const mean = numsSum / numbers.length
+            const absDiffArray = numbers.map((num) => Math.abs(num - mean))
+            const results = absDiffArray.reduce((a, b) => a + b, 0) / numbers.length
             
-            calcResultsEl.innerHTML = `<p> Average:: ${results.toFixed(2) * 1}</p>`
+            calcResultsEl.innerHTML = `
+              <p>Mean Absolute Deviation:</p>
+              <p>MAD: ${results.toFixed(4) * 1} </p>
+              <p>Mean (x̄): ${mean.toFixed(4) * 1} </p>
+              <p>Count (n): ${numbers.length} </p>
+            `
           } catch (error) {
             alert("Something Went Wrong!!!");
             resethandler()
@@ -81,3 +89,4 @@
     </script>
 </body>
 </html>
+
