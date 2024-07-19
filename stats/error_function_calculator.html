@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Error Function Calculator</title>
+  </head>
+  <body>
+    <h1>Error Function Calculator</h1>
+    <h4>
+      Use this ERF calculator to easily calculate the Gauss error function erf(x) for any real-valued x and the inverse error function erf-1(y), y ∈ [-1, 1]. <br>
+      It can also output their complementary functions erfc(x) and erfc-1(y). High-precision calculation up to 25 significant digits. A table of x values and <br>
+      corresponding values of erf and erfc is included as reference.
+    </h4>
+    <p>
+      Calculate:
+      <select id="functionSelect">
+        <option value="errorFn" selected>Error function</option>
+        <option value="invErrorFn">Inverse error function</option>
+      </select>
+    </p>
+    <p>
+      Value (x=):
+      <input type="number" id="xValue" />
+    </p>
+    <p>
+      Precision :
+      <input type="number" id="precision" /> Enter the required precision for the output.
+    </p>
+
+    <button id="calcBtn">Calculate</button>
+    <button id="resetBtn">Reset</button>
+    <hr />
+    <div>
+      <h3>Result:</h3>
+      <h3 id="calcResults">Result will appear here...</h3>
+    </div>
+
+    <script>
+      // Get required elements from the HTML
+      const functionSelectEl = document.getElementById("functionSelect");
+      const xValueEl = document.getElementById("xValue");
+      const precisionEl = document.getElementById("precision");
+
+      const calcBtnEl = document.getElementById("calcBtn");
+      const resetBtnEl = document.getElementById("resetBtn");
+      const calcResultsEl = document.getElementById("calcResults");
+
+      function calculateResults() {
+        // Retrieve input values
+        const xValue = parseFloat(xValueEl.value);
+        const functionSelect = functionSelectEl.value;
+        const precision = parseFloat(precisionEl.value);
+
+        if (isNaN(precision) || isNaN(xValue)) {
+          alert("Please Enter All Details.");
+          return;
+        }
+
+        try {
+          const results = {};
+
+          calcResultsEl.innerHTML = `
+              <p>erf(${xValue})</p>
+              <p>erfc(${xValue})</p>
+            `;
+        } catch (error) {
+          alert("Something Went Wrong!!!");
+          resethandler();
+        }
+      }
+
+      function resetForm() {
+        precisionEl.value = "14";
+        xValueEl.value = "";
+        functionSelectEl.selectedIndex = "0";
+      }
+
+      function resetResult() {
+        calcResultsEl.innerHTML = "<p>Result will appear here...</p>";
+      }
+
+      function resethandler() {
+        resetForm();
+        resetResult();
+      }
+
+      resetBtnEl.addEventListener("click", resethandler);
+      calcBtnEl.addEventListener("click", calculateResults);
+
+      [precisionEl, xValueEl, functionSelectEl].forEach((el) => {
+        el.addEventListener("input", resetResult);
+      });
+    </script>
+  </body>
+</html>

@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Chi-Square Calculator</title>
+</head>
+<body>
+    <h1>Chi-Square Calculator</h1>
+    <p>
+      Observed value:
+      <input type="number" id="observedVal">
+    </p>
+    <p>
+      Expected value: 
+        <input type="number" id="expectedVal">
+    </p>
+
+    <button id="calcBtn">Calculate</button>
+    <button id="resetBtn">Reset</button>
+    <hr>
+    <div>
+      <h3>Result:</h3>
+      <h3 id="calcResults">Result will appear here...</h3>
+    </div>
+
+    <script>
+      // Get required elements from the HTML
+      const observedValEl = document.getElementById("observedVal");
+      const expectedValEl = document.getElementById("expectedVal");
+
+      const calcBtnEl = document.getElementById('calcBtn');
+      const resetBtnEl = document.getElementById('resetBtn');
+      const calcResultsEl = document.getElementById('calcResults') 
+
+      function calculateResults() {
+          // Retrieve input values
+          const observedVal = parseFloat(observedValEl.value);
+          const expectedVal = parseFloat(expectedValEl.value);
+
+          if (isNaN(observedVal) || isNaN(expectedVal)) {
+            alert("Please Enter All Details.");
+            return;
+          } else if (expectedVal == 0 ) {
+            alert("The relative uncertainty cannot be negative.");
+              return;
+          }
+
+          try {
+            const results = ((observedVal - expectedVal) ** 2) / expectedVal
+            
+            calcResultsEl.innerHTML = `<p>The value of chi-square (x<sup>2</sup>): ${results.toFixed(2) * 1}</p>`
+          } catch (error) {
+            alert("Something Went Wrong!!!");
+            resethandler()
+          }
+      }
+
+      function resetForm() {
+        observedValEl.value = ""
+        expectedValEl.value = ""
+      }
+
+      function resetResult() {
+        calcResultsEl.innerHTML = "<p>Result will appear here...</p>";
+      } 
+
+      function resethandler() {
+        resetForm();
+        resetResult();
+      }
+
+      resetBtnEl.addEventListener("click", resethandler);
+      calcBtnEl.addEventListener("click", calculateResults);
+
+      [observedValEl, expectedValEl].forEach((el) => {
+        el.addEventListener("input", resetResult);
+      });  
+    </script>
+</body>
+</html>

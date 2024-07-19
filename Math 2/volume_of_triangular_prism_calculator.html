@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="base=device-base, initial-scale=1.0">
+  <title>Volume of Triangular Prism Calculator</title>
+
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.6.5/dist/sweetalert2.all.min.js"></script>
+  <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11.6.5/dist/sweetalert2.min.css" rel="stylesheet">
+</head>
+
+<body>
+  <div>
+    <h1>Volume of Triangular Prism Calculator</h1>
+    <p>
+      <label for="length">Prism length:</label>
+      <input type="number" id="length" placeholder="10">
+    </p>
+    <p>
+      <label for="base">Prism base:</label>
+      <input type="number" id="base" placeholder="10">
+    </p>
+    
+    <p>
+      <label for="height">Prism height:</label>
+      <input type="number" id="height" placeholder="10">
+    </p>
+    <p>
+      <label for="metricUnit">Metric:</label>
+      <select id="metricUnit">
+        <option value="mm">mm</option>
+        <option value="cm" selected>cm</option>
+        <option value="dm">dm</option>
+        <option value="m">meter</option>
+        <option value="km">km</option>
+        <option value="in">in</option>
+        <option value="ft">ft</option>
+        <option value="yd">yd</option>
+        <option value="mi">mi</option>
+      </select>
+    </p>
+
+    <p>
+      <button id="calcBtn">Calculate</button>
+      <button id="resetBtn">Reset</button>
+    </p>
+    <hr>
+    <p>
+    <h3>Result:</h3>
+    <h3 id="calcResults">Result will appear here...</h3>
+    </p>
+  </div>
+  <script>
+
+    /********************************** ELEMENTS **********************************/
+    const baseEl = document.getElementById('base');
+    const lengthEl = document.getElementById('length');
+    const heightEl = document.getElementById('height');
+    const metricUnitEl = document.getElementById('metricUnit');
+    const calcBtnEl = document.getElementById('calcBtn');
+    const resetBtnEl = document.getElementById('resetBtn');
+    const calcResultsEl = document.getElementById('calcResults')
+
+    /********************************** FUNCTIONS **********************************/
+    // Conversion functions
+
+    function volumeOfTriangularPrism(base, length, height) {
+      let results = 0;
+      results = (base * length * height) / 2;
+      return results
+    }
+
+    function calculateResults() {
+      // Retrieve input values
+      const base = parseFloat(baseEl.value)
+      const length = parseFloat(lengthEl.value)
+      const height = parseFloat(heightEl.value)
+      const metricUnit = metricUnitEl.value;
+
+      if (
+        isNaN(base) || base < 0 || isNaN(length) || length < 0 || isNaN(height) || height < 0
+      ) {
+        showError("Please Enter All Details.");
+        return;
+      }
+
+
+      try {
+        let trianPrismVolume = volumeOfTriangularPrism(base, length, height)
+        trianPrismVolume = (trianPrismVolume.toFixed(10) * 1).toLocaleString()
+        calcResultsEl.innerHTML = `Prism volume = ${trianPrismVolume} ${metricUnit}<sup>3</sup>`
+
+      } catch (error) {
+        showError("Something Went Wrong!!!");
+        resethandler()
+      }
+
+    }
+
+    /********************************* HELPER FUNCTIONS **********************************/
+
+    function showError(errorMessage) {
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: errorMessage,
+      });
+    }
+
+    function resetForm() {
+      baseEl.value = "";
+      lengthEl.value = "";
+      heightEl.value = "";
+      metricUnitEl.selectedIndex = '1';
+    }
+
+    function resetResult() {
+      calcResultsEl.innerHTML = "<p>Result will appear here...</p>";
+    }
+
+    function resethandler() {
+      resetForm();
+      resetResult();
+    }
+
+    /********************************** EVENT LISTENERS **********************************/
+    resetBtnEl.addEventListener("click", resethandler);
+    [baseEl, heightEl, lengthEl].forEach((el) => {
+      el.addEventListener("input", resetResult);
+    });
+    metricUnitEl.addEventListener("change", resetResult);
+    calcBtnEl.addEventListener("click", calculateResults);
+  </script>
+</body>
+
+</html> 

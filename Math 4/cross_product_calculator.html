@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cross Product Calculator</title>
+
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.6.5/dist/sweetalert2.all.min.js"></script>
+  <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11.6.5/dist/sweetalert2.min.css" rel="stylesheet">
+</head>
+
+<body>
+  <div>
+    <h1>Cross Product Calculator</h1>
+    <p>Calculate the cross product of two vectors using the calculator below.</p>
+    <p>Vector a</p>
+      <p>
+        <label for="vectAX">x:</label>
+        <input type="number" id="vectAX" />  
+      </p>
+      <p>
+        <label for="vectAY">y:</label>
+        <input type="number" id="vectAY" />  
+      </p>
+      <p>
+        <label for="vectAZ">z:</label>
+        <input type="number" id="vectAZ" />  
+      </p>
+    <p>Vector b:</p>
+      <p>
+        <label for="vectBX">x:</label>
+        <input type="number" id="vectBX" />  
+      </p>
+      <p>
+        <label for="vectBY">y:</label>
+        <input type="number" id="vectBY" />  
+      </p>
+      <p>
+        <label for="vectBZ">z:</label>
+        <input type="number" id="vectBZ" />  
+      </p>
+    
+    <p>
+      <button id="calcBtn">Calculate</button>
+      <button id="resetBtn">Reset</button>
+    </p>
+    <hr>
+    <p>
+    <h3>Result:</h3>
+    <h3 id="calcResults">Result will appear here...</h3>
+    </p>
+  </div>
+  <script>
+
+    /********************************** ELEMENTS **********************************/
+    const vectAXEl = document.getElementById('vectAX');
+    const vectAYEl = document.getElementById('vectAY');
+    const vectAZEl = document.getElementById('vectAZ');
+    const vectBXEl = document.getElementById('vectBX');
+    const vectBYEl = document.getElementById('vectBY');
+    const vectBZEl = document.getElementById('vectBZ');
+    const calcBtnEl = document.getElementById('calcBtn');
+    const resetBtnEl = document.getElementById('resetBtn');
+    const calcResultsEl = document.getElementById('calcResults')
+
+    /********************************** FUNCTIONS **********************************/
+    // Conversion functions
+
+
+    function crossProduct(ax, ay, az, bx, by, bz) {
+      let results = '';
+      let a = 0;
+      let b = 0;
+      let c = 0;
+      a = (ay * bz) - (az * by)
+      b = (ax * bz) - (az * bx)
+      c = (ax * by) - (ay * bx)
+      if (b < 0) {
+        b = b * -1
+      } else {
+        b = `-${b}`
+      }
+      results = `${a}, ${b}, ${c}`
+      return results
+    }
+
+    function calculateResults() {
+      // Retrieve input values
+      const vectAX = parseFloat(vectAXEl.value)
+      const vectAY = parseFloat(vectAYEl.value)
+      const vectAZ = parseFloat(vectAZEl.value)
+      const vectBX = parseFloat(vectBXEl.value)
+      const vectBY = parseFloat(vectBYEl.value)
+      const vectBZ = parseFloat(vectBZEl.value)
+      
+      if (
+        isNaN(vectAX) || isNaN(vectAY) || isNaN(vectAZ) || isNaN(vectBX) || isNaN(vectBY) || isNaN(vectBZ)
+      ) {
+        showError("Please Enter All Details.");
+        return;
+      }
+      
+      
+      try {
+        const results = crossProduct(vectAX, vectAY, vectAZ, vectBX, vectBY, vectBZ)
+        
+        calcResultsEl.innerHTML = `<p> Cross Product of Vectors (a x b):</p>
+                                     <p>(${results})</p>
+                                    `
+      } catch (error) {
+        showError("Something Went Wrong!!!");
+        resethandler()
+      }
+    }
+
+    /********************************* HELPER FUNCTIONS **********************************/
+
+    function showError(errorMessage) {
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: errorMessage,
+      });
+    }
+
+    function resetForm() {
+      vectAXEl.value = ""
+      vectAZEl.value = ""
+      vectBYEl.value = ""
+      vectAYEl.value = ""
+      vectBXEl.value = ""
+      vectBZEl.value = ""
+    }
+
+    function resetResult() {
+      calcResultsEl.innerHTML = "<p>Result will appear here...</p>";
+    }
+
+    function resethandler() {
+      resetForm();
+      resetResult();
+    }
+
+    /********************************** EVENT LISTENERS **********************************/
+    resetBtnEl.addEventListener("click", resethandler);
+    [vectAXEl, vectAYEl, vectAZEl, vectBXEl, vectBYEl, vectBZEl].forEach((el) => {
+      el.addEventListener("input", resetResult);
+    });   
+    calcBtnEl.addEventListener("click", calculateResults);
+  </script>
+</body>
+
+</html> 

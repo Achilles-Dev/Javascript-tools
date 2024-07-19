@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Octal Calculator</title>
+
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.6.5/dist/sweetalert2.all.min.js"></script>
+  <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11.6.5/dist/sweetalert2.min.css" rel="stylesheet">
+</head>
+<body>
+  <div>
+    <h1>Octal Calculator
+    </h1>
+    <p>Enter two octal numbers to perform calculation:</p>
+    <p>
+    <input type="text" id="numberOne">
+    </p>
+    <p>
+      <label for="operationUnit">Operation:</label>
+      <select id="operationUnit">
+        <option value="+" selected> + &nbsp;</option>
+        <option value="-"> - &nbsp;</option>
+        <option value="*"> &#215; &nbsp;</option>
+        <option value="/"> &#247; &nbsp;</option>
+      </select> 
+    </p>
+    <p>
+      <input type="text" id="numberTwo">
+    </p>
+    <p>
+      <button id="calcBtn">Calculate</button>
+      <button id="resetBtn">Reset</button>
+    </p>
+      <hr>
+    <p>
+      <h3>Result:</h3>
+      <h4>Note: Note: Outputs are all in Octal.</h4>
+      <h3 id="calcResults">Result will appear here...</h3> 
+    </p>
+  </div>
+  <script>
+
+    /********************************** ELEMENTS **********************************/
+    const numberOneEl = document.getElementById('numberOne');
+    const operationUnitEl = document.getElementById('operationUnit')
+    const numberTwoEl = document.getElementById('numberTwo');
+    const calcBtnEl = document.getElementById('calcBtn');
+    const resetBtnEl = document.getElementById('resetBtn');
+    const calcResultsEl = document.getElementById('calcResults')
+    
+     /********************************** FUNCTIONS **********************************/
+      // Conversion functions
+
+      function octalToBaseTen(num) {
+        let index = 0
+        let value = 0
+        let negative = false
+        if (num[0] == '-') {
+          num = num.substring(1) 
+          negative = true      
+        }
+        while (index < num.length) {
+          let item = num[num.length - (index + 1)]    
+          if (Number(item) || item == 0) {
+            value += Number(item) * 8 ** index 
+          } else {
+            const newItem = convertSymbolToNumber(item)
+            if (Number(newItem)) {
+              value += Number(newItem) * 8 ** index  
+            } else {
+              return;
+            }
+          }
+          index += 1
+        }
+        return negative ? (value * -1) : value
+      }
+
+      function baseTenToOctalHelper(numerator, divisor) {
+        let value = ''
+        if (numerator < divisor) {
+          value = numerator + value
+        } else {
+          while (numerator >= divisor) {
+            let item = Number(numerator) % divisor
+            numerator = Math.floor(Number(numerator) / divisor)   
+            value = item + value
+            if (numerator < divisor) {
+              value = numerator + value
+            }
+          }     
+        }
+        return value
+      }
+
+      function baseTenToOctalHelper2(numerator, divisor) {
+        let value = ''
+        if (numerator % 1 != 0) {
+          let item1 = Math.floor(numerator)
+          let valueA = baseTenToOctalHelper(item1, divisor)
+          let item2 = (numerator % 1 ) * divisor
+          let valueB = baseTenToOctalHelper2(item2, divisor)
+          value = valueA + valueB
+        } else {
+          value = baseTenToOctalHelper(numerator, divisor) 
+        }
+        return value;
+      }
+
+      function baseTenToOctal(num) {
+        let divisor = 8
+        let numerator = num
+        let value = ''
+        if (numerator % 1 != 0) {
+          let item1 = Math.floor(numerator)
+          console.log(item1)
+          let valueA = baseTenToOctalHelper(item1, divisor)
+          let item2 = (numerator % 1 ) * divisor
+          let valueB = baseTenToOctalHelper2(item2, divisor)
+          
+          value = valueA + '.' + valueB
+        } else {
+          value = baseTenToOctalHelper(numerator, divisor)
+        }
+        return value
+      }
+
+      function solveOperation (operation, a, b) {
+        if (operation == '+') {
+          return a + b;
+        } else if (operation == "-") {
+          return a - b;
+        } else if (operation == "*") {
+          return a * b
+        } else {
+          return a / b
+        }
+      }
+
+      function calculateResults() {
+        // Retrieve input values
+        const numberOne = numberOneEl.value
+        let operationUnit = operationUnitEl.value;
+        const numberTwo = numberTwoEl.value
+       
+        if (numberOne == undefined || numberOne == '' || numberTwo == undefined || numberTwo == ''
+        ) {
+          showError("Please input valid octal integers.");
+          return;
+        }
+        
+        try {
+          const baseTenTotal = solveOperation(operationUnit, octalToBaseTen(numberOne) , octalToBaseTen(numberTwo))
+          console.log(baseTenTotal)
+          if (operationUnit == "*") {
+            operationUnit = '&#215;';
+          } else if (operationUnit == "/") {
+            operationUnit = '&#247;';
+          }
+          const octalTotal = baseTenToOctal(baseTenTotal)
+          calcResultsEl.innerHTML = `${numberOne} ${operationUnit}  ${numberTwo} =  ${octalTotal}`
+          
+        } catch (error) {
+          showError("Something Went Wrong!!!");
+          resethandler()
+        }
+        
+      }
+    
+      /********************************* HELPER FUNCTIONS **********************************/
+
+      function showError(errorMessage) {
+        Swal.fire({
+            icon: "error",
+            title: "Error",
+            text: errorMessage,
+        });
+      }
+
+      function resetForm() {
+        numberOneEl.value = "";
+        numberTwoEl.value = ""
+        operationUnitEl.selectedIndex = 0;
+      }
+
+      function resetResult() {
+        calcResultsEl.innerHTML = "<p>Result will appear here...</p>";
+      }
+
+      function resethandler() {
+        resetForm();
+        resetResult();
+      }
+
+      /********************************** EVENT LISTENERS **********************************/
+      resetBtnEl.addEventListener("click", resethandler);
+      operationUnitEl.addEventListener("change", resetResult);
+      [numberOneEl, numberTwoEl].forEach((el) => {
+        el.addEventListener("input", resetResult);
+      });
+      calcBtnEl.addEventListener("click", calculateResults);
+  </script>
+</body>
+</html>

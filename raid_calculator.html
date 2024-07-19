@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>RAID Calculator</title>
+
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.6.5/dist/sweetalert2.all.min.js"></script>
+  <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11.6.5/dist/sweetalert2.min.css" rel="stylesheet">
+</head>
+<body>
+  <div>
+    <h1>RAID Calculator</h1>
+    <p>Use this RAID calculator to easily calculate RAID capacity, disk space utilization, <br />
+      cost per usable TB, read/write efficiency (I/O operations per second improvement) and more.
+    </p>
+    <p>
+      <label for="raidTypeUnit">RAID Type:</label>
+      <select id="raidTypeUnit">
+        <option value="0" selected="selected">RAID 0 (Stripe)</option>
+        <option value="1">RAID 1 (Mirror)</option>
+        <option value="1e">RAID 1E (Mirror + Stripe)</option>
+        <option value="4">RAID 4 (Srtipe + Parity)</option>
+        <option value="5">RAID 5 (Stripe + Parity)</option>
+        <option value="5e">RAID 5E/5EE (Stripe + Parity + Spare)</option>
+        <option value="6">RAID 6 (Stripe + Double Parity)</option>
+        <option value="10">RAID 10 (Striped Mirrors)</option>
+        <option value="50">RAID 50 (Parity + Stripe)</option>
+        <option value="60">RAID 60 (Double Parity + Stripe)</option>
+      </select>
+    </p>
+    <p>
+    <label for="driveCap">Drive Capacity:</label>
+    <input type="number" id="driveCap" placeholder="1">
+    <select id="driveCapUnit">
+      <option value="TB" selected="selected">TB &nbsp;</option>
+      <option value="GB">GB</option>
+      <option value="TiB">TiB</option>
+      <option value="GiB">GiB</option>
+    </select>
+    </p>
+    <p>
+      <label for="driveCost">Drive Cost: </label><span>$</span>
+      <input type="number" id="driveCost" placeholder="100">  
+    </p>
+    <p>
+      <label for="drivesPerRD">Drives per RAID:</label>
+      <input type="number" id="drivesPerRD" placeholder="2">  
+    </p>
+    <p>
+      <label for="RDGroups">RAID Groups:</label>
+      <input type="number" id="RDGroups" placeholder="1">  
+    </p>
+    <p>
+      <button id="calcBtn">Calculate</button>
+      <button id="resetBtn">Reset</button>
+    </p>
+    
+    <hr>
+    <p>
+    <h3>Result:</h3>
+    <h3 id="calcResults">Result will appear here...</h3>
+    </p>
+  </div>
+  <script>
+
+    /********************************** ELEMENTS **********************************/
+    const raidTypeUnitEl = document.getElementById('raidTypeUnit');
+    const driveCapEl = document.getElementById('driveCap');
+    const driveCapUnitEl = document.getElementById('driveCapUnit')
+    const driveCostEl = document.getElementById('driveCost')
+    const drivesPerRDEl = document.getElementById('drivesPerRD');
+    const RDGroupsEl = document.getElementById('RDGroups');
+
+    const calcBtnEl = document.getElementById('calcBtn');
+    const resetBtnEl = document.getElementById('resetBtn');
+    const calcResultsEl = document.getElementById('calcResults')
+
+     /********************************** FUNCTIONS **********************************/
+            // Conversion functions        
+
+      function calcRDValues(raidTypeUnit, driveCap, driveCapUnit, driveCost, drivesPerRD, RDGroups) {
+        let capUnit = driveCapUnit == 'GB' ? 'GiB' : 'TiB'
+        let totalNumOfDrive = drivesPerRD * RDGroups;
+        let multiplier = driveCapUnit == 'GB' ? 0.9310833 : 0.908888889
+
+        if (raidTypeUnit == '0') {
+          let totalUsageStorage = driveCap * drivesPerRD * RDGroups;
+          return {
+            totalUsageStorage: `${driveCapUnit == 'GB' || driveCapUnit == 'TB' ? 
+              `${totalUsageStorage} ${driveCapUnit} (${(totalUsageStorage * multiplier).toFixed(2) * 1} ${capUnit})` : 
+              `${totalUsageStorage} ${driveCapUnit} `}`,
+            costPerTB: driveCost > 0 ? (driveCost / driveCap) : 'none',
+            totalCost: driveCost > 0 ? (driveCost / driveCap) * totalUsageStorage : 'none',
+            diskSpaceEff: '100%',
+            usableCapacity: `${driveCapUnit == 'GB' || driveCapUnit == 'TB' ? 
+              `${ totalUsageStorage / RDGroups} ${driveCapUnit} (${((totalUsageStorage / RDGroups) * multiplier).toFixed(2) * 1} ${capUnit})` : 
+              `${ totalUsageStorage / RDGroups} ${driveCapUnit} `}`,
+            faultTolerance: 0,
+            totalNumOfDrive,
+            readSpeedGain: `${totalNumOfDrive}x`,
+            writeSpeedGain: `${totalNumOfDrive}x`,
+            message: ''
+          } 
+        } else if (raidTypeUnit == '1') {
+          if (drivesPerRD != 2) {
+            return {
+              message: 'RAID 1 can only support exactly 2 disks. Please, correct your input and recalculate.'
+            }
+          } else {
+            let totalUsageStorage = driveCap * (drivesPerRD / 2) * RDGroups;           
+            return {
+              totalUsageStorage: `${driveCapUnit == 'GB' || driveCapUnit == 'TB' ? 
+                `${totalUsageStorage} ${driveCapUnit} (${(totalUsageStorage * multiplier).toFixed(2) * 1} ${capUnit})` : 
+                `${totalUsageStorage} ${driveCapUnit} `}`,
+              costPerTB: driveCost > 0 ? ((driveCost * drivesPerRD) / driveCap) : 'none',
+              totalCost: driveCost > 0 ? ((driveCost * drivesPerRD) / driveCap) * totalUsageStorage : 'none',
+              diskSpaceEff: '50%',
+              usableCapacity: `${driveCapUnit == 'GB' || driveCapUnit == 'TB' ? 
+                `${ totalUsageStorage / RDGroups} ${driveCapUnit} (${((totalUsageStorage / RDGroups) * multiplier).toFixed(2) * 1} ${capUnit})` : 
+                `${ totalUsageStorage / RDGroups} ${driveCapUnit} `}`,
+              faultTolerance: 1,
+              totalNumOfDrive,
+              readSpeedGain: `${totalNumOfDrive}x`,
+              writeSpeedGain: `${totalNumOfDrive / 2}x`,
+              message: ''
+            }
+          }
+        } else if (raidTypeUnit == '1e') {
+          if (drivesPerRD < 3) {
+            return {
+              message: 'RAID 1E needs 3 or more disks. Please, correct your input and recalculate.'
+            }
+          } else {
+            let totalUsageStorage = ((driveCap * drivesPerRD) / 2) * RDGroups;
+            return {
+              totalUsageStorage: `${driveCapUnit == 'GB' || driveCapUnit == 'TB' ? 
+                `${totalUsageStorage} ${driveCapUnit} (${(totalUsageStorage * multiplier).toFixed(2) * 1} ${capUnit})` : 
+                `${totalUsageStorage} ${driveCapUnit} `}`,
+              costPerTB: driveCost > 0 ? (driveCost * 2) / driveCap : 'none',
+              totalCost: driveCost > 0 ? ((driveCost * 2) / driveCap) * totalUsageStorage : 'none',
+              diskSpaceEff: '50%',
+              usableCapacity: `${driveCapUnit == 'GB' || driveCapUnit == 'TB' ? 
+                `${ totalUsageStorage / RDGroups} ${driveCapUnit} (${((totalUsageStorage / RDGroups) * multiplier).toFixed(2) * 1} ${capUnit})` : 
+                `${ totalUsageStorage / RDGroups} ${driveCapUnit} `}`,
+              faultTolerance: 1,
+              totalNumOfDrive,
+              message: ''
+            } 
+          }
+        } else if (raidTypeUnit == '4' || raidTypeUnit == '5') {
+          if (drivesPerRD < 3) {
+            return {
+              message: `RAID ${raidTypeUnit} needs 3 or more disks. Please, correct your input and recalculate.`
+            }
+          } else {
+            let totalUsageStorage = ((driveCap * drivesPerRD) - driveCap) * RDGroups;
+            let diskSpaceEff = '';
+            return {
+              totalUsageStorage: `${driveCapUnit == 'GB' || driveCapUnit == 'TB' ? 
+                `${totalUsageStorage} ${driveCapUnit} (${(totalUsageStorage * multiplier).toFixed(2) * 1} ${capUnit})` : 
+                `${totalUsageStorage} ${driveCapUnit} `}`,
+              costPerTB: driveCost > 0 ? ((driveCost * drivesPerRD) / (drivesPerRD - 1)) / driveCap : 'none',
+              totalCost: driveCost > 0 ? ((driveCost * drivesPerRD)) * RDGroups : 'none',
+              diskSpaceEff: '66.67%',
+              usableCapacity: `${driveCapUnit == 'GB' || driveCapUnit == 'TB' ? 
+                `${ totalUsageStorage / RDGroups} ${driveCapUnit} (${((totalUsageStorage / RDGroups) * multiplier).toFixed(2) * 1} ${capUnit})` : 
+                `${ totalUsageStorage / RDGroups} ${driveCapUnit} `}`,
+              faultTolerance: 1,
+              totalNumOfDrive,
+              readSpeedGain: raidTypeUnit == '4' ? undefined : `${totalNumOfDrive}x`,
+              writeSpeedGain: raidTypeUnit == '4' ? undefined : `${totalNumOfDrive / 4}x`,
+              message: ''
+            } 
+          }
+        } else if (raidTypeUnit == '5e') {
+          if (drivesPerRD < 3) {
+            return {
+              message: `RAID ${raidTypeUnit} needs 3 or more disks. Please, correct your input and recalculate.`
+            }
+          } else {
+            let totalUsageStorage = (driveCap * (drivesPerRD - 2)) * RDGroups;
+            let diskSpaceEff = '';
+            return {
+              totalUsageStorage: `${driveCapUnit == 'GB' || driveCapUnit == 'TB' ? 
+                `${totalUsageStorage} ${driveCapUnit} (${(totalUsageStorage * multiplier).toFixed(2) * 1} ${capUnit})` : 
+                `${totalUsageStorage} ${driveCapUnit} `}`,
+              costPerTB: driveCost > 0 ? ((driveCost * drivesPerRD) / (totalUsageStorage / RDGroups)) : 'none',
+              totalCost: driveCost > 0 ? (driveCost * drivesPerRD) * RDGroups : 'none',
+              diskSpaceEff: '33.33%',
+              usableCapacity: `${driveCapUnit == 'GB' || driveCapUnit == 'TB' ? 
+                `${ totalUsageStorage / RDGroups} ${driveCapUnit} (${((totalUsageStorage / RDGroups) * multiplier).toFixed(2) * 1} ${capUnit})` : 
+                `${ totalUsageStorage / RDGroups} ${driveCapUnit} `}`,
+              faultTolerance: 1,
+              totalNumOfDrive,
+              message: ''
+            } 
+          }
+        } else if (raidTypeUnit == '6' || raidTypeUnit == '10') {        
+          if (drivesPerRD < 4 && raidTypeUnit == '6') {
+            return {
+              message: `RAID ${raidTypeUnit} needs 4 or more disks. Please, correct your input and recalculate.`
+            }
+          } else if ((drivesPerRD < 4 || (drivesPerRD % 2 != 0)) && raidTypeUnit == '10') {
+            return {
+              message: `RAID ${raidTypeUnit} needs 4 or more disks and the number of disks needs to be even. 
+                Please, correct your input and recalculate`
+            }
+          } else {
+            let totalUsageStorage = (driveCap * (drivesPerRD - 2)) * RDGroups;
+            let diskSpaceEff = '';
+            return {
+              totalUsageStorage: `${driveCapUnit == 'GB' || driveCapUnit == 'TB' ? 
+                `${totalUsageStorage} ${driveCapUnit} (${(totalUsageStorage * multiplier).toFixed(2) * 1} ${capUnit})` : 
+                `${totalUsageStorage} ${driveCapUnit} `}`,
+              costPerTB: driveCost > 0 ? ((driveCost * drivesPerRD) / (totalUsageStorage / RDGroups)) : 'none',
+              totalCost: driveCost > 0 ? (driveCost * drivesPerRD) * RDGroups : 'none',
+              diskSpaceEff: '50%',
+              usableCapacity: `${driveCapUnit == 'GB' || driveCapUnit == 'TB' ? 
+                `${ totalUsageStorage / RDGroups} ${driveCapUnit} (${((totalUsageStorage / RDGroups) * multiplier).toFixed(2) * 1} ${capUnit})` : 
+                `${ totalUsageStorage / RDGroups} ${driveCapUnit} `}`,
+              faultTolerance: raidTypeUnit == '6' ? 2 : '1 to 2',
+              totalNumOfDrive,
+              readSpeedGain: `${totalNumOfDrive}x`,
+              writeSpeedGain: raidTypeUnit == '6' ? `${totalNumOfDrive / totalNumOfDrive}x` : `${totalNumOfDrive / 2}x`,
+              message: ''
+            } 
+          }
+        } else if (raidTypeUnit == '50') {        
+          if (drivesPerRD < 6) {
+            return {
+              message: `RAID ${raidTypeUnit} needs 6 or more disks. Please, correct your input and recalculate.`
+            }
+          } else if (RDGroups < 2) {
+            return {
+              message: `RAID ${raidTypeUnit} needs 2 or more RAID groups. Please, correct your input and recalculate.`
+            }
+          } else {
+            let totalUsageStorage = driveCap * ((drivesPerRD * RDGroups) - RDGroups);
+            let diskSpaceEff = '';
+            return {
+              totalUsageStorage: `${driveCapUnit == 'GB' || driveCapUnit == 'TB' ? 
+                `${totalUsageStorage} ${driveCapUnit} (${(totalUsageStorage * multiplier).toFixed(2) * 1} ${capUnit})` : 
+                `${totalUsageStorage} ${driveCapUnit} `}`,
+              costPerTB: driveCost > 0 ? ((driveCost * drivesPerRD) / (totalUsageStorage / RDGroups)) : 'none',
+              totalCost: driveCost > 0 ? (driveCost * drivesPerRD) * RDGroups : 'none',
+              diskSpaceEff: '83.33%',
+              usableCapacity: `${driveCapUnit == 'GB' || driveCapUnit == 'TB' ? 
+                `${ totalUsageStorage / RDGroups} ${driveCapUnit} (${((totalUsageStorage / RDGroups) * multiplier).toFixed(2) * 1} ${capUnit})` : 
+                `${ totalUsageStorage / RDGroups} ${driveCapUnit} `}`,
+              faultTolerance: 1,
+              totalNumOfDrive,
+              message: ''
+            } 
+          }
+        } else if (raidTypeUnit == '60') {        
+          if (drivesPerRD < 6) {
+            return {
+              message: `RAID ${raidTypeUnit} needs 6 or more disks. Please, correct your input and recalculate.`
+            }
+          } else if (RDGroups < 2) {
+            return {
+              message: `RAID ${raidTypeUnit} needs 2 or more RAID groups. Please, correct your input and recalculate.`
+            }
+          } else {
+            let totalUsageStorage = driveCap * ((drivesPerRD * RDGroups) - (RDGroups * 2));
+            let diskSpaceEff = '';
+            return {
+              totalUsageStorage: `${driveCapUnit == 'GB' || driveCapUnit == 'TB' ? 
+                `${totalUsageStorage} ${driveCapUnit} (${(totalUsageStorage * multiplier).toFixed(2) * 1} ${capUnit})` : 
+                `${totalUsageStorage} ${driveCapUnit} `}`,
+              costPerTB: driveCost > 0 ? ((driveCost * drivesPerRD) / (totalUsageStorage / RDGroups)) : 'none',
+              totalCost: driveCost > 0 ? (driveCost * drivesPerRD) * RDGroups : 'none',
+              diskSpaceEff: '66.67%',
+              usableCapacity: `${driveCapUnit == 'GB' || driveCapUnit == 'TB' ? 
+                `${ totalUsageStorage / RDGroups} ${driveCapUnit} (${((totalUsageStorage / RDGroups) * multiplier).toFixed(2) * 1} ${capUnit})` : 
+                `${ totalUsageStorage / RDGroups} ${driveCapUnit} `}`,
+              faultTolerance: 1,
+              totalNumOfDrive,
+              message: ''
+            } 
+          }
+        }
+      }
+
+      function calculateResults() {
+        // Retrieve input values
+        const raidTypeUnit = raidTypeUnitEl.value;
+        const driveCap = parseFloat(driveCapEl.value)
+        const driveCapUnit = driveCapUnitEl.value;
+        const driveCost = parseFloat(driveCostEl.value);
+        const drivesPerRD = parseFloat(drivesPerRDEl.value);
+        const RDGroups = parseFloat(RDGroupsEl.value);
+
+        if (
+          isNaN(driveCap) || driveCap <= 0 ||
+          isNaN(drivesPerRD) || drivesPerRD < 2 ||
+          isNaN(RDGroups) || RDGroups <= 0
+        ) {
+          showError("Please Enter All Details.");
+          return;
+        }
+
+        try {
+          const {
+            totalUsageStorage, costPerTB, totalCost, diskSpaceEff,
+            usableCapacity, faultTolerance, totalNumOfDrive, readSpeedGain, 
+            writeSpeedGain,
+            message
+          } = calcRDValues(raidTypeUnit, driveCap, driveCapUnit, driveCost, drivesPerRD, RDGroups);
+          if (message.length != 0) {
+            calcResultsEl.innerHTML = `<p>${message}</p>`
+          } else {
+            calcResultsEl.innerHTML = `<p>Total usable storage = ${totalUsageStorage}</p>
+                                      ${costPerTB != 'none' ? `<p>Cost per TB usable =	${costPerTB}</p>` : ''}
+                                      ${totalCost != 'none' ? `<p>Total cost = ${totalCost}</p>` : ''}
+                                      <p>Usable capacity of a single RAID group = ${usableCapacity}	</p>
+                                      <p>Fault tolerance per RAID group = ${faultTolerance} </p>
+                                      <p>Total number of drives =	${totalNumOfDrive} </p>
+                                      ${readSpeedGain != undefined ? `<p>Read speed gain = ${readSpeedGain} </p>` : '' }
+                                      ${writeSpeedGain != undefined ? `<p>Write speed gain = ${writeSpeedGain} </p>` : '' }
+                                    `
+          }
+          
+        } catch (error) {
+          showError("Something Went Wrong!!!");
+          resethandler()
+        }
+        
+      }
+    /********************************* HELPER FUNCTIONS **********************************/
+
+    function showError(errorMessage) {
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: errorMessage,
+      });
+    }
+
+    function resetForm() {
+      driveCapEl.value = "";
+      driveCostEl.value = "";
+      drivesPerRDEl.value = "";
+      RDGroupsEl.value = "";
+      raidTypeUnitEl.selectedIndex = "0";
+      driveCapUnitEl.selectedIndex = "0";
+    }
+
+    function resetResult() {
+      calcResultsEl.innerHTML = "<p>Result will appear here...</p>";
+    }
+
+    function resethandler() {
+      resetForm();
+      resetResult();
+    }
+
+    /********************************** EVENT LISTENERS **********************************/
+    [driveCapEl, driveCostEl, drivesPerRDEl, RDGroupsEl, driveCapUnitEl, raidTypeUnitEl].forEach((el) => {
+      el.addEventListener("input", resetResult);
+    });
+    resetBtnEl.addEventListener("click", resethandler);
+    calcBtnEl.addEventListener("click", calculateResults);
+  </script>
+</body>
+</html>

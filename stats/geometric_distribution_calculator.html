@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Geometric Distribution Calculator</title>
+  </head>
+  <body>
+    <h1>Geometric Distribution Calculator</h1>
+    <p>
+      Number of failures (before success):
+      <input type="number" id="numOfFails" />
+    </p>
+    <p>
+      Probability of success (of one trial):
+      <input type="number" min="0" max="1" id="successProb" style="width: 180px;" />
+      Enter a decimal between 0 and 1
+    </p>
+
+    <button id="calcBtn">Calculate</button>
+    <button id="resetBtn">Reset</button>
+    <hr />
+    <div>
+      <h3>Result:</h3>
+      <h3 id="calcResults">Result will appear here...</h3>
+    </div>
+
+    <script>
+      // Get required elements from the HTML
+      const numOfFailsEl = document.getElementById("numOfFails");
+      const successProbEl = document.getElementById("successProb");
+
+      const calcBtnEl = document.getElementById("calcBtn");
+      const resetBtnEl = document.getElementById("resetBtn");
+      const calcResultsEl = document.getElementById("calcResults");
+
+      function calculateResults() {
+        // Retrieve input values
+        const numOfFails = parseFloat(numOfFailsEl.value);
+        const successProb = parseFloat(successProbEl.value);
+
+        if (isNaN(numOfFails) || isNaN(successProb)) {
+          alert("Please Enter All Details.");
+          return;
+        }
+
+        try {
+          const results = ((1-successProb) ** numOfFails) * successProb;
+          const mean = (1 - successProb) / successProb;
+          const variance = (1 - successProb) / (successProb ** 2);
+          const sd = Math.sqrt((1-successProb) / (successProb ** 2));
+
+          calcResultsEl.innerHTML = `
+              <p>Geometric probability: ${results.toFixed(8) * 1} </p>
+              <p>Expectation (mean): ${mean.toFixed(6) * 1} </p>
+              <p>Variance: ${variance.toFixed(6) * 1} </p>
+              <p>Standard deviation: ${sd.toFixed(6) * 1} </p>
+            `;
+        } catch (error) {
+          alert("Something Went Wrong!!!");
+          resethandler();
+        }
+      }
+
+      function resetForm() {
+        numOfFailsEl.value = "";
+        successProbEl.value = "";
+      }
+
+      function resetResult() {
+        calcResultsEl.innerHTML = "<p>Result will appear here...</p>";
+      }
+
+      function resethandler() {
+        resetForm();
+        resetResult();
+      }
+
+      resetBtnEl.addEventListener("click", resethandler);
+      calcBtnEl.addEventListener("click", calculateResults);
+
+      [numOfFailsEl, successProbEl].forEach((el) => {
+        el.addEventListener("input", resetResult);
+      });
+    </script>
+  </body>
+</html>

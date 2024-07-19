@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Paint Calculator</title>
+
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.6.5/dist/sweetalert2.all.min.js"></script>
+  <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11.6.5/dist/sweetalert2.min.css" rel="stylesheet">
+</head>
+<body>
+  <div>
+    <h1>Paint Calculator</h1>
+    <p>Estimate how much paint in gallons or litres you would need to paint a room or external surface. <br />
+      This paint calculator supports doors and windows, number of coats and custom paint coverage efficiency. <br />
+      Internal painting calculation excludes the ceiling.
+    </p>
+    <p>
+      <label>Type &nbsp;&nbsp;&nbsp;</label>
+      <input type="radio" id="intPainting" name="changeType" value="intPainting" checked>
+      <label for="intPainting">Internal Painting</label>
+      <input type="radio" id="extPainting" name="changeType" value="extPainting">
+      <label for="extPainting">External Painting</label>
+    </p>
+    <div id="internalInput">
+      <p>
+        <label for="width">Room width:</label>
+        <input type="number" id="width">
+        <select id="widthUnit">
+          <option value="mm">mm</option>
+          <option value="cm">cm</option>
+          <option value="m">m</option>
+          <option value="in">in</option>
+          <option value="ft" selected>ft</option>
+          
+        </select>
+      </p>
+      <p>
+        <label for="length">Room length:</label>
+        <input type="number" id="length">
+        <select id="lengthUnit">
+          <option value="mm">mm</option>
+          <option value="cm">cm</option>
+          <option value="m">m</option>
+          <option value="in">in</option>
+          <option value="ft" selected>ft</option>
+        </select>
+      </p>
+      <p>
+        <label for="height">Room Height:</label>
+        <input type="number" id="height">
+        <select id="heightUnit">
+          <option value="mm">mm</option>
+          <option value="cm">cm</option>
+          <option value="m">m</option>
+          <option value="in">in</option>
+          <option value="ft" selected>ft</option>
+        </select>
+      </p>
+    </div>
+    <div id="externalInput" style="display: none;">
+      <p>
+        <label for="totWidth">Total width:</label>
+        <input type="number" id="totWidth">
+        <select id="totWidthUnit">
+          <option value="mm">mm</option>
+          <option value="cm">cm</option>
+          <option value="m">m</option>
+          <option value="in">in</option>
+          <option value="ft" selected>ft</option>
+        </select>
+      </p>   
+      <p>
+        <label for="totHeight">Total height:</label>
+        <input type="number" id="totHeight">
+        <select id="totHeightUnit">
+          <option value="mm">mm</option>
+          <option value="cm">cm</option>
+          <option value="m">m</option>
+          <option value="in">in</option>
+          <option value="ft" selected>ft</option>
+        </select>
+      </p>
+    </div>
+    <p>
+      <label for="winWidth">Window width:</label>
+      <input type="number" id="winWidth" placeholder="3">
+      <select id="winWidthUnit">
+        <option value="mm">mm</option>
+        <option value="cm">cm</option>
+        <option value="m">m</option>
+        <option value="in">in</option>
+        <option value="ft" selected>ft</option>
+      </select>
+    </p>
+    <p>
+      <label for="winHeight">Window height:</label>
+      <input type="number" id="winHeight" placeholder="4">
+      <select id="winHeightUnit">
+        <option value="mm">mm</option>
+        <option value="cm">cm</option>
+        <option value="m">m</option>
+        <option value="in">in</option>
+        <option value="ft" selected>ft</option>
+      </select>
+    </p>
+    <p><label for="windows">Windows</label>
+      <input type="number" id="windows" value=2>
+    </p>
+    <p>
+      <label for="doors">Doors</label>
+      <input type="number" id="doors" value=1></p>
+    <p>
+    <h3>Paint characteristics:</h3>
+    <p>
+      <label for="numOfCoats">Number of coats:</label>
+      <input type="number" id="numOfCoats" value=1>
+    </p>
+    <p>
+      <label for="paintEff">Paint efficiency:</label>
+      <input type="number" id="paintEff" value=107.64>&nbsp;&nbsp;<span>ft<sup>2</sup>
+        /gallon</span>
+    </p>
+    <p>
+      <label for="price">Price per gallon: $</label>
+      <input type="number" id="price" placeholder="Optional">
+    </p>
+    <p>
+      <button id="calcBtn">Calculate</button>
+      <button id="resetBtn">Reset</button>
+    </p>
+    
+    <hr>
+    <p>
+    <h3>Result:</h3>
+    <h3 id="calcResults">Result will appear here...</h3>
+    </p>
+  </div>
+  <script>
+
+    /********************************** ELEMENTS **********************************/
+    const changeTypeEl = document.querySelectorAll("input[name='changeType']");
+    const internalInputEl = document.getElementById('internalInput')
+    const externalInputEl = document.getElementById('externalInput')
+    const winWidthEl = document.getElementById('winWidth') 
+    const winWidthUnitEl = document.getElementById('winWidthUnit')
+    const winHeightEl = document.getElementById('winHeight') 
+    const winHeightUnitEl = document.getElementById('winHeightUnit')
+    const windowsEl = document.getElementById('windows')
+    const doorsEl = document.getElementById('doors')
+    const numOfCoatsEl = document.getElementById('numOfCoats')
+    const paintEffEl = document.getElementById('paintEff')
+    const priceEl = document.getElementById('price'); 
+    const calcBtnEl = document.getElementById('calcBtn');
+    const resetBtnEl = document.getElementById('resetBtn');
+    const calcResultsEl = document.getElementById('calcResults');
+
+    let firstInputEl = document.getElementById('width');
+    let firstInputUnitEl = document.getElementById('widthUnit');
+    let secondInputEl = document.getElementById('length');
+    let secondInputUnitEl = document.getElementById('lengthUnit');
+    let thirdInputEl = document.getElementById('height');;
+    let thirdInputUnitEl = document.getElementById('heightUnit');
+    let selectedArea = changeTypeEl[0].value
+
+     /********************************** FUNCTIONS **********************************/
+            // Conversion functions
+      const convertWidthAndLength = (value, unit) => {
+        const toFeet = {
+          'cm': 0.0328084,
+          'in': 1/12,
+          'yd': 3,
+          'm': 3.28084,
+          'ft': 1
+        };
+        const conversionFactor = toFeet[unit];
+        if (conversionFactor !== undefined) {
+          return value * conversionFactor;
+        } else {
+          showError(`Unsupported unit: ${unit}`);
+          return;
+        }
+      }
+
+      function changechangeType(e) {
+        const area = e.target.value
+        internalInputEl.style.display = area ==  'intPainting' ? 'block' : 'none'
+        externalInputEl.style.display = area ==  'extPainting' ? 'block' : 'none'
+        if (area == 'intPainting') {
+          firstInputEl = document.getElementById('width');
+          firstInputUnitEl = document.getElementById('widthUnit');
+          secondInputEl = document.getElementById('length');
+          secondInputUnitEl = document.getElementById('lengthUnit');
+          thirdInputEl = document.getElementById('height');
+          thirdInputUnitEl = document.getElementById('heightUnit');
+          selectedArea = area
+        } else if (area == 'extPainting') {
+          firstInputEl = document.getElementById('totWidth');
+          firstInputUnitEl = document.getElementById('totWidthUnit');
+          secondInputEl = document.getElementById('totHeight');
+          secondInputUnitEl = document.getElementById('totHeightUnit');
+          selectedArea = area
+        }
+      }
+
+      function calculateIntPainting(rWidth, rLength, rHeight, winWidth, winHeight, windows, doors, numOfCoats, paintEff) {
+        let squareFeet = 0;
+        let squareYards = 0
+        let gallons = 0;
+        let totalRoomArea = (((rWidth * rHeight) * 2) + ((rLength * rHeight) * 2))
+        let windDoorArea = (windows * (winWidth * winHeight)) + (doors * 19.375)
+        squareFeet = totalRoomArea - windDoorArea
+        squareYards = squareFeet / 9
+        let perGallon = squareFeet / paintEff
+        gallons = perGallon > 1 ? ((squareFeet / paintEff) * numOfCoats) : 1
+        return {
+          squareYards: squareYards.toFixed(2) * 1, 
+          squareFeet: squareFeet.toFixed(3) * 1,
+          gallons: gallons.toFixed()
+        }
+      }
+
+      function calculateExtPainting(totWidth, totHeight, winWidth, winHeight, windows, doors, numOfCoats, paintEff) {
+        let squareFeet = 0;
+        let squareYards = 0
+        let gallons = 0;
+        let totalRoomArea = totWidth * totHeight
+        let windDoorArea = (windows * (winWidth * winHeight)) + (doors * 19.375)
+        squareFeet = totalRoomArea - windDoorArea
+        squareYards = squareFeet / 9
+        let perGallon = squareFeet / paintEff
+        gallons = perGallon > 1 ? ((squareFeet / paintEff) * numOfCoats) : 1
+        return {
+          squareYards: squareYards.toFixed(2) * 1, 
+          squareFeet: squareFeet.toFixed(3) * 1,
+          gallons: gallons.toFixed()
+        }
+      }
+
+      function calculateResults() {
+        // Retrieve input values
+        const firstInput = parseFloat(firstInputEl.value)
+        const firstInputUnit = firstInputUnitEl.value
+        const secondInput = parseFloat(secondInputEl.value)
+        const secondInputUnit = secondInputUnitEl.value;
+        const thirdInput = parseFloat(thirdInputEl.value);
+        const thirdInputUnit = thirdInputUnitEl.value
+        const winWidth = parseFloat(winWidthEl.value);
+        const winWidthUnit = winWidthUnitEl.value
+        const winHeight = parseFloat(winHeightEl.value);
+        const winHeightUnit = winHeightUnitEl.value
+        const windows = parseFloat(windowsEl.value);
+        const doors = parseFloat(doorsEl.value);
+        const numOfCoats = parseFloat(numOfCoatsEl.value);
+        const paintEff = parseFloat(paintEffEl.value);
+        const price = parseFloat(priceEl.value);
+
+        if (
+          ((firstInput && isNaN(firstInput)) || (firstInput <= 0)) || 
+          ((secondInput && isNaN(secondInput)) || (secondInput <= 0)) || 
+          ((thirdInput && isNaN(thirdInput)) || (thirdInput <= 0)) ||
+          (isNaN(winWidth) || winWidth <= 0) || (isNaN(winHeight) || winHeight <= 0) ||
+          (isNaN(windows) || windows <= 0) || (isNaN(doors) || doors <= 0) ||
+          (isNaN(numOfCoats) || numOfCoats <= 0) || (isNaN(paintEff) || paintEff <= 0)
+        ) {
+          showError("Please Enter All Details.");
+          return;
+        }
+
+        try {
+          // Convert input values
+          let squareFeet = 0;
+          let squareYards = 0;
+          let gallons = 0;
+          if (selectedArea == 'intPainting') {
+            const rWidth = convertWidthAndLength(firstInput, firstInputUnit);
+            const rLength = convertWidthAndLength(secondInput, secondInputUnit);
+            const rHeight = convertWidthAndLength(thirdInput, thirdInputUnit);
+            const rWinWidth = convertWidthAndLength(winWidth, winWidthUnit);
+            const rWinHeight = convertWidthAndLength(winHeight, winHeightUnit);
+            const results = calculateIntPainting(rWidth,rLength, rHeight, rWinWidth, rWinHeight, windows, doors, numOfCoats, paintEff)
+            squareFeet = results.squareFeet
+            gallons = results.gallons
+            squareYards = results.squareYards
+            
+          } else if (selectedArea == 'extPainting') {
+            const totWidth = convertWidthAndLength(firstInput, firstInputUnit);
+            const totHeight = convertWidthAndLength(secondInput, secondInputUnit);
+            const totWinWidth = convertWidthAndLength(winWidth, winWidthUnit);
+            const totWinHeight = convertWidthAndLength(winHeight, winHeightUnit);
+            const results = calculateExtPainting(totWidth, totHeight, totWinWidth, totWinHeight, windows, doors, numOfCoats, paintEff)
+            squareFeet = results.squareFeet
+            gallons = results.gallons
+            squareYards = results.squareYards
+          }
+          if (squareFeet < 0) {
+            calcResultsEl.innerHTML = `<p>Calculator error: The total area is negative. Check the room 
+                                          dimensions and the number and size of windows and doors.</p>
+                                      `
+          } else {
+            if (price) {
+              let cost = 0
+              cost = (price * gallons).toFixed(2)
+              calcResultsEl.innerHTML = `<p>Total area: ${squareYards} square yards  (${squareFeet} ft<sup>2</sup>)</p>
+                                          <p>Paint needed: ${gallons} gallons</p>
+                                          <p>Total price: $${cost}</p>
+                                        `
+            } else {
+              calcResultsEl.innerHTML = `
+                                          <p>Total area: ${squareYards} square yards  (${squareFeet} ft<sup>2</sup>)</p>
+                                          <p>Paint needed: ${gallons} gallons</p>
+                                        `
+            }
+          }
+                                    
+        } catch (error) {
+          showError("Something Went Wrong!!!");
+          resethandler()
+        }
+      
+      }
+    /********************************* HELPER FUNCTIONS **********************************/
+
+    function showError(errorMessage) {
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: errorMessage,
+      });
+    }
+
+    function resetForm() {
+      firstInputEl.value = "";
+      secondInputEl.value = "";
+      thirdInputEl.value = "";
+      winWidthEl.value = "";
+      winHeightEl.value = "";
+      windowsEl.value = "2";
+      doorsEl.value = "1";
+      numOfCoatsEl.value = "1";
+      paintEffEl.value = "107.64";
+      priceEl.value = "";
+      firstInputUnitEl.selectedIndex = "4";
+      secondInputUnitEl.selectedIndex = "4";
+      thirdInputUnitEl.selectedIndex = "4";
+      winWidthUnitEl.selectedIndex = "4";
+      winHeightUnitEl.selectedIndex = "4";
+    }
+
+    function resetResult() {
+      calcResultsEl.innerHTML = "<p>Result will appear here...</p>";
+    }
+
+    function resethandler() {
+      resetForm();
+      resetResult();
+    }
+
+    /********************************** EVENT LISTENERS **********************************/
+    [firstInputEl, secondInputEl, thirdInputEl, priceEl, winWidthEl, winHeightEl, windowsEl, doorsEl, numOfCoatsEl, paintEffEl].forEach((el) => {
+      if (el) {
+        el.addEventListener("input", resetResult);
+      }
+    });
+    [changeTypeEl[0], changeTypeEl[1]].forEach((el) => {
+      el.addEventListener("change", (e) => changechangeType(e));
+    });  
+    resetBtnEl.addEventListener("click", resethandler);
+    calcBtnEl.addEventListener("click", calculateResults);
+  </script>
+</body>
+</html>

@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Combination Calculator</title>
+  </head>
+  <body>
+    <h1>Combination Calculator</h1>
+    <p>
+      Objects to choose from:
+      <input type="number" id="objectsVal" />
+    </p>
+    <p>
+      How many to choose?:
+      <input type="number" id="selectedNum" />
+    </p>
+    <p>
+      <input type="checkbox" id="repetition" />
+      With repetition (Select when repeteated draws of the same type from the
+      set is allowed):
+    </p>
+
+    <button id="calcBtn">Calculate</button>
+    <button id="resetBtn">Reset</button>
+    <hr />
+    <div>
+      <h3>Result:</h3>
+      <h3 id="calcResults">Result will appear here...</h3>
+    </div>
+
+    <script>
+      // Get required elements from the HTML
+      const objectsValEl = document.getElementById("objectsVal");
+      const selectedNumEl = document.getElementById("selectedNum");
+      const repetitionEl = document.getElementById("repetition");
+
+      const calcBtnEl = document.getElementById("calcBtn");
+      const resetBtnEl = document.getElementById("resetBtn");
+      const calcResultsEl = document.getElementById("calcResults");
+
+      function calcFactorialOfNum(num) {
+        if (num == 0) {
+          return 1;
+        } else {
+          return num * calcFactorialOfNum(num - 1);
+        }
+      }
+
+      function calculateResults() {
+        // Retrieve input values
+        const objectsVal = parseFloat(objectsValEl.value);
+        const selectedNum = parseFloat(selectedNumEl.value);
+        const repetition = repetitionEl;
+
+        if (isNaN(objectsVal) || isNaN(selectedNum)) {
+          alert("Please Enter All Details.");
+          return;
+        } else if (objectsVal < selectedNum) {
+          alert(
+            "You are choosing more than available. Choose an appropriate number"
+          );
+          return;
+        } else if (objectsVal % 1 != 0 || selectedNum % 1 != 0) {
+          alert("Decimal values not allowed. Choose a whole number");
+          return;
+        }
+
+        try {
+          const nFactorial = calcFactorialOfNum(objectsVal);
+          const rFactorial = calcFactorialOfNum(selectedNum);
+
+          if (repetition.checked) {
+            const results =
+              calcFactorialOfNum(objectsVal + selectedNum - 1) /
+              (rFactorial * calcFactorialOfNum(objectsVal - 1));
+
+            calcResultsEl.innerHTML = `<p> Combinations	: ${results.toLocaleString()}</p>`;
+          } else {
+            const results =
+              nFactorial /
+              (rFactorial * calcFactorialOfNum(objectsVal - selectedNum));
+
+            calcResultsEl.innerHTML = `<p> Combinations	: ${results.toLocaleString()}</p>`;
+          }
+        } catch (error) {
+          alert("Something Went Wrong!!!");
+          resethandler();
+        }
+      }
+
+      function resetForm() {
+        objectsValEl.value = "";
+        selectedNumEl.value = "";
+      }
+
+      function resetResult() {
+        calcResultsEl.innerHTML = "<p>Result will appear here...</p>";
+      }
+
+      function resethandler() {
+        resetForm();
+        resetResult();
+      }
+
+      resetBtnEl.addEventListener("click", resethandler);
+      calcBtnEl.addEventListener("click", calculateResults);
+
+      [objectsValEl, selectedNumEl].forEach((el) => {
+        el.addEventListener("input", resetResult);
+      });
+    </script>
+  </body>
+</html>

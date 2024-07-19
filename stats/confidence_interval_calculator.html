@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Confidence Interval Calculator</title>
+  </head>
+  <body>
+    <h1>Confidence Interval Calculator</h1>
+    <p>
+      Confidence Level:
+      <select id="confidenceLevel">
+        <option value="90">90%</option>
+        <option value="95">95%</option>
+        <option value="99">99%</option>
+      </select>
+    </p>
+    <p>
+      Population (Leave blank if unknown or very large):
+      <input type="number" id="population" />
+    </p>
+    <p>
+      Sample Size:
+      <input type="number" id="sampleSize" />
+    </p>
+    <p>
+      Percentage:
+      <input type="number" id="percentage" />
+    </p>
+    <button id="calcBtn">Calculate</button>
+    <button id="resetBtn">Reset</button>
+    <hr />
+    <div>
+      <h3>Result:</h3>
+      <h3 id="calcResults">Result will appear here...</h3>
+    </div>
+
+    <script>
+      const confidenceLevelInputEl = document.getElementById("confidenceLevel");
+      const populationInputEl = document.getElementById("population");
+      const sampleSizeInputEl = document.getElementById("sampleSize");
+      const percentageInputEl = document.getElementById("percentage");
+
+      const calcBtnEl = document.getElementById("calcBtn");
+      const resetBtnEl = document.getElementById("resetBtn");
+      const calcResultsEl = document.getElementById("calcResults");
+
+      function calculateResults() {
+        const confidenceLevel = parseFloat(confidenceLevelInputEl.value);
+        const population = parseFloat(populationInputEl.value);
+        const sampleSize = parseFloat(sampleSizeInputEl.value);
+        const percentage = parseFloat(percentageInputEl.value);
+
+        // Calculate confidence level
+        let zScore;
+        if (confidenceLevel === 90) {
+          zScore = 1.645;
+        } else if (confidenceLevel === 95) {
+          zScore = 1.96;
+        } else if (confidenceLevel === 99) {
+          zScore = 2.576;
+        } else {
+          alert("Invalid confidence level. Please choose 90, 95, or 99.");
+          return;
+        }
+
+        try {
+          const p = percentage / 100;
+          const q = 1 - p;
+
+          let standardError;
+          if (population) {
+            standardError = zScore * Math.sqrt((p * q) / sampleSize);
+          } else {
+            standardError = zScore * Math.sqrt((p * q) / sampleSize);
+          }
+
+          const marginOfError = standardError * 100;
+
+          // Calculate confidence interval
+          const lowerBound = (percentage - marginOfError).toFixed(2);
+          const upperBound = (percentage + marginOfError).toFixed(2);
+
+          // Display the result
+
+          calcResultsEl.innerHTML = `<p>Confidence Interval: ${
+            marginOfError.toFixed(2) * 1
+          }`;
+        } catch (error) {
+          alert("Something Went Wrong!!!");
+          resethandler();
+        }
+      }
+
+      function resetForm() {
+        confidenceLevelInputEl.selectedIndex = "0";
+        populationInputEl.value = "";
+        percentageInputEl.value = "";
+        sampleSizeInputEl.value = "";
+      }
+
+      function resetResult() {
+        calcResultsEl.innerHTML = "<p>Result will appear here...</p>";
+      }
+
+      function resethandler() {
+        resetForm();
+        resetResult();
+      }
+
+      resetBtnEl.addEventListener("click", resethandler);
+      calcBtnEl.addEventListener("click", calculateResults);
+
+      [
+        confidenceLevelInputEl,
+        populationInputEl,
+        sampleSizeInputEl,
+        percentageInputEl,
+      ].forEach((el) => {
+        el.addEventListener("input", resetResult);
+      });
+    </script>
+  </body>
+</html>

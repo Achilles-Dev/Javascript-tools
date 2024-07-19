@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="numberB=device-numberB, initial-scale=1.0">
+  <title>Volume of Ellipsoid Calculator</title>
+
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.6.5/dist/sweetalert2.all.min.js"></script>
+  <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11.6.5/dist/sweetalert2.min.css" rel="stylesheet">
+</head>
+
+<body>
+  <div>
+    <h1>Volume of Ellipsoid Calculator</h1>
+    <p>Calculate the volume of ellipsoid.</p>
+    <p>Enter the semi axes a, b and c:</p>
+    <p>
+      <label for="numberA">a:</label>
+      <input type="number" id="numberA" placeholder="10">
+    </p>
+    <p>
+      <label for="numberB">b:</label>
+      <input type="number" id="numberB" placeholder="10">
+    </p>
+    <p>
+      <label for="numberC">c:</label>
+      <input type="number" id="numberC" placeholder="10">
+    </p>
+    
+    <p>
+      <button id="calcBtn">Calculate</button>
+      <button id="resetBtn">Reset</button>
+    </p>
+    <hr>
+    <p>
+    <h3>Result:</h3>
+    <h3 id="calcResults">Result will appear here...</h3>
+    </p>
+  </div>
+  <script>
+
+    /********************************** ELEMENTS **********************************/
+    const numberBEl = document.getElementById('numberB');
+    const numberAEl = document.getElementById('numberA');
+    const numberCEl = document.getElementById('numberC');
+    const calcBtnEl = document.getElementById('calcBtn');
+    const resetBtnEl = document.getElementById('resetBtn');
+    const calcResultsEl = document.getElementById('calcResults')
+
+    /********************************** FUNCTIONS **********************************/
+    // Conversion functions
+
+    function volumeOEllipsoid(numberB, numberA, numberC) {
+      let results = 0;
+      const PIE = 3.141592654;
+      results = (4 * PIE * numberB * numberA * numberC) / 3;
+      return results
+    }
+
+    function calculateResults() {
+      // Retrieve input values
+      const numberB = parseFloat(numberBEl.value)
+      const numberA = parseFloat(numberAEl.value)
+      const numberC = parseFloat(numberCEl.value)
+
+      if (
+        isNaN(numberB) || numberB < 0 || isNaN(numberA) || numberA < 0 || isNaN(numberC) || numberC < 0
+      ) {
+        showError("Please Enter All Details.");
+        return;
+      }
+
+      try {
+        let ellipsoidVolume = volumeOEllipsoid(numberB, numberA, numberC)
+        ellipsoidVolume = ellipsoidVolume.toFixed(10) * 1
+        calcResultsEl.innerHTML = `Volume = ${ellipsoidVolume}`
+
+      } catch (error) {
+        showError("Something Went Wrong!!!");
+        resethandler()
+      }
+
+    }
+
+    /********************************* HELPER FUNCTIONS **********************************/
+
+    function showError(errorMessage) {
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: errorMessage,
+      });
+    }
+
+    function resetForm() {
+      numberBEl.value = "";
+      numberAEl.value = "";
+      numberCEl.value = "";
+    }
+
+    function resetResult() {
+      calcResultsEl.innerHTML = "<p>Result will appear here...</p>";
+    }
+
+    function resethandler() {
+      resetForm();
+      resetResult();
+    }
+
+    /********************************** EVENT LISTENERS **********************************/
+    resetBtnEl.addEventListener("click", resethandler);
+    [numberBEl, numberCEl, numberAEl].forEach((el) => {
+      el.addEventListener("input", resetResult);
+    });
+    calcBtnEl.addEventListener("click", calculateResults);
+  </script>
+</body>
+
+</html> 

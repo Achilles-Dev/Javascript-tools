@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Null Space Calculator</title>
+
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.6.5/dist/sweetalert2.all.min.js"></script>
+  <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11.6.5/dist/sweetalert2.min.css" rel="stylesheet">
+</head>
+
+<body>
+  <div>
+    <h1>Null Space Calculator</h1>
+    <p>
+      <label for="numRows">Number of rows: </label>
+      <select id="numRows">
+        <option value="1">&nbsp;1 &nbsp;</option>
+        <option value="2" selected>&nbsp;2 &nbsp;</option>
+        <option value="3">&nbsp;3 &nbsp;</option>
+        <option value="4">&nbsp;4 &nbsp;</option>  
+      </select>
+    </p>
+    <p>
+      <label for="numCols">Number of columns: </label>
+      <select id="numCols">
+        <option value="1">&nbsp;1 &nbsp;</option>
+        <option value="2">&nbsp;2 &nbsp;</option>
+        <option value="3" selected>&nbsp;3 &nbsp;</option>
+        <option value="4">&nbsp;4 &nbsp;</option>   
+      </select>
+    </p>
+    <p>
+      <label for="showReducedMat">Show the reduced matrix?</label>
+      <select id="showReducedMat">
+        <option value="yes">&nbsp;Yes &nbsp;</option>
+        <option value="no" selected>&nbsp;No &nbsp;</option>  
+      </select>
+    </p>
+    
+    <p>First row</p>
+      <p>
+        <label for="a1">a₁:</label>
+        <input type="number" id="a1" />  
+      </p>
+      <p id="a2Input">
+        <label for="a2">a₂:</label>
+        <input type="number" id="a2" />  
+      </p>
+      <p id="a3Input">
+        <label for="a3">a₃:</label>
+        <input type="number" id="a3" />  
+      </p>
+      <p id="a4Input" style="display: none;">
+        <label for="a4">a₄:</label>
+        <input type="number" id="a4" />  
+      </p> 
+           
+    <div id="secondRowInputs">
+      <p>Second row</p>
+        <p id="b1Input">
+          <label for="b1">b₁:</label>
+          <input type="number" id="b1" />  
+        </p>
+        <p id="b2Input">
+          <label for="b2">b₂:</label>
+          <input type="number" id="b2" />  
+        </p>
+        <p id="b3Input">
+          <label for="b3">b₃:</label>
+          <input type="number" id="b3" />  
+        </p>    
+        <p id="b4Input" id="a4Input" style="display: none;">
+          <label for="b4">b₄:</label>
+          <input type="number" id="b4" />  
+        </p>   
+      </div>  
+     <div id="thirdRowInputs" style="display: none;">
+      <p>Third row</p>
+      <p id="c1Input">
+        <label for="c1">c₁:</label>
+        <input type="number" id="c1" />  
+      </p>
+      <p id="c2Input">
+        <label for="c2">c₂:</label>
+        <input type="number" id="c2" />  
+      </p>                    
+      <p id="c3Input">
+        <label for="c3">c₃:</label>
+        <input type="number" id="c3" />  
+      </p>
+      <p id="c4Input" style="display: none;">
+        <label for="c4">c₄:</label>
+        <input type="number" id="c4" /> 
+      </p> 
+    </div>
+    <div id="fourthRowInputs" style="display: none;">
+      <p>Fourth row</p>
+      <p id="d1Input">
+        <label for="d1">d₁:</label>
+        <input type="number" id="d1" />  
+      </p> 
+      <p id="d2Input">
+        <label for="d2">d₂:</label>
+        <input type="number" id="d2" />  
+      </p> 
+      <p id="d3Input">
+        <label for="d3">d₃:</label>
+        <input type="number" id="d3" />  
+      </p>  
+      <p id="d4Input" style="display: none;">
+        <label for="d4">d₄:</label>
+        <input type="number" id="d4" />  
+      </p>
+    </div>
+    
+    <p>
+      <button id="calcBtn">Calculate</button>
+      <button id="resetBtn">Reset</button>
+    </p>
+    <hr>
+    <p>
+    <h3>Result:</h3>
+    <h3 id="calcResults">Result will appear here...</h3>
+    </p>
+  </div>
+  <script>
+
+    /********************************** ELEMENTS **********************************/
+    const numRowsEl = document.getElementById('numRows');
+    const numColsEl = document.getElementById('numCols');
+    const showReducedMatEl = document.getElementById('showReducedMat');
+
+    const secondRowInputsEl = document.getElementById('secondRowInputs');
+    const thirdRowInputsEl = document.getElementById('thirdRowInputs');
+    const fourthRowInputsEl = document.getElementById('fourthRowInputs');
+
+    const b1InputEl = document.getElementById('b1Input');
+    const c1InputEl = document.getElementById('c1Input');
+    const d1InputEl = document.getElementById('d1Input');
+    const a2InputEl = document.getElementById('a2Input');
+    const b2InputEl = document.getElementById('b2Input');
+    const c2InputEl = document.getElementById('c2Input');
+    const d2InputEl = document.getElementById('d2Input');
+    const a3InputEl = document.getElementById('a3Input');
+    const b3InputEl = document.getElementById('b3Input');
+    const c3InputEl = document.getElementById('c3Input');
+    const d3InputEl = document.getElementById('d3Input');
+    const a4InputEl = document.getElementById('a4Input');
+    const b4InputEl = document.getElementById('b4Input');
+    const c4InputEl = document.getElementById('c4Input');
+    const d4InputEl = document.getElementById('d4Input');
+
+    const calcBtnEl = document.getElementById('calcBtn');
+    const resetBtnEl = document.getElementById('resetBtn');
+    const calcResultsEl = document.getElementById('calcResults')
+
+    let a1El = document.getElementById('a1');
+    let a2El = document.getElementById('a2');
+    let a3El = document.getElementById('a3');
+    let a4El = '';
+    let b1El = document.getElementById('b1');
+    let b2El = document.getElementById('b2');
+    let b3El = document.getElementById('b3');;
+    let b4El = '';
+    let c1El = '';
+    let c2El = '';
+    let c3El = '';
+    let c4El = '';
+    let d1El = '';
+    let d2El = '';
+    let d3El = '';
+    let d4El = '';
+
+    let numRowsSelected = '2';
+    let numColsSelected = '3';
+    let reducedMatSelected = 'no';
+
+    /********************************** FUNCTIONS **********************************/
+    // Conversion functions
+
+    function handleNumRowsChange(e) {
+      const numRowSize = e.target.value
+
+      secondRowInputsEl.style.display = numRowSize == '1' ? 'none' : 'block'
+      thirdRowInputsEl.style.display = (numRowSize == '1' || numRowSize == '2') ? 'none' : 'block'
+      fourthRowInputsEl.style.display = numRowSize == '4' ? 'block' : 'none'
+
+      b1InputEl.style.display = numRowSize == '1'  ? 'none' : 'block'
+      c1InputEl.style.display = (numRowSize == '1' || numRowSize == '2') ? 'none' : 'block'
+      d1InputEl.style.display = numRowSize == '4' ? 'block' : 'none'
+
+      numRowsSelected = numRowSize
+
+      console.log(numColsSelected, numRowsSelected)
+
+      b1El = numRowSize == '1' ? '' : document.getElementById('b1');
+      c1El = (numRowSize == '1' || numRowSize == '2') ? '' : document.getElementById('c1');
+      d1El = numRowSize ==  '4' ? document.getElementById('d1') : '';
+
+      a2El = numColsSelected == '1' ? '' : document.getElementById('a2');
+      a3El = (numColsSelected == '1' || numColsSelected == '2') ? '' : document.getElementById('a3');
+      a4El = numColsSelected == '4' ? document.getElementById('a4') : '';
+      b2El = numRowSize == '1' ? '' : document.getElementById('b2');
+      b3El = (numRowSize == '1' || numColsSelected == '1' || numColsSelected == '2') ? '' : document.getElementById('b3');
+      b4El = (numRowSize == '1' || numColsSelected != '4') ? '' : document.getElementById('b4');
+      c2El = (numRowSize == '1' || numRowSize == '2' || numColsSelected == '1') ? '' : document.getElementById('c2');
+      c3El = (numRowSize == '1' || numRowSize == '2' || numColsSelected == '1' || numColsSelected == '2') ? '' : document.getElementById('c3');
+      c4El = (numRowSize == '1' || numRowSize == '2' || numColsSelected != '4') ? '' : document.getElementById('c4');
+      d2El = (numRowSize !=  '4' || numColsSelected == '1') ? '' : document.getElementById('d2');
+      d3El = (numRowSize !=  '4' || numColsSelected == '1' || numColsSelected == '2' ) ? '' : document.getElementById('d3');
+      d4El = (numRowSize !=  '4' || numColsSelected != '4') ? '' : document.getElementById('d4');
+
+      if (numRowSize == '3') {
+        [c1El, c2El, c3El].forEach((el) => {
+          if (el) {
+            el.addEventListener("input", resetResult);
+          }
+        });
+      } else if (numRowSize == '4') {
+        [d1El, d2El, d3El].forEach((el) => {
+          if (el) {
+            el.addEventListener("input", resetResult);
+          }
+        });
+      }
+    }
+
+    function handleNumColsChange(e) {
+      const numColSize = e.target.value
+
+      a2InputEl.style.display = numColSize == '1' ? 'none' : 'block'
+      b2InputEl.style.display = numColSize == '1' ? 'none' : 'block'
+      c2InputEl.style.display = numColSize == '1' ? 'none' : 'block'
+      d2InputEl.style.display = numColSize == '1' ? 'none' : 'block'
+
+      a3InputEl.style.display = (numColSize == '1' || numColSize == '2') ? 'none' : 'block'
+      b3InputEl.style.display = (numColSize == '1' || numColSize == '2') ? 'none' : 'block'
+      c3InputEl.style.display = (numColSize == '1' || numColSize == '2') ? 'none' : 'block'
+      d3InputEl.style.display = (numColSize == '1' || numColSize == '2') ? 'none' : 'block'
+
+      a4InputEl.style.display = numColSize == '4' ? 'block' : 'none'
+      b4InputEl.style.display = numColSize == '4' ? 'block' : 'none'
+      c4InputEl.style.display = numColSize == '4' ? 'block' : 'none'
+      d4InputEl.style.display = numColSize == '4' ? 'block' : 'none'
+
+      numColsSelected = numColSize
+      
+      a2El = numColSize == '1' ? '' : document.getElementById('a2');
+      a3El = (numColSize == '1' || numColSize == '2') ? '' : document.getElementById('a3');
+      a4El = numColSize == '4' ? document.getElementById('a4') : '';
+      b2El = numColSize == '1' ? '' : document.getElementById('b2');
+      b3El = (numRowsSelected == '1' || numColSize == '1' || numColSize == '2') ? '' : document.getElementById('b3');
+      b4El = (numRowsSelected == '1' || numColSize != '4') ? '' : document.getElementById('b4');
+      c2El = (numRowsSelected == '1' || numRowsSelected == '2' || numColSize == '1') ? '' : document.getElementById('c2');
+      c3El = (numRowsSelected == '1' || numRowsSelected == '2' || numColSize == '1' || numColSize == '2') ? '' : document.getElementById('c3');
+      c4El = (numRowsSelected == '1' || numRowsSelected == '2' || numColSize != '4') ? '' : document.getElementById('c4');
+      d2El = (numRowsSelected !=  '4' || numColSize == '1') ? '' : document.getElementById('d2');
+      d3El = (numRowsSelected !=  '4' || numColSize == '1' || numColSize == '2' ) ? '' : document.getElementById('d3');
+      d4El = (numRowsSelected !=  '4' || numColSize != '4') ? '' : document.getElementById('d4');
+      
+      if (numColSize == '4') {
+        [d4El, c4El, b4El, a4El].forEach((el) => {
+          if (el) {
+            el.addEventListener("input", resetResult);
+          }
+        });
+      }
+    }
+
+
+    function nullSpace(a1, a2, a3, a4, b1, b2, b3, b4, c1, c2, c3, c4, d1, d2, d3, d4) {
+      let results = {};
+
+      if (parseFloat(numRowsSelected) <= parseFloat(numColsSelected) || numColsSelected == '1') {
+        results = {
+          nSpace: 'trivial'
+        };
+      } else {
+        
+        results = {
+          nSpace: ''
+        };
+      }
+      return results
+    }
+
+    function calculateResults() {
+      // Retrieve input values
+      const a1 = parseFloat(a1El.value)
+      const a2 = parseFloat(a2El.value)
+      const a3 = parseFloat(a3El.value)
+      const a4 = parseFloat(a4El.value)
+      const b1 = parseFloat(b1El.value)
+      const b2 = parseFloat(b2El.value)
+      const b3 = parseFloat(b3El.value)
+      const b4 = parseFloat(b4El.value)
+      const c1 = parseFloat(c1El.value)
+      const c2 = parseFloat(c2El.value)
+      const c3 = parseFloat(c3El.value)
+      const c4 = parseFloat(c4El.value)
+      const d1 = parseFloat(d1El.value)
+      const d2 = parseFloat(d2El.value)
+      const d3 = parseFloat(d3El.value)
+      const d4 = parseFloat(d4El.value)     
+
+      console.log(a1El, a2El, a3El, a4El, b1El, b2El, b3El, b4El, c1El, c2El, c3El, c4El, d1El, d2El, d3El, d4El)
+      
+      if (
+        isNaN(a1) || (a2El != '' && isNaN(a2)) || (a3El != '' && isNaN(a3)) || (a4El != '' && isNaN(a4)) 
+        || (b1El != '' && isNaN(b1)) || (b2El != '' && isNaN(b2)) || (b3El != '' && isNaN(b3)) || 
+        (b4El != '' && isNaN(b4)) || (c1El != '' && isNaN(c1)) || (c2El != '' && isNaN(c2)) || 
+        (c3El != '' && isNaN(c3)) || (c4El != '' && isNaN(c4)) || (d1El != '' && isNaN(d1)) || 
+        (d2El != '' && isNaN(d2)) || (d3El != '' && isNaN(d3)) || (d4El != '' && isNaN(d4))
+      ) {
+        showError("Please Enter All Details.");
+        return;
+      }
+      
+      
+      try {
+        const results = nullSpace(a1, a2, a3, a4, b1, b2, b3, b4, c1, c2, c3, c4, d1, d2, d3, d4)
+
+        let firstBracketOpen = numRowsSelected == '1' ? '[' : '⌈'
+        let firstBracketClose = numRowsSelected == '1' ? ']' : '⌉	'
+        let secondBracketOpen = numRowsSelected == '2' ? '⌊' : (numRowsSelected == '3' || numRowsSelected == '4')  ?  '|&nbsp;' : '';
+        let secondBracketClose = numRowsSelected == '2' ? '⌋' : (numRowsSelected == '3' || numRowsSelected == '4') ?  '&nbsp;|' : '';
+
+        let thirdBracketOpen = numRowsSelected == '3' ? '⌊' : numRowsSelected == '4' ?  '|' : '';
+        let thirdBracketClose = numRowsSelected == '3' ? '⌋' : numRowsSelected == '4' ?  '|' : '';
+        let fourthBracketOpen = numRowsSelected == '4' ? '⌊' :  '';
+        let fourthBracketClose = numRowsSelected == '4' ? '⌋' : '';
+        let matrixA = `
+          <p>A  =  ${firstBracketOpen} ${!isNaN(a1) ? `${a1} &nbsp;` : ''}  ${!isNaN(a2) ? `${a2} &nbsp;` : ''}  
+            ${!isNaN(a3) ? a3 : ''} ${!isNaN(a4) ? a4 : ''} ${firstBracketClose}</p>
+          <p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;${secondBracketOpen} ${!isNaN(b1) ? `${b1} &nbsp;` : ''} ${!isNaN(b2) ? `${b2} &nbsp;` : ''} 
+            ${!isNaN(b3) ? b3 : ''} ${!isNaN(b4) ? b4 : ''} ${secondBracketClose}</p>
+          <p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;${thirdBracketOpen} ${!isNaN(c1) ? `${c1} &nbsp;` : ''} ${!isNaN(c2) ? `${c2} &nbsp;` : ''} 
+            ${!isNaN(c3) ? c3 : ''} ${!isNaN(c4) ? c4 : ''} ${thirdBracketClose} </p>
+          <p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ${fourthBracketOpen} ${!isNaN(d1) ? `${d1} &nbsp;` : ''}  ${!isNaN(d2) ? `${d2} &nbsp;` : ''}  
+            ${!isNaN(d3) ? d3 : ''} ${!isNaN(d4) ? d4 : ''} ${fourthBracketClose}</p>
+        `
+        console.log(results.nSpace, reducedMatSelected)
+        if (results.nSpace == 'trivial') {
+          let reducedForm = ''
+          if (reducedMatSelected == 'yes') {
+            reducedForm = `
+            <p>A  =  ${firstBracketOpen} 1 &nbsp;  ${!isNaN(a2) ? `0 &nbsp;` : ''}  
+              ${!isNaN(a3) ? `0 &nbsp;` : ''} ${!isNaN(a4) ? 0 : ''} ${firstBracketClose}</p>
+            <p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;${secondBracketOpen} ${!isNaN(b1) ? `0 &nbsp;` : ''} ${!isNaN(b2) ? `1 &nbsp;` : ''} 
+              ${!isNaN(b3) ? 0 : ''} ${!isNaN(b4) ? 0 : ''} ${secondBracketClose}</p>
+            <p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;${thirdBracketOpen} ${!isNaN(c1) ? `0 &nbsp;` : ''} ${!isNaN(c2) ? `0 &nbsp;` : ''} 
+              ${!isNaN(c3) ? 1 : ''} ${!isNaN(c4) ? 0 : ''} ${thirdBracketClose} </p>
+            <p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ${fourthBracketOpen} ${!isNaN(d1) ? `0 &nbsp;` : ''}  ${!isNaN(d2) ? `0 &nbsp;` : ''}  
+              ${!isNaN(d3) ? 0 : ''} ${!isNaN(d4) ? 1 : ''} ${fourthBracketClose}</p>
+          `
+            calcResultsEl.innerHTML = `
+              ${matrixA}
+              <p>After Gauss-Jordan elimination your matrix takes the form</p>
+              ${reducedForm}
+              <p>The null space of your matrix is trivial, i.e., it is only the zero vector.</p>
+            `
+          } else if (reducedMatSelected == 'no') {
+            calcResultsEl.innerHTML = `
+              ${matrixA}
+              <p>The null space of your matrix is trivial, i.e., it is only the zero vector.</p>
+            `
+          }
+        } else {
+          calcResultsEl.innerHTML = `
+            ${matrixA}
+            <p></p>
+          `
+        }
+       
+      } catch (error) {
+        showError("Something Went Wrong!!!");
+        resethandler()
+      }
+    }
+
+    /********************************* HELPER FUNCTIONS **********************************/
+
+    function showError(errorMessage) {
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: errorMessage,
+      });
+    }
+
+    function resetForm() {
+      a1El.value = ""
+      a2El.value = ""
+      a3El.value = ""
+      a4El.value = ""
+      b1El.value = ""
+      b2El.value = ""
+      b3El.value = ""
+      b4El.value = ""
+      c1El.value = ""
+      c2El.value = ""
+      c3El.value = ""
+      c4El.value = ""
+      d1El.value = ""
+      d2El.value = ""
+      d3El.value = ""
+      d4El.value = ""
+    }
+
+    function resetResult() {
+      calcResultsEl.innerHTML = "<p>Result will appear here...</p>";
+    }
+
+    function resethandler() {
+      resetForm();
+      resetResult();
+    }
+
+    /********************************** EVENT LISTENERS **********************************/
+    resetBtnEl.addEventListener("click", resethandler);
+    [a1El, a2El, a3El, b1El, b2El, b3El].forEach((el) => {
+      el.addEventListener("input", resetResult);
+    }); 
+    
+    numRowsEl.addEventListener("change", (e) => {
+      handleNumRowsChange(e);
+      resetResult();
+    })
+
+    numColsEl.addEventListener("change", (e) => {
+      handleNumColsChange(e);
+      resetResult();
+    })
+
+    showReducedMatEl.addEventListener("change", (e) => {
+      reducedMatSelected = e.target.value
+      resetResult();
+    })
+    calcBtnEl.addEventListener("click", calculateResults);
+  </script>
+</body>
+
+</html> 

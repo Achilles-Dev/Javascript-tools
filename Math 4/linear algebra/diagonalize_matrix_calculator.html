@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Diagonalize Matrix Calculator</title>
+
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.6.5/dist/sweetalert2.all.min.js"></script>
+  <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11.6.5/dist/sweetalert2.min.css" rel="stylesheet">
+</head>
+
+<body>
+  <div>
+    <h1>Diagonalize Matrix Calculator</h1>
+    <p>
+      <label for="matSize">Matrix size: </label>
+      <select id="matSize">
+        <option value="two" selected>&nbsp;2x2 &nbsp;</option>
+        <option value="three">&nbsp;3x3 &nbsp;</option>  
+      </select>
+    </p>
+    <span>(number of rows) x (number of columns).</span>
+    
+    <p>First row</p>
+      <p>
+        <label for="a1">a₁:</label>
+        <input type="number" id="a1" />  
+      </p>
+      <p>
+        <label for="a2">a₂:</label>
+        <input type="number" id="a2" />  
+      </p>
+      <p id="first3DInput" style="display: none;">
+        <label for="a3">a₃:</label>
+        <input type="number" id="a3" />  
+      </p>
+    <p>Second row</p>
+      <p>
+        <label for="b1">b₁:</label>
+        <input type="number" id="b1" />  
+      </p>
+      <p>
+        <label for="b2">b₂:</label>
+        <input type="number" id="b2" />  
+      </p>
+      <p id="second3DInput" style="display: none;">
+        <label for="b3">b₃:</label>
+        <input type="number" id="b3" />  
+      </p>
+    <div id="thirdRowInputs" style="display: none;">
+      <p>Third row</p>
+      <p>
+        <label for="c1">c₁:</label>
+        <input type="number" id="c1" />  
+      </p>
+      <p>
+        <label for="c2">c₂:</label>
+        <input type="number" id="c2" />  
+      </p>              
+      <p>
+        <label for="c3">c₃:</label>
+        <input type="number" id="c3" />  
+      </p>
+    </div>
+    
+    <p>
+      <button id="calcBtn">Calculate</button>
+      <button id="resetBtn">Reset</button>
+    </p>
+    <hr>
+    <p>
+    <h3>Result:</h3>
+    <h3 id="calcResults">Result will appear here...</h3>
+    </p>
+  </div>
+  <script>
+
+    /********************************** ELEMENTS **********************************/
+    const matSizeEl = document.getElementById('matSize');
+    const first3DInputEl = document.getElementById('first3DInput');
+    const second3DInputEl = document.getElementById('second3DInput');
+    const thirdRowInputsEl = document.getElementById('thirdRowInputs');
+    const calcBtnEl = document.getElementById('calcBtn');
+    const resetBtnEl = document.getElementById('resetBtn');
+    const calcResultsEl = document.getElementById('calcResults')
+
+    let a1El = document.getElementById('a1');
+    let a2El = document.getElementById('a2');
+    let a3El = '';
+    let b1El = document.getElementById('b1');
+    let b2El = document.getElementById('b2');
+    let b3El = '';
+    let c1El = '';
+    let c2El = '';
+    let c3El = '';
+    let matSizeSelected = 'two';
+
+    /********************************** FUNCTIONS **********************************/
+    // Conversion functions
+
+    function handleMatrixSizeChange(e) {
+      const matrixSize = e.target.value
+      first3DInputEl.style.display = matrixSize ==  'three' ? 'block' : 'none'
+      second3DInputEl.style.display = matrixSize ==  'three' ? 'block' : 'none'
+      thirdRowInputsEl.style.display = matrixSize ==  'three' ? 'block' : 'none'
+      matSizeSelected = matrixSize;
+      if (matrixSize == 'two') {
+        a1El = document.getElementById('a1');
+        a2El = document.getElementById('a2');
+        a3El = '';
+        b1El = document.getElementById('b1');
+        b2El = document.getElementById('b2');
+        b3El = '';
+        c1El = '';
+        c2El = '';
+        c3El = '';
+      } else if (matrixSize == 'three') {
+        a1El = document.getElementById('a1');
+        a2El = document.getElementById('a2');
+        a3El = document.getElementById('a3');
+        b1El = document.getElementById('b1');
+        b2El = document.getElementById('b2');
+        b3El = document.getElementById('b3');
+        c1El = document.getElementById('c1');
+        c2El = document.getElementById('c2');
+        c3El = document.getElementById('c3');
+        [a3El, b3El, c1El, c2El, c3El].forEach((el) => {
+          el.addEventListener("input", resetResult);
+        });
+      }
+    }
+
+    function diagonalizeMatrix(a1, a2, a3, b1, b2, b3, c1, c2, c3) {
+      let results = {};
+      return results
+    }
+
+    function calculateResults() {
+      // Retrieve input values
+      const a1 = parseFloat(a1El.value)
+      const a2 = parseFloat(a2El.value)
+      const a3 = parseFloat(a3El.value)
+      const b1 = parseFloat(b1El.value)
+      const b2 = parseFloat(b2El.value)
+      const b3 = parseFloat(b3El.value)
+      const c1 = parseFloat(c1El.value)
+      const c2 = parseFloat(c2El.value)
+      const c3 = parseFloat(c3El.value)
+      
+      
+      if (
+        isNaN(a1) || isNaN(b1) || isNaN(a2) || isNaN(b2) ||  (c1El != '' && isNaN(c1)) ||  (c2El != '' && isNaN(c2)) ||
+        (a3El != '' && isNaN(a3)) || (b3El != '' && isNaN(b3)) || (c3El != '' && isNaN(c3))
+        
+      ) {
+        showError("Please Enter All Details.");
+        return;
+      }
+      
+      
+      try {
+        const results = diagonalizeMatrix(a1, a2, a3, b1, b2, b3, c1, c2, c3)
+        
+        calcResultsEl.innerHTML = `<p>Your eigenvalues are:</p>
+                                     <p></p>
+                                     <p>The real eigenvectors are:</p>
+                                     <p></p>
+                                  `
+      } catch (error) {
+        showError("Something Went Wrong!!!");
+        resethandler()
+      }
+    }
+
+    /********************************* HELPER FUNCTIONS **********************************/
+
+    function showError(errorMessage) {
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: errorMessage,
+      });
+    }
+
+    function resetForm() {
+      a1El.value = ""
+      a2El.value = ""
+      a3El.value = ""
+      b1El.value = ""
+      b2El.value = ""
+      b3El.value = ""
+      c1El.value = ""
+      c2El.value = ""
+      c3El.value = ""
+    }
+
+    function resetResult() {
+      calcResultsEl.innerHTML = "<p>Result will appear here...</p>";
+    }
+
+    function resethandler() {
+      resetForm();
+      resetResult();
+    }
+
+    /********************************** EVENT LISTENERS **********************************/
+    resetBtnEl.addEventListener("click", resethandler);
+    [a1El, a2El, b1El, b2El].forEach((el) => {
+      el.addEventListener("input", resetResult);
+    });   
+    matSizeEl.addEventListener("change", (e) => {
+      handleMatrixSizeChange(e);
+      resetResult();
+    })
+    calcBtnEl.addEventListener("click", calculateResults);
+  </script>
+</body>
+
+</html> 

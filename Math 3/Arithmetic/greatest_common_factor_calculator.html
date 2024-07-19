@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Greatest Common Factor Calculator</title>
+
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.6.5/dist/sweetalert2.all.min.js"></script>
+  <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11.6.5/dist/sweetalert2.min.css" rel="stylesheet">
+</head>
+
+<body>
+  <div>
+    <h1>Greatest Common Factor Calculator</h1>
+    <p>Calculate the greatest common factor.</p>
+    <h4>To find the greatest common factor, enter all the whole numbers separated by comma 75,90,135 or space 75 90 135:</h4>
+    <p>
+      <input type="text" id="nums" />  
+    </p>
+
+    <p>
+      <button id="calcBtn">Calculate</button>
+      <button id="resetBtn">Reset</button>
+    </p>
+    <hr>
+    <p>
+    <h3>Result:</h3>
+    <h3 id="calcResults">Result will appear here...</h3>
+    </p>
+  </div>
+  <script>
+
+    /********************************** ELEMENTS **********************************/
+    const numsEl = document.getElementById('nums');
+    const calcBtnEl = document.getElementById('calcBtn');
+    const resetBtnEl = document.getElementById('resetBtn');
+    const calcResultsEl = document.getElementById('calcResults')
+
+    /********************************** FUNCTIONS **********************************/
+    // Conversion functions
+
+    function greatestCommonFactor(commonFactors) {
+      let shortestFactorsLen = commonFactors[0].length
+      let factors = commonFactors[0];
+      for (let i = 1; i < commonFactors.length; i++) {
+        if (commonFactors[i].length < shortestFactorsLen) {
+          shortestFactorsLen = commonFactors[i].length
+          factors = commonFactors[i]
+        }
+      }
+
+      let commonFactorsLen = commonFactors.length;
+      let factorsLen = shortestFactorsLen;
+      let gcd = 1;
+
+      while (commonFactorsLen >= 0) {
+        let factLen = factorsLen - 1 
+        let commFactLen = commonFactorsLen - 1 
+        if (commonFactors[commFactLen].includes(factors[factLen])) {
+          commonFactorsLen -= 1
+          if (commFactLen <= 0) {
+            gcd = factors[factLen]
+            break;
+          }
+        } else {
+          factorsLen -= 1;
+        }
+      }
+      return gcd
+    }
+
+    function getAllFactors(num) {
+      if (num % 1 != 0) {
+        return;
+      }
+      let factors = []
+      for (let i = 1; i <= num; i++) {
+        if (num % i == 0) {
+            factors.push(i)
+        }
+      }
+      return factors;
+    }
+
+    function calcGreatestCommonFactor(nums) {
+      let results = '';
+      let commonFactors = [];
+      nums = nums.replace(/[ ,]+/g, ",")
+      nums = nums.split(",")
+      for (let i = 0; i < nums.length; i++) {
+        let factors = getAllFactors(nums[i])
+        if (factors == undefined) {
+          showError("Please Enter a whole number.");
+          return;
+        }
+        commonFactors.push(factors)
+      }
+      results = greatestCommonFactor(commonFactors);
+      return results;
+    }
+
+    function calculateResults() {
+      // Retrieve input values
+      const nums = numsEl.value
+
+      if (
+        nums == ''
+      ) {
+        showError("Please Enter All Details.");
+        return;
+      }
+
+      try {
+        const gcf = calcGreatestCommonFactor(nums)
+        let newNums = nums.replace(/[ ,]+/g, ", ");
+        calcResultsEl.innerHTML = `The Greatest Common Factor of ${newNums} = ${gcf}`
+      } catch (error) {
+        showError("Something Went Wrong!!!");
+        resethandler()
+      }
+
+    }
+
+    /********************************* HELPER FUNCTIONS **********************************/
+
+    function showError(errorMessage) {
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: errorMessage,
+      });
+    }
+
+    function resetForm() {
+      numsEl.value = ""
+    }
+
+    function resetResult() {
+      calcResultsEl.innerHTML = "<p>Result will appear here...</p>";
+    }
+
+    function resethandler() {
+      resetForm();
+      resetResult();
+    }
+
+    /********************************** EVENT LISTENERS **********************************/
+    resetBtnEl.addEventListener("click", resethandler);
+    numsEl.addEventListener("input", resetResult);
+    calcBtnEl.addEventListener("click", calculateResults);
+  </script>
+</body>
+
+</html> 

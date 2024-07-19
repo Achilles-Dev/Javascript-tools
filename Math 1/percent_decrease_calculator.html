@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Percent Decrease Calculator</title>
+
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.6.5/dist/sweetalert2.all.min.js"></script>
+  <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11.6.5/dist/sweetalert2.min.css" rel="stylesheet">
+</head>
+<body>
+  <div>
+    <h1>Percent Decrease Calculator</h1>
+    <p>Find the percent decrease or the decrease in a value by entering the known values below.</p>
+    <p>
+      <label for="initialValue">Initial Value:</label>
+      <input type="number" id="initialValue" placeholder="200">
+    </p>
+
+    <p>
+      <label for="finalValue">Final Value:</label>
+      <input type="number" id="finalValue" placeholder="120">
+    </p>
+  
+    <p>
+      <button id="calcBtn">Calculate</button>
+      <button id="resetBtn">Reset</button>
+    </p>
+      <hr>
+    <p>
+      <h3>Result:</h3>
+      <h3 id="calcResults">Result will appear here...</h3> 
+    </p>
+  </div>
+  <script>
+
+    /********************************** ELEMENTS **********************************/
+    const initialValueEl = document.getElementById('initialValue');
+    const finalValueEl = document.getElementById('finalValue');
+    const calcBtnEl = document.getElementById('calcBtn');
+    const resetBtnEl = document.getElementById('resetBtn');
+    const calcResultsEl = document.getElementById('calcResults')
+    
+     /********************************** FUNCTIONS **********************************/
+      // Conversion functions
+
+      function percentDecrease(initialValue, finalValue) {
+        let results = 0;
+        results = ((initialValue - finalValue) / (Math.abs(initialValue))) * 100
+        return results;
+      }
+
+      function calculateResults() {
+        // Retrieve input values
+        const initialValue = parseFloat(initialValueEl.value)
+        const finalValue = parseFloat(finalValueEl.value)
+       
+        if (
+          isNaN(initialValue) || isNaN(finalValue) || initialValue == 0 || finalValue == 0
+        ) {
+          showError("Please Enter All Details.");
+          return;
+        }
+        
+        try {
+          const percentageDecrease = percentDecrease(initialValue, finalValue)
+          let change = ''
+          if (initialValue < finalValue) {
+            change = 'increase'
+          } else {
+            change = 'decrease'
+          }
+          calcResultsEl.innerHTML = `${Math.abs(percentageDecrease.toFixed(4) * 1)}% ${change}`
+          
+        } catch (error) {
+          showError("Something Went Wrong!!!");
+          resethandler()
+        }
+        
+      }
+    
+      /********************************* HELPER FUNCTIONS **********************************/
+
+      function showError(errorMessage) {
+        Swal.fire({
+            icon: "error",
+            title: "Error",
+            text: errorMessage,
+        });
+      }
+
+      function resetForm() {
+        initialValueEl.value = "";
+        finalValueEl.value = "";
+      }
+
+      function resetResult() {
+        calcResultsEl.innerHTML = "<p>Result will appear here...</p>";
+      }
+
+      function resethandler() {
+        resetForm();
+        resetResult();
+      }
+
+      /********************************** EVENT LISTENERS **********************************/
+      resetBtnEl.addEventListener("click", resethandler);
+      [initialValueEl, finalValueEl].forEach((el) => {
+        el.addEventListener("input", resetResult);
+      });
+      calcBtnEl.addEventListener("click", calculateResults);
+  </script>
+</body>
+</html>

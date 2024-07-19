@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Significant Figures Calculator</title>
+
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.6.5/dist/sweetalert2.all.min.js"></script>
+  <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11.6.5/dist/sweetalert2.min.css" rel="stylesheet">
+</head>
+
+<body>
+  <div>
+    <h1>Significant Figures Calculator</h1>
+    <p>
+      <label for="num">Number:</label>
+      <input type="number" id="num" />  
+    </p>
+    <p>
+      <label for="sigNum">Round to sig fig:</label>
+      <input type="number" id="sigNum" />  
+    </p>
+    
+    <p>
+      <button id="calcBtn">Calculate</button>
+      <button id="resetBtn">Reset</button>
+    </p>
+    <hr>
+    <p>
+    <h3>Result:</h3>
+    <h3 id="calcResults">Result will appear here...</h3>
+    </p>
+  </div>
+  <script>
+
+    /********************************** ELEMENTS **********************************/
+    const numEl = document.getElementById('num');
+    const sigNumEl = document.getElementById('sigNum');
+    const calcBtnEl = document.getElementById('calcBtn');
+    const resetBtnEl = document.getElementById('resetBtn');
+    const calcResultsEl = document.getElementById('calcResults')
+
+    /********************************** FUNCTIONS **********************************/
+    // Conversion functions
+
+    function sigFigures(num, sigNum) {
+      let results = 0;
+      let numStr = num.toString()
+      if (num % 1 == 0) {
+        results = parseFloat(num.toPrecision(sigNum))
+      } else {
+        let decimalLen = ((numStr.length - Math.floor(num).toString().length) - 1)
+        let wholeLen = ((numStr.length - decimalLen) - 1)
+        if (numStr.charAt(wholeLen + 1) == '0' && numStr.charAt(sigNum) == '0' && parseFloat(numStr.charAt(sigNum + 1)) < 5 && num >= 1) {
+          let zeroes = 10 ** (sigNum - wholeLen)
+          results = `${parseFloat(num.toPrecision(sigNum))}.${zeroes.toString().substring(1, (sigNum - wholeLen) + 1)}`
+        } else {
+          results = parseFloat(num.toPrecision(sigNum))
+        }
+      }
+      return results
+    }
+
+    function calculateResults() {
+      // Retrieve input values
+      const num = parseFloat(numEl.value)
+      const sigNum = parseFloat(sigNumEl.value)
+
+      if (
+        isNaN(num)  || isNaN(sigNum) || sigNum <= 0
+      ) {
+        showError("Please Enter All Details.");
+        return;
+      }
+      
+      try {
+        const results = sigFigures(num, sigNum)
+        calcResultsEl.innerHTML = `${results}`
+      } catch (error) {
+        showError("Something Went Wrong!!!");
+        resethandler()
+      }
+
+    }
+
+    /********************************* HELPER FUNCTIONS **********************************/
+
+    function showError(errorMessage) {
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: errorMessage,
+      });
+    }
+
+    function resetForm() {
+      numEl.value = ""
+      sigNumEl.value = ""
+    }
+
+    function resetResult() {
+      calcResultsEl.innerHTML = "<p>Result will appear here...</p>";
+    }
+
+    function resethandler() {
+      resetForm();
+      resetResult();
+    }
+
+    /********************************** EVENT LISTENERS **********************************/
+    resetBtnEl.addEventListener("click", resethandler);
+    [numEl, sigNumEl].forEach((el) => {
+      el.addEventListener("input", resetResult);
+    });
+    calcBtnEl.addEventListener("click", calculateResults);
+  </script>
+</body>
+
+</html>   

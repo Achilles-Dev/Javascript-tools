@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Scientific Notation Calculator</title>
+
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.6.5/dist/sweetalert2.all.min.js"></script>
+  <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11.6.5/dist/sweetalert2.min.css" rel="stylesheet">
+</head>
+
+<body>
+  <div>
+    <h1>Scientific Notation Calculator</h1>
+    <p>Perform addition, subtraction, multiplication and division calculations in scientific notation.</p>
+    <p>
+      <p>Enter numbers in scientific notation (e.g. -3.34e5, 1.1E-7, 6.78, etc)</p>
+      <input type="number" id="numA" /> 
+      <select id="signUnit" >
+        <option value="+">+&nbsp;&nbsp;&nbsp;</option>
+        <option value="-">-</option>
+        <option value="*">&times;</option>
+        <option value="/">&divide;</option>
+      </select> 
+      <input type="number" id="numB" />  
+    </p>
+
+    <p>
+      <button id="calcBtn">Calculate</button>
+      <button id="resetBtn">Reset</button>
+    </p>
+    <hr>
+    <p>
+    <h3>Result:</h3>
+    <h3 id="calcResults">Result will appear here...</h3>
+    </p>
+  </div>
+  <script>
+
+    /********************************** ELEMENTS **********************************/
+    const numAEl = document.getElementById('numA');
+    const numBEl = document.getElementById('numB');
+    const signUnitEl = document.getElementById('signUnit');
+    const calcBtnEl = document.getElementById('calcBtn');
+    const resetBtnEl = document.getElementById('resetBtn');
+    const calcResultsEl = document.getElementById('calcResults')
+
+    /********************************** FUNCTIONS **********************************/
+    // Conversion functions
+
+    function calcSciNotation(numA, numB, signUnit) {
+      let results = 0
+      if (signUnit == '-') {
+        results = parseFloat(numA) - parseFloat(numB)
+      } else if (signUnit == '*') {
+        results = parseFloat(numA) * parseFloat(numB)
+      } else if (signUnit == '/') {
+        results = parseFloat(numA) / parseFloat(numB)
+      } else {
+        results = parseFloat(numA) + parseFloat(numB)
+      }
+      return results
+    }
+
+    function calculateResults() {
+      // Retrieve input values
+      const numA = numAEl.value
+      const numB = numBEl.value
+      const signUnit = signUnitEl.value
+
+      if (
+        isNaN(numA) || isNaN(numB)
+      ) {
+        showError("Please Enter All Details.");
+        return;
+      }
+      
+      try {
+        const results = calcSciNotation(numA, numB, signUnit)
+        let mySign = signUnit
+        if (signUnit == '*') {
+          mySign = '&times;'
+        } else if (signUnit == '/') {
+          mySign = '&divide;'
+        }
+        calcResultsEl.innerHTML = `${numA} ${mySign} ${numB} = ${results}`
+      } catch (error) {
+        showError("Something Went Wrong!!!");
+        resethandler()
+      }
+    }
+
+    /********************************* HELPER FUNCTIONS **********************************/
+
+    function showError(errorMessage) {
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: errorMessage,
+      });
+    }
+
+    function resetForm() {
+      numAEl.value = ""
+      numBEl.value = ""
+      signUnitEl.selectedIndex = 0
+    }
+
+    function resetResult() {
+      calcResultsEl.innerHTML = "<p>Result will appear here...</p>";
+    }
+
+    function resethandler() {
+      resetForm();
+      resetResult();
+    }
+
+    /********************************** EVENT LISTENERS **********************************/
+    resetBtnEl.addEventListener("click", resethandler);
+    [numAEl, numBEl].forEach((el) => {
+      el.addEventListener("input", resetResult);
+    });
+    signUnitEl.addEventListener("change", resetResult)
+    calcBtnEl.addEventListener("click", calculateResults);
+  </script>
+</body>
+</html> 

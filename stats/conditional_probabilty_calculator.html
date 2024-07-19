@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Conditional Probability Calculator</title>
+  </head>
+  <body>
+    <h1>Conditional Probability Calculator</h1>
+    <h3>Event A:</h3>
+    <div>
+      <p>
+        P(A):&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        <input type="number" id="probA" />
+      </p>
+      <p>
+        P(B | A):&nbsp;&nbsp;
+        <input type="number" id="probBGnA" />
+      </p>
+      <p>
+        P(<span style="text-decoration: overline">B</span> | A):&nbsp;
+        <input type="number" id="probBCompGvA" />
+      </p>
+      <p>
+        P(A &#8745; B):&nbsp;&nbsp;
+        <input type="number" id="probAIntB" />
+      </p>
+      <p>
+        P(A &#8745; <span style="text-decoration: overline">B</span>):&nbsp;
+        <input type="number" id="probAIntBComp" />
+      </p>
+    </div>
+    <h4>Event <span style="text-decoration: overline">A</span>:</h4>
+    <div>
+      <p>
+        P(<span style="text-decoration: overline">A</span
+        >):&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        <input type="number" id="probAComp" />
+      </p>
+      <p>
+        P(B | <span style="text-decoration: overline">A</span>):&nbsp;&nbsp;
+        <input type="number" id="probBGvAComp" />
+      </p>
+      <p>
+        P(<span style="text-decoration: overline">B</span> |
+        <span style="text-decoration: overline">A</span>):&nbsp;
+        <input type="number" id="probBCompGvAComp" />
+      </p>
+      <p>
+        P(<span style="text-decoration: overline">A</span> &#8745;
+        B):&nbsp;&nbsp;
+        <input type="number" id="probACompIntB" />
+      </p>
+      <p>
+        P(<span style="text-decoration: overline">A</span> &#8745;
+        <span style="text-decoration: overline">B</span>):&nbsp;
+        <input type="number" id="probACompIntBComp" />
+      </p>
+    </div>
+
+    <button id="calcBtn">Calculate</button>
+    <button id="resetBtn">Reset</button>
+    <hr />
+    <div>
+      <h3>Result:</h3>
+      <h3 id="calcResults">Result will appear here...</h3>
+    </div>
+
+    <script>
+      // Get required elements from the HTML
+      const probAEl = document.getElementById("probA");
+      const probBGvAEl = document.getElementById("probBGnA");
+      const probBCompGvAEl = document.getElementById("probBCompGvA");
+      const probAIntBEl = document.getElementById("probAIntB");
+      const probAIntBCompEl = document.getElementById("probAIntBComp");
+
+      const probACompEl = document.getElementById("probAComp");
+      const probBGvACompEl = document.getElementById("probBGvAComp");
+      const probBCompGvACompEl = document.getElementById("probBCompGvAComp");
+      const probACompIntBEl = document.getElementById("probACompIntB");
+      const probACompIntBCompEl = document.getElementById("probACompIntBComp");
+
+      const calcBtnEl = document.getElementById("calcBtn");
+      const resetBtnEl = document.getElementById("resetBtn");
+      const calcResultsEl = document.getElementById("calcResults");
+
+      function calculateResults() {
+        // Retrieve input values
+        const probA = parseFloat(probAEl.value);
+        const probBGvA = parseFloat(probBGvAEl.value);
+        const probBCompGvA = parseFloat(probBCompGvAEl.value);
+        const probAIntB = parseFloat(probAIntBEl.value);
+        const probAIntBComp = parseFloat(probAIntBCompEl.value);
+
+        const probAComp = parseFloat(probACompEl.value);
+        const probBGvAComp = parseFloat(probBGvACompEl.value);
+        const probBCompGvAComp = parseFloat(probBCompGvACompEl.value);
+        const probACompIntB = parseFloat(probACompIntBEl.value);
+        const probACompIntBComp = parseFloat(probACompIntBCompEl.value);
+
+        if (
+          ((isNaN(probA) || isNaN(probBGvA)) && isNaN(probAIntB)) ||
+          ((isNaN(probAComp) || isNaN(probBGvAComp)) && isNaN(probACompIntB))
+        ) {
+          alert("Please Enter All Details.");
+          return;
+        } else if (
+          probA > 1 ||
+          probA < 0 ||
+          probBGvA > 1 ||
+          probBGvA < 0 ||
+          probBCompGvA > 1 ||
+          probBCompGvA < 0 ||
+          probAIntB > 1 ||
+          probAIntB < 0 ||
+          probAIntBComp > 1 ||
+          probAIntBComp < 0 ||
+          probAComp > 1 ||
+          probAComp < 0 ||
+          probBGvAComp > 1 ||
+          probBGvAComp < 0 ||
+          probBCompGvAComp > 1 ||
+          probBCompGvAComp < 0 ||
+          probACompIntB > 1 ||
+          probACompIntB < 0 ||
+          probACompIntBComp > 1 ||
+          probACompIntBComp < 0
+        ) {
+          alert("Value of probability must be between 0 and 1.");
+          return;
+        }
+
+        try {
+          const results = 1;
+
+          calcResultsEl.innerHTML = `<p> Combinations	: ${
+            results.toFixed(2) * 1
+          }</p>`;
+        } catch (error) {
+          alert("Something Went Wrong!!!");
+          resethandler();
+        }
+      }
+
+      function resetForm() {
+        probAEl.value = "";
+        probBGvAEl.value = "";
+        probBCompGvAEl.value = "";
+        probAIntBEl.value = "";
+        probAIntBCompEl.value = "";
+        probACompEl.value = "";
+        probBGvACompEl.value = "";
+        probBCompGvACompEl.value = "";
+        probACompIntBEl.value = "";
+        probACompIntBCompEl.value = "";
+      }
+
+      function resetResult() {
+        calcResultsEl.innerHTML = "<p>Result will appear here...</p>";
+      }
+
+      function resethandler() {
+        resetForm();
+        resetResult();
+      }
+
+      resetBtnEl.addEventListener("click", resethandler);
+      calcBtnEl.addEventListener("click", calculateResults);
+
+      [
+        probAEl,
+        probBGvAEl,
+        probBCompGvAEl,
+        probAIntBEl,
+        probAIntBCompEl,
+      ].forEach((el) => {
+        el.addEventListener("input", resetResult);
+      });
+      [
+        probACompEl,
+        probBGvACompEl,
+        probBCompGvACompEl,
+        probACompIntBEl,
+        probACompIntBCompEl,
+      ].forEach((el) => {
+        el.addEventListener("input", resetResult);
+      });
+    </script>
+  </body>
+</html>

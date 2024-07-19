@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Inverse Matrix Calculator</title>
+
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.6.5/dist/sweetalert2.all.min.js"></script>
+  <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11.6.5/dist/sweetalert2.min.css" rel="stylesheet">
+</head>
+
+<body>
+  <div>
+    <h1>Inverse Matrix Calculator</h1>
+    <p>
+      <label for="matSize">Matrix size: </label>
+      <select id="matSize">
+        <option value="two" selected>&nbsp;2x2 &nbsp;</option>
+        <option value="three">&nbsp;3x3 &nbsp;</option>
+        <option value="four">&nbsp;4x4 &nbsp;</option>  
+      </select>
+    </p>
+    
+    <p>First row</p>
+      <p>
+        <label for="a1">a₁:</label>
+        <input type="number" id="a1" />  
+      </p>
+      <p>
+        <label for="a2">a₂:</label>
+        <input type="number" id="a2" />  
+      </p>
+      <p id="first3DInput" style="display: none;">
+        <label for="a3">a₃:</label>
+        <input type="number" id="a3" />  
+      </p>
+      <p id="first4DInput" style="display: none;">
+        <label for="a4">a₄:</label>
+        <input type="number" id="a4" />  
+      </p>
+    <p>Second row</p>
+      <p>
+        <label for="b1">b₁:</label>
+        <input type="number" id="b1" />  
+      </p>
+      <p>
+        <label for="b2">b₂:</label>
+        <input type="number" id="b2" /> 
+      </p>
+      <p id="second3DInput" style="display: none;">
+        <label for="b3">b₃:</label>
+        <input type="number" id="b3" />  
+      </p>
+      <p id="second4DInput" style="display: none;">
+        <label for="b4">b₄:</label>
+        <input type="number" id="b4" />  
+      </p>
+    <div id="thirdRowInputs" style="display: none;">
+      <p>Third row</p>
+      <p>
+        <label for="c1">c₁:</label>
+        <input type="number" id="c1" />  
+      </p>
+      <p>
+        <label for="c2">c₂:</label>
+        <input type="number" id="c2" />  
+      </p>              
+      <p>
+        <label for="c3">c₃:</label>
+        <input type="number" id="c3" />  
+      </p>
+      <p id="third4DInput" style="display: none;">
+        <label for="c4">c₄:</label>
+        <input type="number" id="c4" /> 
+      </p>
+    </div>
+    <div id="fourthRowInputs" style="display: none;">
+      <p>Fourth row</p>
+      <p>
+        <label for="d1">d₁:</label>
+        <input type="number" id="d1" />  
+      </p>
+      <p>
+        <label for="d2">d₂:</label>
+        <input type="number" id="d2" />  
+      </p>              
+      <p>
+        <label for="d3">d₃:</label>
+        <input type="number" id="d3" />  
+      </p>
+      <p>
+        <label for="d4">d₄:</label>
+        <input type="number" id="d4" />  
+      </p>
+    </div>
+    
+    <p>
+      <button id="calcBtn">Calculate</button>
+      <button id="resetBtn">Reset</button>
+    </p>
+    <hr>
+    <p>
+    <h3>Result:</h3>
+    <h3 id="calcResults">Result will appear here...</h3>
+    </p>
+  </div>
+  <script>
+
+    /********************************** ELEMENTS **********************************/
+    const matSizeEl = document.getElementById('matSize');
+    const first3DInputEl = document.getElementById('first3DInput');
+    const first4DInputEl = document.getElementById('first4DInput');
+    const second3DInputEl = document.getElementById('second3DInput');
+    const second4DInputEl = document.getElementById('second4DInput');
+    const third4DInputEl = document.getElementById('third4DInput');
+    const thirdRowInputsEl = document.getElementById('thirdRowInputs');
+    const fourthRowInputsEl = document.getElementById('fourthRowInputs');
+    const calcBtnEl = document.getElementById('calcBtn');
+    const resetBtnEl = document.getElementById('resetBtn');
+    const calcResultsEl = document.getElementById('calcResults')
+
+    let a1El = document.getElementById('a1');
+    let a2El = document.getElementById('a2');
+    let a3El = '';
+    let a4El = '';
+    let b1El = document.getElementById('b1');
+    let b2El = document.getElementById('b2');
+    let b3El = '';
+    let b4El = '';
+    let c1El = '';
+    let c2El = '';
+    let c3El = '';
+    let c4El = '';
+    let d1El = '';
+    let d2El = '';
+    let d3El = '';
+    let d4El = '';
+    let matSizeSelected = 'two';
+
+    /********************************** FUNCTIONS **********************************/
+    // Conversion functions
+
+    function handleMatrixSizeChange(e) {
+      const matrixSize = e.target.value
+      first3DInputEl.style.display = (matrixSize ==  'three' || matrixSize ==  'four') ? 'block' : 'none'
+      second3DInputEl.style.display = (matrixSize ==  'three' || matrixSize ==  'four') ? 'block' : 'none'
+      thirdRowInputsEl.style.display = (matrixSize ==  'three' || matrixSize ==  'four') ? 'block' : 'none'
+
+      first4DInputEl.style.display = matrixSize ==  'four' ? 'block' : 'none'
+      second4DInputEl.style.display = matrixSize ==  'four' ? 'block' : 'none'
+      third4DInputEl.style.display = matrixSize ==  'four' ? 'block' : 'none'
+      fourthRowInputsEl.style.display = matrixSize ==  'four' ? 'block' : 'none'
+
+      matSizeSelected = matrixSize;
+      if (matrixSize == 'two') {
+        a1El = document.getElementById('a1');
+        a2El = document.getElementById('a2');
+        a3El = '';
+        a4El = '';
+        b1El = document.getElementById('b1');
+        b2El = document.getElementById('b2');
+        b3El = '';
+        b4El = '';
+        c1El = '';
+        c2El = '';
+        c3El = '';
+        c4El = '';
+        d1El = '';
+        d2El = '';
+        d3El = '';
+        d4El = '';
+      } else if (matrixSize == 'three') {
+        a1El = document.getElementById('a1');
+        a2El = document.getElementById('a2');
+        a3El = document.getElementById('a3');
+        a4El = '';
+        b1El = document.getElementById('b1');
+        b2El = document.getElementById('b2');
+        b3El = document.getElementById('b3');
+        b4El = '';
+        c1El = document.getElementById('c1');
+        c2El = document.getElementById('c2');
+        c3El = document.getElementById('c3');
+        c4El = '';
+        d1El = '';
+        d2El = '';
+        d3El = '';
+        d4El = '';
+        [a3El, b3El, c1El, c2El, c3El].forEach((el) => {
+          el.addEventListener("input", resetResult);
+        });
+      } else if (matrixSize == 'four') {
+        a1El = document.getElementById('a1');
+        a2El = document.getElementById('a2');
+        a3El = document.getElementById('a3');
+        a4El = document.getElementById('a4');
+        b1El = document.getElementById('b1');
+        b2El = document.getElementById('b2');
+        b3El = document.getElementById('b3');
+        b4El = document.getElementById('b4');
+        c1El = document.getElementById('c1');
+        c2El = document.getElementById('c2');
+        c3El = document.getElementById('c3');
+        c4El = document.getElementById('c4');
+        d1El = document.getElementById('d1');
+        d2El = document.getElementById('d2');
+        d3El = document.getElementById('d3');
+        d4El = document.getElementById('d4');
+        [a3El, b3El, c1El, c2El, c3El, a4El, b4El, c4El, d1El, d2El, d3El, d4El].forEach((el) => {
+          el.addEventListener("input", resetResult);
+        });
+      }
+    }
+
+    function matrixDeterminant(a1, a2, a3, a4, b1, b2, b3, b4, c1, c2, c3, c4, d1, d2, d3, d4) {
+      let results = 0;
+      if (matSizeSelected == 'two') {
+        results = (a1 * b2) - (b1 * a2)
+      } else if (matSizeSelected == 'three') {
+        results = (a1 * b2 * c3) + (b1 * c2 * a3) + (c1 * a2 * b3) - (c1 * b2 * a3) - (b1 * a2 * c3) - (a1 * c2 * b3)
+      } else if (matSizeSelected == 'four') {
+        results = (a1 * b2 * c3 * d4) - (a2 * b1 * c3 * d4) + (a3 * b1 * c2 * d4) - (a1 * b3 * c2 * d4) + 
+        (a2 * b3 * c1 * d4) - (a3 * b2 * c1 * d4)  + (a3 * b2 * c4 * d1) - (a2 * b3 * c4 * d1) + (a4 * b3 * c2 * d1) -
+        (a3 * b4 * c2 * d1) + (a2 * b4 * c3 * d1) - (a4 * b2 * c3 * d1) + (a4 * b1 * c3 * d2) - (a1 * b4 * c3 * d2) +
+        (a3 * b4 * c1 * d2) - (a4 * b3 * c1 * d2) + (a1 * b3 * c4 * d2) - (a3 * b1 * c4 * d2) + (a2 * b1 * c4 * d3) - 
+        (a1 * b2 * c4 * d3) + (a4 * b2 * c1 * d3) - (a2 * b4 * c1 * d3) + (a1 * b4 * c2 * d3) - (a4 * b1 * c2 * d3)
+      }
+      return results
+    }
+
+    function inverseMatrix(a1, a2, a3, a4, b1, b2, b3, b4, c1, c2, c3, c4, d1, d2, d3, d4) {
+      let results = {};
+      let detA = matrixDeterminant(a1, a2, a3, a4, b1, b2, b3, b4, c1, c2, c3, c4, d1, d2, d3, d4);
+      if (matSizeSelected == 'two') {      
+        results = {
+          r1c1: ((1 / detA) * (b2)).toFixed(4) * 1,
+          r1c2: ((1 / detA) * (a2 * -1)).toFixed(4) * 1,
+          r2c1: ((1 / detA) * (b1 * -1)).toFixed(4) * 1,
+          r2c2: ((1 / detA) * (a1)).toFixed(4) * 1,
+          detA: detA
+        } 
+      } 
+      else if (matSizeSelected == 'three') {      
+        results = {
+          r1c1: ((1 / detA) * ((b2 * c3) - (c2 * b3))).toFixed(4) * 1,
+          r1c2: ((1 / detA) * (((a2 * c3) - (c2 * a3)) * -1)).toFixed(4) * 1,
+          r1c3: ((1 / detA) * ((a2 * b3) - (b2 * a3))).toFixed(4) * 1,
+          r2c1: ((1 / detA) * (((b1 * c3) - (c1 * b3)) * -1)).toFixed(4) * 1,
+          r2c2: ((1 / detA) * ((a1 * c3) - (c1 * a3))).toFixed(4) * 1,
+          r2c3: ((1 / detA) * (((a1 * b3) - (b1 * a3)) * -1)).toFixed(4) * 1,
+          r3c1: ((1 / detA) * ((b1 * c2) - (c1 * b2))).toFixed(4) * 1,
+          r3c2: ((1 / detA) * (((a1 * c2) - (c1 * a2)) * -1)).toFixed(4) * 1,
+          r3c3: ((1 / detA) * ((a1 * b2) - (b1 * a2))).toFixed(4) * 1,
+          detA: detA
+        }
+      } 
+      else if (matSizeSelected == 'four') {      
+          results = {
+            r1c1: ((1 / detA) * ((b2 * c3 * d4) + (c2 * d3 * b4) + (d2 * b3 * c4) - (d2 * c3 * b4) - (c2 * b3 * d4) - (b2 * d3 * c4))).toFixed(4) * 1,
+            r1c2: ((1 / detA) * ((a2 * c3 * d4) + (c2 * d3 * a4) + (d2 * a3 * c4) - (d2 * c3 * a4) - (c2 * a3 * d4) - (a2 * d3 * c4)) * -1).toFixed(4) * 1,
+            r1c3: ((1 / detA) * ((a2 * b3 * d4) + (b2 * d3 * a4) + (d2 * a3 * b4) - (d2 * b3 * a4) - (b2 * a3 * d4) - (a2 * d3 * b4))).toFixed(4) * 1,
+            r1c4: ((1 / detA) * ((a2 * b3 * c4) + (b2 * c3 * a4) + (c2 * a3 * b4) - (c2 * b3 * a4) - (b2 * a3 * c4) - (a2 * c3 * b4)) * -1).toFixed(4) * 1,
+            r2c1: ((1 / detA) * ((b1 * c3 * d4) + (c1 * d3 * b4) + (d1 * b3 * c4) - (d1 * c3 * b4) - (c1 * b3 * d4) - (b1 * d3 * c4)) * -1).toFixed(4) * 1,
+            r2c2: ((1 / detA) * ((a1 * c3 * d4) + (c1 * d3 * a4) + (d1 * a3 * c4) - (d1 * c3 * a4) - (c1 * a3 * d4) - (a1 * d3 * c4))).toFixed(4) * 1,
+            r2c3: ((1 / detA) * ((a1 * b3 * d4) + (b1 * d3 * a4) + (d1 * a3 * b4) - (d1 * b3 * a4) - (b1 * a3 * d4) - (a1 * d3 * b4)) * -1).toFixed(4) * 1,
+            r2c4: ((1 / detA) * ((a1 * b3 * c4) + (b1 * c3 * a4) + (c1 * a3 * b4) - (c1 * b3 * a4) - (b1 * a3 * c4) - (a1 * c3 * b4))).toFixed(4) * 1,
+            r3c1: ((1 / detA) * ((b1 * c2 * d4) + (c1 * d2 * b4) + (d1 * b2 * c4) - (d1 * c2 * b4) - (c1 * b2 * d4) - (b1 * d2 * c4))).toFixed(4) * 1,
+            r3c2: ((1 / detA) * ((a1 * c2 * d4) + (c1 * d2 * a4) + (d1 * a2 * c4) - (d1 * c2 * a4) - (c1 * a2 * d4) - (a1 * d2 * c4)) * -1).toFixed(4) * 1,
+            r3c3: ((1 / detA) * ((a1 * b2 * d4) + (b1 * d2 * a4) + (d1 * a2 * b4) - (d1 * b2 * a4) - (b1 * a2 * d4) - (a1 * d2 * b4))).toFixed(4) * 1,
+            r3c4: ((1 / detA) * ((a1 * b2 * c4) + (b1 * c2 * a4) + (c1 * a2 * b4) - (c1 * b2 * a4) - (b1 * a2 * c4) - (a1 * c2 * b4)) * -1).toFixed(4) * 1,
+            r4c1: ((1 / detA) * ((b1 * c2 * d3) + (c1 * d2 * b3) + (d1 * b2 * c3) - (d1 * c2 * b3) - (c1 * b2 * d3) - (b1 * d2 * c3)) * -1).toFixed(4) * 1,
+            r4c2: ((1 / detA) * ((a1 * c2 * d3) + (c1 * d2 * a3) + (d1 * a2 * c3) - (d1 * c2 * a3) - (c1 * a2 * d3) - (a1 * d2 * c3))).toFixed(4) * 1,
+            r4c3: ((1 / detA) * ((a1 * b2 * d3) + (b1 * d2 * a3) + (d1 * a2 * b3) - (d1 * b2 * a3) - (b1 * a2 * d3) - (a1 * d2 * b3)) * -1).toFixed(4) * 1,
+            r4c4: ((1 / detA) * ((a1 * b2 * c3) + (b1 * c2 * a3) + (c1 * a2 * b3) - (c1 * b2 * a3) - (b1 * a2 * c3) - (a1 * c2 * b3))).toFixed(4) * 1,
+            detA: detA
+          }
+      }
+      return results
+    }
+
+    function calculateResults() {
+      // Retrieve input values
+      const a1 = parseFloat(a1El.value)
+      const a2 = parseFloat(a2El.value)
+      const a3 = parseFloat(a3El.value)
+      const a4 = parseFloat(a4El.value)
+      const b1 = parseFloat(b1El.value)
+      const b2 = parseFloat(b2El.value)
+      const b3 = parseFloat(b3El.value)
+      const b4 = parseFloat(b4El.value)
+      const c1 = parseFloat(c1El.value)
+      const c2 = parseFloat(c2El.value)
+      const c3 = parseFloat(c3El.value)
+      const c4 = parseFloat(c4El.value)
+      const d1 = parseFloat(d1El.value)
+      const d2 = parseFloat(d2El.value)
+      const d3 = parseFloat(d3El.value)
+      const d4 = parseFloat(d4El.value)
+      
+      if (
+        isNaN(a1) || isNaN(b1) || isNaN(a2) || isNaN(b2) || (a3El != '' && isNaN(a3)) || (b3El != '' && isNaN(b3)) ||
+        (c1El != '' && isNaN(c1)) || (c2El != '' && isNaN(c2)) || (c3El != '' && isNaN(c3)) ||
+        (d1El != '' && isNaN(d1)) || (d2El != '' && isNaN(d2)) || (d3El != '' && isNaN(d3)) ||
+        (a4El != '' && isNaN(a4)) || (b4El != '' && isNaN(b4)) || (c4El != '' && isNaN(c4)) || (d4El != '' && isNaN(d4))
+      ) {
+        showError("Please Enter All Details.");
+        return;
+      }
+      
+      
+      try {
+        const {
+          r1c1, r1c2, r1c3, r1c4, r2c1, r2c2, r2c3, r2c4, r3c1, r3c2, r3c3, r3c4, r4c1, r4c2, r4c3, r4c4, detA 
+        } = inverseMatrix(a1, a2, a3, a4, b1, b2, b3, b4, c1, c2, c3, c4, d1, d2, d3, d4)
+        let firstBracketOpen = '⌈'
+        let firstBracketClose = '⌉	'
+        let secondBracketOpen = matSizeSelected == 'two' ? '⌊' : '|&nbsp;';
+        let secondBracketClose = matSizeSelected == 'two' ? '⌋' : '&nbsp;|';
+
+        let thirdBracketOpen = matSizeSelected == 'three' ? '⌊' : matSizeSelected == 'four' ?  '|' : '';
+        let thirdBracketClose = matSizeSelected == 'three' ? '⌋' : matSizeSelected == 'four' ?  '|' : '';
+        let fourthBracketOpen = matSizeSelected == 'four' ? '⌊' :  '';
+        let fourthBracketClose = matSizeSelected == 'four' ? '⌋' : '';
+        if (detA ==  0) {
+          calcResultsEl.innerHTML = `
+           <p> Determinant |A|  =  ${detA} </p>
+           <p> The matrix inverse doesn't exist. </p>
+          `
+        } else {
+          calcResultsEl.innerHTML = `
+            <p> Determinant |A|  =  ${detA} </p>
+          
+            <p>A  =  ${firstBracketOpen} ${!isNaN(a1) ? `${a1} &nbsp;` : ''}  ${!isNaN(a2) ? `${a2} &nbsp;` : ''}  
+              ${!isNaN(a3) ? a3 : ''} ${!isNaN(a4) ? a4 : ''} ${firstBracketClose}</p>
+            <p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;${secondBracketOpen} ${!isNaN(b1) ? `${b1} &nbsp;` : ''} ${!isNaN(b2) ? `${b2} &nbsp;` : ''} 
+              ${!isNaN(b3) ? b3 : ''} ${!isNaN(b4) ? b4 : ''} ${secondBracketClose}</p>
+            <p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;${thirdBracketOpen} ${!isNaN(c1) ? `${c1} &nbsp;` : ''} ${!isNaN(c2) ? `${c2} &nbsp;` : ''} 
+              ${!isNaN(c3) ? c3 : ''} ${!isNaN(c4) ? c4 : ''} ${thirdBracketClose} </p>
+            <p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ${fourthBracketOpen} ${!isNaN(d1) ? `${d1} &nbsp;` : ''}  ${!isNaN(d2) ? `${d2} &nbsp;` : ''}  
+              ${!isNaN(d3) ? d3 : ''} ${!isNaN(d4) ? d4 : ''} ${fourthBracketClose}</p>
+            <p>=</p>
+
+            <p>${firstBracketOpen} ${r1c1 != undefined ? `${r1c1} &nbsp;` : ''}  ${r1c2 != undefined ? `${r1c2} &nbsp;` : ''}  
+              ${r1c3 != undefined ? `${r1c3} &nbsp;` : ''} ${r1c4 != undefined ? `${r1c4} &nbsp;` : ''} ${firstBracketClose}</p>
+            <p>${secondBracketOpen} ${r2c1 != undefined ? `${r2c1} &nbsp;` : ''} ${r2c2 != undefined ? `${r2c2} &nbsp;` : ''}
+              ${r2c3 != undefined ? `${r2c3} &nbsp;` : ''} ${r2c4 != undefined ? `${r2c4} &nbsp;` : ''} ${secondBracketClose}</p>
+            <p>${thirdBracketOpen} ${r3c1 != undefined ? `${r3c1} &nbsp;` : ''} ${r3c2 != undefined ? `${r3c2} &nbsp;` : ''}
+              ${r3c3 != undefined ? `${r3c3} &nbsp;` : ''} ${r3c4 != undefined ? `${r3c4} &nbsp;` : ''} ${thirdBracketClose} </p>
+            <p> ${fourthBracketOpen} ${r4c1 != undefined ? `${r4c1} &nbsp;` : ''} ${r4c2 != undefined ? `${r4c2} &nbsp;` : ''}  
+              ${r4c3 != undefined ? `${r4c3} &nbsp;` : ''} ${r4c4 != undefined ? `${r4c4} &nbsp;` : ''} ${fourthBracketClose}</p>
+          `
+        }
+        
+      } catch (error) {
+        showError("Something Went Wrong!!!");
+        resethandler()
+      }
+    }
+
+    /********************************* HELPER FUNCTIONS **********************************/
+
+    function showError(errorMessage) {
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: errorMessage,
+      });
+    }
+
+    function resetForm() {
+      a1El.value = ""
+      a2El.value = ""
+      a3El.value = ""
+      a4El.value = ""
+      b1El.value = ""
+      b2El.value = ""
+      b3El.value = ""
+      b4El.value = ""
+      c1El.value = ""
+      c2El.value = ""
+      c3El.value = ""
+      c4El.value = ""
+      d1El.value = ""
+      d2El.value = ""
+      d3El.value = ""
+      d4El.value = ""
+    }
+
+    function resetResult() {
+      calcResultsEl.innerHTML = "<p>Result will appear here...</p>";
+    }
+
+    function resethandler() {
+      resetForm();
+      resetResult();
+    }
+
+    /********************************** EVENT LISTENERS **********************************/
+    resetBtnEl.addEventListener("click", resethandler);
+    [a1El, a2El, b1El, b2El].forEach((el) => {
+      el.addEventListener("input", resetResult);
+    });   
+
+    matSizeEl.addEventListener("change", (e) => {
+      handleMatrixSizeChange(e);
+      resetResult();
+    })
+    calcBtnEl.addEventListener("click", calculateResults);
+  </script>
+</body>
+
+</html> 

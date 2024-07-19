@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Absolute Uncertainty Calculator</title>
+</head>
+<body>
+    <h1>Absolute Uncertainty Calculator</h1>
+    <p>
+      Measured value:
+      <input type="number" id="measuredVal">
+    </p>
+    <p>
+        Relative uncertainty: 
+        <input type="number" id="relUncertainty">%
+    </p>
+
+    <button id="calcBtn">Calculate</button>
+    <button id="resetBtn">Reset</button>
+    <hr>
+    <div>
+      <h3>Result:</h3>
+      <h3 id="calcResults">Result will appear here...</h3>
+    </div>
+
+    <script>
+      // Get required elements from the HTML
+      const measuredValEl = document.getElementById("measuredVal");
+      const relUncertaintyEl = document.getElementById("relUncertainty");
+
+      const calcBtnEl = document.getElementById('calcBtn');
+      const resetBtnEl = document.getElementById('resetBtn');
+      const calcResultsEl = document.getElementById('calcResults') 
+
+      function calculateResults() {
+          // Retrieve input values
+          const measuredVal = parseFloat(measuredValEl.value);
+          const relUncertainty = parseFloat(relUncertaintyEl.value);
+
+          if (isNaN(measuredVal) || isNaN(relUncertainty)) {
+            alert("Please Enter All Details.");
+            return;
+          } else if (relUncertainty < 0  ) {
+            alert("The relative uncertainty cannot be negative.");
+              return;
+          }
+
+          try {
+            const results = measuredVal * (relUncertainty / 100)
+            
+            calcResultsEl.innerHTML = `<p> Absolute uncertainty: ${results.toFixed(2) * 1}</p>`
+          } catch (error) {
+            alert("Something Went Wrong!!!");
+            resethandler()
+          }
+      }
+
+      function resetForm() {
+        measuredValEl.value = ""
+        relUncertaintyEl.value = ""
+      }
+
+      function resetResult() {
+        calcResultsEl.innerHTML = "<p>Result will appear here...</p>";
+      } 
+
+      function resethandler() {
+        resetForm();
+        resetResult();
+      }
+
+      resetBtnEl.addEventListener("click", resethandler);
+      calcBtnEl.addEventListener("click", calculateResults);
+
+      [measuredValEl, relUncertaintyEl].forEach((el) => {
+        el.addEventListener("input", resetResult);
+      });  
+    </script>
+</body>
+</html>

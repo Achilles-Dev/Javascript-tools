@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Least Common Multiple (LCM) Calculator</title>
+
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.6.5/dist/sweetalert2.all.min.js"></script>
+  <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11.6.5/dist/sweetalert2.min.css" rel="stylesheet">
+</head>
+
+<body>
+  <div>
+    <h1>Least Common Multiple (LCM) Calculator</h1>
+    <p>Calculate the greatest common factor.</p>
+    <h4>To find the least common multiple, enter all the positive integers separated by comma <strong></strong>5, 10 or space 75 90 135</h4>
+    <p>
+      <input type="text" id="nums" />  
+    </p>
+
+    <p>
+      <button id="calcBtn">Calculate</button>
+      <button id="resetBtn">Reset</button>
+    </p>
+    <hr>
+    <p>
+    <h3>Result:</h3>
+    <h3 id="calcResults">Result will appear here...</h3>
+    </p>
+  </div>
+  <script>
+
+    /********************************** ELEMENTS **********************************/
+    const numsEl = document.getElementById('nums');
+    const calcBtnEl = document.getElementById('calcBtn');
+    const resetBtnEl = document.getElementById('resetBtn');
+    const calcResultsEl = document.getElementById('calcResults')
+
+    /********************************** FUNCTIONS **********************************/
+    // Conversion functions
+
+    function getPrimeFactors(num) {
+      if (num % 1 != 0) {
+        showError("Please Enter a whole number.");
+        return;
+      }
+      const factors = {};
+      for (let i = 2; i <= num; i++) {
+        // Count occurances of factor
+        while ((num % i) === 0) {
+          factors[i] = (factors[i]) ? factors[i] + 1 : 1;
+          num /= i;
+        }
+      }
+      return factors;
+    }
+
+    function calcLeastCommonMultiple(nums) {
+      nums = nums.replace(/[ ,]+/g, ",")
+      nums = nums.split(",")
+      const primeFactors = {};  
+      for (let i = 0; i < nums.length; i++) {
+        // Factorize number in nums array
+        const currentFactors = getPrimeFactors(nums[i]);     
+        for (let prime in currentFactors) {
+          // Add factor to set or update number of occurrences
+          if (!primeFactors[prime] || currentFactors[prime] > primeFactors[prime]) {
+            primeFactors[prime] = currentFactors[prime]
+          }
+        }
+      }
+      // Build LCM from factorization
+      let multiple = 1;
+      for (let prime in primeFactors) {
+        multiple *= prime ** primeFactors[prime];
+      }
+      
+      return multiple;
+    }
+
+    function calculateResults() {
+      // Retrieve input values
+      const nums = numsEl.value
+
+      if (
+        nums == ''
+      ) {
+        showError("Please Enter All Details.");
+        return;
+      }
+
+      try {
+        const lcm = calcLeastCommonMultiple(nums)
+        let newNums = nums.replace(/[ ,]+/g, ", ");
+        calcResultsEl.innerHTML = `The Greatest Common Factor of ${newNums} = ${lcm}`
+      } catch (error) {
+        showError("Something Went Wrong!!!");
+        resethandler()
+      }
+
+    }
+
+    /********************************* HELPER FUNCTIONS **********************************/
+
+    function showError(errorMessage) {
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: errorMessage,
+      });
+    }
+
+    function resetForm() {
+      numsEl.value = ""
+    }
+
+    function resetResult() {
+      calcResultsEl.innerHTML = "<p>Result will appear here...</p>";
+    }
+
+    function resethandler() {
+      resetForm();
+      resetResult();
+    }
+
+    /********************************** EVENT LISTENERS **********************************/
+    resetBtnEl.addEventListener("click", resethandler);
+    numsEl.addEventListener("input", resetResult);
+    calcBtnEl.addEventListener("click", calculateResults);
+  </script>
+</body>
+
+</html> 

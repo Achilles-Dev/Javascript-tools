@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Class Width Calculator</title>
+  </head>
+  <body>
+    <h1>Class Width Calculator</h1>
+    <p>
+      Maximum (Maximum value in distribution):
+      <input type="number" id="maxVal" />
+    </p>
+    <p>
+      Minimum (Minimum value in distribution):
+      <input type="number" id="minVal" />
+    </p>
+    <p>
+      Number of classes
+      <input type="number" id="numClasses" />
+    </p>
+
+    <button id="calcBtn">Calculate</button>
+    <button id="resetBtn">Reset</button>
+    <hr />
+    <div>
+      <h3>Result:</h3>
+      <h3 id="calcResults">Result will appear here...</h3>
+    </div>
+
+    <script>
+      // Get required elements from the HTML
+      const maxValEl = document.getElementById("maxVal");
+      const minValEl = document.getElementById("minVal");
+      const numClassesEl = document.getElementById("numClasses");
+
+      const calcBtnEl = document.getElementById("calcBtn");
+      const resetBtnEl = document.getElementById("resetBtn");
+      const calcResultsEl = document.getElementById("calcResults");
+
+      function calculateResults() {
+        // Retrieve input values
+        const maxVal = parseFloat(maxValEl.value);
+        const minVal = parseFloat(minValEl.value);
+        const numClasses = parseFloat(numClassesEl.value);
+
+        if (isNaN(maxVal) || isNaN(minVal) || isNaN(numClasses)) {
+          alert("Please Enter All Details.");
+          return;
+        } else if (maxVal <= minVal) {
+          alert("The minimum value should be smaller than the maximum value.");
+          return;
+        }
+
+        try {
+          const results = (maxVal - minVal) / numClasses;
+
+          calcResultsEl.innerHTML = `<p>Class width: ${
+            results.toFixed(2) * 1
+          }</p>`;
+        } catch (error) {
+          alert("Something Went Wrong!!!");
+          resethandler();
+        }
+      }
+
+      function resetForm() {
+        maxValEl.value = "";
+        minValEl.value = "";
+        numClassesEl.value = "";
+      }
+
+      function resetResult() {
+        calcResultsEl.innerHTML = "<p>Result will appear here...</p>";
+      }
+
+      function resethandler() {
+        resetForm();
+        resetResult();
+      }
+
+      resetBtnEl.addEventListener("click", resethandler);
+      calcBtnEl.addEventListener("click", calculateResults);
+
+      [maxValEl, minValEl, numClassesEl].forEach((el) => {
+        el.addEventListener("input", resetResult);
+      });
+    </script>
+  </body>
+</html>

@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Endpoint Calculator</title>
+
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.6.5/dist/sweetalert2.all.min.js"></script>
+  <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11.6.5/dist/sweetalert2.min.css" rel="stylesheet">
+</head>
+
+<body>
+  <div>
+    <h1>Endpoint Calculator</h1>
+    <p>Use this calculator to determine the coordinates of one endpoint (B) of a line segment <br />
+      determined by its midpoint and its other endpoint (A). Find the endpoint of a line segment.
+    </p>
+    <p>
+      <label for="startPtX">Starting point coordinates:&nbsp;&nbsp;&nbsp;&nbsp;</label>
+      <input type="number" id="startPtX" placeholder="x"/> 
+      <span>&nbsp;&nbsp;&nbsp;&nbsp;,&nbsp;&nbsp;&nbsp;&nbsp;</span>
+      <input type="number" id="startPtY" placeholder="y"/>  
+    </p>
+    <p>
+      <label for="midPointX">Midpoint coordinates:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label>
+      <input type="number" id="midPointX" placeholder="x"/> 
+      <span>&nbsp;&nbsp;&nbsp;&nbsp;,&nbsp;&nbsp;&nbsp;&nbsp;</span>
+      <input type="number" id="midPointY" placeholder="y"/>  
+    </p>
+    <p>
+      <button id="calcBtn">Calculate</button>
+      <button id="resetBtn">Reset</button>
+    </p>
+    <hr>
+    <p>
+    <h3>Result:</h3>
+    <h3 id="calcResults">Result will appear here...</h3>
+    </p>
+  </div>
+  <script>
+
+    /********************************** ELEMENTS **********************************/
+    const startPtXEl = document.getElementById('startPtX');
+    const startPtYEl = document.getElementById('startPtY');
+    const midPointXEl = document.getElementById('midPointX');
+    const midPointYEl = document.getElementById('midPointY');
+    const calcBtnEl = document.getElementById('calcBtn');
+    const resetBtnEl = document.getElementById('resetBtn');
+    const calcResultsEl = document.getElementById('calcResults')
+
+    /********************************** FUNCTIONS **********************************/
+    // Conversion functions
+
+
+    function endPoint(stX, stY, midX, midY) {
+      let results = '';
+      let xVal = (2 * midX) - stX;
+      let yVal = (2 * midY) - stY;
+
+      results = `${xVal}, ${yVal}`
+      return results
+    }
+
+    function calculateResults() {
+      // Retrieve input values
+      const startPtX = parseFloat(startPtXEl.value)
+      const startPtY = parseFloat(startPtYEl.value)
+      const midPointX = parseFloat(midPointXEl.value)
+      const midPointY = parseFloat(midPointYEl.value)
+      
+      if (
+        isNaN(startPtX) || isNaN(startPtY) || isNaN(midPointX) || isNaN(midPointY)
+      ) {
+        showError("Please Enter All Details.");
+        return;
+      }
+      
+      try {
+        const results = endPoint(startPtX, startPtY, midPointX, midPointY)
+        
+        calcResultsEl.innerHTML = `<p> Endpoint coordinates (x, y)</p>
+                                     <p>(${results})</p>
+                                    `
+      } catch (error) {
+        showError("Something Went Wrong!!!");
+        resethandler()
+      }
+    }
+
+    /********************************* HELPER FUNCTIONS **********************************/
+
+    function showError(errorMessage) {
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: errorMessage,
+      });
+    }
+
+    function resetForm() {
+      startPtXEl.value = ""
+      startPtYEl.value = ""
+      midPointXEl.value = ""
+      midPointYEl.value = ""
+    }
+
+    function resetResult() {
+      calcResultsEl.innerHTML = "<p>Result will appear here...</p>";
+    }
+
+    function resethandler() {
+      resetForm();
+      resetResult();
+    }
+
+    /********************************** EVENT LISTENERS **********************************/
+    resetBtnEl.addEventListener("click", resethandler);
+    [startPtXEl, startPtYEl, midPointXEl, midPointYEl].forEach((el) => {
+      el.addEventListener("input", resetResult);
+    });  
+
+    calcBtnEl.addEventListener("click", calculateResults);
+  </script>
+</body>
+
+</html> 

@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Quotient and Remainder Calculator</title>
+
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.6.5/dist/sweetalert2.all.min.js"></script>
+  <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11.6.5/dist/sweetalert2.min.css" rel="stylesheet">
+</head>
+
+<body>
+  <div>
+    <h1>Quotient and Remainder Calculator</h1>
+    <p>
+      <label for="quotient">Dividend:</label>
+      <input type="text" id="quotient" />  
+    </p>
+    <p>
+      <label for="remainder">Divisor:</label>
+      <input type="text" id="remainder" />  
+    </p>
+
+    <p>
+      <button id="calcBtn">Calculate</button>
+      <button id="resetBtn">Reset</button>
+    </p>
+    <hr>
+    <p>
+    <h3>Result:</h3>
+    <h3 id="calcResults">Result will appear here...</h3>
+    </p>
+  </div>
+  <script>
+
+    /********************************** ELEMENTS **********************************/
+    const quotientEl = document.getElementById('quotient');
+    const remainderEl = document.getElementById('remainder');
+    const calcBtnEl = document.getElementById('calcBtn');
+    const resetBtnEl = document.getElementById('resetBtn');
+    const calcResultsEl = document.getElementById('calcResults')
+
+    /********************************** FUNCTIONS **********************************/
+    // Conversion functions
+
+    function calcQuotAndRemain(quotient, remainder) {
+      let quotVal = 1
+      let remainVal = 0
+      quotVal = Math.floor(quotient / remainder)
+      remainVal = quotient % remainder
+      return {quotVal, remainVal}
+    }
+
+    function calculateResults() {
+      // Retrieve input values
+      const quotient = parseFloat(quotientEl.value)
+      const remainder = parseFloat(remainderEl.value)
+      
+      if (
+        isNaN(quotient) || isNaN(remainder) ||  quotient <= 0 || remainder <= 0
+      ) {
+        showError("Please Enter All Details.");
+        return;
+      }
+      
+      try {
+        const {quotVal, remainVal} = calcQuotAndRemain(quotient, remainder)
+        calcResultsEl.innerHTML = `<p>quotient = ${quotVal}</p>
+                                   <p>remainder = ${remainVal}</p>`
+      } catch (error) {
+        showError("Something Went Wrong!!!");
+        resethandler()
+      }
+    }
+
+    /********************************* HELPER FUNCTIONS **********************************/
+
+    function showError(errorMessage) {
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: errorMessage,
+      });
+    }
+
+    function resetForm() {
+      quotientEl.value = ""
+      remainderEl.value = ""
+    }
+
+    function resetResult() {
+      calcResultsEl.innerHTML = "<p>Result will appear here...</p>";
+    }
+
+    function resethandler() {
+      resetForm();
+      resetResult();
+    }
+
+    /********************************** EVENT LISTENERS **********************************/
+    resetBtnEl.addEventListener("click", resethandler);
+    [quotientEl, remainderEl].forEach((el) => {
+      el.addEventListener("input", resetResult);
+    });
+    calcBtnEl.addEventListener("click", calculateResults);
+  </script>
+</body>
+
+</html> 

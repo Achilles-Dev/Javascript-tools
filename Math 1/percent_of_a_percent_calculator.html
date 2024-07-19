@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Percent of a Percent Calculator</title>
+
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.6.5/dist/sweetalert2.all.min.js"></script>
+  <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11.6.5/dist/sweetalert2.min.css" rel="stylesheet">
+</head>
+<body>
+  <div>
+    <h1>Percent of a Percent Calculator</h1>
+    <p>Find the percentage of a percentage by entering them below.</p>
+    <p>
+      <label for="percent1">Percent 1:</label>
+      <input type="number" id="percent1" placeholder="15"><span> %</span>
+    </p>
+
+    <p>
+      <label for="percent2">Percent 2:</label>
+      <input type="number" id="percent2" placeholder="40"><span> %</span>
+    </p>
+  
+    <p>
+      <button id="calcBtn">Calculate</button>
+      <button id="resetBtn">Reset</button>
+    </p>
+      <hr>
+    <p>
+      <h3>Result:</h3>
+      <h3 id="calcResults">Result will appear here...</h3> 
+    </p>
+  </div>
+  <script>
+
+    /********************************** ELEMENTS **********************************/
+    const percent1El = document.getElementById('percent1');
+    const percent2El = document.getElementById('percent2');
+    const calcBtnEl = document.getElementById('calcBtn');
+    const resetBtnEl = document.getElementById('resetBtn');
+    const calcResultsEl = document.getElementById('calcResults')
+    
+     /********************************** FUNCTIONS **********************************/
+      // Conversion functions
+
+      function calcPercentOfPercent(percent1, percent2) {
+        let results = 0;
+        results = ((percent1 / 100) * (percent2 / 100)) * 100
+        return results;
+      }
+
+      function calculateResults() {
+        // Retrieve input values
+        const percent1 = parseFloat(percent1El.value)
+        const percent2 = parseFloat(percent2El.value)
+       
+        if (
+          isNaN(percent1) || isNaN(percent2)
+        ) {
+          showError("Please Enter All Details.");
+          return;
+        }
+        
+        try {
+          let percentOfPercent = calcPercentOfPercent(percent1, percent2)
+          percentOfPercent = percentOfPercent.toFixed(4) * 1
+          calcResultsEl.innerHTML = `${percent1}% of ${percent2}% = ${percentOfPercent}%`
+          
+        } catch (error) {
+          showError("Something Went Wrong!!!");
+          resethandler()
+        }
+        
+      }
+    
+      /********************************* HELPER FUNCTIONS **********************************/
+
+      function showError(errorMessage) {
+        Swal.fire({
+            icon: "error",
+            title: "Error",
+            text: errorMessage,
+        });
+      }
+
+      function resetForm() {
+        percent1El.value = "";
+        percent2El.value = "";
+      }
+
+      function resetResult() {
+        calcResultsEl.innerHTML = "<p>Result will appear here...</p>";
+      }
+
+      function resethandler() {
+        resetForm();
+        resetResult();
+      }
+
+      /********************************** EVENT LISTENERS **********************************/
+      resetBtnEl.addEventListener("click", resethandler);
+      [percent1El, percent2El].forEach((el) => {
+        el.addEventListener("input", resetResult);
+      });
+      calcBtnEl.addEventListener("click", calculateResults);
+  </script>
+</body>
+</html>

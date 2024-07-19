@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Soil Calculator</title>
+
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.6.5/dist/sweetalert2.all.min.js"></script>
+  <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11.6.5/dist/sweetalert2.min.css" rel="stylesheet">
+</head>
+<body>
+  <div>
+    <h1>Soil Calculator</h1>
+    <p>Calculate the soil, topsoil, or fill dirt needed by entering the length, width, <br />
+      and depth of the space you want to fill.</p>
+    <p>
+      <label for="length">Length:</label>
+      <input type="number" id="length" placeholder="Length">
+      <select id="lengthUnit">
+        <option value="ft" selected>ft</option>
+        <option value="in">in</option>
+        <option value="yd">yd</option>
+        <option value="cm">cm</option>
+        <option value="m">m</option>
+      </select>
+    </p>
+    <p>
+    <label for="width">Width:</label>
+    <input type="number" id="width" placeholder="Width">
+    <select id="widthUnit">
+      <option value="ft" selected>ft</option>
+      <option value="in">in</option>
+      <option value="yd">yd</option>
+      <option value="cm">cm</option>
+      <option value="m">m</option>
+    </select>
+    </p>
+    <p>
+      <label for="depth">Depth:</label>
+      <input type="number" id="depth" placeholder="Depth">
+      <select id="depthUnit">
+        <option value="in" selected>in</option>
+        <option value="ft">ft</option>
+        <option value="yd">yd</option>
+        <option value="cm">cm</option>
+        <option value="m">m</option>
+      </select>
+    </p>
+    <p>
+      <button id="calcBtn">Calculate</button>
+      <button id="resetBtn">Reset</button>
+    </p>
+    
+    <hr>
+    <p>
+    <h3>Result:</h3>
+    <h3 id="calcResults">Result will appear here...</h3>
+    </p>
+  </div>
+  <script>
+
+    /********************************** ELEMENTS **********************************/
+    const lengthEl = document.getElementById('length');
+    const lengthUnitEl = document.getElementById('lengthUnit');
+    const widthEl = document.getElementById('width')
+    const widthUnitEl = document.getElementById('widthUnit')
+    const depthEl = document.getElementById('depth');
+    const depthUnitEl = document.getElementById('depthUnit');
+
+    const calcBtnEl = document.getElementById('calcBtn');
+    const resetBtnEl = document.getElementById('resetBtn');
+    const calcResultsEl = document.getElementById('calcResults')
+
+     /********************************** FUNCTIONS **********************************/
+            // Conversion functions
+      const convertWidthAndLength = (value, unit) => {
+        const toFeet = {
+          'cm': 0.0328084,
+          'in': 1/12,
+          'yd': 3,
+          'm': 3.28084,
+          'ft': 1
+        };
+        const conversionFactor = toFeet[unit];
+        if (conversionFactor !== undefined) {
+          return value * conversionFactor;
+        } else {
+          showError(`Unsupported unit: ${unit}`);
+          return;
+        }
+      }
+        
+
+      const convertDepth = (value, unit) => {
+        const toInch = {
+          'cm': 0.3937,
+          'yd': 0.02778,
+          'm': 39.37,
+          'ft': 12,
+          'in': 1
+        };
+        const conversionFactor = toInch[unit];
+        if (conversionFactor !== undefined) {
+          return value * conversionFactor;
+        } else {
+          showError(`Unsupported unit: ${unit}`);
+          return;
+        }
+      };
+
+      function calculateSoil(length, width, depth) {
+        let cubicFeet = 0;
+        let cubicYards = 0;
+        let totalBags = 0;
+        cubicFeet = (length * width * (depth / 12))
+        cubicYards = cubicFeet / 27
+        totalBags = (4/3) * cubicFeet
+        return {
+          cubicYards: cubicYards.toFixed(2) * 1, 
+          cubicFeet: cubicFeet.toFixed() * 1,
+          totalBags: Math.ceil(totalBags)
+        }
+      }
+
+      function calculateResults() {
+        // Retrieve input values
+        const width = parseFloat(widthEl.value)
+        const widthUnit = widthUnitEl.value;
+        const length = parseFloat(lengthEl.value)
+        const lengthUnit = lengthUnitEl.value
+        const depth = parseFloat(depthEl.value);
+        const depthUnit = depthUnitEl.value
+
+        if (
+          isNaN(width) || width <= 0 ||
+          isNaN(length) || length <= 0 ||
+          isNaN(depth) || depth <= 0
+        ) {
+          showError("Please Enter All Details.");
+          return;
+        }
+
+        try {
+          // Convert input values
+          const W = convertWidthAndLength(width, widthUnit);
+          const L = convertWidthAndLength(length, lengthUnit);
+          const D = convertDepth(depth, depthUnit);
+          const {cubicFeet, cubicYards, totalBags} = calculateSoil(W, L, D)
+
+          calcResultsEl.innerHTML = `<p>How Much Soil You Need:</p>
+                                      <span>${cubicYards} Cubic yards</span>
+                                      <p>${cubicFeet} Cubic feet</p>
+                                      <p>Number of Soil Bags:</p>
+                                      <p>${totalBags} (0.75 cu. ft. bags)</p>
+                                    `
+        } catch (error) {
+          showError("Something Went Wrong!!!");
+          resethandler()
+        }
+        
+      }
+    /********************************* HELPER FUNCTIONS **********************************/
+
+    function showError(errorMessage) {
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: errorMessage,
+      });
+    }
+
+    function resetForm() {
+      lengthEl.value = "";
+      widthEl.value = "";
+      depthEl.value = "";
+      lengthUnitEl.selectedIndex = "0";
+      widthUnitEl.selectedIndex = "0";
+      depthUnitEl.selectedIndex = "0";
+    }
+
+    function resetResult() {
+      calcResultsEl.innerHTML = "<p>Result will appear here...</p>";
+    }
+
+    function resethandler() {
+      resetForm();
+      resetResult();
+    }
+
+    /********************************** EVENT LISTENERS **********************************/
+    [lengthEl, widthEl, depthEl].forEach((el) => {
+      el.addEventListener("input", resetResult);
+    });
+    resetBtnEl.addEventListener("click", resethandler);
+    calcBtnEl.addEventListener("click", calculateResults);
+  </script>
+</body>
+</html>

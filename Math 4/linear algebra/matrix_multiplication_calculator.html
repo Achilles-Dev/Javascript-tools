@@ -1,0 +1,569 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Matrix Multiplication Calculator</title>
+
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.6.5/dist/sweetalert2.all.min.js"></script>
+  <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11.6.5/dist/sweetalert2.min.css" rel="stylesheet">
+</head>
+
+<body>
+  <div>
+    <h1>Matrix Multiplication Calculator</h1>
+    <p>
+      <h3>First matrix size:</h3>
+      <p>
+        <label for="firstNumRow">Number of rows: </label>
+        <select id="firstNumRow">
+          <option value="one">&nbsp;1 &nbsp;</option>
+          <option value="two" selected>&nbsp;2 &nbsp;</option>
+          <option value="three">&nbsp;3 &nbsp;</option>  
+        </select>
+      </p>
+      <p>
+      <label for="firstNumCols">Number of columns: </label>
+      <select id="firstNumCols">
+        <option value="one">&nbsp;1 &nbsp;</option>
+        <option value="two" selected>&nbsp;2 &nbsp;</option>
+        <option value="three">&nbsp;3 &nbsp;</option>  
+      </select>
+      </p>
+    </p>
+    <p>
+      <h3>Second matrix size:</h3>
+      <p>
+        <label for="secondNumRow">Number of rows: </label>
+        <select id="secondNumRow">
+          <option value="one">&nbsp;1 &nbsp;</option>
+          <option value="two" selected>&nbsp;2 &nbsp;</option>
+          <option value="three">&nbsp;3 &nbsp;</option>  
+        </select>
+      </p>
+      <p>
+      <label for="secondNumCols">Number of columns: </label>
+      <select id="secondNumCols">
+        <option value="one">&nbsp;1 &nbsp;</option>
+        <option value="two" selected>&nbsp;2 &nbsp;</option>
+        <option value="three">&nbsp;3 &nbsp;</option>  
+      </select>
+      </p>
+    </p>
+    
+    <p><h3>First matrix entries</h3></p>
+      <p>
+        <label for="a1">a₁:</label>
+        <input type="number" id="a1" />  
+      </p>
+      <p id="a2Input">
+        <label for="a2">a₂:</label>
+        <input type="number" id="a2" />  
+      </p>
+      <p id="a3Input" style="display: none;">
+        <label for="a3">a₃:</label>
+        <input type="number" id="a3" />  
+      </p>
+      <p id="b1Input">
+        <label for="b1">b₁:</label>
+        <input type="number" id="b1" />  
+      </p>
+      <p id="b2Input">
+        <label for="b2">b₂:</label>
+        <input type="number" id="b2" />  
+      </p>
+      <p id="b3Input" style="display: none;">
+        <label for="b3">b₃:</label>
+        <input type="number" id="b3" />  
+      </p>
+      <p id="c1Input" style="display: none;">
+        <label for="c1">c₁:</label>
+        <input type="number" id="c1" />  
+      </p>
+      <p id="c2Input" style="display: none;">
+        <label for="c2">c₂:</label>
+        <input type="number" id="c2" />  
+      </p>              
+      <p id="c3Input" style="display: none;">
+        <label for="c3">c₃:</label>
+        <input type="number" id="c3" />  
+      </p>
+
+      <p><h3>Second matrix entries</h3></p>
+      <p>
+        <label for="x1">x₁:</label>
+        <input type="number" id="x1" />  
+      </p>
+      <p id="x2Input">
+        <label for="x2">x₂:</label>
+        <input type="number" id="x2" />  
+      </p>
+      <p id="x3Input" style="display: none;">
+        <label for="x3">x₃:</label>
+        <input type="number" id="x3" />  
+      </p>
+      <p id="y1Input">
+        <label for="y1">y₁:</label>
+        <input type="number" id="y1" />  
+      </p>
+      <p id="y2Input">
+        <label for="y2">y₂:</label>
+        <input type="number" id="y2" />  
+      </p>
+      <p id="y3Input" style="display: none;">
+        <label for="y3">y₃:</label>
+        <input type="number" id="y3" />  
+      </p>
+      <p id="z1Input" style="display: none;">
+        <label for="yz1">z₁:</label>
+        <input type="number" id="z1" />  
+      </p>
+      <p id="z2Input" style="display: none;">
+        <label for="z2">z₂:</label>
+        <input type="number" id="z2" />  
+      </p>
+      <p id="z3Input" style="display: none;">
+        <label for="z3">z₃:</label>
+        <input type="number" id="z3" />  
+      </p>
+    <p>
+      <button id="calcBtn">Calculate</button>
+      <button id="resetBtn">Reset</button>
+    </p>
+    <hr>
+    <p>
+    <h3>Result:</h3>
+    <h3 id="calcResults">Result will appear here...</h3>
+    </p>
+  </div>
+  <script>
+
+    /********************************** ELEMENTS **********************************/
+    const firstNumRowEl = document.getElementById('firstNumRow');
+    const firstNumColsEl = document.getElementById('firstNumCols');
+    const secondNumRowEl = document.getElementById('secondNumRow');
+    const secondNumColsEl = document.getElementById('secondNumCols');
+
+    const b1InputEl = document.getElementById('b1Input');
+    const a2InputEl = document.getElementById('a2Input');
+    const b2InputEl = document.getElementById('b2Input');
+    const a3InputEl = document.getElementById('a3Input');
+    const b3InputEl = document.getElementById('b3Input');
+    const c1InputEl = document.getElementById('c1Input');
+    const c2InputEl = document.getElementById('c2Input');
+    const c3InputEl = document.getElementById('c3Input');
+
+    const y1InputEl = document.getElementById('y1Input');
+    const x2InputEl = document.getElementById('x2Input');
+    const y2InputEl = document.getElementById('y2Input');
+    const x3InputEl = document.getElementById('x3Input');
+    const y3InputEl = document.getElementById('y3Input');
+    const z1InputEl = document.getElementById('z1Input');
+    const z2InputEl = document.getElementById('z2Input');
+    const z3InputEl = document.getElementById('z3Input');
+
+    const calcBtnEl = document.getElementById('calcBtn');
+    const resetBtnEl = document.getElementById('resetBtn');
+    const calcResultsEl = document.getElementById('calcResults')
+
+    let a1El = document.getElementById('a1');
+    let a2El = document.getElementById('a2');
+    let a3El = '';
+    let b1El = document.getElementById('b1');
+    let b2El = document.getElementById('b2');
+    let b3El = '';
+    let c1El = '';
+    let c2El = '';
+    let c3El = '';
+
+    let x1El = document.getElementById('x1');
+    let x2El = document.getElementById('x2');
+    let x3El = '';
+    let y1El = document.getElementById('y1');
+    let y2El = document.getElementById('y2');
+    let y3El = '';
+    let z1El = '';
+    let z2El = '';
+    let z3El = '';
+    
+    let  firstNumRowSelected = 'two';
+    let  firstNumColsSelected = 'two';
+    let  secondNumRowSelected = 'two';
+    let  secondNumColsSelected = 'two';
+
+    /********************************** FUNCTIONS **********************************/
+    // Conversion functions
+
+    function handleFirstNumRowChange(e) {
+      const numRowSize = e.target.value
+      b1InputEl.style.display = numRowSize ==  'one' ? 'none' : 'block'
+      b2InputEl.style.display = (numRowSize ==  'one' || firstNumColsSelected ==  'one') ? 'none' : 'block'
+      b3InputEl.style.display = (numRowSize ==  'one' || firstNumColsSelected ==  'one' || firstNumColsSelected ==  'two') ? 'none' : 'block'
+      c1InputEl.style.display = (numRowSize ==  'one' || numRowSize ==  'two') ? 'none' : 'block'
+      c2InputEl.style.display = (numRowSize ==  'one' || numRowSize ==  'two' || firstNumColsSelected ==  'one') ? 'none' : 'block'
+      c3InputEl.style.display = (numRowSize ==  'one' || numRowSize ==  'two' || firstNumColsSelected ==  'one' || firstNumColsSelected ==  'two') ? 'none' : 'block'
+
+      firstNumRowSelected = numRowSize
+      a1El = document.getElementById('a1');
+      a2El =  firstNumColsSelected ==  'one' ? '' : document.getElementById('a2');
+      a3El = (firstNumColsSelected ==  'one' || firstNumColsSelected ==  'two') ? '' : document.getElementById('a3');
+      b1El = numRowSize ==  'one' ? '' : document.getElementById('b1');
+      b2El = (numRowSize ==  'one' || firstNumColsSelected ==  'one') ? '' : document.getElementById('b2');
+      b3El = (numRowSize ==  'one' || firstNumColsSelected ==  'one' || firstNumColsSelected ==  'two') ? '' : 
+        document.getElementById('b3');
+      c1El = (numRowSize ==  'one' || numRowSize ==  'two') ? '' : document.getElementById('c1');
+      c2El = (numRowSize ==  'one' || numRowSize ==  'two' || firstNumColsSelected ==  'one') ? '' : 
+        document.getElementById('c2');
+      c3El = (numRowSize ==  'one' || numRowSize ==  'two' || firstNumColsSelected ==  'one' || firstNumColsSelected ==  'two') ? 
+        '' : document.getElementById('c3');
+
+      if (numRowSize == 'three') {
+        [c1El, c2El].forEach((el) => {
+          el.addEventListener("input", resetResult);
+        });
+      } else if (numRowSize == 'three' && firstNumColsSelected == 'three') {    
+        c3El.addEventListener("input", resetResult);
+      }
+    }
+
+    function handleFirstColsSecondRowChange(e) {
+      const numRowSize = e.target.value
+      a2InputEl.style.display = numRowSize ==  'one' ? 'none' : 'block'
+      b2InputEl.style.display = (numRowSize ==  'one' || firstNumRowSelected ==  'one') ? 'none' : 'block'
+      c2InputEl.style.display = (numRowSize ==  'one' || firstNumRowSelected ==  'one' || firstNumRowSelected ==  'two') ? 
+        'none' : 'block'
+      a3InputEl.style.display = (numRowSize ==  'one' || numRowSize ==  'two') ? 'none' : 'block'
+      b3InputEl.style.display = (numRowSize ==  'one' || numRowSize ==  'two' || firstNumRowSelected ==  'one') ? 'none' : 'block'
+      c3InputEl.style.display = (numRowSize ==  'one' || numRowSize ==  'two' || firstNumRowSelected ==  'one' || 
+        firstNumRowSelected ==  'two') ? 'none' : 'block'
+
+      y1InputEl.style.display = numRowSize ==  'one' ? 'none' : 'block'
+      y2InputEl.style.display = (numRowSize ==  'one' || secondNumColsSelected ==  'one') ? 'none' : 'block'
+      y3InputEl.style.display = (numRowSize ==  'one' || secondNumColsSelected ==  'one' || 
+        secondNumColsSelected ==  'two') ? 'none' : 'block'
+      z1InputEl.style.display = (numRowSize ==  'one' || numRowSize ==  'two') ? 'none' : 'block'
+      z2InputEl.style.display = (numRowSize ==  'one' || numRowSize ==  'two' || secondNumColsSelected ==  'one') ? 
+        'none' : 'block'
+      z3InputEl.style.display = (numRowSize ==  'one' || numRowSize ==  'two' || secondNumColsSelected ==  'one' || 
+        secondNumColsSelected ==  'two') ? 'none' : 'block'
+
+      firstNumColsEl.selectedIndex =  numRowSize ==  'one' ? '0' : firstNumColsEl.selectedIndex
+      firstNumColsEl.selectedIndex =  numRowSize ==  'two' ? '1' : firstNumColsEl.selectedIndex
+      firstNumColsEl.selectedIndex =  numRowSize ==  'three' ? '2' : firstNumColsEl.selectedIndex
+
+      secondNumRowEl.selectedIndex =  numRowSize ==  'one' ? '0' : secondNumRowEl.selectedIndex
+      secondNumRowEl.selectedIndex =  numRowSize ==  'two' ? '1' : secondNumRowEl.selectedIndex
+      secondNumRowEl.selectedIndex =  numRowSize ==  'three' ? '2' : secondNumRowEl.selectedIndex
+
+      firstNumColsSelected = numRowSize
+      secondNumRowSelected = numRowSize
+
+      a1El = document.getElementById('a1');
+      a2El =  firstNumColsSelected ==  'one' ? '' : document.getElementById('a2');
+      a3El = (firstNumColsSelected ==  'one' || firstNumColsSelected ==  'two') ? '' : document.getElementById('a3');
+      b1El = firstNumRowSelected ==  'one' ? '' : document.getElementById('b1');
+      b2El = (firstNumColsSelected ==  'one' || firstNumRowSelected ==  'one') ? '' : document.getElementById('b2');
+      b3El = (firstNumColsSelected ==  'one' || firstNumColsSelected ==  'two' || firstNumRowSelected ==  'one') ? '' : 
+        document.getElementById('b3');
+      c1El = (firstNumRowSelected ==  'one' || firstNumRowSelected ==  'two') ? '' : document.getElementById('c1');
+      c2El = (firstNumColsSelected ==  'one' || firstNumRowSelected ==  'one' || firstNumRowSelected ==  'two') ? '' : 
+        document.getElementById('c2');
+      c3El = (firstNumColsSelected ==  'one' || firstNumColsSelected ==  'two' || firstNumRowSelected ==  'one' || firstNumRowSelected ==  'two') ? 
+        '' : document.getElementById('c3');
+      
+      x1El = document.getElementById('x1');
+      x2El = secondNumColsSelected ==  'one' ? '' : document.getElementById('x2');
+      x3El = (secondNumColsSelected ==  'one' || secondNumColsSelected ==  'two') ? '' : document.getElementById('x3');
+      y1El = secondNumRowSelected ==  'one' ? '' : document.getElementById('y1');
+      y2El = (secondNumRowSelected ==  'one' || secondNumColsSelected ==  'one') ? '' : document.getElementById('y2');
+      y3El = (secondNumRowSelected ==  'one' || secondNumColsSelected ==  'one' || secondNumColsSelected ==  'two') ? '' : 
+        document.getElementById('y3');
+      z1El = (secondNumRowSelected ==  'one' || secondNumRowSelected ==  'two') ? '' : document.getElementById('z1');
+      z2El = (secondNumRowSelected ==  'one' || secondNumRowSelected ==  'two' || secondNumColsSelected ==  'one') ? '' : 
+        document.getElementById('z2');
+      z3El = (secondNumRowSelected ==  'one' || secondNumRowSelected ==  'two' || secondNumColsSelected ==  'one' || secondNumColsSelected ==  'two') ? 
+        '' : document.getElementById('z3');
+
+      if (numRowSize == 'three') {
+        [a3El, b3El, z1El, z2El].forEach((el) => {
+          el.addEventListener("input", resetResult);
+        });
+      }
+    }
+
+    function handleSecondNumColsChange(e) {
+      const numRowSize = e.target.value
+      x2InputEl.style.display = numRowSize ==  'one' ? 'none' : 'block'
+      y2InputEl.style.display = (numRowSize ==  'one' || secondNumRowSelected ==  'one') ? 'none' : 'block'
+      z2InputEl.style.display = (numRowSize ==  'one' || secondNumRowSelected ==  'one' || secondNumRowSelected ==  'two') ?
+         'none' : 'block'
+      x3InputEl.style.display = (numRowSize ==  'one' || numRowSize ==  'two') ? 'none' : 'block'
+      y3InputEl.style.display = (numRowSize ==  'one' || numRowSize ==  'two' || secondNumRowSelected ==  'one') ? 'none' : 'block'
+      z3InputEl.style.display = (numRowSize ==  'one' || numRowSize ==  'two' || secondNumRowSelected ==  'one' || 
+      secondNumRowSelected ==  'two') ? 'none' : 'block'
+
+      secondNumColsSelected = numRowSize
+
+      x1El = document.getElementById('x1');
+      x2El =  numRowSize ==  'one' ? '' : document.getElementById('x2');
+      x3El = (numRowSize ==  'one' || numRowSize ==  'two') ? '' : document.getElementById('x3');
+      y1El = (numRowSize ==  'one' || secondNumRowSelected ==  'one') ? '' : document.getElementById('y1');
+      y2El = (numRowSize ==  'one' || secondNumRowSelected ==  'one') ? '' : document.getElementById('y2');
+      y3El = (numRowSize ==  'one' || numRowSize ==  'two' || secondNumRowSelected ==  'one') ? '' : 
+        document.getElementById('y3');
+      z1El = (numRowSize ==  'one' || numRowSize ==  'two') ? '' : document.getElementById('z1');
+      z2El = (numRowSize ==  'one' || secondNumRowSelected ==  'one' || secondNumRowSelected ==  'two') ? '' : 
+        document.getElementById('z2');
+      z3El = (numRowSize ==  'one' || numRowSize ==  'two' || secondNumRowSelected ==  'one' || secondNumRowSelected ==  'two') ? 
+        '' : document.getElementById('z3');
+
+      if (numRowSize == 'three') {
+        [x3El, y3El].forEach((el) => {
+          el.addEventListener("input", resetResult);
+        });
+      } else if (numRowSize == 'three' && secondNumRowSelected == 'three') {    
+        z3El.addEventListener("input", resetResult);
+      }
+    }
+
+    function multiplyMatrix(a1, a2, a3, b1, b2, b3, c1, c2, c3, x1, x2, x3, y1, y2, y3, z1, z2, z3) {
+      let results = {};
+      if (firstNumRowSelected == 'one') {
+        if (firstNumColsSelected == 'one') {
+          results = {
+            r1c1: a1 * x1,
+            r1c2: x2 ? a1 * x2 : '',
+            r1c3: x3 ? a1 * x3 : '',
+          }
+        } else if (firstNumColsSelected == 'two') {
+          results = {
+            r1c1: (a1 * x1) + (a2 * y1),
+            r1c2: x2 ? (a1 * x2) + (a2 * y2) : '',
+            r1c3: x3 ? (a1 * x3) + (a2 * y3) : '',
+          }
+        } else if (firstNumColsSelected == 'three') {
+          results = {
+            r1c1: (a1 * x1) + (a2 * y1) + (a3 * y1),
+            r1c2: x2 ? ((a1 * x2) + (a2 * y2) + (a3 * z2)) : '',
+            r1c3: x3 ? ((a1 * x3) + (a2 * y3) + (a3 * z3)) : '',
+          }
+        }
+      } 
+      else if (firstNumRowSelected == 'two') {
+        if (firstNumColsSelected == 'one') {
+          results = {
+            r1c1: a1 * x1,
+            r1c2: x2 ? a1 * x2 : '',
+            r1c3: x3 ? a1 * x3 : '',
+            r2c1: b1 * x1,
+            r2c2: x2 ? b1 * x2 : '',
+            r2c3: x3 ? b1 * x3 : '',
+          }
+        } else if (firstNumColsSelected == 'two') {
+          results = {
+            r1c1: (a1 * x1) + (a2 * y1),
+            r1c2: x2 ? (a1 * x2) + (a2 * y2) : '',
+            r1c3: x3 ? (a1 * x3) + (a2 * y3) : '',
+            r2c1: (b1 * x1) + (b2 * y1),
+            r2c2: x2 ? (b1 * x2) + (b2 * y2) : '',
+            r2c3: x3 ? (b1 * x3) + (b2 * y3) : '',
+          }
+        } else if (firstNumColsSelected == 'three') {
+          results = {
+            r1c1: (a1 * x1) + (a2 * y1) + (a3 * z1),
+            r1c2: x2 ? (a1 * x2) + (a2 * y2) + (a3 * z2) : '',
+            r1c3: x3 ? (a1 * x3) + (a2 * y3) + (a3 * z3) : '',
+            r2c1: (b1 * x1) + (b2 * y1) + (b3 * z1),
+            r2c2: x2 ? (b1 * x2) + (b2 * y2) + (b3 * z2) : '',
+            r2c3: x3 ? (b1 * x3) + (b2 * y3) + (b3 * z3) : '',
+          }
+        }
+      } 
+      else if (firstNumRowSelected == 'three') {
+        if (firstNumColsSelected == 'one') {
+          results = {
+            r1c1: a1 * x1,
+            r1c2: x2 ? a1 * x2 : '',
+            r1c3: x3 ? a1 * x3 : '',
+            r2c1: b1 * x1,
+            r2c2: x2 ? b1 * x2 : '',
+            r2c3: x3 ? b1 * x3 : '',
+            r3c1: c1 * x1,
+            r3c2: x2 ? c1 * x2 : '',
+            r3c3: x3 ? c1 * x3 : '',
+          }
+        } else if (firstNumColsSelected == 'two') {
+          results = {
+            r1c1: (a1 * x1) + (a2 * y1),
+            r1c2: x2 ? (a1 * x2) + (a2 * y2) : '',
+            r1c3: x3 ? (a1 * x3) + (a2 * y3) : '',
+            r2c1: (b1 * x1) + (b2 * y1),
+            r2c2: x2 ? (b1 * x2) + (b2 * y2) : '',
+            r2c3: x3 ? (b1 * x3) + (b2 * y3) : '',
+            r3c1: (c1 * x1) + (c2 * y1),
+            r3c2: x2 ? (c1 * x2) + (c2 * y2) : '',
+            r3c3: x3 ? (c1 * x3) + (c2 * y3) : '',
+          }
+        } else if (firstNumColsSelected == 'three') {
+          results = {
+            r1c1: (a1 * x1) + (a2 * y1) + (a3 * z1),
+            r1c2: x2 ? (a1 * x2) + (a2 * y2) + (a3 * z2) : '',
+            r1c3: x3 ? (a1 * x3) + (a2 * y3) + (a3 * z3) : '',
+            r2c1: (b1 * x1) + (b2 * y1) + (b3 * z1),
+            r2c2: x2 ? (b1 * x2) + (b2 * y2) + (b3 * z2) : '',
+            r2c3: x3 ? (b1 * x3) + (b2 * y3) + (b3 * z3) : '',
+            r3c1: (c1 * x1) + (c2 * y1) + (c3 * z1),
+            r3c2: x2 ? (c1 * x2) + (c2 * y2) + (c3 * z2) : '',
+            r3c3: x3 ? (c1 * x3) + (c2 * y3) + (c3 * z3) : '',
+          }
+        }
+      }
+      return results
+    }
+
+    function calculateResults() {
+      // Retrieve input values
+      const a1 = parseFloat(a1El.value)
+      const a2 = parseFloat(a2El.value)
+      const a3 = parseFloat(a3El.value)
+      const b1 = parseFloat(b1El.value)
+      const b2 = parseFloat(b2El.value)
+      const b3 = parseFloat(b3El.value)
+      const c1 = parseFloat(c1El.value)
+      const c2 = parseFloat(c2El.value)
+      const c3 = parseFloat(c3El.value)
+
+      const x1 = parseFloat(x1El.value)
+      const x2 = parseFloat(x2El.value)
+      const x3 = parseFloat(x3El.value)
+      const y1 = parseFloat(y1El.value)
+      const y2 = parseFloat(y2El.value)
+      const y3 = parseFloat(y3El.value)
+      const z1 = parseFloat(z1El.value)
+      const z2 = parseFloat(z2El.value)
+      const z3 = parseFloat(z3El.value)
+
+      if (
+        isNaN(a1) || isNaN(x1) || (b1El != '' && isNaN(b1)) || (c1El != '' && isNaN(c1)) || (a2El != '' && isNaN(a2)) || 
+        (b2El != '' && isNaN(b2)) || (c2El != '' && isNaN(c2)) || (a3El != '' && isNaN(a3)) || (b3El != '' && isNaN(b3)) ||
+        (c3El != '' && isNaN(c3)) || (y1El != '' && isNaN(y1)) || (z1El != '' && isNaN(z1)) ||(x2El != '' && isNaN(x2)) || 
+        (y2El != '' && isNaN(y2)) || (z2El != '' && isNaN(z2)) || (x3El != '' && isNaN(x3)) || (y3El != '' && isNaN(y3)) || 
+        (z3El != '' && isNaN(z3))
+      ) {
+        showError("Please Enter All Details.");
+        return;
+      }
+      
+      
+      try {
+        const {
+          r1c1, r1c2, r1c3, r2c1, r2c2, r2c3, r3c1, r3c2, r3c3
+        } = multiplyMatrix(a1, a2, a3, b1, b2, b3, c1, c2, c3, x1, x2, x3, y1, y2, y3, z1, z2, z3)
+
+        let aBracketOpen = firstNumRowSelected == 'one' ? '[' : '⌈'
+        let aBracketClose = firstNumRowSelected == 'one' ? ']' : '⌉	'
+        let xBracketOpen = secondNumRowSelected == 'one' ? '[' : '⌈'
+        let xBracketClose = secondNumRowSelected == 'one' ? ']' : '⌉	'
+
+        let bBracketOpen = firstNumRowSelected == 'two' ? '⌊' : firstNumRowSelected == 'three' ?  '|' : '';
+        let bBracketClose = firstNumRowSelected == 'two' ? '⌋' : firstNumRowSelected == 'three' ?  '|' : '';
+        let yBracketOpen = secondNumRowSelected == 'two' ? '⌊' : secondNumRowSelected == 'three' ?  '|' : '';
+        let yBracketClose = secondNumRowSelected == 'two' ? '⌋' : secondNumRowSelected == 'three' ?  '|' : '';
+
+        let cBracketOpen = firstNumRowSelected == 'three' ? '⌊' : '';
+        let cBracketClose = firstNumRowSelected == 'three' ? '⌋' : '';
+        let zBracketOpen = secondNumRowSelected == 'three' ? '⌊' : '';
+        let zBracketClose = secondNumRowSelected == 'three' ? '⌋' : '';
+        calcResultsEl.innerHTML = `
+            <p> ${aBracketOpen} ${!isNaN(a1) ? `${a1} &nbsp;` : ''}  ${!isNaN(a2) ? `${a2} &nbsp;` : ''}  ${!isNaN(a3) ? a3 : ''} ${aBracketClose}</p>
+            <p>${bBracketOpen} ${!isNaN(b1) ? `${b1} &nbsp;` : ''} ${!isNaN(b2) ? `${b2} &nbsp;` : ''} ${!isNaN(b3) ? b3 : ''} ${bBracketClose}</p>
+            <p>${cBracketOpen} ${!isNaN(c1) ? `${c1} &nbsp;` : ''} ${!isNaN(c2) ? `${c2} &nbsp;` : ''} ${!isNaN(c3) ? c3 : ''} ${cBracketClose} </p>
+            <p>&nbsp;&nbsp;X</p>
+            <p>${xBracketOpen} ${!isNaN(x1) ? `${x1} &nbsp;` : ''}  ${!isNaN(x2) ? `${x2} &nbsp;` : ''}  ${!isNaN(x3) ? x3 : ''} ${xBracketClose}</p>
+            <p>${yBracketOpen} ${!isNaN(y1) ? `${y1} &nbsp;` : ''} ${!isNaN(y2) ? `${y2} &nbsp;` : ''} ${!isNaN(y3) ? y3 : ''} ${yBracketClose}</p>
+            <p>${zBracketOpen}${!isNaN(z1) ? `${z1} &nbsp;` : ''} ${!isNaN(z2) ? `${z2} &nbsp;` : ''} ${!isNaN(z3) ? z3 : ''} ${zBracketClose}</p>
+            <p>&nbsp;&nbsp;=</p>
+            <p>${aBracketOpen} ${r1c1 != undefined ? `${r1c1} &nbsp;` : ''} ${r1c2 != undefined ? `${r1c2} &nbsp;` : ''} ${r1c3 != undefined ? r1c3 : ''} ${aBracketClose}</p>
+            <p>${bBracketOpen} ${r2c1 != undefined ? `${r2c1} &nbsp;` : ''} ${r2c2 != undefined ? `${r2c2} &nbsp;` : ''} ${r2c3 != undefined ? r2c3 : ''} ${bBracketClose}</p>
+            <p>${cBracketOpen} ${r3c1 != undefined ? `${r3c1} &nbsp;` : ''} ${r3c2 != undefined ? `${r3c2} &nbsp;` : ''} ${r3c3 != undefined ? r3c3 : ''} ${cBracketClose}</p>
+      `
+      } catch (error) {
+        showError("Something Went Wrong!!!");
+        resethandler()
+      }
+    }
+
+    /********************************* HELPER FUNCTIONS **********************************/
+
+    function showError(errorMessage) {
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: errorMessage,
+      });
+    }
+
+    function resetForm() {
+      a1El.value = ""
+      a2El.value = ""
+      a3El.value = ""      
+      b1El.value = ""
+      b2El.value = ""
+      b3El.value = ""    
+      c1El.value = ""
+      c2El.value = ""
+      c3El.value = ""
+
+      x1El.value = ""
+      x2El.value = ""
+      x3El.value = ""      
+      y1El.value = ""
+      y2El.value = ""
+      y3El.value = ""    
+      z1El.value = ""
+      z2El.value = ""
+      z3El.value = ""
+
+    }
+
+    function resetResult() {
+      calcResultsEl.innerHTML = "<p>Result will appear here...</p>";
+    }
+
+    function resethandler() {
+      resetForm();
+      resetResult();
+    }
+
+    /********************************** EVENT LISTENERS **********************************/
+    resetBtnEl.addEventListener("click", resethandler);
+    [a1El, a2El, b1El, b2El, x1El, x2El, y1El, y2El].forEach((el) => {
+      el.addEventListener("input", resetResult);
+    });
+    
+    firstNumRowEl.addEventListener("change", (e) => {
+      handleFirstNumRowChange(e);
+      resetResult();
+    })
+
+    firstNumColsEl.addEventListener("change", (e) => {
+      handleFirstColsSecondRowChange(e);
+      resetResult();
+    })
+
+    secondNumRowEl.addEventListener("change", (e) => {
+      handleFirstColsSecondRowChange(e);
+      resetResult();
+    })
+
+    secondNumColsEl.addEventListener("change", (e) => {
+      handleSecondNumColsChange(e);
+      resetResult();
+    })
+
+    calcBtnEl.addEventListener("click", calculateResults);
+  </script>
+</body>
+
+</html> 

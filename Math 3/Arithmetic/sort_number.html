@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sort Number</title>
+
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.6.5/dist/sweetalert2.all.min.js"></script>
+  <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11.6.5/dist/sweetalert2.min.css" rel="stylesheet">
+</head>
+
+<body>
+  <div>
+    <h1>Sort Number</h1>
+    <h4>Enter numbers separated by comma 1.618,2,3.14,5.382,-8.5 space 1.618,2,3.14,5.382,-8.5 or line break</h4>
+    <p>
+      <textarea type="text" id="nums" cols="40" rows="10"></textarea>  
+    </p>
+    <p>
+      <input type="radio" id="ascending" name="order" value="ascending">
+      <label for="ascending">Ascending order (from small to large)</label><br>
+      <input type="radio" id="descending" name="order" value="descending">
+      <label for="descending">Descending order (from large to small)</label><br>
+    </p>
+    <p>
+      <button id="calcBtn">Calculate</button>
+      <button id="resetBtn">Reset</button>
+    </p>
+    <hr>
+    <p>
+    <h3>Result:</h3>
+    <h3 id="calcResults">Result will appear here...</h3>
+    </p>
+  </div>
+  <script>
+
+    /********************************** ELEMENTS **********************************/
+    const numsEl = document.getElementById('nums');
+    const orderEl = document.querySelectorAll("input[name='order']");
+    const calcBtnEl = document.getElementById('calcBtn');
+    const resetBtnEl = document.getElementById('resetBtn');
+    const calcResultsEl = document.getElementById('calcResults')
+
+    /********************************** FUNCTIONS **********************************/
+    // Conversion functions
+
+    function sortNumbers(nums, order1, order2) {
+      let results = 0
+      nums = nums.replace(/[ ,\n]+/g, ",")
+      nums = nums.split(",")
+      if (order1) {
+        results = nums.sort((a, b) => parseFloat(a) - parseFloat(b))
+      } else if (order2) {
+        results = nums.sort((a, b) => parseFloat(b) - parseFloat(a))
+      }
+      
+      return (nums.toString()).replace(/,/g, ", ")
+    }
+
+    function calculateResults() {
+      // Retrieve input values
+      const nums = numsEl.value
+      const order = orderEl
+
+      if (
+        nums == '' || (order[0].checked == false && order[1].checked == false)
+      ) {
+        showError("Please Enter All Details.");
+        return;
+      }
+
+      try {
+        const sortedNums = sortNumbers(nums, order[0].checked, order[1].checked)
+        calcResultsEl.innerHTML = `New Numbers = ${sortedNums}`
+      } catch (error) {
+        showError("Something Went Wrong!!!");
+        resethandler()
+      }
+
+    }
+
+    /********************************* HELPER FUNCTIONS **********************************/
+
+    function showError(errorMessage) {
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: errorMessage,
+      });
+    }
+
+    function resetForm() {
+      numsEl.value = ""
+      orderEl[0].checked = false
+      orderEl[1].checked = false
+    }
+
+    function resetResult() {
+      calcResultsEl.innerHTML = "<p>Result will appear here...</p>";
+    }
+
+    function resethandler() {
+      resetForm();
+      resetResult();
+    }
+
+    /********************************** EVENT LISTENERS **********************************/
+    resetBtnEl.addEventListener("click", resethandler);
+    numsEl.addEventListener("input", resetResult);
+    [orderEl[0], orderEl[1]].forEach((el) => {
+      el.addEventListener("change", resetResult);
+    });   
+    calcBtnEl.addEventListener("click", calculateResults);
+  </script>
+</body>
+
+</html> 

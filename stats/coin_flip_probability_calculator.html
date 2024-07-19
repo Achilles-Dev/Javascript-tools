@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Coin Flip Probability Calculator</title>
+  </head>
+  <body>
+    <h1>Coin Flip Probability Calculator</h1>
+    <p>
+      Number of flips:
+      <input type="number" id="flipsNum" />
+      (How many times we flip the coin.)
+    </p>
+    <p>
+      I want to have...
+      <select id="numOfHeadsSelect">
+        <option value="exactly" selected>exactly &nbsp;&nbsp;</option>
+        <option value="atLeast">at least</option>
+        <option value="atMost">at most</option>
+      </select>
+    </p>
+    <p>
+      ...this number of heads:
+      <input type="number" id="numOfHeads" />
+      (Exactly how many heads we obtained.)
+    </p>
+    <p>
+      Probability of heads:
+      <input type="number" value="0.5" id="headsProbs" />
+      (How likely it is to get heads (0.5 for a fair coin).)
+    </p>
+
+    <button id="calcBtn">Calculate</button>
+    <button id="resetBtn">Reset</button>
+    <hr />
+    <div>
+      <h3>Result:</h3>
+      <h3 id="calcResults">Result will appear here...</h3>
+    </div>
+
+    <script>
+      // Get required elements from the HTML
+      const flipsNumEl = document.getElementById("flipsNum");
+      const numOfHeadsSelectEl = document.getElementById("numOfHeadsSelect");
+      const numOfHeadsEl = document.getElementById("numOfHeads");
+      const headsProbsEl = document.getElementById("headsProbs");
+
+      const calcBtnEl = document.getElementById("calcBtn");
+      const resetBtnEl = document.getElementById("resetBtn");
+      const calcResultsEl = document.getElementById("calcResults");
+
+      function calcFactorialOfNum(num) {
+        if (num == 0) {
+          return 1;
+        } else {
+          return num * calcFactorialOfNum(num - 1);
+        }
+      }
+      
+      function calculateProbOfToss(number, k, headsProbs) {
+        const nFactorial = calcFactorialOfNum(number);
+        const kFactorial = calcFactorialOfNum(k); 
+        const nCK = nFactorial / (kFactorial * calcFactorialOfNum(number - k));
+        return nCK * (headsProbs ** k) * ((1 - headsProbs) ** (number - k))
+      }
+
+      function calculateProbOfSuccess(number, k, headsProbs, selection) {
+        if (selection == 'exactly') {
+          return calculateProbOfToss(number, k, headsProbs)
+        } else if (selection == 'atLeast') {
+          let results = calculateProbOfToss(number, k, headsProbs)
+          let value = k + 1;
+          while (value <= number) {
+            results += calculateProbOfToss(number, value, headsProbs)
+            value += 1;
+          }
+          return results
+        } else if (selection == 'atMost') {
+          let results = calculateProbOfToss(number, k, headsProbs)
+          let value = k - 1;
+          while (value > 0) {
+            results += calculateProbOfToss(number, value, headsProbs)
+            value -= 1;
+          }
+          return results
+        }
+      }
+
+      function calculateResults() {
+        // Retrieve input values
+        const flipsNum = parseFloat(flipsNumEl.value);
+        const numOfHeadsSelect = numOfHeadsSelectEl.value;
+        const numOfHeads = parseFloat(numOfHeadsEl.value);
+        const headsProbs = parseFloat(headsProbsEl.value);
+
+        if (isNaN(flipsNum) || isNaN(numOfHeads) || isNaN(headsProbs)) {
+          alert("Please Enter All Details.");
+          return;
+        } else if (flipsNum <= 0) {
+          alert("The number of tosses must be positive.");
+          return;
+        } else if (flipsNum <= numOfHeads) {
+          alert("The number of flips must be greater than the number of heads obtained");
+          return;
+        } else if (numOfHeads < 0) {
+          alert("The number of obtained heads must be at least 0.");
+          return;
+        } else if (headsProbs < 0) {
+          alert("The probability of getting heads must be at least 0.");
+          return;
+        } else if (headsProbs > 1) {
+          alert("The probability of getting heads cannot be greater than 1.");
+          return;
+        }
+
+        try {
+          const results = calculateProbOfSuccess(flipsNum, numOfHeads, headsProbs, numOfHeadsSelect);
+
+          calcResultsEl.innerHTML = `
+            <p>Probability of success</p>
+            <p>Probability: ${results.toFixed(5) * 1}</p>
+            <p>Chance of success: ${(results * 100).toFixed(3) * 1}%</p>
+            <p>Probability of 1 in ${(1 / results).toFixed(3) * 1} flips</p>
+            
+          `;
+        } catch (error) {
+          alert("Something Went Wrong!!!");
+          resethandler();
+        }
+      }
+
+      function resetForm() {
+        flipsNumEl.value = "";
+        numOfHeadsSelectEl.selectedIndex = "0";
+        numOfHeadsEl.value = "";
+        headsProbsEl.value = "0.5";
+      }
+
+      function resetResult() {
+        calcResultsEl.innerHTML = "<p>Result will appear here...</p>";
+      }
+
+      function resethandler() {
+        resetForm();
+        resetResult();
+      }
+
+      resetBtnEl.addEventListener("click", resethandler);
+      calcBtnEl.addEventListener("click", calculateResults);
+
+      [flipsNumEl, numOfHeadsSelectEl, numOfHeadsEl, headsProbsEl].forEach(
+        (el) => {
+          el.addEventListener("input", resetResult);
+        }
+      );
+    </script>
+  </body>
+</html>

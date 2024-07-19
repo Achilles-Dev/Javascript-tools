@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sand Calculator</title>
+
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.6.5/dist/sweetalert2.all.min.js"></script>
+  <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11.6.5/dist/sweetalert2.min.css" rel="stylesheet">
+</head>
+<body>
+  <div>
+    <h1>Sand Calculator</h1>
+    <p>Use this calculator to estimate how much sand in volume (cubic ft, cubic yards, or cubic meters) or weight <br/>
+      (tons & pounds, tonnes and kilograms) you would need. It uses conventional sand density to convert sand volume <br/>
+      to sand weight.
+    </p>
+    <p>
+      <label>The area to fill is &nbsp;&nbsp;&nbsp;</label>
+      <input type="radio" id="rectangle" name="areaToFill" value="rectangle" checked>
+      <label for="rectangle">Rectangular</label>
+      <input type="radio" id="circle" name="areaToFill" value="circle">
+      <label for="circle">Circular</label>
+    </p>
+    <div id="rectangularAreaInput">
+      <p>
+        <label for="width">Width:</label>
+        <input type="number" id="width" placeholder="Width">
+        <select id="widthUnit">
+          <option value="ft" selected>ft</option>
+          <option value="in">in</option>
+          <option value="yd">yd</option>
+          <option value="cm">cm</option>
+          <option value="m">m</option>
+        </select>
+      </p>
+      <p>
+        <label for="length">Length:</label>
+        <input type="number" id="length" placeholder="Length">
+        <select id="lengthUnit">
+          <option value="ft" selected>ft</option>
+          <option value="in">in</option>
+          <option value="yd">yd</option>
+          <option value="cm">cm</option>
+          <option value="m">m</option>
+        </select>
+      </p>
+      <p>
+        <label for="depth">Depth / Height:</label>
+        <input type="number" id="depth">
+        <select id="depthUnit">
+          <option value="in" selected>in</option>
+          <option value="ft">ft</option>
+          <option value="yd">yd</option>
+          <option value="cm">cm</option>
+          <option value="m">m</option>
+        </select>
+      </p>
+    </div>
+    <div id="circularAreaInput" style="display: none;">
+      <p>
+        <label for="circleDepth">Depth / Height:</label>
+        <input type="number" id="circleDepth">
+        <select id="circleDepthUnit">
+          <option value="in" selected>in</option>
+          <option value="ft">ft</option>
+          <option value="yd">yd</option>
+          <option value="cm">cm</option>
+          <option value="m">m</option>
+        </select>
+      </p>   
+      <p>
+        <label for="diameter">Diameter:</label>
+        <input type="number" id="diameter" placeholder="Diameter">
+        <select id="diameterUnit">
+          <option value="in" selected>in</option>
+          <option value="ft">ft</option>
+          <option value="yd">yd</option>
+          <option value="cm">cm</option>
+          <option value="m">m</option>
+        </select>
+      </p>
+    </div>
+    <p>
+      <label for="price">Price: $</label>
+      <input type="number" id="price" placeholder="Optional">
+    </p>
+    <p>
+      <button id="calcBtn">Calculate</button>
+      <button id="resetBtn">Reset</button>
+    </p>
+    
+    <hr>
+    <p>
+    <h3>Result:</h3>
+    <h3 id="calcResults">Result will appear here...</h3>
+    </p>
+  </div>
+  <script>
+
+    /********************************** ELEMENTS **********************************/
+    const areaToFillEl = document.querySelectorAll("input[name='areaToFill']");
+    const rectangularAreaInputEl = document.getElementById('rectangularAreaInput')
+    const circularAreaInputEl = document.getElementById('circularAreaInput')
+    const priceEl = document.getElementById('price'); 
+    const calcBtnEl = document.getElementById('calcBtn');
+    const resetBtnEl = document.getElementById('resetBtn');
+    const calcResultsEl = document.getElementById('calcResults');
+    let firstInputEl = document.getElementById('length');
+    let firstInputUnitEl = document.getElementById('lengthUnit');
+    let secondInputEl = document.getElementById('width');
+    let secondInputUnitEl = document.getElementById('widthUnit');
+    let thirdInputEl = document.getElementById('depth');;
+    let thirdInputUnitEl = document.getElementById('depthUnit');
+    let selectedArea = areaToFillEl[0].value
+
+     /********************************** FUNCTIONS **********************************/
+            // Conversion functions
+      const convertWidthAndLength = (value, unit) => {
+        const toFeet = {
+          'cm': 0.0328084,
+          'in': 1/12,
+          'yd': 3,
+          'm': 3.28084,
+          'ft': 1
+        };
+        const conversionFactor = toFeet[unit];
+        if (conversionFactor !== undefined) {
+          return value * conversionFactor;
+        } else {
+          showError(`Unsupported unit: ${unit}`);
+          return;
+        }
+      }
+        
+      const convertDepth = (value, unit) => {
+        const toInch = {
+          'cm': 0.393701,
+          'yd': 36,
+          'm': 39.3701,
+          'ft': 12,
+          'in': 1
+        };
+
+
+        const conversionFactor = toInch[unit];
+        if (conversionFactor !== undefined) {
+          return value * conversionFactor;
+        } else {
+          showError(`Unsupported unit: ${unit}`);
+          return;
+        }
+      };
+
+      function changeAreaToFill(e) {
+        const area = e.target.value
+        if (area == 'rectangle') {
+          rectangularAreaInputEl.style.display = 'block'
+          circularAreaInputEl.style.display = 'none'
+          firstInputEl = document.getElementById('length');
+          firstInputUnitEl = document.getElementById('lengthUnit');
+          secondInputEl = document.getElementById('width');
+          secondInputUnitEl = document.getElementById('widthUnit');
+          thirdInputEl = document.getElementById('depth');
+          thirdInputUnitEl = document.getElementById('depthUnit');
+          selectedArea = area
+        } else if (area == 'circle') {
+          rectangularAreaInputEl.style.display = 'none'
+          circularAreaInputEl.style.display = 'block'
+          firstInputEl = document.getElementById('diameter');
+          firstInputUnitEl = document.getElementById('diameterUnit');
+          secondInputEl = document.getElementById('circleDepth');
+          secondInputUnitEl = document.getElementById('circleDepthUnit');
+          selectedArea = area
+        }
+      }
+
+      function calculateRectangularArea(length, width, depth) {
+        let cubicFeet = 0;
+        let cubicYards = 0
+        let weightTons = 0;
+        let weightPounds = 0;
+        cubicFeet = (length * width * (depth / 12))
+        cubicYards = cubicFeet / 27
+        weightTons = (4 / 3) * cubicYards
+        weightPounds = cubicYards * 2696.981;
+        return {
+          cubicYards: cubicYards.toFixed(3) * 1, 
+          cubicFeet: cubicFeet.toFixed(3) * 1,
+          weightTons: weightTons,
+          weightPounds: weightPounds.toFixed()
+        }
+      }
+
+      function calculateCircularArea(diameter, depth) {
+        let cubicFeet = 0;
+        let cubicYards = 0
+        let weightTons = 0;
+        let weightPounds = 0;
+        cubicFeet = (Math.PI * ((diameter / 2) / 12) ** 2) * (depth / 12)
+        cubicYards = cubicFeet / 27
+        weightTons = (4 / 3) * cubicYards
+        weightPounds = cubicYards * 2696.981;;
+        return {
+          cubicYards: cubicYards.toFixed(3) * 1, 
+          cubicFeet: cubicFeet.toFixed(3) * 1,
+          weightTons: weightTons,
+          weightPounds: weightPounds.toFixed()
+        }
+      }
+
+      function calculateResults() {
+        // Retrieve input values
+        const firstInput = parseFloat(firstInputEl.value)
+        const firstInputUnit = firstInputUnitEl.value
+        const secondInput = parseFloat(secondInputEl.value)
+        const secondInputUnit = secondInputUnitEl.value;
+        const thirdInput = parseFloat(thirdInputEl.value);
+        const thirdInputUnit = thirdInputUnitEl.value
+        const price = parseFloat(priceEl.value);
+
+        if (
+          ((firstInput && isNaN(firstInput)) || (firstInput && firstInput < 0)) || 
+          ((secondInput && isNaN(secondInput)) || (secondInput && secondInput < 0)) || 
+          ((thirdInput && isNaN(thirdInput)) || (thirdInput && thirdInput < 0))
+        ) {
+          showError("Please Enter All Details.");
+          return;
+        }
+
+        try {
+          // Convert input values
+          let cubicYards = 0;
+          let cubicFeet = 0;
+          let weightTons = 0;
+          let weightPounds = 0;
+          if (selectedArea == 'rectangle') {
+            const W = convertWidthAndLength(secondInput, secondInputUnit);
+            const L = convertWidthAndLength(firstInput, firstInputUnit);
+            const D = convertDepth(thirdInput, thirdInputUnit);
+            const results = calculateRectangularArea(W, L, D)
+            cubicFeet = results.cubicFeet
+            cubicYards = results.cubicYards
+            weightTons = results.weightTons
+            weightPounds = results.weightPounds
+          } else if (selectedArea == 'circle') {
+            const DM = convertDepth(firstInput, firstInputUnit);
+            const D = convertDepth(secondInput, secondInputUnit);
+            const results = calculateCircularArea(DM, D)
+            cubicFeet = results.cubicFeet
+            cubicYards = results.cubicYards
+            weightTons = results.weightTons
+            weightPounds = results.weightPounds
+          }
+          
+          if (price) {
+          let cost = 0
+          cost = (price * weightTons).toFixed(2)
+          weightTons = weightTons.toFixed(2) * 1
+          calcResultsEl.innerHTML = `<p>Sand volume: ${cubicYards} cubic yards (${cubicFeet} ft<sup>3</sup>)</p>
+                                      <p>Sand weight: ${weightTons} tons (${weightPounds} lbs)</p>
+                                      <p>Sand cost: $${cost}</p>
+                                    `
+        } else {
+          weightTons = weightTons.toFixed(2) * 1
+          calcResultsEl.innerHTML = `
+                                      <p>Sand volume: ${cubicYards} cubic yards (${cubicFeet} ft<sup>3</sup>)</p>
+                                      <p>Sand weight: ${weightTons} tons (${weightPounds} lbs)</p>
+                                    `
+        }
+                                    
+        } catch (error) {
+          showError("Something Went Wrong!!!");
+          resethandler()
+        }
+      
+      }
+    /********************************* HELPER FUNCTIONS **********************************/
+
+    function showError(errorMessage) {
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: errorMessage,
+      });
+    }
+
+    function resetForm() {
+      firstInputEl.value = "";
+      secondInputEl.value = "";
+      thirdInputEl.value = "";
+      priceEl.value = "";
+      firstInputUnitEl.selectedIndex = "0";
+      secondInputUnitEl.selectedIndex = "0";
+      thirdInputUnitEl.selectedIndex = "0";
+    }
+
+    function resetResult() {
+      calcResultsEl.innerHTML = "<p>Result will appear here...</p>";
+    }
+
+    function resethandler() {
+      resetForm();
+      resetResult();
+    }
+
+    /********************************** EVENT LISTENERS **********************************/
+    [firstInputEl, secondInputEl, thirdInputEl, priceEl].forEach((el) => {
+      if (el) {
+        el.addEventListener("input", resetResult);
+      }
+    });
+    [areaToFillEl[0], areaToFillEl[1]].forEach((el) => {
+      el.addEventListener("change", (e) => changeAreaToFill(e));
+    });  
+    resetBtnEl.addEventListener("click", resethandler);
+    calcBtnEl.addEventListener("click", calculateResults);
+  </script>
+</body>
+</html>

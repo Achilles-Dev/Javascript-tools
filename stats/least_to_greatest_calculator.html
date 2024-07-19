@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Least to Greatest Calculator</title>
+  </head>
+  <body>
+    <h1>Least to Greatest Calculator</h1>
+    <h4>
+      Values (enter up to 50 numbers)
+    </h4  >
+    <p>
+      #1
+      <input type="number" id="num1" />
+    </p>
+    <p>
+      #2
+      <input type="number" id="num2" />
+    </p>
+    <div id="additions"></div>
+    <p>
+      <button id="addInput">Add Input</button>
+      <button id="removeInput">Remove Input</button>
+    </p>
+    <button id="calcBtn">Calculate</button>
+    <button id="resetBtn">Reset</button>
+    <hr />
+    <div>
+      <h3>Result:</h3>
+      <h3 id="calcResults">Result will appear here...</h3>
+    </div>
+
+    <script>
+      // Get required elements from the HTML
+      const num1El = document.getElementById("num1");
+      const num2El = document.getElementById("num2");
+      const additionsEl = document.getElementById("additions");
+      const addInputEl = document.getElementById("addInput");
+      const removeInputEl = document.getElementById("removeInput");
+      let numNEl = {};
+
+      const calcBtnEl = document.getElementById("calcBtn");
+      const resetBtnEl = document.getElementById("resetBtn");
+      const calcResultsEl = document.getElementById("calcResults");
+
+      let index = 3;
+
+      function handleAddInput() {
+        if (index > 50) {
+          return;
+        }
+        const para = document.createElement('p');
+        para.id = `input${index}`
+        let input = `
+            #${index}
+            <input type="number" id="num${index}" />
+        `
+        para.innerHTML = input
+        
+        additionsEl.appendChild(para);
+        numNEl[`num${index}El`] = document.getElementById(`num${index}`);
+        document.getElementById(`num${index}`).addEventListener("input", resetResult);
+        index += 1;
+        resetResult()
+      }
+
+      function handleRemoveInput() {
+        let removeIndex = index - 1;
+        const lastPara = document.getElementById(`input${removeIndex}`)
+        if (removeIndex > 2) {
+          lastPara.remove()
+          delete numNEl[`num${removeIndex}El`]
+          index -=  1;
+          resetResult()
+        }
+      }
+
+      function calculateResults() {
+        // Retrieve input values
+        const num1 = parseFloat(num1El.value);
+        const num2 = parseFloat(num2El.value);
+
+        if (isNaN(num1) || isNaN(num2)) {
+          alert("Please Enter All Details.");
+          return;
+        } else {
+          for (const [key, value] of Object.entries(numNEl)) {
+            if (isNaN(parseFloat(value.value))) {
+              alert("Please Enter All Details.");
+              return;
+            }
+          }
+        }
+
+        try {
+          let idx = index - 1;
+          let numsArray = [num1, num2];
+          while (idx > 2) {
+            numsArray.push(parseFloat(numNEl[`num${idx}El`].value))
+            idx -= 1;
+          }
+
+          const results = (numsArray.sort((a,b) => a - b)).toString().replace(/,/g, ", ")
+          calcResultsEl.innerHTML = `
+              <p>Your sorted dataset is:: ${results}</p>
+            `;
+        } catch (error) {
+          alert("Something Went Wrong!!!");
+          resethandler();
+        }
+      }
+
+      function resetForm() {
+        num1El.value = "";
+        num2El.value = "";
+      }
+
+      function resetResult() {
+        calcResultsEl.innerHTML = "<p>Result will appear here...</p>";
+      }
+
+      function resethandler() {
+        resetForm();
+        resetResult();
+      }
+
+      resetBtnEl.addEventListener("click", resethandler);
+      calcBtnEl.addEventListener("click", calculateResults);
+      addInputEl.addEventListener("click", handleAddInput);
+      removeInputEl.addEventListener("click", handleRemoveInput);
+
+      [num1El, num2El].forEach((el) => {
+        el.addEventListener("input", resetResult);
+      });
+    </script>
+  </body>
+</html>

@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Coefficient of Variation Calculator</title>
+  </head>
+  <body>
+    <h1>Coefficient of Variation Calculator</h1>
+    <p>
+      Enter numbers separated by comma [example1], space [example2] or line
+      break [example3]:
+    </p>
+    <textarea id="numbersInput" rows="5"></textarea>
+    <br />
+    <button id="calcBtn">Calculate</button>
+    <button id="resetBtn">Reset</button>
+    <hr />
+    <div>
+      <h3>Result:</h3>
+      <h3 id="calcResults">Result will appear here...</h3>
+    </div>
+
+    <script>
+      // Get required elements from the HTML
+      const numbersInputEl = document.getElementById("numbersInput");
+
+      const calcBtnEl = document.getElementById("calcBtn");
+      const resetBtnEl = document.getElementById("resetBtn");
+      const calcResultsEl = document.getElementById("calcResults");
+
+      // Function to calculate the Coefficient of Variation
+      function calculateCoefficientOfVariation(numbers) {
+        const mean = calculateMean(numbers);
+        const standardDeviation = calculateStandardDeviation(numbers, mean);
+        const coefficientOfVariation = standardDeviation / mean;
+        return coefficientOfVariation;
+      }
+
+      // Function to calculate the mean of an array of numbers
+      function calculateMean(numbers) {
+        const sum = numbers.reduce((acc, num) => acc + num, 0);
+        const mean = sum / numbers.length;
+        return mean;
+      }
+
+      // Function to calculate the standard deviation of an array of numbers
+      function calculateStandardDeviation(numbers, mean) {
+        const squaredDifferences = numbers.map((num) =>
+          Math.pow(num - mean, 2)
+        );
+        const sumSquaredDifferences = squaredDifferences.reduce(
+          (acc, num) => acc + num,
+          0
+        );
+        const variance = sumSquaredDifferences / numbers.length;
+        const standardDeviation = Math.sqrt(variance);
+        return standardDeviation;
+      }
+
+      // Function to extract numbers from the input text
+      function extractNumbers(inputText) {
+        const regex = /[+\-]?\d*\.?\d+(?:[Ee][+\-]?\d+)?/g;
+        const matches = inputText.match(regex);
+        const numbers = matches ? matches.map(Number) : [];
+        return numbers;
+      }
+
+      function calculateResults() {
+        const numbers = extractNumbers(numbersInputEl.value);
+
+        if (numbers.length < 2) {
+          alert("Please enter at least two valid numbers.");
+        }
+
+        try {
+          const coefficientOfVariation =
+            calculateCoefficientOfVariation(numbers);
+          const meanValue = calculateMean(numbers)
+          const standardDeviation = calculateStandardDeviation(numbers, meanValue)
+          calcResultsEl.innerHTML = `
+                    <p>Total numbers: ${numbers.length} </p>
+                    <p>Mean value: ${meanValue.toFixed(9) * 1} </p>
+                    <p>Population standard deviation: ${standardDeviation.toFixed(9) * 1} </p>
+                    <p>Coefficient of variation: ${coefficientOfVariation.toFixed(3) * 1} </p>
+                `;
+        } catch (error) {
+          alert("Something Went Wrong!!!");
+          resethandler();
+        }
+      }
+
+      function resetForm() {
+        numbersInputEl.value = "";
+      }
+
+      function resetResult() {
+        calcResultsEl.innerHTML = "<p>Result will appear here...</p>";
+      }
+
+      function resethandler() {
+        resetForm();
+        resetResult();
+      }
+
+      resetBtnEl.addEventListener("click", resethandler);
+      calcBtnEl.addEventListener("click", calculateResults);
+      numbersInputEl.addEventListener("input", resetResult);
+    </script>
+  </body>
+</html>

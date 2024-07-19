@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Rounding Numbers Calculator</title>
+
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.6.5/dist/sweetalert2.all.min.js"></script>
+  <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11.6.5/dist/sweetalert2.min.css" rel="stylesheet">
+</head>
+
+<body>
+  <div>
+    <h1>Rounding Numbers Calculator</h1>
+    <p>
+      <label for="num">Number:</label>
+      <input type="number" id="num" />  
+    </p>
+    <p>
+      <label for="roundUnit">Round to:</label>
+      <select id="roundUnit">
+        <option value="1000000">Millions (1,000,000)</option>
+        <option value="100000">Hundred Thousands (100,000)</option>
+        <option value="10000">Ten Thousands (10,000)</option>
+        <option value="1000">Thousands (1,000)</option>
+        <option value="100">Hundred (100)</option>
+        <option value="10">Tens (10)</option>
+        <option value="1">Ones (1)</option>
+        <option value="0.1">Tenths (0.1)</option>
+        <option value="0.01" selected>Hundredths (0.01)</option>
+        <option value="0.001">Thousandths (0.001)</option>
+        <option value="0.0001">Ten Thousandths (0.0001)</option>
+        <option value="0.00001">Hundred Thousandths (0.00001)</option>
+        <option value="0.000001">Millionths (0.000001)</option>
+        <option value="1">Custom precision</option>
+      </select> 
+    </p>
+    
+    <p>
+      <button id="calcBtn">Calculate</button>
+      <button id="resetBtn">Reset</button>
+    </p>
+    <hr>
+    <p>
+    <h3>Result:</h3>
+    <h3 id="calcResults">Result will appear here...</h3>
+    </p>
+  </div>
+  <script>
+
+    /********************************** ELEMENTS **********************************/
+    const numEl = document.getElementById('num');
+    const roundUnitEl = document.getElementById('roundUnit');
+    const calcBtnEl = document.getElementById('calcBtn');
+    const resetBtnEl = document.getElementById('resetBtn');
+    const calcResultsEl = document.getElementById('calcResults')
+
+    /********************************** FUNCTIONS **********************************/
+    // Conversion functions
+
+    function roundNum(num, roundUnit) {
+      let results = 0;
+      results = (((num / roundUnit).toFixed()) * roundUnit).toFixed(10) * 1
+      return results
+    }
+
+    function calculateResults() {
+      // Retrieve input values
+      const num = parseFloat(numEl.value)
+      const roundUnit = parseFloat(roundUnitEl.value)
+
+      if (
+        isNaN(num) 
+      ) {
+        showError("Please Enter All Details.");
+        return;
+      }
+      
+      try {
+        const results = roundNum(num, roundUnit)
+        calcResultsEl.innerHTML = `${results}`
+      } catch (error) {
+        showError("Something Went Wrong!!!");
+        resethandler()
+      }
+
+    }
+
+    /********************************* HELPER FUNCTIONS **********************************/
+
+    function showError(errorMessage) {
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: errorMessage,
+      });
+    }
+
+    function resetForm() {
+      numEl.value = ""
+      roundUnitEl.selectedIndex = 8
+    }
+
+    function resetResult() {
+      calcResultsEl.innerHTML = "<p>Result will appear here...</p>";
+    }
+
+    function resethandler() {
+      resetForm();
+      resetResult();
+    }
+
+    /********************************** EVENT LISTENERS **********************************/
+    resetBtnEl.addEventListener("click", resethandler);
+    numEl.addEventListener("input", resetResult);
+    roundUnitEl.addEventListener("change", resetResult)
+    calcBtnEl.addEventListener("click", calculateResults);
+  </script>
+</body>
+
+</html> 

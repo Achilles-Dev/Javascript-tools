@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>(Reduced) Row Echelon Form Calculator</title>
+
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.6.5/dist/sweetalert2.all.min.js"></script>
+  <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11.6.5/dist/sweetalert2.min.css" rel="stylesheet">
+</head>
+
+<body>
+  <div>
+    <h1>(Reduced) Row Echelon Form Calculator</h1>
+    <p>
+      <label for="isReducedForm">Use the reduced form?</label>
+      <select id="isReducedForm">
+        <option value="yes" selected>&nbsp;Yes &nbsp;</option>
+        <option value="no">&nbsp;No &nbsp;</option>  
+      </select>
+    </p>
+    <p>
+      <label for="eqnNo">Number of equations: </label>
+      <select id="eqnNo">
+        <option value="two" selected>&nbsp;2 &nbsp;</option>
+        <option value="three">&nbsp;3 &nbsp;</option>  
+      </select>
+    </p>
+    <p id="twoEqns">
+      <span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;a₁x + b₁y = c₁</span><br />
+      <span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;a₂x + b₂y = c₂</span>
+    </p>
+    <p id="threeEqns" style="display: none;">
+      <span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;a₁x + b₁y + c₁ = d₁</span><br />
+      <span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;a₂x + b₂y + c₂ = d₂</span><br />
+      <span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;a₃x + b₃y + c₃ = d₃</span>
+    </p>
+    <p>First equation</p>
+      <p>
+        <label for="a1">a₁:</label>
+        <input type="number" id="a1" />  
+      </p>
+      <p>
+        <label for="b1">b₁:</label>
+        <input type="number" id="b1" />  
+      </p>
+      <p>
+        <label for="c1">c₁:</label>
+        <input type="number" id="c1" />  
+      </p>
+      <p id="first3DInput" style="display: none;">
+        <label for="d1">d₁:</label>
+        <input type="number" id="d1" />  
+      </p>
+    <p>Second equation</p>
+      <p>
+        <label for="a2">a₂:</label>
+        <input type="number" id="a2" />  
+      </p>
+      <p>
+        <label for="b2">b₂:</label>
+        <input type="number" id="b2" />  
+      </p>
+      <p>
+        <label for="c2">c₂:</label>
+        <input type="number" id="c2" />  
+      </p>
+      <p id="second3DInput" style="display: none;">
+        <label for="d2">d₂:</label>
+        <input type="number" id="d2" />
+      </p>
+      <div id="thirdEqnInputs" style="display: none;">
+        <p>Third equation</p>
+        <p>
+          <label for="a3">a₃:</label>
+          <input type="number" id="a3" />  
+        </p>
+        <p>
+          <label for="b3">b₃:</label>
+          <input type="number" id="b3" />  
+        </p>
+        <p>
+          <label for="c3">c₃:</label>
+          <input type="number" id="c3" />  
+        </p>
+        <p>
+          <label for="d3">d₃:</label>
+          <input type="number" id="d3" />
+        </p>
+      </div>
+    
+    <p>
+      <button id="calcBtn">Calculate</button>
+      <button id="resetBtn">Reset</button>
+    </p>
+    <hr>
+    <p>
+    <h3>Result:</h3>
+    <h3 id="calcResults">Result will appear here...</h3>
+    </p>
+  </div>
+  <script>
+
+    /********************************** ELEMENTS **********************************/
+    const eqnNoEl = document.getElementById('eqnNo');
+    const isReducedFormEl = document.getElementById('isReducedForm');
+    const twoEqnsEl = document.getElementById('twoEqns');
+    const threeEqnsEl = document.getElementById('threeEqns');
+    const first3DInputEl = document.getElementById('first3DInput');
+    const second3DInputEl = document.getElementById('second3DInput');
+    const thirdEqnInputsEl = document.getElementById('thirdEqnInputs');
+    const calcBtnEl = document.getElementById('calcBtn');
+    const resetBtnEl = document.getElementById('resetBtn');
+    const calcResultsEl = document.getElementById('calcResults')
+    let a1El = document.getElementById('a1');
+    let b1El = document.getElementById('b1');
+    let c1El = document.getElementById('c1');
+    let d1El = '';
+    let a2El = document.getElementById('a2');
+    let b2El = document.getElementById('b2');
+    let c2El = document.getElementById('c2');
+    let d2El = '';
+    let a3El = '';
+    let b3El = '';
+    let c3El = '';
+    let d3El = '';
+    let eqnNoSelected = 'two'
+    let reducedFormSelected = 'yes'
+
+    /********************************** FUNCTIONS **********************************/
+    // Conversion functions
+
+    function handleEquationNoChange(e) {
+      const equationNo = e.target.value
+      first3DInputEl.style.display = equationNo ==  'three' ? 'block' : 'none'
+      second3DInputEl.style.display = equationNo ==  'three' ? 'block' : 'none'
+      thirdEqnInputsEl.style.display = equationNo ==  'three' ? 'block' : 'none'
+
+      twoEqnsEl.style.display = equationNo ==  'two' ? 'block' : 'none'
+      threeEqnsEl.style.display = equationNo ==  'three' ? 'block' : 'none'
+
+      eqnNoSelected = equationNo
+      
+      if (equationNo == 'two') {
+        a1El = document.getElementById('a1');
+        b1El = document.getElementById('b1');
+        c1El = document.getElementById('c1');
+        d1El = '';
+        a2El = document.getElementById('a2');
+        b2El = document.getElementById('b2');
+        c2El = document.getElementById('c2');
+        d2El = '';
+        a3El = '';
+        b3El = '';
+        c3El = '';
+        d3El = '';
+      } else if (equationNo == 'three') {
+        a1El = document.getElementById('a1');
+        b1El = document.getElementById('b1');
+        c1El = document.getElementById('c1');
+        d1El = document.getElementById('d1');
+        a2El = document.getElementById('a2');
+        b2El = document.getElementById('b2');
+        c2El = document.getElementById('c2');
+        d2El = document.getElementById('d2');
+        a3El = document.getElementById('a3');
+        b3El = document.getElementById('b3');
+        c3El = document.getElementById('c3');
+        d3El = document.getElementById('d3');
+        [d1El, d2El, a3El, b3El, c3El, d3El].forEach((el) => {
+          el.addEventListener("input", resetResult);
+        });
+      }
+    }
+
+    function cramersRule(a1, b1, c1, d1, a2, b2, c2, d2, a3, b3, c3, d3) {
+      let results = {};
+      if (eqnNoSelected == 'two') {
+        let W = (a1 * b2) - (b1 * a2)
+        let Wx = (c1 * b2) - (b1 * c2)
+        let Wy = (a1 * c2) - (c1 * a2)
+        results = {
+          xValue: (Wx / W).toFixed(3) * 1,
+          yValue: (Wy / W).toFixed(3) * 1,
+          W,
+          Wx,
+          Wy,
+        }
+      } else if (eqnNoSelected == 'three') {
+        let W = (a1 * b2 * c3) + (b1 * c2 * a3) + (c1 * a2 * b3) - (c1 * b2 * a3) - (b1 * a2 * c3) - (a1 * c2 * b3)
+        let Wx = (d1 * b2 * c3) + (b1 * c2 * d3) + (c1 * d2 * b3) - (c1 * b2 * d3) - (b1 * d2 * c3) - (d1 * c2 * b3)
+        let Wy = (a1 * d2 * c3) + (d1 * c2 * a3) + (c1 * a2 * d3) - (c1 * d2 * a3) - (d1 * a2 * c3) - (a1 * c2 * d3)
+        let Wz = (a1 * b2 * d3) + (b1 * d2 * a3) + (d1 * a2 * b3) - (d1 * b2 * a3) - (b1 * a2 * d3) - (a1 * d2 * b3)
+        results = {
+          xValue: (Wx / W).toFixed(3) * 1,
+          yValue: (Wy / W).toFixed(3) * 1,
+          zValue: (Wz / W).toFixed(3) * 1,
+          W,
+          Wx,
+          Wy,
+          Wz
+        }
+      }
+      return results
+    }
+
+    function reducedRowEchelonForm(a1, b1, c1, d1, a2, b2, c2, d2, a3, b3, c3, d3) {
+      let results = {};
+      let refb2 = b2;
+      let refc2 = c2;
+      if (a1 && (Math.abs(a1) == Math.abs(a2))) {
+        if (a1 == a2) {
+          refb2 -= b1
+          refc2 -= c1
+        } else {
+          refb2 += b1
+          refc2 += c1
+        }
+         
+      } else if (a1 && (a1 != a2)) {
+        let divisor = a1 / a2
+        if ((a1 < 0 && divisor < 0) || (a1 > 0 && divisor > 0)) {
+          refb2 = (divisor * b2) - b1;
+          refc2 = (divisor * c2) - c1;
+        } else {
+          refb2 = (divisor * b2) + b1;
+          refc2 = (divisor * c2) + c1
+        }
+      }
+      if (eqnNoSelected == 'two') {
+        const {xValue, yValue} = cramersRule(a1, b1, c1, d1, a2, b2, c2, d2, a3, b3, c3, d3)      
+        results = {
+          b2: refb2.toFixed(3) * 1,
+          c2: refc2.toFixed(3) * 1,
+          xValue,
+          yValue
+        }
+        
+      } else if (eqnNoSelected == 'three') {
+        const {xValue, yValue, zValue} = cramersRule(a1, b1, c1, d1, a2, b2, c2, d2, a3, b3, c3, d3)
+        let refd2 = d2;
+        let refb3 = b3;
+        let refc3 = c3;
+        let refd3 = d3;
+        if (a1 && (Math.abs(a1) == Math.abs(a2))) {
+          if (a1 == a2) {
+            refb2 -= b1
+            refc2 -= c1
+            refd2 -= d1
+          } else {
+            refb2 += b1
+            refc2 += c1
+            refd2 += d1
+          }        
+        } else if (a1 && (a1 != a2)) {
+          let divisor = a1 / a2
+          if ((a1 < 0 && divisor < 0) || (a1 > 0 && divisor > 0)) {
+            refb2 = (divisor * b2) - b1;
+            refc2 = (divisor * c2) - c1;
+            refd2 = (divisor * d2) - d1;
+          } else {
+            refb2 = (divisor * b2) + b1;
+            refc2 = (divisor * c2) + c1
+            refd2 = (divisor * d2) + d1;
+          }
+        }
+        if (a1 && (Math.abs(a1) == Math.abs(a3))) {
+          if (a1 == a3) {
+            refb3 -= b1
+            refc3 -= c1
+            refd3 -= d1
+          } else {
+            refb3 += b1
+            refc3 += c1
+            refd3 += d1
+          }        
+        } else if (a1 && (a1 != a3)) {
+          let divisor = a1 / a3
+          if ((a1 < 0 && divisor < 0) || (a1 > 0 && divisor > 0)) {
+            refb3 = (divisor * b3) - b1;
+            refc3 = (divisor * c3) - c1;
+            refd3 = (divisor * d3) - d1;
+          } else {
+            refb3 = (divisor * b3) + b1;
+            refc3 = (divisor * c3) + c1
+            refd3 = (divisor * d3) + d1
+          }
+        }
+
+        if (refb2 && (Math.abs(refb2) == Math.abs(refb3))) {
+          if (refb2 == refb3) {
+            refc3 -= c1
+            refd3 -= d1
+          } else {
+            refc3 += c1
+            refd3 += d1
+          }
+         
+        } else if (refb2 && (refb2 != refb3)) {
+          let divisor = refb3 / refb2
+          if ((refb2 < 0 && divisor < 0) || (refb2 > 0 && divisor > 0)) {
+            refc3 = (divisor * refc3) - refc2;
+            refd3 = (divisor * refd3) - refd2;
+          } else {
+            refc3 = (divisor * refc3) + refc2;
+            refd3 = (divisor * refd3) + refd2;
+          }
+        }
+        results = {
+          b2: refb2.toFixed(3) * 1,
+          c2: refc2.toFixed(3) * 1,
+          d2: refd2.toFixed(3) * 1,
+          c3: refc3.toFixed(3) * 1,
+          d3: refd3.toFixed(3) * 1,
+          xValue,
+          yValue,
+          zValue
+        }
+      }
+      return results
+    }
+
+    function calculateResults() {
+      // Retrieve input values
+      const a1 = parseFloat(a1El.value)
+      const b1 = parseFloat(b1El.value)
+      const c1 = parseFloat(c1El.value)
+      const d1 = parseFloat(d1El.value)
+      const a2 = parseFloat(a2El.value)
+      const b2 = parseFloat(b2El.value)
+      const c2 = parseFloat(c2El.value)
+      const d2 = parseFloat(d2El.value)
+      const a3 = parseFloat(a3El.value)
+      const b3 = parseFloat(b3El.value)
+      const c3 = parseFloat(c3El.value)
+      const d3 = parseFloat(d3El.value)
+      
+      if (
+        isNaN(a1) || isNaN(b1) || isNaN(c1) || isNaN(a2) || isNaN(b2) || isNaN(c2) ||
+        (a3El != '' && isNaN(a3)) || (b3El != '' && isNaN(b3)) || (c3El != '' && isNaN(c3)) ||
+        (d1El != '' && isNaN(d1)) || (d2El != '' && isNaN(d2)) || (d3El != '' && isNaN(d3))
+      ) {
+        showError("Please Enter All Details.");
+        return;
+      }
+      
+      
+      try {
+        const results = reducedRowEchelonForm(a1, b1, c1, d1, a2, b2, c2, d2, a3, b3, c3, d3)
+        if (reducedFormSelected == 'yes') {
+          let rrefb1 = (b1 / a1).toFixed(3) * 1;
+          let rrefc1 = (c1 / a1).toFixed(3) * 1;
+          let rrefc2 = (results.c2 / results.b2).toFixed(3) * 1;
+          if (eqnNoSelected == 'three') {           
+            let rrefd1 = (b1 / a1).toFixed(3) * 1;           
+            let rrefd2 = (results.d2 / results.b2).toFixed(3) * 1;
+            let rrefd3 = (results.d3 / results.c3).toFixed(3) * 1;
+
+            calcResultsEl.innerHTML = `
+            <p>After Gauss elimination, your system of equations takes the form:</p>
+            <p>⎛ x &nbsp;&nbsp;${rrefb1 < 0 ? (rrefb1 == 1 ? '' : rrefb1) : `+${rrefb1 == 1 ? '': rrefb1}`}y&nbsp;&nbsp;
+              ${rrefc1 < 0 ? (rrefc1 == 1 ? '' : rrefc1) : `+${rrefc1 == 1 ? '' : rrefc1}`}z&nbsp;&nbsp;&nbsp; = &nbsp;${rrefd1} 
+            </p>
+            <p>⎨ &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; y &nbsp;&nbsp;${rrefc2 < 0 ? (rrefc2 == 1 ? '' : rrefc2) : `+${rrefc2 == 1 ? '' : rrefc2}`}z
+              &nbsp;&nbsp;&nbsp; = &nbsp;${rrefd2} 
+            </p>
+            <p>⎝	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; z &nbsp;&nbsp;&nbsp; = &nbsp;${rrefd3} </p>
+            <p>The unique solution to the system is</p>
+            <p>x = ${results.xValue}, y = ${results.yValue}, z = ${results.zValue} </p>
+            `
+          } else {
+            calcResultsEl.innerHTML = `
+            <p>After Gauss elimination, your system of equations takes the form:</p>
+            <p>⎰ x&nbsp;&nbsp;${rrefb1 < 0 ? (rrefb1 == 1 ? '' : rrefb1) : `+${rrefb1 == 1 ? '' : rrefb1}`}y&nbsp;&nbsp; = &nbsp;${rrefc1} </p>
+            <p>⎱ &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; y = &nbsp;${rrefc2} </p>
+
+            <p>The unique solution to the system is</p>
+            <p>x = ${results.xValue}, y = ${results.yValue}</p>
+            `
+          }
+        } else {
+          if (eqnNoSelected == 'three') {
+            calcResultsEl.innerHTML = `
+            <p>After Gauss elimination, your system of equations takes the form:</p>
+            <p>⎛ ${a1}x &nbsp;&nbsp;${b1 < 0 ? (b1 == 1 ? '' : b1) : `+${b1 == 1 ? '' : b1}`}y
+              &nbsp;&nbsp;${c1 < 0 ? (c1 == 1 ? '' : c1) : `+${c1 == 1 ? '' : c1}`}z &nbsp;&nbsp;&nbsp; = &nbsp;${d1} </p>
+            <p>⎨ &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;${results.b2}y&nbsp;&nbsp;${results.c2 < 0 ? (results.c2 == 1 ? '' : results.c2) : `+${results.c2 == 1 ? '' : results.c2}`}z
+              &nbsp;&nbsp;&nbsp; = &nbsp;${results.d2} </p>
+            <p>⎝	 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;${results.c3 == 1 ? '' : results.c3}z&nbsp;&nbsp;&nbsp; = &nbsp;${results.d3} </p>
+            <p>The unique solution to the system is</p>
+            <p>x = ${results.xValue}, y = ${results.yValue}, z = ${results.zValue} </p>
+            `
+          } else {
+            calcResultsEl.innerHTML = `
+            <p>After Gauss elimination, your system of equations takes the form:</p>
+            <p>⎰ ${a1}x&nbsp;&nbsp;${b1 < 0 ? b1 : `+${b1}`}y&nbsp;&nbsp; = &nbsp;${c1} </p>
+            <p>⎱ &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;${results.b2}y = &nbsp;${results.c2} </p>
+
+            <p>The unique solution to the system is</p>
+            <p>x = ${results.xValue}, y = ${results.yValue}</p>
+            `
+          }
+        }
+        
+        
+      } catch (error) {
+        showError("Something Went Wrong!!!");
+        resethandler()
+      }
+    }
+
+    /********************************* HELPER FUNCTIONS **********************************/
+
+    function showError(errorMessage) {
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: errorMessage,
+      });
+    }
+
+    function resetForm() {
+      a1El.value = ""
+      a2El.value = ""
+      a3El.value = ""
+      b1El.value = ""
+      b2El.value = ""
+      b3El.value = ""
+      c1El.value = ""
+      c2El.value = ""
+      c3El.value = ""
+      d1El.value = ""
+      d2El.value = ""
+      d3El.value = ""
+    }
+
+    function resetResult() {
+      calcResultsEl.innerHTML = "<p>Result will appear here...</p>";
+    }
+
+    function resethandler() {
+      resetForm();
+      resetResult();
+    }
+
+    /********************************** EVENT LISTENERS **********************************/
+    resetBtnEl.addEventListener("click", resethandler);
+    [a1El, a2El, b1El, b2El, c1El, c2El].forEach((el) => {
+      el.addEventListener("input", resetResult);
+    });
+      
+    eqnNoEl.addEventListener("change", (e) => {
+      handleEquationNoChange(e);
+      resetResult();
+    })
+
+    isReducedFormEl.addEventListener("change", (e) => {
+      reducedFormSelected = e.target.value
+      resetResult();
+    })
+    calcBtnEl.addEventListener("click", calculateResults);
+  </script>
+</body>
+
+</html> 

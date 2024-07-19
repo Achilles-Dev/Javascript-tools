@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Square Footage Calculator</title>
+
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.6.5/dist/sweetalert2.all.min.js"></script>
+  <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11.6.5/dist/sweetalert2.min.css" rel="stylesheet">
+</head>
+
+<body>
+  <div>
+    <h1>Square Footage Calculator</h1>
+    <p>Enter the secondInput and firstInput to find the area in square meters. Optionally estimate cost by adding the price per sq m.</p>
+    <p>
+      <label for="shapeSelect">Shape:</label>
+      <select id="shapeSelect">
+        <option value="rect" selected>Rectangle</option>
+        <option value="square">Square</option>
+        <option value="circle">Circle</option>
+        <option value="trian">Triangle</option>
+      </select>
+    </p>
+    <div id="rectInputParams">
+      <p>
+        <label for="rectLength">Length:</label>
+        <input type="number" id="rectLength">
+        <select id="rectLengthUnit">
+          <option value="in">in</option>
+          <option value="ft" selected>ft</option>
+          <option value="yd">yd</option>
+          <option value="cm">cm</option>
+          <option value="m">m</option>
+        </select>
+      </p>
+      <p>
+        <label for="rectWidth">Width:</label>
+        <input type="number" id="rectWidth">
+        <select id="rectWidthUnit">
+          <option value="in">in</option>
+          <option value="ft" selected>ft</option>
+          <option value="yd">yd</option>
+          <option value="cm">cm</option>
+          <option value="m">m</option>
+        </select>
+      </p>
+    </div>
+    <div id="squareInputParams" style="display: none;">
+      <p>
+        <label for="squareWidth">Width:</label>
+        <input type="number" id="squareWidth">
+        <select id="squareWidthUnit">
+          <option value="in">in</option>
+          <option value="ft" selected>ft</option>
+          <option value="yd">yd</option>
+          <option value="cm">cm</option>
+          <option value="m">m</option>
+        </select>
+      </p>
+    </div>
+    <div id="circleInputParams" style="display: none;">
+      <p>
+        <label for="diameter">Diameter:</label>
+        <input type="number" id="diameter">
+        <select id="diameterUnit">
+          <option value="in">in</option>
+          <option value="ft" selected>ft</option>
+          <option value="yd">yd</option>
+          <option value="cm">cm</option>
+          <option value="m">m</option>
+        </select>
+      </p>
+    </div>
+    <div id="trianInputParams" style="display: none;">
+      <p>
+        <label for="sideA">Side A:</label>
+        <input type="number" id="sideA">
+        <select id="sideAUnit">
+          <option value="in">in</option>
+          <option value="ft" selected>ft</option>
+          <option value="yd">yd</option>
+          <option value="cm">cm</option>
+          <option value="m">m</option>
+        </select>
+      </p>
+      <p>
+        <label for="sideB">Side B:</label>
+        <input type="number" id="sideB">
+        <select id="sideBUnit">
+          <option value="in">in</option>
+          <option value="ft" selected>ft</option>
+          <option value="yd">yd</option>
+          <option value="cm">cm</option>
+          <option value="m">m</option>
+        </select>
+      </p>
+      <p>
+        <label for="sideC">Side C:</label>
+        <input type="number" id="sideC">
+        <select id="sideCUnit">
+          <option value="in">in</option>
+          <option value="ft" selected>ft</option>
+          <option value="yd">yd</option>
+          <option value="cm">cm</option>
+          <option value="m">m</option>
+        </select>
+      </p>
+    </div>
+    <div>
+      <p>
+        <label for="borderCheck">Border:</label>
+        <input type="checkbox" id="borderCheck">
+      </p>
+      <p id="border" style="display: none;">
+        <label for="borderWidth:">Border Width:</label>
+        <input type="number" id="borderWidth">
+        <select id="borderWidthUnit">
+          <option value="in">in</option>
+          <option value="ft" selected>ft</option>
+          <option value="yd">yd</option>
+          <option value="cm">cm</option>
+          <option value="m">m</option>
+        </select>
+      </p>
+    </div>
+    <p>
+      <label for="quantity">Quantity:</label>
+      <input type="number" id="quantity" placeholder="1">
+    </p>
+    <p>
+      <p>Optionally enter the price per square meter</p>
+      <p>
+        <label for="price">Price:</label>
+        <input type="number" id="price" placeholder="$">
+      </p>
+    </p>
+
+    <p>
+      <button id="calcBtn">Calculate</button>
+      <button id="resetBtn">Reset</button>
+    </p>
+    
+    <hr>
+    <p>
+    <h3>Result:</h3>
+    <h3 id="calcResults">Result will appear here...</h3>
+    </p>
+  </div>
+  <script>
+
+    /********************************** ELEMENTS **********************************/
+    const shapeSelectEl = document.getElementById('shapeSelect')
+    const rectInputParamsEL = document.getElementById('rectInputParams')
+    const squareInputParamsEl = document.getElementById('squareInputParams')
+    const circleInputParamsEl = document.getElementById('circleInputParams')
+    const trianInputParamsEl = document.getElementById('trianInputParams')
+    const borderCheckEl = document.getElementById('borderCheck')
+    const quantityEl = document.getElementById('quantity');
+    const priceEl = document.getElementById('price'); 
+    const calcBtnEl = document.getElementById('calcBtn');
+    const resetBtnEl = document.getElementById('resetBtn');
+    const calcResultsEl = document.getElementById('calcResults')
+    const borderEl = document.getElementById('border')
+    const borderWidthEl = document.getElementById('borderWidth')
+    const borderWidthUnitEl = document.getElementById('borderWidthUnit')
+    let firstInputEl = document.getElementById('rectLength');
+    let firstInputUnitEl = document.getElementById('rectLengthUnit');
+    let secondInputEl = document.getElementById('rectWidth');
+    let secondInputUnitEl = document.getElementById('rectWidthUnit');
+    let thirdInputEl = '';
+    let thirdInputUnitEl = ''
+
+    /********************************** FUNCTIONS **********************************/
+    // Conversion functions
+
+    function handleSquareFootageShapeChange(e) {
+      let shape = e.target.value
+      rectInputParamsEL.style.display = shape ==  'rect' ? 'block' : 'none'
+      squareInputParamsEl.style.display = shape ==  'square' ? 'block' : 'none'
+      circleInputParamsEl.style.display = shape ==  'circle' ? 'block' : 'none'
+      trianInputParamsEl.style.display = shape ==  'trian' ? 'block' : 'none'
+        
+      if (shape == 'rect') {
+        borderEl.parentNode.style.display = 'block'
+        borderEl.style.display = 'none'
+        borderWidthEl.value = "";
+        borderCheckEl.checked = false;
+        firstInputEl = document.getElementById('rectLength');
+        firstInputUnitEl = document.getElementById('rectLengthUnit');
+        secondInputEl = document.getElementById('rectWidth');
+        secondInputUnitEl = document.getElementById('rectWidthUnit');
+        thirdInputEl = ''
+        thirdInputUnitEl = ''
+      } else if (shape == 'square') {
+        borderEl.parentNode.style.display = 'block'
+        borderEl.style.display = 'none'
+        borderWidthEl.value = "";
+        borderCheckEl.checked = false;
+        firstInputEl = document.getElementById('squareWidth');
+        firstInputUnitEl = document.getElementById('squareWidthUnit');
+        secondInputEl = ''
+        secondInputUnitEl = ''
+        thirdInputEl = ''
+        thirdInputUnitEl = ''
+      } else if (shape == 'circle') {     
+        borderEl.parentNode.style.display = 'block'
+        borderEl.style.display = 'none'
+        borderWidthEl.value = "";
+        borderCheckEl.checked = false;
+        firstInputEl = document.getElementById('diameter');
+        firstInputUnitEl = document.getElementById('diameterUnit');
+        secondInputEl = '';
+        secondInputUnitEl = '';
+        thirdInputEl = ''
+        thirdInputUnitEl = ''
+      } else if (shape == 'trian') {
+        borderEl.parentNode.style.display = 'none'
+        borderEl.style.display = 'none'
+        borderWidthEl.value = "";
+        borderCheckEl.checked = false;
+        firstInputEl = document.getElementById('sideA');
+        firstInputUnitEl = document.getElementById('sideAUnit');
+        secondInputEl = document.getElementById('sideB');
+        secondInputUnitEl = document.getElementById('sideBUnit');
+        thirdInputEl = document.getElementById('sideC');
+        thirdInputUnitEl = document.getElementById('sideCUnit');
+      }
+    }
+
+    const convertToFeet = (value, unit) => {
+        const toFeet = {
+          'cm': 0.0328084,
+          'in': 1/12,
+          'yd': 3,
+          'm': 3.28084,
+          'ft': 1
+        };
+        const conversionFactor = toFeet[unit];
+        if (conversionFactor !== undefined) {
+          return value * conversionFactor;
+        } else {
+          showError(`Unsupported unit: ${unit}`);
+          return;
+        }
+      }
+
+    function rectangularSquareFootage(length, width, borderWidth) {
+      let results = 0;
+      if (borderWidth) {
+        let smallLength = length - (2 * borderWidth)
+        let smallWidth = width - (2 * borderWidth)
+        results = (length * width) - (smallLength * smallWidth)
+      } else {
+        results = length * width
+      }
+      return results = results.toFixed(3) * 1;
+    }
+
+    function SquareSquareFootage(length, borderWidth) {
+      let results = 0;
+      if (borderWidth) {
+        let smallLength = length - (2 * borderWidth)
+        results = ((length ** 2) - (smallLength ** 2))
+      } else {
+        results = length ** 2
+      }
+      return results = results.toFixed(3) * 1;
+    }
+
+    function circlularSquareFootage(firstInput, borderWidth) {
+      let results = 0;
+      if (borderWidth) {
+        let outerArea = Math.PI * (firstInput / 2) ** 2
+        let innerArea = Math.PI * ((firstInput - (2 * borderWidth)) / 2) ** 2
+        results = outerArea - innerArea
+      } else {
+        results = Math.PI * (firstInput / 2) ** 2
+      }
+      return results = results.toFixed(3) * 1;
+    }
+
+    function triangularSquareFootage(firstInput, secondInput, thirdInput) {
+      let results = 0;  
+      results = (1 / 4) * ((firstInput + secondInput + thirdInput) * 
+        (-firstInput + secondInput + thirdInput) * 
+        (firstInput - secondInput + thirdInput) *
+        (firstInput + secondInput - thirdInput)) ** (1/2) 
+      return results = results.toFixed(3) * 1;
+    }
+
+    function calculateResults() {
+      // Retrieve input values
+      const shapeSelect = shapeSelectEl.value
+      const firstInput = parseFloat(firstInputEl.value)
+      const firstInputUnit = firstInputUnitEl.value;
+      const secondInput = parseFloat(secondInputEl.value)
+      const secondInputUnit = secondInputUnitEl.value
+      const thirdInput = parseFloat(thirdInputEl.value)
+      const thirdInputUnit = thirdInputUnitEl.value
+      const quantity = parseFloat(quantityEl.value)
+      const price = parseFloat(priceEl.value);
+      let borderWidth = 0
+      const borderWidthUnit = borderWidthUnitEl.value
+      if(borderCheckEl.checked && borderEl.style.display == 'block') {
+        borderWidth = parseFloat(borderWidthEl.value)
+        borderWidth = convertToFeet(borderWidth, borderWidthUnit);
+        if (borderWidth == 0) {
+          showError("Border width should be positive");
+          return;
+        }
+        if ((borderWidth * 2) >= firstInput || (borderWidth * 2) >= secondInput) {
+          showError("The border should be smaller than the square");
+          return;
+        }
+      }
+
+      if (
+        ((firstInput && isNaN(firstInput)) || (firstInput && firstInput < 0)) || 
+        ((secondInput && isNaN(secondInput)) || (secondInput && secondInput < 0)) || 
+        ((thirdInput && isNaN(thirdInput)) || (thirdInput && thirdInput < 0))
+      ) {
+        showError("Please Enter All Details.");
+        return;
+      }
+
+      try {
+        let results = 0;
+        if (shapeSelect == 'rect') {
+          const W = convertToFeet(firstInput, firstInputUnit);
+          const L = convertToFeet(secondInput, secondInputUnit);
+          results = rectangularSquareFootage(W, L, borderWidth) 
+          results = quantity > 0 && quantity < 1 ? 0 : (quantity > 0) ? (results * quantity).toFixed(3) * 1 : results
+        } else if (shapeSelect == 'square') {
+          const W = convertToFeet(firstInput, firstInputUnit);
+          results = SquareSquareFootage(W, borderWidth)
+          results = quantity > 0 && quantity < 1 ? 0 : (quantity > 0) ? (results * quantity).toFixed(3) * 1 : results
+        } else if (shapeSelect == 'circle') {
+          const D = convertToFeet(firstInput, firstInputUnit)
+          results = circlularSquareFootage(D, borderWidth)
+          results = quantity > 0 && quantity < 1 ? 0 : (quantity > 0) ? (results * quantity).toFixed(3) * 1 : results
+        } else if (shapeSelect == 'trian') {         
+          const A = convertToFeet(firstInput, firstInputUnit)
+          const B = convertToFeet(secondInput, secondInputUnit)
+          const C = convertToFeet(thirdInput, thirdInputUnit)
+          results = triangularSquareFootage(A, B, C)
+          results = quantity > 0 && quantity < 1 ? 0 : (quantity > 0) ? (results * quantity).toFixed(3) * 1 : results
+        }
+        
+        if (price) {
+          let cost = 0
+          cost = (price * results).toFixed(2)
+          calcResultsEl.innerHTML = `<p>Area in Square Feet: = ${results} ft<sup>2</sup></p>
+                                     <p>Estimated Price = $${cost}</p>
+                                    `
+        } else {
+          calcResultsEl.innerHTML = `Area in Square Feet: = ${results} ft<sup>2</sup>`
+        }
+        
+      } catch (error) {
+        showError("Something Went Wrong!!!");
+        resethandler()
+      }
+
+    }
+
+    /********************************* HELPER FUNCTIONS **********************************/
+
+    function showError(errorMessage) {
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: errorMessage,
+      });
+    }
+
+    function resetForm() {
+      firstInputEl.value = "";
+      secondInputEl.value = "";
+      thirdInputEl.value = "";
+      quantityEl.value = "";
+      priceEl.value = "";
+      borderWidthEl.value = "";
+      borderWidthUnitEl.selectedIndex = "1";
+      firstInputUnitEl.selectedIndex = "1";
+      secondInputUnitEl.selectedIndex = "1";
+      thirdInputUnitEl.selectedIndex = "1";
+    }
+
+    function resetResult() {
+      calcResultsEl.innerHTML = "<p>Result will appear here...</p>";
+    }
+
+    function resethandler() {
+      resetForm();
+      resetResult();
+    }
+
+    /********************************** EVENT LISTENERS **********************************/
+    resetBtnEl.addEventListener("click", resethandler);
+    [firstInputEl, secondInputEl, thirdInputEl, quantityEl, borderWidthEl, priceEl].forEach((el) => {
+      if (el) {
+        el.addEventListener("input", resetResult);
+      }
+    });
+    shapeSelectEl.addEventListener("change", (e) => {
+      handleSquareFootageShapeChange(e);
+      resethandler();
+    })
+    borderCheckEl.addEventListener("input", (e) => {
+      let checked = e.target.checked
+      if (checked) {
+        borderEl.style.display = 'block'
+      } else {
+        borderEl.style.display = 'none'
+      }
+    })
+    calcBtnEl.addEventListener("click", calculateResults);
+  </script>
+</body>
+
+</html> 

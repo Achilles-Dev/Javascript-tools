@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Percent to Fraction Calculator</title>
+
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.6.5/dist/sweetalert2.all.min.js"></script>
+  <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11.6.5/dist/sweetalert2.min.css" rel="stylesheet">
+</head>
+<body>
+  <div>
+    <h1>Percent to Fraction Calculator</h1>
+    <p>Enter a percentage below to convert it to a fraction.</p>
+    <p>
+      <label for="percent">Percent:</label>
+      <input type="number" id="percent" placeholder="50"><span> %</span>
+    </p>
+  
+    <p>
+      <button id="calcBtn">Calculate</button>
+      <button id="resetBtn">Reset</button>
+    </p>
+      <hr>
+    <p>
+      <h3>Result:</h3>
+      <h3 id="calcResults">Result will appear here...</h3> 
+    </p>
+  </div>
+  <script>
+
+    /********************************** ELEMENTS **********************************/
+    const percentEl = document.getElementById('percent');
+    const calcBtnEl = document.getElementById('calcBtn');
+    const resetBtnEl = document.getElementById('resetBtn');
+    const calcResultsEl = document.getElementById('calcResults')
+    
+     /********************************** FUNCTIONS **********************************/
+      // Conversion functions
+
+      function greatestCommonDivisor(num, den) {
+        return den ? greatestCommonDivisor(den, num%den) : num
+      }
+
+      function percentToDecimal(percent) {
+        let results = 0;
+        results = percent / 100
+        return results;
+      }
+
+      function decimalToFraction(decimal) {
+        let decimalLength = (decimal.toString().length - 1) - Math.floor(decimal).toString().length
+        
+        let numerator = decimalLength > 0 ? (decimal * 10 ** decimalLength).toFixed() : decimal
+        let denominator = decimalLength > 0 ? 10 ** decimalLength : 1
+        let gcd = greatestCommonDivisor(numerator, denominator )
+        const simplifiedNum = numerator / Number(gcd)
+        const simplifiedDen = denominator / Number(gcd)
+        return {simplifiedNum, simplifiedDen};
+      }
+
+      function calculateResults() {
+        // Retrieve input values
+        const percent = parseFloat(percentEl.value)
+       
+        if (
+          isNaN(percent) || percent < 0
+        ) {
+          showError("Please Enter All Details.");
+          return;
+        }
+        
+        try {
+          let percentToDec = percentToDecimal(percent)
+          const {simplifiedNum, simplifiedDen} = decimalToFraction(percentToDec)
+          const result = `${simplifiedNum} / ${simplifiedDen}`
+         
+          calcResultsEl.innerHTML = `${result}`
+          
+        } catch (error) {
+          showError("Something Went Wrong!!!");
+          resethandler()
+        }
+        
+      }
+    
+      /********************************* HELPER FUNCTIONS **********************************/
+
+      function showError(errorMessage) {
+        Swal.fire({
+            icon: "error",
+            title: "Error",
+            text: errorMessage,
+        });
+      }
+
+      function resetForm() {
+        percentEl.value = "";
+      }
+
+      function resetResult() {
+        calcResultsEl.innerHTML = "<p>Result will appear here...</p>";
+      }
+
+      function resethandler() {
+        resetForm();
+        resetResult();
+      }
+
+      /********************************** EVENT LISTENERS **********************************/
+      resetBtnEl.addEventListener("click", resethandler);
+      percentEl.addEventListener("input", resetResult);
+      calcBtnEl.addEventListener("click", calculateResults);
+  </script>
+</body>
+</html>
