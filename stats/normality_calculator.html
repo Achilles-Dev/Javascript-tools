@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Normality Calculator</title>
+  </head>
+  <body>
+    <h1>Normality Calculator</h1>
+    <h4>
+      Use this normality test calculator to easily assess if the normality
+      assumption can be applied to your <br />data by using a battery of
+      mis-specification tests. Currently supports: Shapiro-Wilk test /<br />
+      Shapiro-Francia test (n < 50 / n > 50), Anderson-Darling test, Jarque &
+      Bera test, Cramer-von Mises test, <br />d'Agostino-Pearson test. Plots a
+      histogram of the data with a normal distribution overlay.
+    </h4>
+    <p>Data to test:</p>
+    <p>
+      <textarea id="dataSetInputs" rows="5"></textarea><br />
+      <span>Separate numbers using a comma, space, new line or tab.</span>
+    </p>
+    <p>
+      Alpha (α =):
+      <input type="number" id="alpha" value="0.05" />
+    </p>
+    <button id="calcBtn">Calculate</button>
+    <button id="resetBtn">Reset</button>
+    <hr />
+    <div>
+      <h3>Result:</h3>
+      <h3 id="calcResults">Result will appear here...</h3>
+    </div>
+
+    <script>
+      // Get required elements from the HTML
+      const dataSetInputsEl = document.getElementById("dataSetInputs");
+      const alhpaEl = document.getElementById("alpha");
+
+      const calcBtnEl = document.getElementById("calcBtn");
+      const resetBtnEl = document.getElementById("resetBtn");
+      const calcResultsEl = document.getElementById("calcResults");
+
+      // Function to extract numbers from the input text
+      function extractNumbers(inputText) {
+        const regex = /[+\-]?\d*\.?\d+(?:[Ee][+\-]?\d+)?/g;
+        const matches = inputText.match(regex);
+        const numbers = matches ? matches.map(Number) : [];
+        return numbers;
+      }
+
+      function calculateResults() {
+        // Retrieve input values
+        const numbers = extractNumbers(dataSetInputsEl.value);
+        const alpha = extractNumbers(alhpaEl.value);
+
+        if (numbers.length < 1 || isNaN(alpha)) {
+          alert("Please Enter All Details.");
+          return;
+        } else if (numbers.length < 10) {
+          alert("At least 10 data points are needed to check for normality.");
+          return;
+        } else if (alpha < 0 || alpha >= 1) {
+          alert("Please enter an alpha value between 0 and 1.");
+          return;
+        }
+
+        try {
+          const numsSum = numbers.reduce((a, b) => a + b, 0);
+          const mean = numsSum / numbers.length;
+          const sdArray = numbers.map((num) => ((num - mean) ** 2))
+          const sd = Math.sqrt((sdArray.reduce((a, b) => a + b, 0)) / (numbers.length ))
+          
+
+          calcResultsEl.innerHTML = `
+              <p>Shapiro-Wilk p-value: </p>
+              <p>Shapiro-Francia p-value:  </p>
+              <p>D'Agostino-Pearson p-value:  </p>
+              <p>Jarque-Bera p-value	: </p>
+              <p>Cramer-von Mises p-value	:  </p>
+              <p>Anderson-Darling p-value	: $</p>
+              <p>Data Points: ${numbers.length} </p>
+              <p>Mean: ${mean.toFixed(4) * 1} </p>
+              <p>Range: ${Math.min(...numbers)} - ${Math.max(...numbers)} </p>
+              <p>Standard deviation: ${sd.toFixed(4) * 1}</p>
+            `;
+        } catch (error) {
+          alert("Something Went Wrong!!!");
+          resethandler();
+        }
+      }
+
+      function resetForm() {
+        dataSetInputsEl.value = "";
+      }
+
+      function resetResult() {
+        calcResultsEl.innerHTML = "<p>Result will appear here...</p>";
+      }
+
+      function resethandler() {
+        resetForm();
+        resetResult();
+      }
+
+      resetBtnEl.addEventListener("click", resethandler);
+      calcBtnEl.addEventListener("click", calculateResults);
+
+      [dataSetInputsEl].forEach((el) => {
+        el.addEventListener("input", resetResult);
+      });
+    </script>
+  </body>
+</html>

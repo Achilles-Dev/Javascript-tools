@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Outlier Calculator</title>
+  </head>
+  <body>
+    <h1>Outlier Calculator</h1>
+    <h4>Find the outliers in a data set by entering the numbers in the calculator below.</h4>
+    <p>Number Set:</p>
+    <p>
+      <textarea id="numbersInput" rows="5"></textarea><br >
+      <span>Separate numbers using a comma (,)</span>
+    </p>
+    <button id="calcBtn">Calculate</button>
+    <button id="resetBtn">Reset</button>
+    <hr>
+    <div>
+      <h3>Result:</h3>
+      <h3 id="calcResults">Result will appear here...</h3>
+    </div>
+
+    <script>
+      // Get required elements from the HTML
+      const numbersInputEl = document.getElementById("numbersInput");
+
+      const calcBtnEl = document.getElementById('calcBtn');
+      const resetBtnEl = document.getElementById('resetBtn');
+      const calcResultsEl = document.getElementById('calcResults')
+
+      
+      // Function to extract numbers from the input text
+      function extractNumbers(inputText) {
+        const regex = /[+\-]?\d*\.?\d+(?:[Ee][+\-]?\d+)?/g;
+        const matches = inputText.match(regex);
+        const numbers = matches ? matches.map(Number) : [];
+        return numbers;
+      }
+
+      function calculateResults() {
+          // Retrieve input values
+          const numbers = extractNumbers(numbersInputEl.value);
+
+          if (numbers.length < 1) {
+            alert("Please Enter All Details.");
+            return;
+          } else if (numbers.length < 2 ) {
+            alert("Please enter at least 2 numbers in the number set");
+              return;
+          }
+
+          try {   
+            const sortedArray = (numbers.sort((a,b) => a - b))
+            let firstQuart = 0;
+            let thirdQuart = 0;
+            if (numbers.length % 2 == 0) {
+              let quartIndex =  ((numbers.length / 2) + 1) / 2;
+              if (quartIndex % 1 == 0) {
+                firstQuart = sortedArray[quartIndex - 1]
+                thirdQuart = sortedArray[((numbers.length / 2) + quartIndex) - 1]
+              } else {
+                quartIndex = (Math.floor(quartIndex))
+                firstQuart = (sortedArray[quartIndex - 1] + sortedArray[quartIndex]) / 2;
+                thirdQuart = (sortedArray[((numbers.length / 2) + quartIndex) - 1] + 
+                  (sortedArray[(((numbers.length) / 2) + quartIndex)])) / 2
+              }
+            } else {
+              let quartIndex =  (((numbers.length + 1) / 2)) / 2;
+              if (quartIndex % 1 == 0) {
+                firstQuart = sortedArray[quartIndex - 1];
+                thirdQuart = sortedArray[(((numbers.length + 1) / 2) + quartIndex) - 1] 
+              } else {
+                quartIndex = (Math.floor(quartIndex))
+                firstQuart = (sortedArray[quartIndex - 1] + sortedArray[quartIndex]) / 2;
+                thirdQuart = (sortedArray[(((numbers.length + 1) / 2) + quartIndex) - 1] + 
+                  (sortedArray[(((numbers.length + 1) / 2) + quartIndex)])) / 2
+              }
+            }
+
+            const interQuartrange = thirdQuart - firstQuart
+            const lowerFence = firstQuart - (1.5 * interQuartrange)
+            const upperFence = thirdQuart + (1.5 * interQuartrange)
+
+            let outliers = [];
+            sortedArray.forEach((num) => {
+              if (num < lowerFence || num > upperFence) {
+                outliers.push(num)
+              }
+            })
+            outliers = outliers.toString().replace(/,/g, ", ");
+
+            if (outliers.length < 1) {
+              outliers = 'none'
+            }
+
+            calcResultsEl.innerHTML = `
+              <p>Outliers: ${outliers} </p>
+              <p>First Quartile: ${firstQuart.toFixed(4) * 1} </p>
+              <p>Third Quartile: ${thirdQuart.toFixed(4) * 1} </p>
+              <p>Interquartile Range: ${interQuartrange} </p>
+              <p>Lower Fence: ${lowerFence}</p>
+              <p>Upper Fence:	 ${upperFence} </p>
+            `
+          } catch (error) {
+            alert("Something Went Wrong!!!");
+            resethandler()
+          }
+      }
+
+      function resetForm() {
+        numbersInputEl.value = ""
+      }
+
+      function resetResult() {
+        calcResultsEl.innerHTML = "<p>Result will appear here...</p>";
+      } 
+
+      function resethandler() {
+        resetForm();
+        resetResult();
+      }
+
+      resetBtnEl.addEventListener("click", resethandler);
+      calcBtnEl.addEventListener("click", calculateResults);
+
+      [numbersInputEl].forEach((el) => {
+        el.addEventListener("input", resetResult);
+      });
+
+    </script>
+</body>
+</html>
+

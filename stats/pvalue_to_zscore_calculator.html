@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>P-value to Z-score Calculator</title>
+</head>
+<body>
+    <h1>P-value to Z-score Calculator</h1>
+    <h4>Use this P to Z calculator to easily convert P-values to Z-scores (standard scores) and <br>
+      see if a result is statistically significant. Supports one-tailed and two-tailed p-values. <br>
+      Detailed information about what a Z-score is.
+    </h4>
+    <p>
+      P-value:
+      <input type="number" id="pValue">
+    </p>
+    <p>
+      Type of P-value: 
+      <select id="typeSelect">
+        <option value="one" selected>One-tailed</option>
+        <option value="two">Two-tailed</option>
+      </select>
+    </p>
+
+    <button id="calcBtn">Calculate</button>
+    <button id="resetBtn">Reset</button>
+    <hr>
+    <div>
+      <h3>Result:</h3>
+      <h3 id="calcResults">Result will appear here...</h3>
+    </div>
+
+    <script>
+      // Get required elements from the HTML
+      const pValueEl = document.getElementById("pValue");
+      const typeSelectEl = document.getElementById("typeSelect");
+
+      const calcBtnEl = document.getElementById('calcBtn');
+      const resetBtnEl = document.getElementById('resetBtn');
+      const calcResultsEl = document.getElementById('calcResults') 
+
+      function calculateResults() {
+          // Retrieve input values
+          const pValue = parseFloat(pValueEl.value);
+          const typeSelect = typeSelectEl.value;
+
+          if (isNaN(pValue)) {
+            alert("Please Enter All Details.");
+            return;
+          } else if (relUncertainty < 0  ) {
+            alert("The relative uncertainty cannot be negative.");
+              return;
+          }
+
+          try {
+            let results = 0
+            if (typeSelect == "one") {
+
+            } else if (typeSelect == "two") {
+
+            }
+            
+            calcResultsEl.innerHTML = `<p> Z-score: ${results.toFixed(6) * 1}</p>`
+          } catch (error) {
+            alert("Something Went Wrong!!!");
+            resethandler()
+          }
+      }
+
+      function resetForm() {
+        pValueEl.value = ""
+        typeSelectEl.selectedIndex = "0"
+      }
+
+      function resetResult() {
+        calcResultsEl.innerHTML = "<p>Result will appear here...</p>";
+      } 
+
+      function resethandler() {
+        resetForm();
+        resetResult();
+      }
+
+      resetBtnEl.addEventListener("click", resethandler);
+      calcBtnEl.addEventListener("click", calculateResults);
+
+      [pValueEl, typeSelectEl].forEach((el) => {
+        el.addEventListener("input", resetResult);
+      });  
+    </script>
+</body>
+</html>
