@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Normal Distribution Calculator</title>
+</head>
+<body>
+    <h1>Normal Distribution Calculator</h1>
+    <h4>Use this calculator to easily calculate the p-value corresponding to the area under a normal curve below <br>
+      or above a given raw score or Z score, or the area between or outside two standard scores. With mean zero and <br>
+      standard deviation of one it functions as a standard normal distribution calculator (a.k.a. z table calculator), <br>
+      but you can enter any mean and standard deviation (sd, sigma). Alternatively, compute the Z score corresponding to <br>
+      a given probability or quantiles of any normal distribution by its inverse distribution function (IDF).</h4>
+    <p>
+      Calculate:
+      <select id="calculateSelect">
+        <option value="scoreProb" selected>Probability from score</option>
+        <option value="zscoreProb">Z score from probability</option>
+        <option value="quantiles">Quantiles</option>
+      </select>
+    </p>
+    <div id="meanSDInputs">
+      <p>
+        Mean (μ=):
+        <input type="number" value="0" id="meanVal">
+      </p>
+      <p>
+        Standard deviation (σ=): 
+        <input type="number" value="1" id="sdVal">
+      </p>
+  </div>
+    <p id="rawScoreInput">
+      Raw score: 
+      <input type="number" id="rawScore" placeholder="e.g. 1.96">
+    </p>
+    <p style="display: none;" id="probInput">
+      Probability (p=): 
+      <input type="number" min="1e-12" id="probVal" placeholder="e.g. 0.05">
+    </p>
+    <p>
+      Precision: 
+      <input type="number" value="14" id="precision">
+    </p>
+
+    <button id="calcBtn">Calculate</button>
+    <button id="resetBtn">Reset</button>
+    <hr>
+    <div>
+      <h3>Result:</h3>
+      <h3 id="calcResults">Result will appear here...</h3>
+    </div>
+
+    <script>
+      // Get required elements from the HTML
+      const calculateSelectEl = document.getElementById("calculateSelect");
+      const meanSDInputsEl = document.getElementById("meanSDInputs");
+      let meanValEl = document.getElementById("meanVal");
+      let sdValEl = document.getElementById("sdVal");
+      const rawScoreInputEl = document.getElementById("rawScoreInput");
+      let rawScoreEl = document.getElementById("rawScore");
+      const precisionEl = document.getElementById("precision");
+      const probInputEl = document.getElementById("probInput");
+      let probValEl = "";
+
+      const calcBtnEl = document.getElementById('calcBtn');
+      const resetBtnEl = document.getElementById('resetBtn');
+      const calcResultsEl = document.getElementById('calcResults') 
+
+      function handleCalculateSelectChange() {
+        if (calculateSelectEl.value == 'scoreProb') {
+          meanSDInputsEl.style.display = 'block'
+          rawScoreInputEl.style.display = 'block'
+          probInputEl.style.display = 'none';
+          rawScoreEl = document.getElementById("rawScore");
+          meanValEl = document.getElementById("meanVal");
+          sdValEl = document.getElementById("sdVal");
+          probValEl = "";
+        } else if (calculateSelectEl.value == 'zscoreProb') {
+          meanSDInputsEl.style.display = 'none'
+          rawScoreInputEl.style.display = 'none'
+          probInputEl.style.display = 'block';
+          rawScoreEl = "";
+          meanValEl = "";
+          sdValEl = "";
+          probValEl = document.getElementById("probVal");
+
+          probValEl.addEventListener("input", resetResult);
+        } else if (calculateSelectEl.value == 'quantiles') {
+          meanSDInputsEl.style.display = 'block'
+          rawScoreInputEl.style.display = 'none'
+          probInputEl.style.display = 'block';
+          rawScoreEl = "";
+          meanValEl = document.getElementById("meanVal");
+          sdValEl = document.getElementById("sdVal");
+          probValEl = document.getElementById("probVal");
+
+          probValEl.addEventListener("input", resetResult);
+        }
+        resetResult()
+      }
+
+      function calculateResults() {
+          // Retrieve input values
+          const meanVal = parseFloat(meanValEl.value);
+          const sdVal = parseFloat(sdValEl.value);
+          const rawScore = parseFloat(rawScoreEl.value);
+          const probVal = parseFloat(probValEl.value);
+          const precision = parseFloat(precisionEl.value);
+          const calculateSelect = calculateSelectEl.value
+
+          if (isNaN(precision) || (meanValEl != ""  && isNaN(meanVal)) || ((sdValEl != "" && isNaN(sdVal)) ||
+              (rawScoreEl != "" && isNaN(rawScore)) || (probValEl != "" && isNaN(probVal))
+        )) {
+            alert("Please Enter All Details.");
+            return;
+          } else if (probVal < parseFloat("1e-12")) {
+            alert("Value must be greater than or equal to 1e-12.");
+            return;
+          } else if (probVal >= 1 && calculateSelect.value == 'quantiles' ) {
+            alert("Value must be between 1e-12 and 1");
+            return;
+          }
+
+          try {
+            let results = 0;
+            if (calculateSelect.value == 'scoreProb') {
+              zScore = Math.abs(rawScore - meanVal) / sdVal
+
+              console.log(Math.abs(rawScore - meanVal))
+
+              calcResultsEl.innerHTML = `<p> Z score: ${zScore.toFixed(precision) * 1}</p>
+                                          <p> P(X > ${rawScore}): </p>
+                                          <p> P(X ≤ ${rawScore}): </p>
+                                          <p> P(X ≤ -${rawScore} ∪ X ≥ ${rawScore}): </p>
+                                          <p> P(-2 ≤ ${rawScore} ≤ ${rawScore}): </p>
+              `
+            } else if (calculateSelect.value == 'zscoreProb') {
+
+              calcResultsEl.innerHTML = `<p> Z-score (one-tailed)	: ${results.toFixed(precision) * 1}</p>
+                                          <p> Z-score (two-tailed)	: ${results.toFixed(precision) * 1}</p>
+              `
+            } else if (calculateSelect.value == 'quantiles') {
+              
+
+              calcResultsEl.innerHTML = `<p> ${probVal * 100}% quantile: </p>
+                                          <p> ${100 - (probVal * 100)}% mid range: </p>
+              `
+            }
+            
+          } catch (error) {
+            alert("Something Went Wrong!!!");
+            resethandler()
+          }
+      }
+
+      function resetForm() {
+        meanValEl.value = "0"
+        sdValEl.value = "1"
+        precisionEl.value = ""
+        rawScoreEl.value = ""
+        probValEl.value = ""
+        calculateSelectEl.selectedIndex  = "0"
+      }
+
+      function resetResult() {
+        calcResultsEl.innerHTML = "<p>Result will appear here...</p>";
+      } 
+
+      function resethandler() {
+        resetForm();
+        resetResult();
+      }
+
+      resetBtnEl.addEventListener("click", resethandler);
+      calcBtnEl.addEventListener("click", calculateResults);
+      calculateSelectEl.addEventListener("change", handleCalculateSelectChange);
+
+      [meanValEl, sdValEl, precisionEl, rawScoreEl].forEach((el) => {
+        el.addEventListener("input", resetResult);
+      });  
+    </script>
+</body>
+</html>

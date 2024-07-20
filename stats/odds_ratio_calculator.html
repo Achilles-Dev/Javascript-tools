@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Odds Ratio Calculator</title>
+</head>
+<body>
+    <h1>Odds Ratio Calculator</h1>
+    <h4>Use this odds ratio calculator to easily calculate the ratio of odds, confidence intervals <br>
+       and p-values for the odds ratio (OR) between an exposed and control group. One and two-sided <br>
+       confidence intervals are reported, as well as Z-scores.</h4>
+    <p>
+      Events in exposed group:
+      <input type="number" min="1" id="expGrpEvt">
+    </p>
+    <p>
+      Non-events in exposed group: 
+        <input type="number" min="1" id="expGrpNonEvt">
+    </p>
+    <p>
+      Events in the control group:
+      <input type="number" min="1" id="ctrlGrpEvt">
+    </p>
+    <p>
+      Non-events in the control group: 
+      <input type="number" min="1" id="ctrlGrpNonEvt">
+    </p>
+    <p>
+      Confidence level: 
+      <input type="number" min="1" value="95" id="confLevel">%
+  </p>
+
+
+    <button id="calcBtn">Calculate</button>
+    <button id="resetBtn">Reset</button>
+    <hr>
+    <div>
+      <h3>Result:</h3>
+      <h3 id="calcResults">Result will appear here...</h3>
+    </div>
+
+    <script>
+      // Get required elements from the HTML
+      const expGrpEvtEl = document.getElementById("expGrpEvt");
+      const expGrpNonEvtEl = document.getElementById("expGrpNonEvt");
+      const ctrlGrpEvtEl = document.getElementById("ctrlGrpEvt");
+      const ctrlGrpNonEvtEl = document.getElementById("ctrlGrpNonEvt");
+      const confLevelEl = document.getElementById("confLevel");
+
+      const calcBtnEl = document.getElementById('calcBtn');
+      const resetBtnEl = document.getElementById('resetBtn');
+      const calcResultsEl = document.getElementById('calcResults') 
+
+      function calculateResults() {
+          // Retrieve input values
+          const expGrpEvt = parseFloat(expGrpEvtEl.value);
+          const expGrpNonEvt = parseFloat(expGrpNonEvtEl.value);
+          const ctrlGrpEvt = parseFloat(ctrlGrpEvtEl.value);
+          const ctrlGrpNonEvt = parseFloat(ctrlGrpNonEvtEl.value);
+          const confLevel = parseFloat(confLevelEl.value);
+
+          if (isNaN(expGrpEvt) || isNaN(expGrpNonEvt) || isNaN(ctrlGrpEvt) || isNaN(ctrlGrpNonEvt) || isNaN(confLevel)) {
+            alert("Please Enter All Details.");
+            return;
+          } else if (expGrpEvt < 1 ||  expGrpNonEvt < 1 || ctrlGrpEvt < 1 || ctrlGrpNonEvt < 1 || confLevel < 1) {
+            alert("Value must be greater than or equal to 1.");
+              return;
+          }
+
+          try {
+            const results = (expGrpEvt / expGrpNonEvt) / (ctrlGrpEvt / ctrlGrpNonEvt)
+            
+            calcResultsEl.innerHTML = `<p> Odds Ratio (Exp/Control): ${results.toFixed(6) * 1}</p>
+                                        <p> ${confLevel}% Confidence Interval: </p>
+                                        <p> ${confLevel}% Left-Sided Interval: </p>
+                                        <p> ${confLevel}% Right-Sided Interval: </p>
+                                        <p> P-value	: </p>
+                                        <p> Z-score: </p>
+            `
+          } catch (error) {
+            alert("Something Went Wrong!!!");
+            resethandler()
+          }
+      }
+
+      function resetForm() {
+        expGrpEvtEl.value = ""
+        expGrpNonEvtEl.value = ""
+        ctrlGrpEvtEl.value = ""
+        ctrlGrpNonEvtEl.value = ""
+        confLevelEl.value = ""
+      }
+
+      function resetResult() {
+        calcResultsEl.innerHTML = "<p>Result will appear here...</p>";
+      } 
+
+      function resethandler() {
+        resetForm();
+        resetResult();
+      }
+
+      resetBtnEl.addEventListener("click", resethandler);
+      calcBtnEl.addEventListener("click", calculateResults);
+
+      [expGrpEvtEl, expGrpNonEvtEl, ctrlGrpEvtEl, ctrlGrpNonEvtEl, confLevelEl].forEach((el) => {
+        el.addEventListener("input", resetResult);
+      });  
+    </script>
+</body>
+</html>
