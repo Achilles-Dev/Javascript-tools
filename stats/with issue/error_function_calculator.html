@@ -18,12 +18,12 @@
       </select>
     </p>
     <p>
-      Value (x=):
-      <input type="number" id="xValue" />
+      Value <span id="valueDesc">(x=)</span>:
+      <input type="number" id="xValue" placeholder="0.5" />
     </p>
     <p>
       Precision :
-      <input type="number" id="precision" /> Enter the required precision for the output.
+      <input type="number" value="14" id="precision" /> Enter the required precision for the output.
     </p>
 
     <button id="calcBtn">Calculate</button>
@@ -38,6 +38,7 @@
       // Get required elements from the HTML
       const functionSelectEl = document.getElementById("functionSelect");
       const xValueEl = document.getElementById("xValue");
+      const valueDescEl = document.getElementById("valueDesc");
       const precisionEl = document.getElementById("precision");
 
       const calcBtnEl = document.getElementById("calcBtn");
@@ -56,12 +57,19 @@
         }
 
         try {
-          const results = {};
-
-          calcResultsEl.innerHTML = `
+          const results = 0
+          if (selectValue == 'errorFn') {
+            calcResultsEl.innerHTML = `
               <p>erf(${xValue})</p>
               <p>erfc(${xValue})</p>
             `;
+          } else {
+            calcResultsEl.innerHTML = `
+              <p>erf<sup>-1</sup>(${xValue})</p>
+              <p>erf<sup>-1</sup>(${xValue})</p>
+            `;
+          }
+          
         } catch (error) {
           alert("Something Went Wrong!!!");
           resethandler();
@@ -85,6 +93,11 @@
 
       resetBtnEl.addEventListener("click", resethandler);
       calcBtnEl.addEventListener("click", calculateResults);
+      functionSelectEl.addEventListener("change", (e) =>{
+        const selectValue = e.target.value
+        valueDescEl.innerHTML = selectValue == 'errorFn' ? "(x=)" : "(y=)";
+        xValueEl.placeholder = selectValue == 'errorFn' ? "0.5" : "0.95";
+      });
 
       [precisionEl, xValueEl, functionSelectEl].forEach((el) => {
         el.addEventListener("input", resetResult);

@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Correlation Coefficient Calculator</title>
+</head>
+<body>
+    <h1>Correlation Coefficient Calculator</h1>
+    <h4>Use this correlation calculator to estimate the correlation coefficient of any two sets of data.<br>
+       The tool can compute the Pearson correlation coefficient r, the Spearman rank correlation coefficient <br>
+       (rs), the Kendall rank correlation coefficient (τ), and the Pearson's weighted r for any two random variables.<br>
+        It also computes p-values, z scores, and confidence intervals, as well as the least-squares regression equation.
+    </h4>
+    <p>Values (x,y):  <br></strong>
+      First column contains values of the <strong>independent variable (X)</strong>,
+      second column contains values of the <strong>dependent variable (Y)</strong>.<br>
+      Column delimiter is space or comma. Number of rows should be equal in all columns.
+      All values should be positive.
+    <p>
+      <textarea id="numbersInput" rows="8" cols="30" placeholder="x,y,w (w is weight, optional) column delimiter is space or comma. Copy/paste from spreadsheet works fine. Example:
+      1 5
+      2 9
+      3 19
+      5 25"></textarea>
+    </p>
+    <p>
+      Coefficient:
+      <select id="coefficientSelect">
+        <option value="pearson" selected>Pearson's r &nbsp;&nbsp;&nbsp;&nbsp;</option>
+        <option value="spearman">Spearman's r</option>
+        <option value="kendall">Kendall's τ </option>
+      </select>
+    </p>
+    <p>
+      Confidence level  :
+      <input type="number" min="1" value="95" id="confInterval">%
+    </p>
+    <button id="calcBtn">Calculate</button>
+    <button id="resetBtn">Reset</button>
+    <hr>
+    <div>
+      <h3>Result:</h3>
+      <h3 id="calcResults">Result will appear here...</h3>
+    </div>
+
+    <script>
+      // Get required elements from the HTML
+      const numbersInputEl = document.getElementById("numbersInput");
+      const coefficientSelectEl = document.getElementById("coefficientSelect");
+      const confIntervalEl = document.getElementById("confInterval");
+
+      const calcBtnEl = document.getElementById('calcBtn');
+      const resetBtnEl = document.getElementById('resetBtn');
+      const calcResultsEl = document.getElementById('calcResults')
+
+      
+      // Function to extract numbers from the input text
+      function extractNumbers(inputText) {
+        const regex = /[+\-]?\d*\.?\d+(?:[Ee][+\-]?\d+)?/g;
+        const matches = inputText.match(regex);
+        const numbers = matches ? matches.map(Number) : [];
+        return numbers;
+      }
+
+      function calculateResults() {
+          // Retrieve input values
+          const numbers = extractNumbers(numbersInputEl.value);
+          const coefficientSelect = coefficientSelectEl.value;
+          const confInterval = parseFloat(confIntervalEl.value)
+
+          if (numbers.length < 1 || isNaN(confInterval)) {
+            alert("Please Enter All Details.");
+            return;
+          } else if (numbers.length != 2 ) {
+            alert(`Exactly 2 columns required.`);
+              return;
+          } else if (numbers.length < 4 ) {
+            alert(`At least 4 rows are required`);
+              return;
+          } else if (confInterval < 1 ) {
+            alert("Value must be greater or equal to 1");
+            return;
+          }
+
+          try {   
+            const results = 0;
+            let coefficientValue = "";
+            let pValueSign = "";
+            if (coefficientSelect == "pearson") {
+              coefficientValue = "Pearson's r";
+              pValueSign = "r; H0: r ≤ 0";
+            } else if (coefficientSelect == "spearman") {
+              coefficientValue = "Spearman's r";
+              pValueSign = "r; H0: r ≤ 0";
+            } else if (coefficientSelect == "kendall") {
+              coefficientValue = "Kendall's τ";
+              pValueSign = "(τ; H0: τ ≤ 0";
+            }
+            
+            calcResultsEl.innerHTML = `<p> ${coefficientValue}: ${results.toFixed(2) * 1}</p>
+                                        <p> Z score: ${results.toFixed(2) * 1}</p>
+                                        <p> P-value (${pValueSign})	: ${results.toFixed(2) * 1}</p>
+                                        <p> ${confInterval}% Confidence Interval: ${results.toFixed(2) * 1}</p>
+                                        <p> ${confInterval}% Right-Sided Interval: ${results.toFixed(2) * 1}</p>
+                                        <p> ${confInterval}% Left-Sided Interval: ${results.toFixed(2) * 1}</p>
+                                        <p>Number of (x,y) pairs: ${results.toFixed(2) * 1}</p>
+                                        <p> Least-Squares Regression Line: ${results.toFixed(2) * 1}</p>
+            `
+          } catch (error) {
+            alert("Something Went Wrong!!!");
+            resethandler()
+          }
+      }
+
+      function resetForm() {
+        numbersInputEl.value = "";
+        confIntervalEl.value = "95";
+        coefficientSelectEl.selectedIndex = "0";
+      }
+
+      function resetResult() {
+        calcResultsEl.innerHTML = "<p>Result will appear here...</p>";
+      } 
+
+      function resethandler() {
+        resetForm();
+        resetResult();
+      }
+
+      resetBtnEl.addEventListener("click", resethandler);
+      calcBtnEl.addEventListener("click", calculateResults);
+
+      [numbersInputEl, confIntervalEl, coefficientSelectEl].forEach((el) => {
+        el.addEventListener("input", resetResult);
+      });
+
+    </script>
+</body>
+</html>
