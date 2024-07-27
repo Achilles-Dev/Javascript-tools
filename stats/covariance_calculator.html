@@ -22,18 +22,6 @@
       3 19
       5 25"></textarea>
     </p>
-    <p>
-      Coefficient:
-      <select id="coefficientSelect">
-        <option value="pearson" selected>Pearson's r &nbsp;&nbsp;&nbsp;&nbsp;</option>
-        <option value="spearman">Spearman's r</option>
-        <option value="kendall">Kendall's τ </option>
-      </select>
-    </p>
-    <p>
-      Confidence level  :
-      <input type="number" min="1" value="95" id="confInterval">%
-    </p>
     <button id="calcBtn">Calculate</button>
     <button id="resetBtn">Reset</button>
     <hr>
@@ -59,26 +47,65 @@
         return numbers;
       }
 
+      // Function to calculate the mean of an array of numbers
+      function calculateMean(numbers) {
+        const sum = numbers.reduce((acc, num) => acc + num, 0);
+        const mean = sum / numbers.length;
+        return mean;
+      }
+
+      // Function to calculate the covariance of X and Y
+      function sumNumMinusMeanXY(xValues, yValues, xValuesMean, yValuesMean) {
+        const XMinusXMean = xValues.map((xVal) => xVal - xValuesMean)
+        const yMinusYMean = yValues.map((yVal) => yVal - yValuesMean)
+        const result = XMinusXMean.reduce((a, b, index) => a + (b * yMinusYMean[index]), 0)
+        return result
+      }
+
       function calculateResults() {
           // Retrieve input values
-          const numbers = extractNumbers(numbersInputEl.value);
+          const numbers = numbersInputEl.value
+          const numbersArray = numbers.split('\n');
 
           if (numbers.length < 1 ) {
             alert("Please Enter All Details.");
             return;
-          } else if (numbers.length < 2 ) {
-            alert(`At least 2 rows are required`);
+          } else {
+            let status = false
+            numbersArray.forEach((numStr) => {
+              const row = extractNumbers(numStr)
+              if (row.length == 0) {
+                return
+              } else if (row.length < 2 ) {
+                status = true
+              }
+            })
+            if (status == true) {
+              alert(`At least 2 rows are required`);
               return;
+            }          
           }
 
           try {   
-            const results = 0;
+            const xValues = numbersArray.map((num) => {
+              const row = extractNumbers(num)
+              return parseFloat(row[0])
+            })
+            const yValues = numbersArray.map((num) => {
+              const row = extractNumbers(num)
+              return parseFloat(row[1])
+            })
+            const xValuesMean = calculateMean(xValues) 
+            const yValuesMean = calculateMean(yValues)
+
+            const popCovXY = sumNumMinusMeanXY(xValues, yValues, xValuesMean, yValuesMean) / xValues.length;
+            const sampCovXY =  sumNumMinusMeanXY(xValues, yValues, xValuesMean, yValuesMean) / (xValues.length - 1);
             
-            calcResultsEl.innerHTML = `<p> Sample covariance: ${results.toFixed(2) * 1}</p>
-                                        <p> Population covariance: ${results.toFixed(2) * 1}</p>
-                                        <p> Mean of X: ${results.toFixed(2) * 1}</p>
-                                        <p> Mean of Y: ${results.toFixed(2) * 1}</p>
-                                        <p>Number of (x,y) pairs: ${results.toFixed(2) * 1}</p>
+            calcResultsEl.innerHTML = `<p> Sample covariance: ${sampCovXY.toFixed(8) * 1}</p>
+                                        <p> Population covariance: ${popCovXY.toFixed(8) * 1}</p>
+                                        <p> Mean of X: ${xValuesMean.toFixed(2) * 1}</p>
+                                        <p> Mean of Y: ${yValuesMean.toFixed(2) * 1}</p>
+                                        <p>Number of (x,y) pairs: ${xValues.length}</p>
             `
           } catch (error) {
             alert("Something Went Wrong!!!");

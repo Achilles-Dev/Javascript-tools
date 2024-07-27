@@ -61,49 +61,114 @@
         return numbers;
       }
 
+      // Function to calculate the mean of an array of numbers
+      function calculateMean(numbers) {
+        const sum = numbers.reduce((acc, num) => acc + num, 0);
+        const mean = sum / numbers.length;
+        return mean;
+      }
+
+      function calculateNumMinusMeanSqt(numbers, mean) {
+        const squaredDifferences = numbers.map((num) =>
+          Math.pow(num - mean, 2)
+        );
+        const sumSquaredDifferences = squaredDifferences.reduce(
+          (acc, num) => acc + num,
+          0
+        );      
+        const numMinusMeanSqt = Math.sqrt(sumSquaredDifferences);
+        return numMinusMeanSqt;
+      }
+
+      // Function to calculate the covariance of X and Y
+      function covarianceXY(xValues, yValues, xValuesMean, yValuesMean) {
+        const XMinusXMean = xValues.map((xVal) => xVal - xValuesMean)
+        const yMinusYMean = yValues.map((yVal) => yVal - yValuesMean)
+        const covXY = XMinusXMean.reduce((a, b, index) => a + (b * yMinusYMean[index]), 0)
+        return covXY
+      }
+
       function calculateResults() {
           // Retrieve input values
-          const numbers = extractNumbers(numbersInputEl.value);
+          const numbers = numbersInputEl.value
+          const numbersArray = numbers.split('\n');
           const coefficientSelect = coefficientSelectEl.value;
           const confInterval = parseFloat(confIntervalEl.value)
 
-          if (numbers.length < 1 || isNaN(confInterval)) {
+          if (numbersArray.length < 1 || isNaN(confInterval)) {
             alert("Please Enter All Details.");
             return;
-          } else if (numbers.length != 2 ) {
-            alert(`Exactly 2 columns required.`);
-              return;
-          } else if (numbers.length < 4 ) {
+          } else if (numbersArray.length < 4 ) {
             alert(`At least 4 rows are required`);
               return;
           } else if (confInterval < 1 ) {
             alert("Value must be greater or equal to 1");
             return;
+          } else {
+            let status = false
+            numbersArray.forEach((numStr) => {
+              const row = extractNumbers(numStr)
+              if (row.length == 0) {
+                return
+              } else if (row.length != 2 ) {
+                status = true
+              }
+            })
+            if (status == true) {
+              alert(`Exactly 2 columns required.`);
+              return
+            }
           }
-
+          
           try {   
-            const results = 0;
+            const xValues = numbersArray.map((num) => {
+              const row = extractNumbers(num)
+              return parseFloat(row[0])
+            })
+            const yValues = numbersArray.map((num) => {
+              const row = extractNumbers(num)
+              return parseFloat(row[1])
+            })
+            
+            const xValuesMean = calculateMean(xValues) 
+            const yValuesMean = calculateMean(yValues)
+            
+            
+            
+            let results = 0
+            let zScore = 0
             let coefficientValue = "";
             let pValueSign = "";
             if (coefficientSelect == "pearson") {
               coefficientValue = "Pearson's r";
               pValueSign = "r; H0: r ≤ 0";
+              const covXY = covarianceXY(xValues, yValues, xValuesMean, yValuesMean)
+              
+              const xMinusMeanSqt = calculateNumMinusMeanSqt(xValues, xValuesMean)
+              const yMinusMeanSqt = calculateNumMinusMeanSqt(yValues, yValuesMean)
+
+              
+              results = covXY / (xMinusMeanSqt * yMinusMeanSqt)
+              zScore = (results - xValuesMean) / (xMinusMeanSqt / xValues.length)
             } else if (coefficientSelect == "spearman") {
               coefficientValue = "Spearman's r";
               pValueSign = "r; H0: r ≤ 0";
+              // results = covXY / (ySD * xSD)
             } else if (coefficientSelect == "kendall") {
               coefficientValue = "Kendall's τ";
               pValueSign = "(τ; H0: τ ≤ 0";
+              // results = covXY / (ySD * xSD)
             }
+
+            // <p> Z score: ${zScore.toFixed(2) * 1}</p>
+            // <p> P-value (${pValueSign})	: ${results.toFixed(2) * 1}</p>
+            // <p> ${confInterval}% Confidence Interval: ${results.toFixed(2) * 1}</p>
+            // <p> ${confInterval}% Right-Sided Interval: ${results.toFixed(2) * 1}</p>
+            // <p> ${confInterval}% Left-Sided Interval: ${results.toFixed(2) * 1}</p>
+            // <p> Least-Squares Regression Line: ${results.toFixed(2) * 1}</p>
             
-            calcResultsEl.innerHTML = `<p> ${coefficientValue}: ${results.toFixed(2) * 1}</p>
-                                        <p> Z score: ${results.toFixed(2) * 1}</p>
-                                        <p> P-value (${pValueSign})	: ${results.toFixed(2) * 1}</p>
-                                        <p> ${confInterval}% Confidence Interval: ${results.toFixed(2) * 1}</p>
-                                        <p> ${confInterval}% Right-Sided Interval: ${results.toFixed(2) * 1}</p>
-                                        <p> ${confInterval}% Left-Sided Interval: ${results.toFixed(2) * 1}</p>
-                                        <p>Number of (x,y) pairs: ${results.toFixed(2) * 1}</p>
-                                        <p> Least-Squares Regression Line: ${results.toFixed(2) * 1}</p>
+            calcResultsEl.innerHTML = `<p> ${coefficientValue}: ${results.toFixed(8) * 1}</p>
+                                        <p>Number of (x,y) pairs: ${xValues.length}</p>
             `
           } catch (error) {
             alert("Something Went Wrong!!!");
