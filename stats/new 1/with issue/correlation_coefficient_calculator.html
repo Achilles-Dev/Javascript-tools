@@ -91,7 +91,8 @@
       function calculateResults() {
           // Retrieve input values
           const numbers = numbersInputEl.value
-          const numbersArray = numbers.split('\n');
+          let numbersArray = numbers.split('\n');
+          numbersArray = numbersArray.filter((num) => num.length > 0)
           const coefficientSelect = coefficientSelectEl.value;
           const confInterval = parseFloat(confIntervalEl.value)
 
@@ -132,9 +133,7 @@
             
             const xValuesMean = calculateMean(xValues) 
             const yValuesMean = calculateMean(yValues)
-            
-            
-            
+          
             let results = 0
             let zScore = 0
             let coefficientValue = "";
@@ -146,8 +145,7 @@
               
               const xMinusMeanSqt = calculateNumMinusMeanSqt(xValues, xValuesMean)
               const yMinusMeanSqt = calculateNumMinusMeanSqt(yValues, yValuesMean)
-
-              
+  
               results = covXY / (xMinusMeanSqt * yMinusMeanSqt)
               zScore = (results - xValuesMean) / (xMinusMeanSqt / xValues.length)
             } else if (coefficientSelect == "spearman") {

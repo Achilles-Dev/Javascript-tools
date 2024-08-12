@@ -81,7 +81,6 @@
         degOfFreedomNumEl = statsSelect == "fDist" ? document.getElementById("degOfFreedomNum") : '';
         degOfFreedomDenEl = statsSelect == "fDist" ? document.getElementById("degOfFreedomDen") : '';
 
-
         if (statsSelect == "fDist") {
           [degOfFreedomNumEl, degOfFreedomDenEl].forEach((el) => {
             el.addEventListener("input", resetResult);

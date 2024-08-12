@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Percent Error Calculator</title>
+</head>
+<body>
+    <h1>Percent Error Calculator</h1>
+    <p>Use this percent error calculator to easily estimate the percentage error of a given observation <br />
+      relative to a known or estimated true value.</p>
+    <p>
+      Observed value:
+      <input type="number" id="observedVal">
+    </p>
+    <p>
+      True value: 
+        <input type="number" id="trueVal">
+    </p>
+
+    <button id="calcBtn">Calculate</button>
+    <button id="resetBtn">Reset</button>
+    <hr>
+    <div>
+      <h3>Result:</h3>
+      <h3 id="calcResults">Result will appear here...</h3>
+    </div>
+
+    <script>
+      // Get required elements from the HTML
+      const observedValEl = document.getElementById("observedVal");
+      const trueValEl = document.getElementById("trueVal");
+
+      const calcBtnEl = document.getElementById('calcBtn');
+      const resetBtnEl = document.getElementById('resetBtn');
+      const calcResultsEl = document.getElementById('calcResults') 
+
+      function calculateResults() {
+          // Retrieve input values
+          const observedVal = parseFloat(observedValEl.value);
+          const trueVal = parseFloat(trueValEl.value);
+
+          if (isNaN(observedVal) || isNaN(trueVal)) {
+            alert("Please Enter All Details.");
+            return;
+          } else if (trueVal < 0  ) {
+            alert("The relative uncertainty cannot be negative.");
+              return;
+          }
+
+          try {
+            const results = ((observedVal -trueVal) / trueVal) * 100
+            
+            calcResultsEl.innerHTML = `<p> Percent error: ${results.toFixed(2) * 1}%</p>`
+          } catch (error) {
+            alert("Something Went Wrong!!!");
+            resethandler()
+          }
+      }
+
+      function resetForm() {
+        observedValEl.value = ""
+        trueValEl.value = ""
+      }
+
+      function resetResult() {
+        calcResultsEl.innerHTML = "<p>Result will appear here...</p>";
+      } 
+
+      function resethandler() {
+        resetForm();
+        resetResult();
+      }
+
+      resetBtnEl.addEventListener("click", resethandler);
+      calcBtnEl.addEventListener("click", calculateResults);
+
+      [observedValEl, trueValEl].forEach((el) => {
+        el.addEventListener("input", resetResult);
+      });  
+    </script>
+</body>
+</html>

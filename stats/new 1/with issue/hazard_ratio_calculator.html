@@ -53,15 +53,32 @@
 
       function calculateResults() {
           // Retrieve input values
-          const numbers = extractNumbers(numbersInputEl.value);
+          const numbers = numbersInputEl.value;
+          let numbersArray = numbers.split('\n');
+          numbersArray = numbersArray.filter((num) => num.length > 0)
           const confInterval = parseFloat(confIntervalEl.value)
-
-          if (numbers.length < 1 || isNaN(confInterval)) {
+          console.log(numbersArray)
+          if (numbersArray.length < 1 || isNaN(confInterval)) {
             alert("Please Enter All Details.");
             return;
-          } else if (numbers.length != 5 ) {
-            alert(`Exactly 5 columns required. ${numbers.length} columns at row 1`);
+          } else if (numbersArray.length != 5 ) {
+            let status = false
+            let colNum = 0;
+            let rowNum = 0;
+            numbersArray.forEach((numStr, idx) => {
+              const row = extractNumbers(numStr)
+              if (row.length == 0) {
+                return;
+              } else if (row.length != 5) {
+                status = true;
+                colNum = row.length;
+                rowNum = idx + 1;
+              }
+            })
+            if (status == true) {
+              alert(`Exactly 5 columns required. ${colNum} columns at row ${rowNum}`);
               return;
+            }
           } else if (confInterval < 1 ) {
             alert("Value must be greater or equal to 1");
             return;

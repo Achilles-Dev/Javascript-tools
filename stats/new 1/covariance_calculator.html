@@ -65,8 +65,9 @@
       function calculateResults() {
           // Retrieve input values
           const numbers = numbersInputEl.value
-          const numbersArray = numbers.split('\n');
-
+          let numbersArray = numbers.split('\n');
+          numbersArray = numbersArray.filter((num) => num.length > 0)
+          
           if (numbers.length < 1 ) {
             alert("Please Enter All Details.");
             return;
@@ -89,12 +90,14 @@
           try {   
             const xValues = numbersArray.map((num) => {
               const row = extractNumbers(num)
+              console.log(row)
               return parseFloat(row[0])
             })
             const yValues = numbersArray.map((num) => {
               const row = extractNumbers(num)
               return parseFloat(row[1])
             })
+
             const xValuesMean = calculateMean(xValues) 
             const yValuesMean = calculateMean(yValues)
 
