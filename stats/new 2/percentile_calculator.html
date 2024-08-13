@@ -44,7 +44,6 @@
 
       function calculationChange(e) {
         const value = e.target.value
-        console.log(value)
         scoreNameEl.innerHTML = value == 'percentile' ? "Score:" : "Percentile:"
       }
 
@@ -69,7 +68,7 @@
           try {   
             let results =  0;
             if (findUnitEl.value == "percentile") {
-              let numberLessEqual = numbers.filter((num) => num <= scoreVal)
+              const numberLessEqual = numbers.filter((num) => num <= scoreVal)
               results = (numberLessEqual.length / numbers.length) * 100
               calcResultsEl.innerHTML = `<p> Percentile for Score: ${results.toFixed(2) * 1}</p>`
             } else {

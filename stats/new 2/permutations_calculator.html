@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Permutations Calculator</title>
+</head>
+<body>
+    <h1>Permutations Calculator</h1>
+    <p>Use this calculator to easily calculate the number of permutations given a set of objects (types) <br />
+       and the number you need to draw from the set.</p>
+    <p>
+      Objects to choose from:
+      <input type="number" id="objectsVal">
+    </p>
+    <p>
+      How many to choose?: 
+      <input type="number" id="selectedNum">
+    </p>
+    <p>
+      With repetition:
+      <select id="repeatUnit">
+        <option value="yes">Yes</option>
+        <option value="no" selected>No</option>
+      </select>
+    </p>
+
+    <button id="calcBtn">Calculate</button>
+    <button id="resetBtn">Reset</button>
+    <hr>
+    <div>
+      <h3>Result:</h3>
+      <h3 id="calcResults">Result will appear here...</h3>
+    </div>
+
+    <script>
+      // Get required elements from the HTML
+      const objectsValEl = document.getElementById("objectsVal");
+      const selectedNumEl = document.getElementById("selectedNum");
+      const repeatUnitEl = document.getElementById("repeatUnit")
+
+      const calcBtnEl = document.getElementById('calcBtn');
+      const resetBtnEl = document.getElementById('resetBtn');
+      const calcResultsEl = document.getElementById('calcResults')
+      
+      function calcFactorialOfNum(num) {
+        if (num == 0) {
+          return 1;
+        } else {
+          return num * calcFactorialOfNum(num - 1);
+        }
+      }
+
+      function calculateResults() {
+          // Retrieve input values
+          const objectsVal = parseFloat(objectsValEl.value);
+          const selectedNum = parseFloat(selectedNumEl.value);
+
+          if (isNaN(objectsVal) || isNaN(selectedNum)) {
+            alert("Please Enter All Details.");
+            return;
+          } else if (selectedNum < 0  ) {
+            alert("The relative uncertainty cannot be negative.");
+              return;
+          }
+
+          try {
+            let results = 0;
+           
+            if (repeatUnitEl.value === "yes") {
+              results = objectsVal ** selectedNum
+            } else {
+              const nFact = calcFactorialOfNum(objectsVal);
+              if (objectsVal < selectedNum) {
+                results = nFact
+              } else {
+                const nrFact = calcFactorialOfNum(objectsVal - selectedNum);
+                results = nFact / nrFact
+              }
+              
+            }
+          
+            calcResultsEl.innerHTML = `<p> Permutations: ${results.toFixed(2) * 1}</p>`
+          } catch (error) {
+            alert("Something Went Wrong!!!");
+            resethandler()
+          }
+      }
+
+      function resetForm() {
+        objectsValEl.value = ""
+        selectedNumEl.value = ""
+      }
+
+      function resetResult() {
+        calcResultsEl.innerHTML = "<p>Result will appear here...</p>";
+      } 
+
+      function resethandler() {
+        resetForm();
+        resetResult();
+      }
+
+      resetBtnEl.addEventListener("click", resethandler);
+      calcBtnEl.addEventListener("click", calculateResults);
+
+      [objectsValEl, selectedNumEl].forEach((el) => {
+        el.addEventListener("input", resetResult);
+      });  
+    </script>
+</body>
+</html>

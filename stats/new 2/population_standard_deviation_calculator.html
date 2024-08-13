@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Population Standard Deviation Calculator</title>
+</head>
+<body>
+    <h1>Population Standard Deviation Calculator</h1>
+    <p>Calculate the population standard deviation of a set of numbers.</p>
+    <p>Enter numbers separated by comma , space or line break </p>
+    <p>
+      <textarea id="numbersInput" rows="5"></textarea>
+    </p>
+    <p>
+      Precision:
+      <select id="precisionUnit">
+        <option value="10" selected>10</option>
+        <option value="20">20</option>
+        <option value="30">30</option>
+        <option value="40">40</option>
+        <option value="50">50</option>
+        <option value="60">60</option>
+        <option value="70">70</option>
+        <option value="80">80</option>
+        <option value="90">90</option>
+        <option value="100">100</option>
+        <option value="200">200</option>
+        <option value="300">300</option>
+        <option value="400">400</option>
+        <option value="500">500</option>
+        <option value="600">600</option>
+        <option value="700">700</option>
+        <option value="800">800</option>
+        <option value="900">900</option>
+        <option value="1000">1000</option>
+      </select>
+    </p>
+    <button id="calcBtn">Calculate</button>
+    <button id="resetBtn">Reset</button>
+    <hr>
+    <div>
+      <h3>Result:</h3>
+      <h3 id="calcResults">Result will appear here...</h3>
+    </div>
+
+    <script>
+      // Get required elements from the HTML
+      const precisionUnitEl = document.getElementById("precisionUnit")
+      const numbersInputEl = document.getElementById("numbersInput");
+
+      const calcBtnEl = document.getElementById('calcBtn');
+      const resetBtnEl = document.getElementById('resetBtn');
+      const calcResultsEl = document.getElementById('calcResults')
+
+
+      // Function to extract numbers from the input text
+      function extractNumbers(inputText) {
+        const regex = /[+\-]?\d*\.?\d+(?:[Ee][+\-]?\d+)?/g;
+        const matches = inputText.match(regex);
+        const numbers = matches ? matches.map(Number) : [];
+        return numbers;
+      }
+
+      function calculateMean(numbers) {
+        const sum = numbers.reduce((acc, num) => acc + num, 0);
+        const mean = sum / numbers.length;
+        return mean;
+      }
+
+      function calculateResults() {
+          // Retrieve input values
+          const numbers = extractNumbers(numbersInputEl.value);
+          const precision = parseFloat(precisionUnitEl.value);
+          
+          if (numbers.length < 1 ) {
+            alert("Please Enter All Details.");
+            return;
+          }
+
+          try {   
+            const mean = calculateMean(numbers)
+            const xMeanSqtArray = numbers.map((num) => (num - mean) ** 2)
+            const xMeanSqtSum = xMeanSqtArray.reduce((a, b) => a + b, 0)
+            const results = Math.sqrt(xMeanSqtSum / numbers.length)
+            const minusVal = results.toFixed().toString().length
+            calcResultsEl.innerHTML = `<p>Total numbers: ${numbers.length}</p>
+                                      <p>Population standard deviation: ${results.toFixed(precision - minusVal) * 1}</p>
+            `      
+          } catch (error) {
+            alert("Something Went Wrong!!!");
+            resethandler()
+          }
+      }
+
+      function resetForm() {
+        numbersInputEl.value = ""
+        precisionUnitEl.selectedIndex = "0"
+      }
+
+      function resetResult() {
+        calcResultsEl.innerHTML = "<p>Result will appear here...</p>";
+      } 
+
+      function resethandler() {
+        resetForm();
+        resetResult();
+      }
+
+      resetBtnEl.addEventListener("click", resethandler);
+      calcBtnEl.addEventListener("click", calculateResults);
+
+      [numbersInputEl, precisionUnitEl].forEach((el) => {
+        el.addEventListener("input", resetResult);
+      });
+
+    </script>
+</body>
+</html>
