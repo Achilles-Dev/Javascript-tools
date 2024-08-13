@@ -1,28 +1,37 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Percentile Calculator</title>
+  <title>Relative Standard Deviation Calculator</title>
 </head>
 <body>
-    <h1>Percentile Calculator</h1>
-    <p>Find the percentile or score at a percentile by entering the numbers in a data set in the calculator below. <br />
-      Continue reading below to learn the percentile formula and the steps to find it.</p>
+    <h1>Relative Standard Deviation Calculator</h1>
+    <p>Enter a data set or the standard deviation and mean if known to calculate relative standard <br />
+      deviation using the calculator below.</p>
+    <p>
+      Find:
+      <select id="findUnit">
+        <option value="dataset" selected>Using Data Set</option>
+        <option value="sdMean">Using Standard Deviation and Mean</option>
+      </select>
+    </p>
+    <div id="datasetInput">
+      <p>Data Set:</p>
       <p>
-        Find:
-        <select id="findUnit">
-          <option value="percentile" selected>Find Percentile</option>
-          <option value="score">Find Score</option>
-        </select>
+        <textarea id="numbersInput" rows="5"></textarea><br >
+        <span>Separate numbers using a comma (,)</span>
       </p>
-    <p>Number Set:</p>
-    <p>
-      <textarea id="numbersInput" rows="5"></textarea><br >
-      <span>Separate numbers using a comma (,)</span>
-    </p>
-    <p>
-      <span id="scoreName">Score:</span>
-      <input type="number" id="scoreVal">
-    </p>
+    </div>
+    <div id="sdMeanInputs" style="display: none;">
+      <p>
+        Standard Deviation:
+        <input type="number" id="sdVal">
+      </p>
+      <p>
+        Mean:
+        <input type="number" id="meanVal">
+      </p>
+    </div>
+    
     <button id="calcBtn">Calculate</button>
     <button id="resetBtn">Reset</button>
     <hr>
@@ -35,8 +44,10 @@
       // Get required elements from the HTML
       const findUnitEl = document.getElementById("findUnit")
       const numbersInputEl = document.getElementById("numbersInput");
-      const scoreValEl = document.getElementById("scoreVal");
-      const scoreNameEl = document.getElementById("scoreName");
+      const datasetInputEl = document.getElementById("datasetInput");
+      const sdMeanInputsEl = document.getElementById("sdMeanInputs");
+      const sdValEl = document.getElementById("sdVal");
+      const meanValEl = document.getElementById("meanVal");
 
       const calcBtnEl = document.getElementById('calcBtn');
       const resetBtnEl = document.getElementById('resetBtn');
@@ -58,29 +69,26 @@
       function calculateResults() {
           // Retrieve input values
           const numbers = extractNumbers(numbersInputEl.value);
-          const scoreVal = parseFloat(scoreValEl.value);
+          const sdVal = parseFloat(sdValEl.value);
+          const meanVal = parseFloat(meanValEl.value);
           
-          if (numbers.length < 1 || scoreVal == '') {
+          if ((findUnitEl.value == 'dataset' && numbers.length < 1) || (findUnitEl.value == 'sdMean' && isNaN(sdVal)) || 
+              (findUnitEl.value == 'sdMean' && isNaN(meanVal))
+          ) {
             alert("Please Enter All Details.");
             return;
           }
 
           try {   
             let results =  0;
-            if (findUnitEl.value == "percentile") {
-              const numberLessEqual = numbers.filter((num) => num <= scoreVal)
-              results = (numberLessEqual.length / numbers.length) * 100
-              calcResultsEl.innerHTML = `<p> Percentile for Score: ${results.toFixed(2) * 1}</p>`
+            if (findUnitEl.value == "sdMean") {
+              
+              calcResultsEl.innerHTML = `<p>Relative Standard Deviation: </p>`
             } else {
-              const sortedArray = (numbers.sort((a,b) => a - b)).toString().replace(/,/g, ", ");
-              console.log(sortedArray)
-              const index = ((scoreVal / 100) * (numbers.length - 1)) + 1
-              console.log(index)
-              calcResultsEl.innerHTML = `<p> Score at Percentile:</p>
-                                        <p>nth percentile: ${results.toFixed(2) * 1}</p>
-                                        <p>Other Percentile Values</p>
-                                        <p>Other Percentile Values</p>
-                                        <p>Other Percentile Values</p>
+              
+              calcResultsEl.innerHTML = `<p> Relative Standard Deviation: </p>
+                                        <p>Standard Deviation: </p>
+                                        <p>Mean:	</p>
               `
             }            
             
@@ -92,8 +100,8 @@
 
       function resetForm() {
         numbersInputEl.value = ""
-        scoreValEl.value = ""
-        scoreNameEl.innerHTML = "Score:"
+        sdValEl.value = ""
+        meanValEl.value = ""
         findUnitEl.selectedIndex = "0"
       }
 
@@ -110,7 +118,7 @@
       calcBtnEl.addEventListener("click", calculateResults);
 
       findUnitEl.addEventListener("change", calculationChange);
-      [numbersInputEl, scoreValEl].forEach((el) => {
+      [numbersInputEl, sdValEl, meanValEl].forEach((el) => {
         el.addEventListener("input", resetResult);
       });
 

@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Range Calculator</title>
+</head>
+<body>
+    <h1>Range Calculator</h1>
+    <p>Find the range for a set of data by entering the numbers in the data set below. <br />
+      Read below to learn more about how to find the range.</p>
+    <p>Number Set:</p>
+    <p>
+      <textarea id="numbersInput" rows="5"></textarea><br >
+      <span>Separate numbers using a comma (,)</span>
+    </p>
+    <button id="calcBtn">Calculate</button>
+    <button id="resetBtn">Reset</button>
+    <hr>
+    <div>
+      <h3>Result:</h3>
+      <h3 id="calcResults">Result will appear here...</h3>
+    </div>
+
+    <script>
+      // Get required elements from the HTML
+      const numbersInputEl = document.getElementById("numbersInput");
+
+      const calcBtnEl = document.getElementById('calcBtn');
+      const resetBtnEl = document.getElementById('resetBtn');
+      const calcResultsEl = document.getElementById('calcResults')
+
+      // Function to extract numbers from the input text
+      function extractNumbers(inputText) {
+        const regex = /[+\-]?\d*\.?\d+(?:[Ee][+\-]?\d+)?/g;
+        const matches = inputText.match(regex);
+        const numbers = matches ? matches.map(Number) : [];
+        return numbers;
+      }
+
+      function calculateResults() {
+          // Retrieve input values
+          const numbers = extractNumbers(numbersInputEl.value);
+          
+          if (numbers.length < 1 ) {
+            alert("Please Enter All Details.");
+            return;
+          }
+
+          try {   
+            let results =  0;
+           
+            calcResultsEl.innerHTML = `<p> Range: </p>
+                                      <p>Min:	</p>
+                                      <p>Max:	</p>
+            `
+            
+          } catch (error) {
+            alert("Something Went Wrong!!!");
+            resethandler()
+          }
+      }
+
+      function resetForm() {
+        numbersInputEl.value = ""
+        scoreValEl.value = ""
+        scoreNameEl.innerHTML = "Score:"
+        findUnitEl.selectedIndex = "0"
+      }
+
+      function resetResult() {
+        calcResultsEl.innerHTML = "<p>Result will appear here...</p>";
+      } 
+
+      function resethandler() {
+        resetForm();
+        resetResult();
+      }
+
+      resetBtnEl.addEventListener("click", resethandler);
+      calcBtnEl.addEventListener("click", calculateResults);
+
+      findUnitEl.addEventListener("change", calculationChange);
+      numbersInputEl.addEventListener("input", resetResult);
+    </script>
+</body>
+</html>

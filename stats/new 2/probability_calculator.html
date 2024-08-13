@@ -9,7 +9,7 @@
     <p>
       Events:
       <select id="eventsUnit">
-        <option value="two">Two Events</option>
+        <option value="two" selected>Two Events</option>
         <option value="series">Series of Events</option>
       </select>
     </p>
@@ -63,20 +63,22 @@
           const probAGvnPA = parseFloat(probAGvnPAEl.value);
           const probBGvnPB = parseFloat(probBGvnPBEl.value);
           const eventsNum = parseFloat(eventsNumEl.value);
-          
-          if (isNaN(probAGvnPA) || isNaN(probBGvnPB) || isNaN(eventsNum) || probAGvnPA > 100 || probBGvnPB > 100 ||
-              probAGvnPA < 0 || probBGvnPB < 0 || eventsNum < 0
+          console.log(eventsUnitEl.value)
+          if (isNaN(probAGvnPA) || isNaN(probBGvnPB) || (eventsUnitEl.value == "series" && isNaN(eventsNum)) || 
+              (eventsUnitEl.value == "series" && eventsNum < 0)
           ) {
             alert("Please Enter All Details.");
+            return;
+          } else if (probAGvnPA > 100 || probBGvnPB > 100 || probAGvnPA < 0 || probBGvnPB < 0) {
+            alert("Value must be less than or equal to 100 and greater than or equal to 0");
             return;
           }
 
           try {   
             let results =  0;
             if (eventsUnitEl.value == "two") {
-              const numberLessEqual = numbers.filter((num) => num <= scoreVal)
-              results = (numberLessEqual.length / numbers.length) * 100
-              calcResultsEl.innerHTML = `<p> Probability Of::</p>
+              
+              calcResultsEl.innerHTML = `<p> Probability Of:</p>
                                         <p>Intersection of A and B:</p>
                                         <p>P(A∩B):	:</p>
                                         <p>Union of A and B:</p>
@@ -91,12 +93,8 @@
                                         <p>P(B'):	</p>
               `
             } else {
-              const sortedArray = (numbers.sort((a,b) => a - b)).toString().replace(/,/g, ", ");
-              console.log(sortedArray)
-              const index = ((scoreVal / 100) * (numbers.length - 1)) + 1
-              console.log(index)
 
-              calcResultsEl.innerHTML = `<p> Probability Of::</p>
+              calcResultsEl.innerHTML = `<p> Probability Of:</p>
                                         <p>A occurring each time:: ${results.toFixed(2) * 1}</p>
                                         <p>A never occurring:</p>
                                         <p>A occurring at least once:	</p>
