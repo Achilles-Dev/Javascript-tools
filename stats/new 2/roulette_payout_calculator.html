@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Roulette Payout Calculator</title>
+</head>
+<body>
+    <h1>Roulette Payout Calculator</h1>
+    <h4>Option A</h4>
+    <p>
+      Select roulette type:
+      <select id="typeSelect">
+        <option value="europe">European roulette (1 zero)</option>
+        <option value="america" selected>American roulette (2 zeros)</option>
+      </select>
+    </p>
+    <h4>Bet</h4>
+    <p>
+      Bet type:
+      <select id="betTypeSelect">
+        <option value="red">Red</option>
+        <option value="black" selected>Black</option>
+        <option value="even">Even</option>
+        <option value="odd">Odd</option>
+        <option value="high">High (19-36)</option>
+        <option value="first12">1st 12 (1-12)</option>
+        <option value="second12">2nd 12 (13-24)</option>
+        <option value="third12">3rd 12 (25-36)</option>
+        <option value="col1">1st column</option>
+        <option value="col2">2nd column</option>
+        <option value="col3">3rd column</option>
+        <option value="singleNum">Straight (single number)</option>
+        <option value="twoNum">Split (two numbers)</option>
+        <option value="threeNum">Street (three numbers)</option>
+        <option value="corner">Corner/square (four numbers)</option>
+        <option value="double">Double street (six numbers)</option>
+=      </select>
+    </p>
+    <p>
+      Amount
+      <input type="number" placeholder="GHS" id="amount">
+    </p>
+    <h4>Odds</h4>
+    <p>
+      Odds of winning
+      <input type="number" id="winOdds" disabled>
+    </p>
+    <p>
+      Odds of winning (%)
+      <input type="number" id="winOddsPercent" disabled>%
+    </p>
+
+    <button id="calcBtn">Calculate</button>
+    <button id="resetBtn">Reset</button>
+    <hr>
+    <div>
+      <h3>Result:</h3>
+      <h3 id="calcResults">Result will appear here...</h3>
+    </div>
+
+    <script>
+      // Get required elements from the HTML
+      const typeSelectEL = document.getElementById("typeSelect");
+      const betTypeSelectEl = document.getElementById("betTypeSelect");
+      const amountEl = document.getElementById("amount");
+      const winOddsEl = document.getElementById("winOdds");
+      const winOddsPercentEl = document.getElementById("winOddsPercent");
+
+      const calcBtnEl = document.getElementById('calcBtn');
+      const resetBtnEl = document.getElementById('resetBtn');
+      const calcResultsEl = document.getElementById('calcResults') 
+
+      function calculateResults() {
+          // Retrieve input values
+          const amountEl = parseFloat(probAEl.value);
+          const winOddsEl = parseFloat(probBEl.value);
+
+          if (isNaN(amountEl) || amountEl <= 0) {
+            alert("Please Enter All Details.");
+            return;
+          }
+
+          try {
+            const results = 0
+            
+            calcResultsEl.innerHTML = `<p> Percent error: ${results.toFixed(2) * 1}%</p>`
+          } catch (error) {
+            alert("Something Went Wrong!!!");
+            resethandler()
+          }
+      }
+
+      function resetForm() {
+        typeSelectEL.selectedIndex = "1"
+        betTypeSelectEl.selectedIndex = "1"
+        amountEl.value = ""
+        
+      }
+
+      function resetResult() {
+        calcResultsEl.innerHTML = "<p>Result will appear here...</p>";
+      } 
+
+      function resethandler() {
+        resetForm();
+        resetResult();
+      }
+
+      resetBtnEl.addEventListener("click", resethandler);
+      calcBtnEl.addEventListener("click", calculateResults);
+
+      amountEl.addEventListener("input", resetResult);
+    </script>
+</body>
+</html>

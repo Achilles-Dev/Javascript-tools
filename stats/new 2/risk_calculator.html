@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Risk Calculator</title>
+</head>
+<body>
+    <h1>Risk Calculator</h1>
+    <h4>Option A</h4>
+    <p>
+      Probability of failure
+      <input type="number" id="probA">%
+    </p>
+    <p>
+      Loss (if failure occurs)
+      <input type="number" placeholder="GHS" id="lossA">
+    </p>
+    <h4>Option B</h4>
+    <p>
+      Probability of failure
+      <input type="number" id="probB">%
+    </p>
+    <p>
+      Loss (if failure occurs)
+      <input type="number" placeholder="GHS" id="lossB">
+    </p>
+
+    <button id="calcBtn">Calculate</button>
+    <button id="resetBtn">Reset</button>
+    <hr>
+    <div>
+      <h3>Result:</h3>
+      <h3 id="calcResults">Result will appear here...</h3>
+    </div>
+
+    <script>
+      // Get required elements from the HTML
+      const probAEl = document.getElementById("probA");
+      const probBEl = document.getElementById("probB");
+      const lossAEl = document.getElementById("lossA");
+      const lossBEl = document.getElementById("lossB");
+
+      const calcBtnEl = document.getElementById('calcBtn');
+      const resetBtnEl = document.getElementById('resetBtn');
+      const calcResultsEl = document.getElementById('calcResults') 
+
+      function calculateResults() {
+          // Retrieve input values
+          const probAEl = parseFloat(probAEl.value);
+          const probBEl = parseFloat(probBEl.value);
+          const lossAEl = parseFloat(lossAEl.value);
+          const lossBEl = parseFloat(lossBEl.value);
+
+          if (isNaN(probAEl) || isNaN(probBEl) || isNaN(lossAEl) || isNaN(lossBEl)) {
+            alert("Please Enter All Details.");
+            return;
+          } else if (trueVal < 0  ) {
+            alert("The relative uncertainty cannot be negative.");
+              return;
+          }
+
+          try {
+            const results = 0
+            
+            calcResultsEl.innerHTML = `<p> Percent error: ${results.toFixed(2) * 1}%</p>`
+          } catch (error) {
+            alert("Something Went Wrong!!!");
+            resethandler()
+          }
+      }
+
+      function resetForm() {
+        probAEl.value = ""
+        probBEl.value = ""
+        lossAEl.value = ""
+        lossBEl.value = ""
+      }
+
+      function resetResult() {
+        calcResultsEl.innerHTML = "<p>Result will appear here...</p>";
+      } 
+
+      function resethandler() {
+        resetForm();
+        resetResult();
+      }
+
+      resetBtnEl.addEventListener("click", resethandler);
+      calcBtnEl.addEventListener("click", calculateResults);
+
+      [probAEl, probBEl, lossAEl, lossBEl].forEach((el) => {
+        el.addEventListener("input", resetResult);
+      });  
+    </script>
+</body>
+</html>
