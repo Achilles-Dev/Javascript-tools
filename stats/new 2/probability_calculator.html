@@ -15,11 +15,11 @@
     </p>
     <p>
       Probability of A | P(A):
-      <input type="number" id="probAGvnPA" min="0">%
+      <input type="number" id="probA" min="0">%
     </p>
     <p>
       Probability of B | P(B): 
-      <input type="number" id="probBGvnPB" min="0">%
+      <input type="number" id="probB" min="0">%
     </p>
     <p id="seriesNum" style="display: none;">
       Number of Events: 
@@ -36,8 +36,8 @@
     <script>
       // Get required elements from the HTML
       const eventsUnitEl = document.getElementById("eventsUnit")
-      const probAGvnPAEl = document.getElementById("probAGvnPA");
-      const probBGvnPBEl = document.getElementById("probBGvnPB");
+      const probAEl = document.getElementById("probA");
+      const probBEl = document.getElementById("probB");
       const eventsNumEl = document.getElementById("eventsNum");
       const seriesNumEl = document.getElementById("seriesNum");
 
@@ -60,47 +60,58 @@
 
       function calculateResults() {
           // Retrieve input values
-          const probAGvnPA = parseFloat(probAGvnPAEl.value);
-          const probBGvnPB = parseFloat(probBGvnPBEl.value);
+          const probA = parseFloat(probAEl.value);
+          const probB = parseFloat(probBEl.value);
           const eventsNum = parseFloat(eventsNumEl.value);
-          console.log(eventsUnitEl.value)
-          if (isNaN(probAGvnPA) || isNaN(probBGvnPB) || (eventsUnitEl.value == "series" && isNaN(eventsNum)) || 
+
+          if (isNaN(probA) || isNaN(probB) || (eventsUnitEl.value == "series" && isNaN(eventsNum)) || 
               (eventsUnitEl.value == "series" && eventsNum < 0)
           ) {
             alert("Please Enter All Details.");
             return;
-          } else if (probAGvnPA > 100 || probBGvnPB > 100 || probAGvnPA < 0 || probBGvnPB < 0) {
+          } else if (probA > 100 || probB > 100 || probA < 0 || probB < 0) {
             alert("Value must be less than or equal to 100 and greater than or equal to 0");
             return;
           }
 
           try {   
-            let results =  0;
             if (eventsUnitEl.value == "two") {
+              const probAnB = (probA * probB) / 100
+              const probAuB = probA + probB - probAnB
+              const probAdB = probAuB - probAnB
+              const probAuBComp = 100 - probAuB
+              const probAComp = 100 - probA
+              const probBComp = 100 - probB
               
               calcResultsEl.innerHTML = `<p> Probability Of:</p>
                                         <p>Intersection of A and B:</p>
-                                        <p>P(A∩B):	:</p>
+                                        <p>P(A∩B): ${probAnB.toFixed(4) * 1}%	</p>
                                         <p>Union of A and B:</p>
-                                        <p>P(A∪B):	</p>
-                                        p>Symmetric Difference of A and B:</p>
-                                        <p>P(A∆B):</p>
+                                        <p>P(A∪B):	${probAuB.toFixed(4) * 1}% </p>
+                                        <p>Symmetric Difference of A and B:</p>
+                                        <p>P(A∆B): ${probAdB.toFixed(4) * 1}% </p>
                                         <p>Complement of A and B:</p>
-                                        <p>P((A∪B)'):	</p>
-                                        p>Complement of A:</p>
-                                        <p>P(A'):	</p>
-                                        p>Complement of B:</p>
-                                        <p>P(B'):	</p>
+                                        <p>P((A∪B)'): ${probAuBComp.toFixed(4) * 1}%	</p>
+                                        <p>Complement of A:</p>
+                                        <p>P(A'):	${probAComp.toFixed(4) * 1}% </p>
+                                        <p>Complement of B:</p>
+                                        <p>P(B'):	${probBComp.toFixed(4) * 1}% </p>
               `
             } else {
+              const probAOET = ((probA / 100) ** eventsNum) * 100
+              const probANO = ((1 - (probA / 100)) ** eventsNum) * 100
+              const probAOALO = 100 - probANO
+              const probBOET = ((probB / 100) ** eventsNum) * 100
+              const probBNO = ((1 - (probB / 100)) ** eventsNum) * 100
+              const probBOALO = 100 - probBNO
 
               calcResultsEl.innerHTML = `<p> Probability Of:</p>
-                                        <p>A occurring each time:: ${results.toFixed(2) * 1}</p>
-                                        <p>A never occurring:</p>
-                                        <p>A occurring at least once:	</p>
-                                        <p>B occurring each time:</p>
-                                        p>B never occurring:</p>
-                                        <p>B occurring at least once:		</p>
+                                        <p>A occurring each time: ${probAOET.toFixed(5) * 1}%</p>
+                                        <p>A never occurring: ${probANO.toFixed(5) * 1}% </p>
+                                        <p>A occurring at least once: ${probAOALO.toFixed(5) * 1}%	</p>
+                                        <p>B occurring each time: ${probBOET.toFixed(5) * 1}% </p>
+                                        <p>B never occurring: ${probBNO.toFixed(5) * 1}% </p>
+                                        <p>B occurring at least once:	${probBOALO.toFixed(5) * 1}% </p>
               `
             }            
             
@@ -112,8 +123,8 @@
 
       function resetForm() {
         eventsUnitEl.selectedIndex = "0"
-        probAGvnPAEl.value = ""
-        probBGvnPBEl.value = ""
+        probAEl.value = ""
+        probBEl.value = ""
         eventsNumEl.value = ""
       }
 
@@ -130,7 +141,7 @@
       calcBtnEl.addEventListener("click", calculateResults);
 
       eventsUnitEl.addEventListener("change", eventsUnitChange);
-      [eventsUnitEl,  probAGvnPAEl, probBGvnPBEl, eventsNumEl].forEach((el) => {
+      [eventsUnitEl,  probAEl, probBEl, eventsNumEl].forEach((el) => {
         el.addEventListener("input", resetResult);
       });
 

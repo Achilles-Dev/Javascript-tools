@@ -68,7 +68,7 @@
       function handleRemoveInputs() {
         let removeIndex = index - 1;
         const lastDiv = document.getElementById(`input${removeIndex}`)
-        if (removeIndex > 5) {
+        if (removeIndex > 2) {
           lastDiv.remove()
           delete xnEl[`x${removeIndex}El`]
           index -=  1;
