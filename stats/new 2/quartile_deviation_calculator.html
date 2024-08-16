@@ -38,19 +38,57 @@
       function calculateResults() {
           // Retrieve input values
           const numbers = extractNumbers(numbersInputEl.value);
-          const precision = parseFloat(precisionUnitEl.value);
           
           if (numbers.length < 1 ) {
             alert("Please Enter All Details.");
             return;
+          }  else if (numbers.length < 4 ) {
+            alert("Please enter at least 4 numbers");
+            return;
           }
 
           try {   
-            const results = 0
+            const sortArray = (numbers.sort((a,b) => a - b))
+            let firstQuart = 0;
+            let thirdQuart = 0;
+            if (numbers.length % 2 == 0) {
+              let quartIndex =  ((numbers.length / 2) + 1) / 2;
+              if (quartIndex % 1 == 0) {
+                firstQuart = sortArray[quartIndex - 1]
+                thirdQuart = sortArray[((numbers.length / 2) + quartIndex) - 1]
+              } else {
+                quartIndex = (Math.floor(quartIndex))
+                firstQuart = (sortArray[quartIndex - 1] + sortArray[quartIndex]) / 2;
+                thirdQuart = (sortArray[((numbers.length / 2) + quartIndex) - 1] + 
+                  (sortArray[(((numbers.length) / 2) + quartIndex)])) / 2
+              }
+            } else {
+              let quartIndex =  (((numbers.length + 1) / 2)) / 2;
+              if (quartIndex % 1 == 0) {
+                firstQuart = sortArray[quartIndex - 1];
+                thirdQuart = sortArray[(((numbers.length + 1) / 2) + quartIndex) - 1] 
+              } else {
+                quartIndex = (Math.floor(quartIndex))
+                firstQuart = (sortArray[quartIndex - 1] + sortArray[quartIndex]) / 2;
+                thirdQuart = (sortArray[(((numbers.length + 1) / 2) + quartIndex) - 1] + 
+                  (sortArray[(((numbers.length + 1) / 2) + quartIndex)])) / 2
+              }
+            }
 
-            calcResultsEl.innerHTML = `<p>First quartile: </p>
-                                      <p>Third quartile: </p>
-                                      <p>Quartile deviation:</p>
+            let xVals = "(x<sub>1</sub>, x<sub>2</sub>)"
+            if (numbers.length > 3 ) {
+              xVals = `(x<sub>1</sub>, x<sub>2</sub>, x<sub>3</sub>,···,x<sub>${numbers.length}</sub>)`
+            } else {
+              xVals = `(x<sub>1</sub>, x<sub>2</sub>, x<sub>3</sub>)`
+            }
+
+            const quartD = (thirdQuart - firstQuart) / 2
+            const sortedArray = sortArray.toString().replace(/,/g, ", ");
+
+            calcResultsEl.innerHTML = `<p>${xVals} = (${sortedArray})</p>
+                                      <p>First quartile Q1: ${firstQuart.toFixed(3) * 1} </p>
+                                      <p>Third quartile Q3: ${thirdQuart.toFixed(3) * 1} </p>
+                                      <p>Quartile deviation QD: ${quartD.toFixed(3) * 1} </p>
             `      
           } catch (error) {
             alert("Something Went Wrong!!!");
@@ -74,9 +112,7 @@
       resetBtnEl.addEventListener("click", resethandler);
       calcBtnEl.addEventListener("click", calculateResults);
 
-      [numbersInputEl].forEach((el) => {
-        el.addEventListener("input", resetResult);
-      });
+      numbersInputEl.addEventListener("input", resetResult);
 
     </script>
 </body>

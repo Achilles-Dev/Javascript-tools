@@ -1,53 +1,18 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <title>Quartile Calculator</title>
-  </head>
-  <body>
-    <h1>Quartile Calculatorr</h1>
+<head>
+  <title>Quartile Calculator</title>
+</head>
+<body>
+    <h1>Quartile Calculator</h1>
+    <p>Calculate the first quartile, second quartile and third quartile of a set of numbers.</p>
+    <p>Enter numbers separated by comma , space or line break </p>
     <p>
-      Values (enter up to 30 values)
-    </p>
-    <p>
-      #1
-      <input type="number" id="num1" />
-    </p>
-    <p>
-      #2
-      <input type="number" id="num2" />
-    </p>
-    <p>
-      #3
-      <input type="number" id="num3" />
-    </p>
-    <p>
-      #4
-      <input type="number" id="num4" />
-    </p>
-    <p>
-      #5
-      <input type="number" id="num5" />
-    </p>
-    <p>
-      #6
-      <input type="number" id="num6" />
-    </p>
-    <p>
-      #7
-      <input type="number" id="num7" />
-    </p>
-    <p>
-      #8
-      <input type="number" id="num8" />
-    </p>
-    <div id="additions"></div>
-    <p>
-      <button id="addInputs">Add Inputs</button>
-      <button id="removeInputs">Remove Inputs</button>
+      <textarea id="numbersInput" rows="5"></textarea>
     </p>
     <button id="calcBtn">Calculate</button>
     <button id="resetBtn">Reset</button>
-    <hr />
+    <hr>
     <div>
       <h3>Result:</h3>
       <h3 id="calcResults">Result will appear here...</h3>
@@ -55,113 +20,102 @@
 
     <script>
       // Get required elements from the HTML
-      const num1El = document.getElementById("num1");
-      const num2El = document.getElementById("num2");
-      const num3El = document.getElementById("num3");
-      const num4El = document.getElementById("num4");
-      const num5El = document.getElementById("num5");
-      const num6El = document.getElementById("num6");
-      const num7El = document.getElementById("num7");
-      const num8El = document.getElementById("num8");
-      const additionsEl = document.getElementById("additions");
-      const addInputsEl = document.getElementById("addInputs");
-      const removeInputsEl = document.getElementById("removeInputs");
-      let xnEl = {};
+      const numbersInputEl = document.getElementById("numbersInput");
 
-      const calcBtnEl = document.getElementById("calcBtn");
-      const resetBtnEl = document.getElementById("resetBtn");
-      const calcResultsEl = document.getElementById("calcResults");
+      const calcBtnEl = document.getElementById('calcBtn');
+      const resetBtnEl = document.getElementById('resetBtn');
+      const calcResultsEl = document.getElementById('calcResults')
 
-      let index = 4;
 
-      function handleAddInputs() {
-        if (index > 30) {
-          return;
-        }
-        const newDiv = document.createElement('div');
-        newDiv.id = `input${index}`
-        let input = `
-          <p>
-            #${index}
-            <input type="number" id="num${index}" />
-          </p>
-        `
-        newDiv.innerHTML = input
-        
-        additionsEl.appendChild(newDiv);
-        xnEl[`x${index}El`] = document.getElementById(`x${index}`);
-        xnEl[`y${index}El`] = document.getElementById(`y${index}`);
-        document.getElementById(`x${index}`).addEventListener("input", resetResult)
-        index += 1;
-        resetResult()
-      }
-
-      function handleRemoveInputs() {
-        let removeIndex = index - 1;
-        const lastDiv = document.getElementById(`input${removeIndex}`)
-        if (removeIndex > 5) {
-          lastDiv.remove()
-          delete xnEl[`x${removeIndex}El`]
-          index -=  1;
-          resetResult()
-        }
+      // Function to extract numbers from the input text
+      function extractNumbers(inputText) {
+        const regex = /[+\-]?\d*\.?\d+(?:[Ee][+\-]?\d+)?/g;
+        const matches = inputText.match(regex);
+        const numbers = matches ? matches.map(Number) : [];
+        return numbers;
       }
 
       function calculateResults() {
-        // Retrieve input values
-        const num1 = parseFloat(num1El.value);
-        const num2 = parseFloat(num2El.value);
-        const num3 = parseFloat(num3El.value);
-        const num4 = parseFloat(num4El.value);
-        const num5 = parseFloat(num5El.value);
-        const num6 = parseFloat(num6El.value);
-        const num7 = parseFloat(num7El.value);
-        const num8 = parseFloat(num8El.value);
-
-        if (isNaN(num1) || isNaN(num2) || isNaN(num3) || isNaN(num4) || isNaN(num5) || 
-            isNaN(num6) || isNaN(num7) || isNaN(num8)
-        ) {
-          alert("Please Enter All Details.");
-          return;
-        } else {
-          for (const [key, value] of Object.entries(xnEl)) {
-            if (isNaN(parseFloat(value.value))) {
-              alert("Please Enter All Details.");
-              return;
-            }
-          }
-        }
-
-        try {
-          let idx = index - 1;
+          // Retrieve input values
+          const numbers = extractNumbers(numbersInputEl.value);
           
-          calcResultsEl.innerHTML = `
-              <p>Your sorted dataset is:</p>
-              <p>The quartiles are:</p>
-              <p>First quartile: </p>
-              <p>Median: </p>
-              <p>Third quartile: </p>
-            `;
-        } catch (error) {
-          alert("Something Went Wrong!!!");
-          resethandler();
-        }
+          if (numbers.length < 1 ) {
+            alert("Please Enter All Details.");
+            return;
+          }  else if (numbers.length < 4 ) {
+            alert("Please enter at least 4 numbers");
+            return;
+          }
+
+          try {   
+            const sortArray = (numbers.sort((a,b) => a - b))
+            let firstQuart = 0;
+            let thirdQuart = 0;
+            let medianIndex = (numbers.length + 1) / 2;
+            let median = 0
+
+            if (numbers.length % 2 == 0) {
+              medianIndex = numbers.length / 2;
+              median = (sortArray[medianIndex - 1] + sortArray[medianIndex]) / 2;
+            }
+
+            if (numbers.length % 2 == 0) {
+              let quartIndex =  ((numbers.length / 2) + 1) / 2;
+              if (quartIndex % 1 == 0) {
+                firstQuart = sortArray[quartIndex - 1]
+                thirdQuart = sortArray[((numbers.length / 2) + quartIndex) - 1]
+              } else {
+                quartIndex = (Math.floor(quartIndex))
+                firstQuart = (sortArray[quartIndex - 1] + sortArray[quartIndex]) / 2;
+                thirdQuart = (sortArray[((numbers.length / 2) + quartIndex) - 1] + 
+                  (sortArray[(((numbers.length) / 2) + quartIndex)])) / 2
+              }
+
+              medianIndex = numbers.length / 2;
+              median = (sortArray[medianIndex - 1] + sortArray[medianIndex]) / 2;
+            } else {
+              let quartIndex =  (((numbers.length + 1) / 2)) / 2;
+              if (quartIndex % 1 == 0) {
+                firstQuart = sortArray[quartIndex - 1];
+                thirdQuart = sortArray[(((numbers.length + 1) / 2) + quartIndex) - 1] 
+              } else {
+                quartIndex = (Math.floor(quartIndex))
+                firstQuart = (sortArray[quartIndex - 1] + sortArray[quartIndex]) / 2;
+                thirdQuart = (sortArray[(((numbers.length + 1) / 2) + quartIndex) - 1] + 
+                  (sortArray[(((numbers.length + 1) / 2) + quartIndex)])) / 2
+              }
+
+              median = sortArray[medianIndex - 1];
+            }
+
+            let xVals = "(x<sub>1</sub>, x<sub>2</sub>)"
+            if (numbers.length > 3 ) {
+              xVals = `(x<sub>1</sub>, x<sub>2</sub>, x<sub>3</sub>,···,x<sub>${numbers.length}</sub>)`
+            } else {
+              xVals = `(x<sub>1</sub>, x<sub>2</sub>, x<sub>3</sub>)`
+            }
+
+            const sortedArray = sortArray.toString().replace(/,/g, ", ");
+
+            calcResultsEl.innerHTML = `<p>${xVals} = (${sortedArray})</p>
+                                      <p>First quartile (Lower quartile): ${firstQuart.toFixed(3) * 1} </p>
+                                      <p>Second quartile (Median):: ${median.toFixed(3) * 1} </p>
+                                      <p>Third quartile (Upper quartile): ${thirdQuart.toFixed(3) * 1} </p>
+                                      
+            `      
+          } catch (error) {
+            alert("Something Went Wrong!!!");
+            resethandler()
+          }
       }
 
       function resetForm() {
-        num1El.value = "";
-        num2El.value = "";
-        num3El.value = "";
-        num4El.value = "";
-        num5El.value = "";
-        num6El.value = "";
-        num7El.value = "";
-        num8El.value = "";
+        numbersInputEl.value = ""
       }
 
       function resetResult() {
         calcResultsEl.innerHTML = "<p>Result will appear here...</p>";
-      }
+      } 
 
       function resethandler() {
         resetForm();
@@ -170,12 +124,9 @@
 
       resetBtnEl.addEventListener("click", resethandler);
       calcBtnEl.addEventListener("click", calculateResults);
-      addInputsEl.addEventListener("click", handleAddInputs);
-      removeInputsEl.addEventListener("click", handleRemoveInputs);
 
-      [num1El, num2El, num3El, num4El, num5El, num6El, num7El, num8El].forEach((el) => {
-        el.addEventListener("input", resetResult);
-      });
+      numbersInputEl.addEventListener("input", resetResult);
+
     </script>
-  </body>
+</body>
 </html>
