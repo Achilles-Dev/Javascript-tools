@@ -55,6 +55,7 @@
         const value = e.target.value
         const id = e.target.id
         probAEl.value = probAEl.value != "" && (value == 'decimal' && id == "formUnitAEl") ? probAEl.value / 100 : probAEl.value
+        resetResult()
       }
 
       // Function to extract numbers from the input text
@@ -67,36 +68,62 @@
 
       function calculateResults() {
           // Retrieve input values
-          const probA = parseFloat(probAEl.value);
-          const probB = parseFloat(probBEl.value);
-          const probC = parseFloat(probCEl.value);
-          const formUnitA = parseFloat(formUnitAEl.value);
-          const formUnitB = parseFloat(formUnitBEl.value);
-          const formUnitC = parseFloat(formUnitCEl.value);
+          let probA = parseFloat(probAEl.value);
+          let probB = parseFloat(probBEl.value);
+          let probC = parseFloat(probCEl.value);
+          const formUnitA = formUnitAEl.value;
+          const formUnitB = formUnitBEl.value;
+          const formUnitC = formUnitCEl.value;
           
           if (isNaN(probA) || isNaN(probB) || isNaN(probC) || probA < 0 || probB < 0 || probC < 0
           ) {
             alert("Please Enter All Details.");
             return;
-          } else if ((formUnitAEl == 'percent' && probA > 100) || (formUnitBEl == 'percent' && probB > 100) ||
-                  (formUnitCEl == 'percent' && probC > 100)
-          ) {
+          } else if (formUnitA == 'percent' && probA > 100) {
             alert("Value must be less than or equal to 100");
             return;
-          } else if ((formUnitAEl == 'decimal' && probA > 1) || (formUnitBEl == 'decimal' && probB > 1) ||
-                  (formUnitCEl == 'decimal' && probC > 1)
-          ) {
+          } else if (formUnitB == 'percent' && probB > 100) {
+            alert("Value must be less than or equal to 100");
+            return;
+          } else if (formUnitC == 'percent' && probC > 100) {
+            alert("Value must be less than or equal to 100");
+            return;
+          } else if (formUnitA == 'decimal' && probA > 1) {
+            alert("Value must be less than or equal to 1");
+            return;
+          } else if (formUnitB == 'decimal' && probB > 1) {
+            alert("Value must be less than or equal to 1");
+            return;
+          } else if (formUnitC == 'decimal' && probC > 1) {
             alert("Value must be less than or equal to 1");
             return;
           }
+            
+          try {
+            if (formUnitA == 'percent') {
+              probA = probA / 100
+            }
+            if (formUnitB == 'percent') {
+              probB = probB / 100
+            } 
+            if (formUnitC == 'percent') {
+              probC = probC / 100
+            }
 
-          try {   
-            let results =  0;
+            const probAnB = probA * probB
+            const probAnC = probA * probC
+            const probBnC = probB * probC
+            const probAnBnC = probA * probB * probC
+
+            const probAuBuC = probA + probB + probC - probAnB - probAnC - probBnC + probAnBnC
+            const probEOne = (probA * (1 - probB) * (1 - probC)) + ((1 - probA) * probB * (1 - probC)) + ((1 - probA) * (1 - probB) * probC)
+            const probNone = 1 - probAuBuC
+
             calcResultsEl.innerHTML = `<p>Probability of...</p>
-                                      <p>All three occurring:</p>
-                                      <p>At least one occurring:</p>
-                                      <p>Exactly one occurring:</p>
-                                      <p>None of them occurring:	</p>
+                                      <p>All three occurring: ${(probAnBnC * 100).toFixed(4) * 1} %</p>
+                                      <p>At least one occurring: ${(probAuBuC * 100).toFixed(4) * 1} %</p>
+                                      <p>Exactly one occurring: ${(probEOne * 100).toFixed(4) * 1} %</p>
+                                      <p>None of them occurring: ${(probNone * 100).toFixed(4) * 1}	%</p>
             `          
             
           } catch (error) {
