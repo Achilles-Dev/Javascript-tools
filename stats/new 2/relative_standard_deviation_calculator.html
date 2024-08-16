@@ -24,11 +24,11 @@
     <div id="sdMeanInputs" style="display: none;">
       <p>
         Standard Deviation:
-        <input type="number" id="sdVal">
+        <input type="number" min="0" id="sdVal">
       </p>
       <p>
         Mean:
-        <input type="number" id="meanVal">
+        <input type="number" min="0" id="meanVal">
       </p>
     </div>
     
@@ -55,7 +55,9 @@
 
       function calculationChange(e) {
         const value = e.target.value
-        scoreNameEl.innerHTML = value == 'percentile' ? "Score:" : "Percentile:"
+        datasetInputEl.style.display = value == 'dataset' ? "block": "none"
+        sdMeanInputsEl.style.display = value == 'sdMean' ? "block": "none"
+        resetResult()
       }
 
       // Function to extract numbers from the input text
@@ -66,29 +68,43 @@
         return numbers;
       }
 
+      function calculateMean(numbers) {
+        const sum = numbers.reduce((acc, num) => acc + num, 0);
+        const mean = sum / numbers.length;
+        return mean;
+      }
+
       function calculateResults() {
           // Retrieve input values
           const numbers = extractNumbers(numbersInputEl.value);
           const sdVal = parseFloat(sdValEl.value);
           const meanVal = parseFloat(meanValEl.value);
           
-          if ((findUnitEl.value == 'dataset' && numbers.length < 1) || (findUnitEl.value == 'sdMean' && isNaN(sdVal)) || 
-              (findUnitEl.value == 'sdMean' && isNaN(meanVal))
+          if ((findUnitEl.value == 'dataset' && numbers.length < 1) || (findUnitEl.value == 'sdMean' && (isNaN(sdVal) || sdVal < 0)) || 
+              (findUnitEl.value == 'sdMean' && (isNaN(meanVal) || meanVal < 0))
           ) {
             alert("Please Enter All Details.");
+            return;
+          } else if (findUnitEl.value == 'dataset' && numbers.length < 2) {
+            alert("Please enter at least 2 numbers in the number set");
             return;
           }
 
           try {   
             let results =  0;
             if (findUnitEl.value == "sdMean") {
-              
-              calcResultsEl.innerHTML = `<p>Relative Standard Deviation: </p>`
+              results = Math.abs(sdVal / meanVal) * 100
+              calcResultsEl.innerHTML = `<p>Relative Standard Deviation: ${results.toFixed(2) * 1}%</p>`
             } else {
-              
-              calcResultsEl.innerHTML = `<p> Relative Standard Deviation: </p>
-                                        <p>Standard Deviation: </p>
-                                        <p>Mean:	</p>
+              const mean = calculateMean(numbers)
+              const xMeanSqtArray = numbers.map((num) => (num - mean) ** 2)
+              const xMeanSqtSum = xMeanSqtArray.reduce((a, b) => a + b, 0)
+              const sd = Math.sqrt(xMeanSqtSum / (numbers.length - 1))
+              results = Math.abs(sd / mean) * 100
+
+              calcResultsEl.innerHTML = `<p> Relative Standard Deviation:  ${results.toFixed(2) * 1}% </p>
+                                        <p>Standard Deviation: ${sd.toFixed(6) * 1} </p>
+                                        <p>Mean: ${mean.toFixed(6) * 1}	</p>
               `
             }            
             
@@ -118,6 +134,7 @@
       calcBtnEl.addEventListener("click", calculateResults);
 
       findUnitEl.addEventListener("change", calculationChange);
+
       [numbersInputEl, sdValEl, meanValEl].forEach((el) => {
         el.addEventListener("input", resetResult);
       });
