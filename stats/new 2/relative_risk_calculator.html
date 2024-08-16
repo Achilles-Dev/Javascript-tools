@@ -50,21 +50,20 @@
 
       function calculateResults() {
           // Retrieve input values
-          const observedVal = parseFloat(confValEl.value);
-          const trueVal = parseFloat(trueValEl.value);
+          const expGrpNegs = parseFloat(expGrpNegsEl.value);
+          const expGrpNons = parseFloat(expGrpNonsEl.value);
+          const contGrpNegs = parseFloat(contGrpNegsEl.value);
+          const contGrpNons = parseFloat(contGrpNonsEl.value);
+          const confVal = parseFloat(confValEl.value);
 
-          if (isNaN(observedVal) || isNaN(trueVal)) {
+          if (isNaN(expGrpNegs) || isNaN(expGrpNons) || isNaN(contGrpNegs) || isNaN(contGrpNons)) {
             alert("Please Enter All Details.");
             return;
-          } else if (trueVal < 0  ) {
-            alert("The relative uncertainty cannot be negative.");
-              return;
           }
 
           try {
-            const results = ((observedVal -trueVal) / trueVal) * 100
-            
-            calcResultsEl.innerHTML = `<p> Percent error: ${results.toFixed(2) * 1}%</p>`
+            const results = (expGrpNegs / (expGrpNegs + expGrpNons)) / (contGrpNegs / (contGrpNegs + contGrpNons))
+            calcResultsEl.innerHTML = `<p> Relative Risk (Risk Ratio): ${results.toFixed(2)} </p>`
           } catch (error) {
             alert("Something Went Wrong!!!");
             resethandler()
@@ -72,8 +71,11 @@
       }
 
       function resetForm() {
-        confValEl.value = ""
-        trueValEl.value = ""
+        expGrpNegsEl.value = ""
+        expGrpNonsEl.value = ""
+        contGrpNegsEl.value = ""
+        contGrpNonsEl.value = ""
+        confValEl.value = "95"
       }
 
       function resetResult() {
@@ -88,9 +90,10 @@
       resetBtnEl.addEventListener("click", resethandler);
       calcBtnEl.addEventListener("click", calculateResults);
 
-      [confValEl, trueValEl].forEach((el) => {
+      [expGrpNegsEl, expGrpNonsEl, contGrpNegsEl, contGrpNonsEl,  confValEl].forEach((el) => {
         el.addEventListener("input", resetResult);
       });  
+      
     </script>
 </body>
 </html>
