@@ -72,15 +72,22 @@
               results = (numberLessEqual.length / numbers.length) * 100
               calcResultsEl.innerHTML = `<p> Percentile for Score: ${results.toFixed(2) * 1}</p>`
             } else {
-              const sortedArray = (numbers.sort((a,b) => a - b)).toString().replace(/,/g, ", ");
-              console.log(sortedArray)
-              const index = ((scoreVal / 100) * (numbers.length - 1)) + 1
-              console.log(index)
-              calcResultsEl.innerHTML = `<p> Score at Percentile:</p>
-                                        <p>nth percentile: ${results.toFixed(2) * 1}</p>
-                                        <p>Other Percentile Values</p>
-                                        <p>Other Percentile Values</p>
-                                        <p>Other Percentile Values</p>
+              const sortArray = (numbers.sort((a,b) => a - b))
+              let scoreNum = 0
+              let index = ((scoreVal / 100) * (numbers.length - 1)) + 1
+              if (index % 1 == 0) {
+                scoreNum = sortArray[index - 1]
+              } else {
+                console.log("test", index)
+                let newIndex = Math.floor(index)
+                let rF = (index % 2).toFixed(4)
+                console.log(newIndex, parseFloat(rF), sortArray[newIndex + 1], sortArray[newIndex - 1])
+                scoreNum = sortArray[newIndex - 1] + parseFloat(rF) * (sortArray[newIndex] - sortArray[newIndex - 1])
+                console.log(sortArray, rF)
+              }
+               
+              calcResultsEl.innerHTML = `<p> Score at Percentile: </p>
+                                        <p>${scoreVal}th percentile: ${scoreNum.toFixed(2) * 1}</p>
               `
             }            
             
