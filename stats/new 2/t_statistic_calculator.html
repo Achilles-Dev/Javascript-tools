@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>t-statistic Calculator</title>
+</head>
+<body>
+    <h1>t-statistic Calculator</h1>
+    <p>
+      Sample mean (x̄):
+      <input type="number" id="meanSamp">
+    </p>
+    <p>
+      Population mean (μ):
+      <input type="number" id="meanPop">
+    </p>
+    <p>
+      Sample size (n):
+      <input type="number" id="sampSize">
+    </p>
+    <p>
+      Sample standard deviation (s):
+      <input type="number" id="sampSD">
+    </p>
+   
+    <button id="calcBtn">Calculate</button>
+    <button id="resetBtn">Reset</button>
+    <hr>
+    <div>
+      <h3>Result:</h3>
+      <h3 id="calcResults">Result will appear here...</h3>
+    </div>
+
+    <script>
+      // Get required elements from the HTML
+      const meanSampEl = document.getElementById("meanSamp");
+      const meanPopEl = document.getElementById("meanPop");
+      const sampSizeEl = document.getElementById("sampSize");
+      const sampSDEl = document.getElementById("sampSD");
+
+      const calcBtnEl = document.getElementById('calcBtn');
+      const resetBtnEl = document.getElementById('resetBtn');
+      const calcResultsEl = document.getElementById('calcResults') 
+
+      function calculateResults() {
+          // Retrieve input values
+          const meanSamp = parseFloat(meanSampEl.value);
+          const meanPop = parseFloat(meanPopEl.value);
+          const sampSize = parseFloat(sampSizeEl.value);
+          const sampSD = parseFloat(sampSDEl.value);
+
+          if (isNaN(meanSamp) || isNaN(meanPop) || isNaN(sampSize) || isNaN(sampSD) ) {
+            alert("Please Enter All Details.");
+            return;
+          }
+
+          try {
+            const results = (meanSamp - meanPop) / (sampSD / Math.sqrt(sampSize))
+
+            calcResultsEl.innerHTML = `<p> T-statistic (t): ${results.toFixed(5) * 1}</p>`
+          } catch (error) {
+            alert("Something Went Wrong!!!");
+            resethandler()
+          }
+      }
+
+      function resetForm() {
+        meanSampEl.value = ""
+        meanPopEl.value = ""
+        sampSizeEl.value = ""
+        sampSDEl.value = ""
+      }
+
+      function resetResult() {
+        calcResultsEl.innerHTML = "<p>Result will appear here...</p>";
+      } 
+
+      function resethandler() {
+        resetForm();
+        resetResult();
+      }
+
+      resetBtnEl.addEventListener("click", resethandler);
+      calcBtnEl.addEventListener("click", calculateResults);
+
+      [meanSampEl, meanPopEl, sampSizeEl, sampSDEl].forEach((el) => {
+        el.addEventListener("input", resetResult);
+      });  
+    </script>
+</body>
+</html>

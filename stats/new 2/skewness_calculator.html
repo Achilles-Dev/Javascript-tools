@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Skewness Calculator</title>
+  </head>
+  <body>
+    <h1>Skewness Calculator</h1>
+    <p>
+      Data (enter up to 30 numbers)
+    </p>
+    <p>
+      X<sub>1</sub>: &nbsp;&nbsp;&nbsp;
+      <input type="number" id="x1" />
+    </p>
+    <p>
+      X<sub>2</sub>: &nbsp;&nbsp;&nbsp;
+      <input type="number" id="x2" />
+    </p>
+    <p>
+      X<sub>3</sub>: &nbsp;&nbsp;&nbsp;
+      <input type="number" id="x3" />
+    </p>
+    <div id="additions"></div>
+    <p>You need at least 3 observations to calculate skewness.</p>
+    <p>
+      <button id="addInputs">Add Inputs</button>
+      <button id="removeInputs">Remove Inputs</button>
+    </p>
+    <button id="calcBtn">Calculate</button>
+    <button id="resetBtn">Reset</button>
+    <hr />
+    <div>
+      <h3>Result:</h3>
+      <h3 id="calcResults">Result will appear here...</h3>
+    </div>
+
+    <script>
+      // Get required elements from the HTML
+      const x1El = document.getElementById("x1");
+      const x2El = document.getElementById("x2");
+      const x3El = document.getElementById("x3");
+      const additionsEl = document.getElementById("additions");
+      const addInputsEl = document.getElementById("addInputs");
+      const removeInputsEl = document.getElementById("removeInputs");
+      let xnEl = {};
+
+      const calcBtnEl = document.getElementById("calcBtn");
+      const resetBtnEl = document.getElementById("resetBtn");
+      const calcResultsEl = document.getElementById("calcResults");
+
+      let index = 4;
+
+      function handleAddInputs() {
+        if (index > 30) {
+          return;
+        }
+        const newDiv = document.createElement('div');
+        newDiv.id = `input${index}`
+        let input = `
+          <p>
+            X<sub>${index}</sub>: &nbsp;&nbsp;&nbsp;
+            <input type="number" id="x${index}" />
+          </p>
+        `
+        newDiv.innerHTML = input
+        
+        additionsEl.appendChild(newDiv);
+        xnEl[`x${index}El`] = document.getElementById(`x${index}`);
+        document.getElementById(`x${index}`).addEventListener("input", resetResult)
+        index += 1;
+        resetResult()
+      }
+
+      function handleRemoveInputs() {
+        let removeIndex = index - 1;
+        const lastDiv = document.getElementById(`input${removeIndex}`)
+        if (removeIndex > 5) {
+          lastDiv.remove()
+          delete xnEl[`x${removeIndex}El`]
+          index -=  1;
+          resetResult()
+        }
+      }
+
+      function calculateMean(numbers) {
+        const sum = numbers.reduce((acc, num) => acc + num, 0);
+        const mean = sum / numbers.length;
+        return mean;
+      }
+
+      function calculateResults() {
+        // Retrieve input values
+        const x1 = parseFloat(x1El.value);
+        const x2 = parseFloat(x2El.value);
+        const x3 = parseFloat(x3El.value);
+
+        if (isNaN(x1) || isNaN(x2) || isNaN(x3)) {
+          alert("Please Enter All Details.");
+          return;
+        } else {
+          for (const [key, value] of Object.entries(xnEl)) {
+            if (isNaN(parseFloat(value.value))) {
+              alert("Please Enter All Details.");
+              return;
+            }
+          }
+        }
+
+        try {
+          let idx = index - 1;
+          let numbers = [x1, x2, x3]
+          if (Object.values(xnEl).length > 0) {
+            Object.values(xnEl).forEach((num) => {
+              numbers.push(parseFloat(num.value))
+            })
+          }
+          
+          const numLen = numbers.length
+          const mean = calculateMean(numbers)
+          const xMeanSqtArray = numbers.map((num) => (num - mean) ** 2)
+          const xMeanSqtSum = xMeanSqtArray.reduce((a, b) => a + b, 0)
+          const sd = Math.sqrt(xMeanSqtSum / (numLen - 1))
+          const xMeanCubeArray = numbers.map((num) => (num - mean) ** 3)
+          const xMeanCubeSum = xMeanCubeArray.reduce((a, b) => a + b, 0)
+          const skewness = (xMeanCubeSum * numLen) / ((numLen - 2) * (numLen - 1) * (sd ** 3))
+          const xMean4Array = numbers.map((num) => (num - mean) ** 4)
+          const xMean4Sum = xMean4Array.reduce((a, b) => a + b, 0)
+          const firstPart = (numLen * (numLen + 1)) / ((numLen - 3) * (numLen - 2) * (numLen - 1))
+          const secondPart = (3 * ((numLen - 1) ** 2)) / ((numLen - 3) * (numLen - 2))
+          const kurkosis = (firstPart * ((1 / (sd ** 4))) * xMean4Sum) - secondPart
+
+          calcResultsEl.innerHTML = `
+              <p>Observations (N): ${numLen} </p>
+              <p>Mean (x̄): ${mean.toFixed(3) * 1} </p>
+              <p>Standard deviation (s): ${sd.toFixed(3) * 1} </p>
+              <p>Skewness: ${skewness.toFixed(4) * 1} </p>
+              ${numLen >= 4 ? `<p>Kurtosis: ${kurkosis.toFixed(4) * 1} </p>` : ""}
+            `;
+        } catch (error) {
+          alert("Something Went Wrong!!!");
+          resethandler();
+        }
+      }
+
+      function resetForm() {
+        x1El.value = "";
+        x2El.value = "";
+        x3El.value = "";
+      }
+
+      function resetResult() {
+        calcResultsEl.innerHTML = "<p>Result will appear here...</p>";
+      }
+
+      function resethandler() {
+        resetForm();
+        resetResult();
+      }
+
+      resetBtnEl.addEventListener("click", resethandler);
+      calcBtnEl.addEventListener("click", calculateResults);
+      addInputsEl.addEventListener("click", handleAddInputs);
+      removeInputsEl.addEventListener("click", handleRemoveInputs);
+
+      [x1El, x2El, x3El].forEach((el) => {
+        el.addEventListener("input", resetResult);
+      });
+    </script>
+  </body>
+</html>
