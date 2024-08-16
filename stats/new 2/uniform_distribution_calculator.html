@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Uniform Distribution Calculator</title>
+</head>
+<body>
+    <h1>Uniform Distribution Calculator</h1>
+    <p>
+      Mode:
+      <select id="modeSelect">
+        <option value="prob" selected>Probability calculator</option>
+        <option value="sample">Sample generator</option>
+        <option value="pdf">Probability density function</option>
+        <option value="cdf">Cumulative distribution function</option>
+        <option value="quantile">Quantile function</option>
+        <option value="common">Common measures</option>
+      </select>
+    </p>
+    <h4 id="functionName"></h4>
+    <p id="typeInput">
+      Probability type:
+      <select id="typeSelect">
+        <option value="lessEqual" selected>P(X ≤ x)</option>
+        <option value="greatEqual">P(X ≥ x)</option>
+        <option value="between">P(x₁ ≤ X ≤ x₂)</option>
+      </select>
+    </p>
+    <p>
+      Pararmeter (a):
+      <input type="number" id="paramA">
+    </p>
+    <p>
+      Pararmeter (b): 
+      <input type="number" id="paramB">
+    </p>
+    <p id="xInput">
+      <span id="xName">x</span>: 
+      <input type="number" id="xValue">
+    </p>
+    <p id="betweenInput" style="display: none;">
+      x<sub>2</sub>: 
+      <input type="number" id="x2Value">
+    </p>
+
+    <button id="calcBtn">Calculate</button>
+    <button id="resetBtn">Reset</button>
+    <hr>
+    <div>
+      <h3>Result:</h3>
+      <h3 id="calcResults">Result will appear here...</h3>
+    </div>
+
+    <script>
+      // Get required elements from the HTML
+      const modeSelectEl = document.getElementById("modeSelect");
+      const typeSelectEl = document.getElementById("typeSelect");
+      const functionNameEl = document.getElementById("functionName");
+      const typeInputEl = document.getElementById("typeInput");
+      const paramAEl = document.getElementById("paramA");
+      const paramBEl = document.getElementById("paramB");
+      const xInputEl = document.getElementById("xInput");
+      const xNameEl = document.getElementById("xName");
+      const xValueEl = document.getElementById("xValue");
+      const betweenInputEl = document.getElementById("betweenInput");
+      const x2ValueEl = document.getElementById("x2Value");
+
+      const calcBtnEl = document.getElementById('calcBtn');
+      const resetBtnEl = document.getElementById('resetBtn');
+      const calcResultsEl = document.getElementById('calcResults') 
+
+      function handleModeSelectChange(e) {
+        const value = e.target.value
+        typeInputEl.style.display = value == 'prob' ? 'block' : 'none'
+        xInputEl.style.display = value != 'common' ? 'block' : 'none'
+        betweenInputEl.style.display = value == "prob" && typeSelectEl.value == 'between' ? 'block' : 'none'
+        
+        if (value == "prob") {
+          xNameEl.innerHTML = typeSelectEl.value == 'between' ? 'x<sub>1</sub>' : `x`
+          functionNameEl.innerHTML = ""
+        } else if (value == "sample") {
+          xNameEl.innerHTML = "Sample length"
+          functionNameEl.innerHTML = ""
+        } else if (value == "pdf") {
+          xNameEl.innerHTML = "f(x)"
+          functionNameEl.innerHTML = "f(x) = <sup>1</sup>&frasl;<sub>(b - a)</sub> for a ≤ x ≤ b"
+        } else if (value == "cdf") {
+          xNameEl.innerHTML = "F(x)"
+          functionNameEl.innerHTML = "F(x) = <sup>(x - a)</sup>&frasl;<sub>(b - a)</sub> for a ≤ x ≤ b"
+        } else if (value == "quantile") {
+          xNameEl.innerHTML = "Quantile (p)"
+          functionNameEl.innerHTML = "Q(p) = (b - a) &#183; p + a for 0 ≤ p ≤ 1"
+        } else {
+          functionNameEl.innerHTML = ""
+          xNameEl.innerHTML = ""
+        }
+
+        resetResult();
+      }
+
+      function handleTypeSelectChange(e) {
+        const value = e.target.value
+        xNameEl.innerHTML = value == 'between' ? 'x<sub>1</sub>' : `x`
+        betweenInputEl.style.display = value == 'between' ? 'block' : 'none'
+
+        resetResult();
+      }
+
+      function randomInteger(min, max) {
+        return Math.floor(Math.random() * (max - min)) + min;
+      }
+
+      function calculateResults() {
+          // Retrieve input values
+          const paramA = parseFloat(paramAEl.value);
+          const paramB = parseFloat(paramBEl.value);
+          const xValue = parseFloat(xValueEl.value);
+          const x2Value = parseFloat(x2ValueEl.value);
+          const modeSelect = modeSelectEl.value
+          const typeSelect = typeSelectEl.value
+
+          if (isNaN(paramA) || isNaN(paramB)) {
+            alert("Please Enter All Details.");
+            return;
+          } else if (modeSelect != "common" && isNaN(xValue)) {
+            alert("Please Enter All Details.");
+            return;
+          } else if (modeSelect == "prob") {
+            if (typeSelect == "between" && isNaN(x2Value)) {
+              alert("Please Enter All Details.");
+              return;
+            } else if (typeSelect == "between" && xValue > x2Value) {
+              alert("x1 must be smaller than or equal to x2.")
+              return;
+            }
+          } else if (paramA >= paramB) {
+            alert("a must be smaller than b.")
+            return;
+          } else if (modeSelect == "quantile" && (xValue > 1 || xValue < 0)) {
+            alert("Enter a number between 0 and 1.")
+            return;
+          }
+
+          try {
+            let results = 0
+            let modeName = "";
+            let decimalPlace = 5;
+            
+            if (modeSelect == "prob") {
+              modeName = typeSelectEl[typeSelectEl.selectedIndex].innerText
+              const pdf = 1 / (paramB - paramA)
+              if (typeSelect == "lessEqual") {
+                results = (xValue > paramA) && (xValue < paramB) ? ((xValue - paramA) * pdf) : xValue >= paramB ? 1 : 0
+              } else if (typeSelect == "greatEqual") {
+                results = (xValue < paramB) && (xValue > paramA) ? ((paramB - xValue) * pdf) : xValue <= paramA ? 1 : 0
+              } else if (typeSelect == "between") {
+                if ((xValue < paramA && x2Value <= paramA) || xValue >= paramB && x2Value >= paramB) {
+                  results = 0
+                } else if (xValue <= paramA && x2Value >= paramB) {
+                  results = 1
+                } else if (xValue < paramA && x2Value > paramA) {
+                  results = (x2Value - paramA) * pdf
+                } else if (xValue > paramA && x2Value >= paramB) {
+                  results = (paramB - xValue) * pdf
+                } else {
+                  results =  (x2Value - xValue) * pdf
+                }
+              }
+            } else if (modeSelect == "sample") {
+              modeName = "Here's your sample"
+              let randNums = []
+              Array.from(Array(xValue).keys()).forEach((num) => {
+                let random = randomInteger(paramA, paramB)
+                let random2 = Math.random();
+                randNums.push(`<span>${(random + random2).toFixed(5) * 1}</span><br />`)
+              })
+              randNums = randNums.toString().replace(/,/g, " ");
+              calcResultsEl.innerHTML = `<p> ${modeName}: </p>
+                                        <div> ${randNums}</div>
+              `
+              return;
+            } else if (modeSelect == "pdf") {
+              modeName = "f(x)"
+              decimalPlace = 8
+              results = 1 / (paramB - paramA)
+            } else if (modeSelect == "cdf") {
+              modeName = "F(x)"
+              decimalPlace = 8
+              results = (xValue - paramA) / (paramB - paramA)
+            } else if (modeSelect == "quantile") {
+              modeName = "Q(p)"
+              results = (paramB - paramA) * xValue + paramA
+            } else {
+              const mean = (paramA + paramB) / 2
+              const variance = ((paramB - paramA) ** 2) / 12
+              const sd = Math.sqrt(variance)
+              decimalPlace = 4
+              calcResultsEl.innerHTML = `<p> Mean: ${mean.toFixed(decimalPlace) * 1}</p>
+                                        <p> Median: ${mean.toFixed(decimalPlace) * 1}</p>
+                                        <p> Variance: ${variance.toFixed(decimalPlace) * 1} </p>
+                                        <p> Standard deviation: ${sd.toFixed(decimalPlace) * 1} </p>
+                                        <p> Skewness: 0</p>
+              `
+              return;
+            }
+            
+            calcResultsEl.innerHTML = `<p> ${modeName}: ${results.toFixed(decimalPlace) * 1}</p>`
+          } catch (error) {
+            alert("Something Went Wrong!!!");
+            resethandler()
+          }
+      }
+
+      function resetForm() {
+        modeSelectEl.selectedIndex = "0"
+        typeSelectEl.selectedIndex = "0"
+        paramAEl.value = ""
+        paramBEl.value = ""
+        xNameEl.innerHTML = "x"
+        xValueEl.value = ""
+        x2ValueEl.value = ""
+      }
+
+      function resetResult() {
+        calcResultsEl.innerHTML = "<p>Result will appear here...</p>";
+      } 
+
+      function resethandler() {
+        resetForm();
+        resetResult();
+      }
+
+      [paramAEl, paramBEl, xValueEl, x2ValueEl].forEach((el) => {
+        el.addEventListener("input", resetResult);
+      });  
+
+      resetBtnEl.addEventListener("click", resethandler);
+      calcBtnEl.addEventListener("click", calculateResults);
+      modeSelectEl.addEventListener("change", handleModeSelectChange)
+      typeSelectEl.addEventListener("change", handleTypeSelectChange)
+      
+    </script>
+</body>
+</html>

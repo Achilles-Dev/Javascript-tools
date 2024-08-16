@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Probability Distribution Calculator</title>
+</head>
+<body>
+    <h1>Probability Distribution Calculator</h1>
+    <p>Use our probability distribution calculator to find the mean, standard deviation, and variance of a <br />
+       distribution by entering each value x and its probability P(x) below. Plus, see the steps to solve below.</p>
+    <table>
+      <th>Value</th>
+      <th>Probability</th>
+      <tbody>
+        <tr>
+          <td>
+            X<sub>1</sub>:
+            <input type="number" id="x1">
+          </td>
+          <td>
+            p(X<sub>1</sub>): 
+            <input type="number" id="px1" min="0" max="1" style="width: 180px;">
+          </td>
+        </tr>
+        <tr>
+          <td>
+            X<sub>2</sub>:
+            <input type="number" id="x2">
+          </td>
+          <td>
+            p(X<sub>2</sub>): 
+            <input type="number" id="px2" min="0" max="1" style="width: 180px;">
+          </td>
+        </tr>
+        <tr>
+          <td>
+            X<sub>3</sub>:
+            <input type="number" id="x3">
+          </td>
+          <td>
+            p(X<sub>3</sub>): 
+            <input type="number" id="px3" min="0" max="1" style="width: 180px;">
+          </td>
+        </tr>
+        <tr>
+          <td>
+            X<sub>4</sub>:
+            <input type="number" id="x4">
+          </td>
+          <td>
+            p(X<sub>4</sub>): 
+            <input type="number" id="px4" min="0" max="1" style="width: 180px;">
+          </td>
+        </tr>
+        <tr>
+          <td>
+            X<sub>5</sub>:
+            <input type="number" id="x5">
+          </td>
+          <td>
+            p(X<sub>5</sub>): 
+            <input type="number" id="px5" min="0" max="1" style="width: 180px;">
+          </td>
+        </tr>
+        <tr>
+          <td>
+            X<sub>6</sub>:
+            <input type="number" id="x6">
+          </td>
+          <td>
+            p(X<sub>6</sub>): 
+            <input type="number" id="px6" min="0" max="1" style="width: 180px;">
+          </td>
+        </tr>
+        <tr>
+          <td>
+            X<sub>7</sub>:
+            <input type="number" id="x7">
+          </td>
+          <td>
+            p(X<sub>7</sub>): 
+            <input type="number" id="px7" min="0" max="1" style="width: 180px;">
+          </td>
+        </tr>
+        <tr>
+          <td>
+            X<sub>8</sub>:
+            <input type="number" id="x8">
+          </td>
+          <td>
+            p(X<sub>8</sub>): 
+            <input type="number" id="px8" min="0" max="1" style="width: 180px;">
+          </td>
+        </tr>
+        <tr>
+          <td>
+            X<sub>9</sub>:
+            <input type="number" id="x9">
+          </td>
+          <td>
+            p(X<sub>9</sub>): 
+            <input type="number" id="px9" min="0" max="1" style="width: 180px;">
+          </td>
+        </tr>
+        <tr>
+          <td>
+            X<sub>10</sub>:
+            <input type="number" id="x10">
+          </td>
+          <td>
+            p(X<sub>10</sub>): 
+            <input type="number" id="px10" min="0" max="1" style="width: 180px;">
+          </td>
+        </tr>
+      </tbody>
+    </table>
+    <button id="calcBtn">Calculate</button>
+    <button id="resetBtn">Reset</button>
+    <hr>
+    <div>
+      <h3>Result:</h3>
+      <h3 id="calcResults">Result will appear here...</h3>
+    </div>
+
+    <script>
+      // Get required elements from the HTML
+      const x1El = document.getElementById("x1")
+      const px1El = document.getElementById("px1");
+      const x2El = document.getElementById("x2");
+      const px2El = document.getElementById("px2");
+      const x3El = document.getElementById("x3")
+      const px3El = document.getElementById("px3");
+      const x4El = document.getElementById("x4");
+      const px4El = document.getElementById("px4");
+      const x5El = document.getElementById("x5")
+      const px5El = document.getElementById("px5");
+      const x6El = document.getElementById("x6");
+      const px6El = document.getElementById("px6");
+      const x7El = document.getElementById("x7")
+      const px7El = document.getElementById("px7");
+      const x8El = document.getElementById("x8");
+      const px8El = document.getElementById("px8");
+      const x9El = document.getElementById("x9")
+      const px9El = document.getElementById("px9");
+      const x10El = document.getElementById("x10");
+      const px10El = document.getElementById("px10");
+
+      const calcBtnEl = document.getElementById('calcBtn');
+      const resetBtnEl = document.getElementById('resetBtn');
+      const calcResultsEl = document.getElementById('calcResults')
+
+      // Function to extract numbers from the input text
+      function extractNumbers(inputText) {
+        const regex = /[+\-]?\d*\.?\d+(?:[Ee][+\-]?\d+)?/g;
+        const matches = inputText.match(regex);
+        const numbers = matches ? matches.map(Number) : [];
+        return numbers;
+      }
+
+      function calculateResults() {
+          // Retrieve input values
+          const x1 = parseFloat(x1El.value);
+          const px1 = parseFloat(px1El.value);
+          const x2 = parseFloat(x2El.value);
+          const px2 = parseFloat(px2El.value);
+          const x3 = parseFloat(x3El.value);
+          const px3 = parseFloat(px3El.value);
+          const x4 = parseFloat(x4El.value);
+          const px4 = parseFloat(px4El.value);
+          const x5 = parseFloat(x5El.value);
+          const px5 = parseFloat(px5El.value);
+          const x6 = parseFloat(x6El.value);
+          const px6 = parseFloat(px6El.value);
+          const x7 = parseFloat(x7El.value);
+          const px7 = parseFloat(px7El.value);
+          const x8 = parseFloat(x8El.value);
+          const px8 = parseFloat(px8El.value);
+          const x9 = parseFloat(x9El.value);
+          const px9 = parseFloat(px9El.value);
+          const x10 = parseFloat(x10El.value);
+          const px10 = parseFloat(px10El.value);
+          const xValArray = [x1, x2, x3, x4, x5, x6, x7, x8, x9, x10]
+          const pxValArray = [px1, px2, px3, px4, px5, px6, px7, px8, px9, px10]
+          
+          xValArray.forEach((num, index) => {
+            console.log(isNaN(num) && pxValArray[index] != '')
+            if (isNaN(num) && pxValArray[index] != '') {
+              alert("Please Enter All Details.");
+              return;
+            }
+          })
+          
+          pxValArray.forEach((num, index) => {
+            if (isNaN(num) && xValArray[index] != '') {
+              alert("Please Enter All Details.");
+              return;
+            } else if (num < 0 || num > 1) {
+              alert("Value must be less than or equal to 1 and greater than or equal to 0");
+              return;
+            }
+          })
+
+          try {   
+            let results =  0;
+            
+              calcResultsEl.innerHTML = `<p> Mean (μ):	</p>
+                                        <p>Standard Deviation (σ):	</p>
+                                        <p>Variance (σ²):</p>
+                                        
+              `           
+            
+          } catch (error) {
+            alert("Something Went Wrong!!!");
+            resethandler()
+          }
+      }
+
+      function resetForm() {
+        x1El.value = ""
+        px1El.value = ""
+        x2El.value = ""
+        px2El.value = ""
+        x3El.value = ""
+        px3El.value = ""
+        x4El.value = ""
+        px4El.value = ""
+        x5El.value = ""
+        px5El.value = ""
+        x6El.value = ""
+        px6El.value = ""
+        x7El.value = ""
+        px7El.value = ""
+        x8El.value = ""
+        px8El.value = ""
+        x9El.value = ""
+        px9El.value = ""
+        x10El.value = ""
+        px10El.value = ""
+      }
+
+      function resetResult() {
+        calcResultsEl.innerHTML = "<p>Result will appear here...</p>";
+      } 
+
+      function resethandler() {
+        resetForm();
+        resetResult();
+      }
+
+      resetBtnEl.addEventListener("click", resethandler);
+      calcBtnEl.addEventListener("click", calculateResults);
+
+      [
+        x1El,  px1El, x2El, px2El, x3El, px3El, x4El, px4El, x5El, px5El,
+        x6El, px6El, x7El, px7El, x8El, px8El, x9El, px9El, x10El, px10El
+      ].forEach((el) => {
+        el.addEventListener("input", resetResult);
+      });
+
+    </script>
+</body>
+</html>

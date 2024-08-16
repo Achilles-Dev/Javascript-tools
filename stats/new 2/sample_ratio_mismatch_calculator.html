@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Sample Mean Calculator</title>
+</head>
+<body>
+    <h1>Sample Mean Calculator</h1>
+    <p>Use this SRM calculator to easily check your A/B testing data for the presence of sample ratio mismatch. <br />
+      Supports equal allocation as well as unequal allocation with custom sampling ratios entered as fractions <br />
+      (0.5 0.5) or percentages (50% 50%). Quick and easy SRM check for your A/B test data.</p>
+    <p>Sample size:</p>
+    <p>
+      <textarea id="numbersInput" rows="5" placeholder="List of sample sizes (number of users, sessions, etc.) 
+      for all test groups. Separate with spaces or new lines. Copy/paste from spreadsheet works fine. Example:
+      1000 1010 990"></textarea>
+    </p>
+    <p>
+      Target allocation:
+      <select id="targetSelect">
+        <option value="equal" selected>Equal</option>
+        <option value="unequal">Unequal</option>
+      </select>
+    </p>
+    <div id="ratioInput" style="display: none;">
+      <p>Target ratios:</p>
+      <p>
+        <textarea id="targetNumInput" rows="5" placeholder="List of target sample ratios for each test group, including the control. 
+        Separate using spaces or new lines. Copy/paste from spreadsheet works fine. Example:
+        0.5 0.5 or 50% 50%"></textarea>
+      </p>
+    </div>
+    <button id="calcBtn">Calculate</button>
+    <button id="resetBtn">Reset</button>
+    <hr>
+    <div>
+      <h3>Result:</h3>
+      <h3 id="calcResults">Result will appear here...</h3>
+    </div>
+
+    <script>
+      // Get required elements from the HTML
+      const numbersInputEl = document.getElementById("numbersInput");
+      const targetSelectEl = document.getElementById("targetSelect");
+      const ratioInputEl = document.getElementById("ratioInput");
+      const targetNumInputEl = document.getElementById("targetNumInput");
+
+      const calcBtnEl = document.getElementById('calcBtn');
+      const resetBtnEl = document.getElementById('resetBtn');
+      const calcResultsEl = document.getElementById('calcResults')
+
+
+      // Function to extract numbers from the input text
+      function extractNumbers(inputText) {
+        const regex = /[+\-]?\d*\.?\d+(?:[Ee][+\-]?\d+)?/g;
+        const matches = inputText.match(regex);
+        const numbers = matches ? matches.map(Number) : [];
+        return numbers;
+      }
+
+      function calculateResults() {
+          // Retrieve input values
+          const numbers = extractNumbers(numbersInputEl.value);
+          
+          if (numbers.length < 1 ) {
+            alert("Please Enter All Details.");
+            return;
+          }
+
+          try {   
+            const numSum = numbers.reduce((acc, num) => acc + num, 0);
+            const results = numSum / numbers.length;
+
+            calcResultsEl.innerHTML = `<p>Total numbers: ${numbers.length}</p>
+                                      <p>Sum of numbers: ${numSum.toFixed(3) * 1} </p>
+                                      <p>Sample Mean value: ${results.toFixed(3) * 1}</p>
+            `      
+          } catch (error) {
+            alert("Something Went Wrong!!!");
+            resethandler()
+          }
+      }
+
+      function resetForm() {
+        numbersInputEl.value = ""
+        targetNumInputEl.value = ""
+      }
+
+      function resetResult() {
+        calcResultsEl.innerHTML = "<p>Result will appear here...</p>";
+      } 
+
+      function resethandler() {
+        resetForm();
+        resetResult();
+      }
+
+      resetBtnEl.addEventListener("click", resethandler);
+      calcBtnEl.addEventListener("click", calculateResults);
+
+      targetSelectEl.addEventListener("change", '')
+      [numbersInputEl, targetNumInputEl].forEach((el) => {
+        el.addEventListener("input", resetResult);
+      });
+
+    </script>
+</body>
+</html>

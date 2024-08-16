@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Sensitivity and Specificity Calculator</title>
+</head>
+<body>
+    <h1>Sensitivity and Specificity Calculator</h1>
+    <p>
+      True positive:
+      <input type="number" id="truePos">
+    </p>
+    <p>
+      False positive: 
+        <input type="number" id="falsePos">
+    </p>
+    <p>
+      False negative:
+      <input type="number" id="falseNeg">
+    </p>
+    <p>
+      True negative: 
+        <input type="number" id="trueNeg">
+    </p>
+    <p>
+      Prevalence: 
+        <input type="number" id="preval">%
+    </p>
+
+    <button id="calcBtn">Calculate</button>
+    <button id="resetBtn">Reset</button>
+    <hr>
+    <div>
+      <h3>Result:</h3>
+      <h3 id="calcResults">Result will appear here...</h3>
+    </div>
+
+    <script>
+      // Get required elements from the HTML
+      const truePosEl = document.getElementById("truePos");
+      const falsePosEl = document.getElementById("falsePos");
+      const falseNegEl = document.getElementById("falseNeg");
+      const trueNegEl = document.getElementById("trueNeg");
+      const prevalEl = document.getElementById("preval");
+
+      const calcBtnEl = document.getElementById('calcBtn');
+      const resetBtnEl = document.getElementById('resetBtn');
+      const calcResultsEl = document.getElementById('calcResults') 
+
+      function calculateResults() {
+          // Retrieve input values
+          const truePos = parseFloat(truePosEl.value);
+          const falsePos = parseFloat(falsePosEl.value);
+          const falseNeg = parseFloat(falseNegEl.value);
+          const trueNeg = parseFloat(trueNegEl.value);
+          const preval = parseFloat(prevalEl.value);
+
+          if (isNaN(truePos) || isNaN(falsePos) || isNaN(falseNeg) || isNaN(trueNeg) || isNaN(preval)) {
+            alert("Please Enter All Details.");
+            return;
+          } 
+
+          try {
+            const sensitivity = truePos / (truePos + falseNeg)
+            const specificity = trueNeg / (falsePos + trueNeg)
+            const posLikeRatio = sensitivity / (1 - specificity)
+            const negLikeRatio = (1 - sensitivity) / specificity
+            const posPredVal = (sensitivity * (preval / 100)) / ((sensitivity * (preval / 100)) + ((1 - specificity) * (1 - (preval / 100))))
+            const negPredVal = (specificity * (1 - (preval / 100))) / (((1 - sensitivity) * (preval / 100)) + (specificity * (1 - (preval / 100))))
+            const accuracy = (truePos + trueNeg) / (truePos + trueNeg + falsePos + falseNeg) * 100
+            
+            calcResultsEl.innerHTML = `<p> Sensitivity: ${(sensitivity * 100).toFixed(2) * 1} %</p>
+                                        <p> Specificity:  ${(specificity * 100).toFixed(2) * 1} %</p>
+                                        <p> Positive likelihood ratio: ${posLikeRatio.toFixed(4) * 1}  </p>
+                                        <p> Negative likelihood ratio: ${negLikeRatio.toFixed(4) * 1}  </p>
+                                        <p> Positive predictive value (PPV): ${(posPredVal * 100).toFixed(2) * 1}  %</p>
+                                        <p> Negative predictive value (NPV): ${(negPredVal * 100).toFixed(2) * 1}  %</p>
+                                        <p> Accuracy ${accuracy.toFixed(2) * 1} %</p>
+            `
+          } catch (error) {
+            alert("Something Went Wrong!!!");
+            resethandler()
+          }
+      }
+
+      function resetForm() {
+        truePosEl.value = ""
+        falsePosEl.value = ""
+        falseNegEl.value = ""
+        trueNegEl.value = ""
+        prevalEl.value = ""
+      }
+
+      function resetResult() {
+        calcResultsEl.innerHTML = "<p>Result will appear here...</p>";
+      } 
+
+      function resethandler() {
+        resetForm();
+        resetResult();
+      }
+
+      resetBtnEl.addEventListener("click", resethandler);
+      calcBtnEl.addEventListener("click", calculateResults);
+
+      [truePosEl, falsePosEl, falseNegEl, trueNegEl, prevalEl].forEach((el) => {
+        el.addEventListener("input", resetResult);
+      });  
+    </script>
+</body>
+</html>

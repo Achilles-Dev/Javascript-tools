@@ -1,15 +1,21 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Average Calculator</title>
+  <title>Percent Error Calculator</title>
 </head>
 <body>
-    <h1>Average Calculator</h1>
-    <p>Number Set:</p>
+    <h1>Percent Error Calculator</h1>
+    <p>Use this percent error calculator to easily estimate the percentage error of a given observation <br />
+      relative to a known or estimated true value.</p>
     <p>
-      <textarea id="numbersInput" rows="5"></textarea><br >
-      <span>Separate numbers using a comma (,)</span>
+      Observed value:
+      <input type="number" id="observedVal">
     </p>
+    <p>
+      True value: 
+        <input type="number" id="trueVal">
+    </p>
+
     <button id="calcBtn">Calculate</button>
     <button id="resetBtn">Reset</button>
     <hr>
@@ -20,38 +26,30 @@
 
     <script>
       // Get required elements from the HTML
-      const numbersInputEl = document.getElementById("numbersInput");
+      const observedValEl = document.getElementById("observedVal");
+      const trueValEl = document.getElementById("trueVal");
 
       const calcBtnEl = document.getElementById('calcBtn');
       const resetBtnEl = document.getElementById('resetBtn');
-      const calcResultsEl = document.getElementById('calcResults')
-
-      
-      // Function to extract numbers from the input text
-      function extractNumbers(inputText) {
-        const regex = /[+\-]?\d*\.?\d+(?:[Ee][+\-]?\d+)?/g;
-        const matches = inputText.match(regex);
-        const numbers = matches ? matches.map(Number) : [];
-        return numbers;
-      }
+      const calcResultsEl = document.getElementById('calcResults') 
 
       function calculateResults() {
           // Retrieve input values
-          const numbers = extractNumbers(numbersInputEl.value);
+          const observedVal = parseFloat(observedValEl.value);
+          const trueVal = parseFloat(trueValEl.value);
 
-          if (numbers.length < 1) {
+          if (isNaN(observedVal) || isNaN(trueVal)) {
             alert("Please Enter All Details.");
             return;
-          } else if (numbers.length < 2 ) {
-            alert("Please enter at least 2 numbers in the number set");
+          } else if (trueVal < 0  ) {
+            alert("The relative uncertainty cannot be negative.");
               return;
           }
 
-          try {   
-            const numsSum =  numbers.reduce((a, b) => a + b, 0)  
-            const results = numsSum / numbers.length
+          try {
+            const results = ((observedVal -trueVal) / trueVal) * 100
             
-            calcResultsEl.innerHTML = `<p> Average:: ${results.toFixed(2) * 1}</p>`
+            calcResultsEl.innerHTML = `<p> Percent error: ${results.toFixed(2) * 1}%</p>`
           } catch (error) {
             alert("Something Went Wrong!!!");
             resethandler()
@@ -59,7 +57,8 @@
       }
 
       function resetForm() {
-        numbersInputEl.value = ""
+        observedValEl.value = ""
+        trueValEl.value = ""
       }
 
       function resetResult() {
@@ -74,10 +73,9 @@
       resetBtnEl.addEventListener("click", resethandler);
       calcBtnEl.addEventListener("click", calculateResults);
 
-      [numbersInputEl].forEach((el) => {
+      [observedValEl, trueValEl].forEach((el) => {
         el.addEventListener("input", resetResult);
-      });
-
+      });  
     </script>
 </body>
 </html>

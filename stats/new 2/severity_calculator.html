@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Severity Calculator</title>
+</head>
+<body>
+    <h1>Severity Calculator</h1>
+    <p>Use this severity calculator to easily calculate the severity criterion (SEV). Use it to determine <br />
+       what inferences about the difference between the means of proportions or continuous metrics are warranted <br />
+      (passed a sever test) given some data</p>
+    <p>
+      Severity for differences:
+      <select id="sevDiffSelect">
+        <option value="btnProps" selected>between proportions</option>
+        <option value="btnMeans">between means</option>
+      </select>
+    </p>
+    <p>
+      Statistic to use:
+      <select id="statsSelect">
+        <option value="single" selected>Z-test</option>
+        <option value="difference">T-test</option>
+      </select>
+    </p>  
+    <p>
+      Alpha (α =)
+      <input type="number" id="alphaNum">
+    </p>
+    <div id="propsInputs">
+      <p>
+        Group A samples:
+        <input type="number" id="grpASamp">
+      </p>
+      <p>
+        Group B samples:
+        <input type="number" id="grpBSamp">
+      </p>
+      <p>
+        Input outcome as:
+        <select id="outcomeSelect">
+          <option value="props" selected>Proportions e.g. 0.05</option>
+          <option value="ratePercent">Rate as percentage e.g. 5%</option>
+          <option value="numEvents">Number of events e.g. 10</option>
+        </select>
+      </p>
+      <p>
+        Group A <span name="groupName">prop</span>:
+        <input type="number" id="propGrpA">
+      </p>
+      <p>
+        Group B <span name="groupName">prop</span>.:
+        <input type="number" id="propGrpB">
+      </p>
+    </div>
+    <div id="meanInputs" style="display: none;">
+      <p>
+        Input:
+        <select id="inputSelect">
+          <option value="rawData" selected>raw data</option>
+          <option value="summData">summary data</option>
+        </select>
+      </p>  
+      <div id="rawDataInputs">
+        <p>Data for group A:</p>
+        <p>
+          <textarea id="grpADataInput" 
+          placeholder="1
+2
+3
+4 or 1 2 3 4 or 1,2,3,4
+Copy/paste from spreadsheet works fine." rows="5"></textarea>
+        </p>
+        <p>Data for group B:</p>
+        <p>
+          <textarea id="grpBDataInput" 
+          placeholder="1
+2
+3
+4 or 1 2 3 4 or 1,2,3,4
+Copy/paste from spreadsheet works fine." rows="5"></textarea>
+        </p>
+      </div>
+      <div id="summDataInputs" style="display: none;">
+        <p>
+          Group A samples:
+          <input type="number" id="grpASamp2">
+        </p>
+        <p>
+          Group B samples:
+          <input type="number" id="grpBSamp2">
+        </p>
+        <p>
+          Group A mean:
+          <input type="number" id="grpAMean">
+        </p>
+        <p>
+          Group B mean:
+          <input type="number" id="grpBMean">
+        </p>
+        <p>
+          Group A SD (σ):
+          <input type="number" id="grpASD">
+        </p>
+        <p>
+          Group B SD (σ):
+          <input type="number" id="grpBSD">
+        </p>
+      </div>
+    </div>
+    <p>
+      Inference for (μ<sub>1</sub>=):
+      <input type="number" id="inferNum">
+    </p>
+    <button id="calcBtn">Calculate</button>
+    <button id="resetBtn">Reset</button>
+    <hr>
+    <div>
+      <h3>Result:</h3>
+      <h3 id="calcResults">Result will appear here...</h3>
+    </div>
+
+    <script>
+      // Get required elements from the HTML
+      const sevDiffSelectEl = document.getElementById("sevDiffSelect");
+      const statsSelectEl = document.getElementById("statsSelect");
+      const alphaNumEl = document.getElementById("alphaNum");
+      const grpASampEl = document.getElementById("grpASamp");
+      const grpBSampEl = document.getElementById("grpBSamp");
+      const outcomeSelectEl = document.getElementById("outcomeSelect");
+      const groupNameEl = document.getElementsByName("groupName");
+      const propGrpAEl = document.getElementById("propGrpA");
+      const propGrpBEl = document.getElementById("propGrpB");
+      const propsInputsEl = document.getElementById("propsInputs");
+      const meanInputsEl = document.getElementById("meanInputs");
+      const inferNumEl = document.getElementById("inferNum");
+      const inputSelectEl = document.getElementById("inputSelect");
+      const rawDataInputsEl = document.getElementById("rawDataInputs");
+      const summDataInputsEl = document.getElementById("summDataInputs");
+      const grpADataInputEl = document.getElementById("grpADataInput");
+      const grpBDataInputEl = document.getElementById("grpBDataInput");
+      const grpASamp2El = document.getElementById("grpASamp2");
+      const grpBSamp2El = document.getElementById("grpBSamp2");
+      const grpAMeanEl = document.getElementById("grpAMean");
+      const grpBMeanEl = document.getElementById("grpBMean");
+      const grpASDEl = document.getElementById("grpASD");
+      const grpBSDEl = document.getElementById("grpBSD");
+
+      const calcBtnEl = document.getElementById('calcBtn');
+      const resetBtnEl = document.getElementById('resetBtn');
+      const calcResultsEl = document.getElementById('calcResults')
+
+      function sevDiffSelectChange(e) {
+        const value = e.target.value
+        propsInputsEl.style.display = value == "btnMeans" ? 'none' : 'block'
+        meanInputsEl.style.display = value == "btnProps" ? 'none' : 'block'
+      }
+
+      function outcomeSelectChange(e) {
+        const value = e.target.value
+        groupNameEl.forEach((name) => {
+          name.innerHTML = value == "numEvents" ? "events" : value == "ratePercent" ? "rate" : "prop"
+        })
+      }
+
+      function inputSelectChange(e) {
+        const value = e.target.value
+        rawDataInputsEl.style.display = value == "rawData" ? 'block' : 'none'
+        summDataInputsEl.style.display = value == "summData" ? 'block' : 'none'
+      }
+
+      // Function to extract numbers from the input text
+      function extractNumbers(inputText) {
+        const regex = /[+\-]?\d*\.?\d+(?:[Ee][+\-]?\d+)?/g;
+        const matches = inputText.match(regex);
+        const numbers = matches ? matches.map(Number) : [];
+        return numbers;
+      }
+
+      function calculateResults() {
+          // Retrieve input values
+          const alphaNum = parseFloat(alphaNumEl.value);
+          const grpASamp = parseFloat(grpASampEl.value);
+          const grpBSamp = parseFloat(grpBSampEl.value);
+          const propGrpA = parseFloat(propGrpAEl.value);
+          const propGrpB = parseFloat(propGrpBEl.value);
+          const inferNum = parseFloat(inferNumEl.value);
+          const grpADataInput = extractNumbers(grpADataInputEl.value);
+          const grpBDataInput = extractNumbers(grpBDataInputEl.value);
+          const grpASamp2 = parseFloat(grpASamp2El.value);
+          const grpBSamp2 = parseFloat(grpBSamp2El.value);
+          const grpAMean = parseFloat(grpAMeanEl.value);
+          const grpBMean = parseFloat(grpBMeanEl.value);
+          const grpASD = parseFloat(grpASDEl.value);
+          const grpBSD = parseFloat(grpBSDEl.value);
+
+          if (isNaN(alphaNum) || isNaN(inferNum)) {
+            alert("Please Enter All Details.");
+            return;
+          } else if (sevDiffSelectEl.value == "btnProps") {
+            if (isNaN(grpASamp) || isNaN(grpBSamp) || isNaN(propGrpA) || isNaN(propGrpB)) {
+              alert("Please Enter All Details.");
+              return;
+            }
+          } else if (sevDiffSelectEl.value == "btnMeans") {
+            if (inputSelectEl.value == "summData") {
+              if (isNaN(grpASamp2) || isNaN(grpBSamp2) || isNaN(grpAMean) || isNaN(grpBMean) || isNaN(grpASD) || isNaN(grpBSD)) {
+                alert("Please Enter All Details.");
+                return;
+              } 
+            } else {
+              if (grpADataInput.length < 1 || grpBDataInput.length < 1) {
+                alert("Please Enter All Details.");
+                return;
+            }
+            }
+          }
+
+          try {
+            const results = 0
+            
+            calcResultsEl.innerHTML = `<p> SEV(μ > 2)	</p>
+                                      <p> SEV(μ > 2) Percent %</p>
+                                      <p> P-value</p>
+                                      <p> Z-score	</p>
+                                      <p> Significance level %</p>
+                                      <p> Difference (B-A) </p>
+            `
+          } catch (error) {
+            alert("Something Went Wrong!!!");
+            resethandler()
+          }
+      }
+
+      function resetForm() {
+        statsSelectEl.selectedIndex = 0
+        outcomeSelectEl.selectedIndex = 0
+        inputSelectEl.selectedIndex = 0
+        sevDiffSelectEl.selectedIndex = 0
+        alphaNumEl.value = ""
+        grpASampEl.value = ""
+        grpBSampEl.value = ""
+        propGrpAEl.value = ""
+        propGrpBEl.value = ""
+        inferNumEl.value = ""
+        groupNameEl.forEach((name) => {
+          name.innerHTML = outcomeSelectEl.value == "numEvents" ? "events" : outcomeSelectEl.value == "ratePercent" ? "rate" : "prop"
+        })       
+      }
+
+      function resetResult() {
+        calcResultsEl.innerHTML = "<p>Result will appear here...</p>";
+      } 
+
+      function resethandler() {
+        resetForm();
+        resetResult();
+      }
+
+      resetBtnEl.addEventListener("click", resethandler);
+      calcBtnEl.addEventListener("click", calculateResults);
+
+      sevDiffSelectEl.addEventListener("change", sevDiffSelectChange);
+      outcomeSelectEl.addEventListener("change", outcomeSelectChange);
+      inputSelectEl.addEventListener("change", inputSelectChange);
+
+
+      [alphaNumEl, grpASampEl, grpBSampEl, propGrpAEl, propGrpBEl, inferNumEl].forEach((el) => {
+        el.addEventListener("input", resetResult);
+      });
+    </script>
+</body>
+</html>

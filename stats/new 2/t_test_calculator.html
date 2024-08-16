@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>T-Test Calculator</title>
+</head>
+<body>
+    <h1>T-Test Calculator</h1>
+    <p>Compare the means of two samples using a single-sample or two-sample t-test below.</p>
+    <p>
+      Sample Type:
+      <select id="sampleSelect">
+        <option value="singleSamp" selected>Single Sample</option>
+        <option value="twoSamp">Two Sample (Unpaired)</option>
+      </select>
+    </p>
+    <p id="popMeanInput">
+      Population Mean:
+      <input type="number" id="popMean">
+    </p>
+    <h4>Sample <span id="sampNum"></span>:</h4>
+    <p>
+      Mean:
+      <input type="number" id="meanSamp1">
+    </p>
+    <p>
+      Standard Deviation:
+      <input type="number" id="sampleSD1">
+    </p>
+    <p>
+      Sample Size:
+      <input type="number" id="sampSize1">
+    </p>
+    <div id="SampleTwoInputs" style="display: none;">
+      <h4>Sample Two:</h4>
+      <p>
+        Mean:
+        <input type="number" id="meanSamp2">
+      </p>
+      <p>
+        Standard Deviation:
+        <input type="number" id="sampleSD2">
+      </p>
+      <p>
+        Sample Size:
+        <input type="number" id="sampSize2">
+      </p>
+    </div>
+
+    <button id="calcBtn">Calculate</button>
+    <button id="resetBtn">Reset</button>
+    <hr>
+    <div>
+      <h3>Result:</h3>
+      <h3 id="calcResults">Result will appear here...</h3>
+    </div>
+
+    <script>
+      // Get required elements from the HTML
+      const sampleSelectEl = document.getElementById("sampleSelect");
+      const popMeanInputEl = document.getElementById("popMeanInput");
+      const popMeanEl = document.getElementById("popMean");
+      const sampleOneInputsEl = document.getElementById("sampleOneInputs");
+      const sampNumEl = document.getElementById("sampNum");
+      const meanSamp1El = document.getElementById("meanSamp1");
+      const sampleSD1El = document.getElementById("sampleSD1");
+      const sampSize1El = document.getElementById("sampSize1");
+      const SampleTwoInputsEl = document.getElementById("SampleTwoInputs");
+      const meanSamp2El = document.getElementById("meanSamp2");
+      const sampleSD2El = document.getElementById("sampleSD2");
+      const sampSize2El = document.getElementById("sampSize2");
+
+      const calcBtnEl = document.getElementById('calcBtn');
+      const resetBtnEl = document.getElementById('resetBtn');
+      const calcResultsEl = document.getElementById('calcResults') 
+
+      function handlesampleSelectChange(e) {
+        const value = e.target.value
+        popMeanInputEl.style.display = value == 'singleSamp' ? 'block' : 'none'
+        sampNumEl.innerHTML = value == 'singleSamp' ? '' : 'One'
+        SampleTwoInputsEl.style.display = value == 'singleSamp' ? 'none' : 'block'
+        if (value == "twoSamp") {
+          [meanSamp2El, sampleSD2El, sampSize2El].forEach((el) => {
+            el.addEventListener("input", resetResult);
+          });  
+        }
+      }
+
+      function calculateResults() {
+          // Retrieve input values
+          const popMean = parseFloat(popMeanEl.value);
+          const meanSamp1 = parseFloat(meanSamp1El.value);
+          const sampleSD1 = parseFloat(sampleSD1El.value);
+          const sampSize1 = parseFloat(sampSize1El.value);
+          const meanSamp2 = parseFloat(meanSamp2El.value);
+          const sampleSD2 = parseFloat(sampleSD2El.value);
+          const sampSize2 = parseFloat(sampSize2El.value);
+
+          if (isNaN(meanSamp1) || isNaN(sampleSD1) || isNaN(sampSize1) || (sampleSelectEl.value == 'singleSamp' && isNaN(popMean)) ) {
+            alert("Please Enter All Details.");
+            return;
+          } else if (sampleSelectEl.value == 'twoSamp') {
+            if (isNaN(meanSamp2) || isNaN(sampleSD2) || isNaN(sampSize2)) {
+              alert("Please Enter All Details.");
+              return;
+            }
+          }
+
+          try {
+            let testStat = 0
+            let degOfFreed = 0
+            let pooledSD = 0
+            let strdErr = 0
+            if (sampleSelectEl.value == "twoSamp") {
+              degOfFreed = sampSize1 + sampSize2 - 2
+              pooledSD = Math.sqrt(((sampSize1 - 1) * (sampleSD1 ** 2) + (sampSize2 - 1) * (sampleSD2 ** 2)) / (sampSize1 + sampSize2 - 2))
+              testStat = (meanSamp1 - meanSamp2) / (pooledSD * Math.sqrt((1 / sampSize1) + (1 / sampSize2)))
+              strdErr = Math.sqrt(((sampleSD1 ** 2) / sampSize1) + ((sampleSD2 ** 2) / sampSize2))
+            } else {
+              degOfFreed = sampSize1 - 1
+              testStat = (meanSamp1 - popMean) / (sampleSD1 / Math.sqrt(sampSize1))
+            }
+
+            calcResultsEl.innerHTML = `<p> Test Statistic (t):	${testStat.toFixed(4) * 1}</p>
+                                      <p> Degrees of Freedom (df): ${degOfFreed}</p>
+                                      ${sampleSelectEl.value == "twoSamp" ?
+                                      `<p> Pooled Standard Deviation:	${pooledSD.toFixed(4) * 1}</p>
+                                      <p> Difference of Means: ${meanSamp1 - meanSamp2}	</p>
+                                      <p> Standard Error of Difference: ${strdErr.toFixed(4) * 1} </p>`
+                                      : ""}
+            `
+          } catch (error) {
+            alert("Something Went Wrong!!!");
+            resethandler()
+          }
+      }
+
+      function resetForm() {
+        sampleSelectEl.selectedIndex = "0"
+        popMeanEl.value = ""
+        sampNumEl.innerHTML = ""
+        meanSamp1El.value = ""
+        sampleSD1El.value = ""
+        sampSize1El.value = ""
+        meanSamp2El.value = ""
+        sampleSD2El.value = ""
+        sampSize2El.value = ""
+      }
+
+      function resetResult() {
+        calcResultsEl.innerHTML = "<p>Result will appear here...</p>";
+      } 
+
+      function resethandler() {
+        resetForm();
+        resetResult();
+      }
+
+      [popMeanEl, meanSamp1El, sampleSD1El, sampSize1El].forEach((el) => {
+        el.addEventListener("input", resetResult);
+      }); 
+
+      resetBtnEl.addEventListener("click", resethandler);
+      calcBtnEl.addEventListener("click", calculateResults);
+      sampleSelectEl.addEventListener("change", handlesampleSelectChange)
+ 
+      
+    </script>
+</body>
+</html>

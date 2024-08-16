@@ -219,13 +219,16 @@
         }
          
       } else if (a1 && (a1 != a2)) {
-        let divisor = a1 / a2
-        if ((a1 < 0 && divisor < 0) || (a1 > 0 && divisor > 0)) {
-          refb2 = (divisor * b2) - b1;
-          refc2 = (divisor * c2) - c1;
+        let divisor = a2 != 0 ? (a1 / a2) : 0
+        if ((((a1 < 0 || a2 < 0) && divisor < 0) || ((a1 > 0 || a2 > 0) && divisor > 0))) {
+          refb2 = ((divisor * b2) - b1) / divisor;
+          refc2 = ((divisor * c2) - c1) / divisor; 
+        } else if (divisor == 0) {
+          refb2 = refb2;
+          refc2 = refc2;
         } else {
-          refb2 = (divisor * b2) + b1;
-          refc2 = (divisor * c2) + c1
+          refb2 = ((divisor * b2) + b1) / divisor;
+          refc2 = ((divisor * c2) + c1) / divisor;
         }
       }
       if (eqnNoSelected == 'two') {
@@ -245,24 +248,18 @@
         let refd3 = d3;
         if (a1 && (Math.abs(a1) == Math.abs(a2))) {
           if (a1 == a2) {
-            refb2 -= b1
-            refc2 -= c1
             refd2 -= d1
           } else {
-            refb2 += b1
-            refc2 += c1
             refd2 += d1
           }        
         } else if (a1 && (a1 != a2)) {
-          let divisor = a1 / a2
-          if ((a1 < 0 && divisor < 0) || (a1 > 0 && divisor > 0)) {
-            refb2 = (divisor * b2) - b1;
-            refc2 = (divisor * c2) - c1;
-            refd2 = (divisor * d2) - d1;
-          } else {
-            refb2 = (divisor * b2) + b1;
-            refc2 = (divisor * c2) + c1
-            refd2 = (divisor * d2) + d1;
+          let divisor = a2 != 0 ? (a1 / a2) : 0
+          if (((a1 < 0 || a2 < 0) && divisor < 0) || ((a1 > 0 || a2 > 0) && divisor > 0)) {
+            refd2 = ((divisor * d2) - d1) / divisor;
+          } else if (divisor == 0) {
+            refd2 = refd2
+          } else { 
+            refd2 = ((divisor * d2) + d1) / divisor;
           }
         }
         if (a1 && (Math.abs(a1) == Math.abs(a3))) {
@@ -276,15 +273,19 @@
             refd3 += d1
           }        
         } else if (a1 && (a1 != a3)) {
-          let divisor = a1 / a3
-          if ((a1 < 0 && divisor < 0) || (a1 > 0 && divisor > 0)) {
-            refb3 = (divisor * b3) - b1;
-            refc3 = (divisor * c3) - c1;
-            refd3 = (divisor * d3) - d1;
+          let divisor = a3 != 0 ? (a1 / a3) : 0
+          if (((a1 < 0 || a3 < 0) && divisor < 0) || ((a1 > 0 || a3 > 0) && divisor > 0)) {
+            refb3 = ((divisor * b3) - b1) / divisor;
+            refc3 = ((divisor * c3) - c1) / divisor;
+            refd3 = ((divisor * d3) - d1) / divisor;
+          } else if (divisor == 0) {
+            refb3 = refb3
+            refc3 = refc3 
+            refd3 = refd3
           } else {
-            refb3 = (divisor * b3) + b1;
-            refc3 = (divisor * c3) + c1
-            refd3 = (divisor * d3) + d1
+            refb3 = ((divisor * b3) + b1) / divisor;
+            refc3 = ((divisor * c3) + c1) / divisor;
+            refd3 = ((divisor * d3) + d1) / divisor;
           }
         }
 
@@ -298,14 +299,19 @@
           }
          
         } else if (refb2 && (refb2 != refb3)) {
-          let divisor = refb3 / refb2
-          if ((refb2 < 0 && divisor < 0) || (refb2 > 0 && divisor > 0)) {
-            refc3 = (divisor * refc3) - refc2;
-            refd3 = (divisor * refd3) - refd2;
+          let divisor = refb2 != 0 ? refb2 / refb3 : 0
+          console.log(divisor, refb2, refc2, refb3, refd2, refc3, refd3)
+          if (((refb2 < 0 || refb3 < 0) && divisor < 0) || ((refb2 > 0 || refb3 > 0) && divisor > 0)) {
+            refc3 = ((divisor * refc3) - refc2) / divisor;
+            refd3 = ((divisor * refd3) - refd2) / divisor;
+          } else if (divisor == 0) {
+            refc3 = refc3 
+            refd3 = refd3
           } else {
-            refc3 = (divisor * refc3) + refc2;
-            refd3 = (divisor * refd3) + refd2;
+            refc3 = ((divisor * refc3) + refc2) / divisor;
+            refd3 = ((divisor * refd3) + refd2) / divisor;
           }
+        
         }
         results = {
           b2: refb2.toFixed(3) * 1,

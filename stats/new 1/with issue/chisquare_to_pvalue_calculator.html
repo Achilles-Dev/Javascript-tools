@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Chi-Square to P-value Calculator</title>
+</head>
+<body>
+    <h1>Chi-Square to P-value Calculator</h1>
+    <h4>Use this X<sup>2</sup> to P calculator to easily convert Chi scores to P-values and see if a result is <br>
+       statistically significant. Information on what a p-value is, how to interpret it, and the difference <br>
+        between one-sided and two-sided tests of significance.
+    </h4>
+    <p>
+      Chi Square statistic(X<sup>2</sup>=):
+      <input type="number" id="x2Value">
+    </p>
+    <p>
+      Degrees of freedom:
+      <input type="number" value="1" min="1" id="degOfFreedom">
+    </p>
+
+    <button id="calcBtn">Calculate</button>
+    <button id="resetBtn">Reset</button>
+    <hr>
+    <div>
+      <h3>Result:</h3>
+      <h3 id="calcResults">Result will appear here...</h3>
+    </div>
+
+    <script>
+      // Get required elements from the HTML
+      const x2ValueEl = document.getElementById("x2Value");
+      const degOfFreedomEl = document.getElementById("degOfFreedom");
+
+      const calcBtnEl = document.getElementById('calcBtn');
+      const resetBtnEl = document.getElementById('resetBtn');
+      const calcResultsEl = document.getElementById('calcResults') 
+
+      function calculateResults() {
+          // Retrieve input values
+          const x2Value = parseFloat(x2ValueEl.value);
+          const degOfFreedom = parseFloat(degOfFreedomEl.value);
+
+          if (isNaN(x2Value) || x2Value < 0 || isNaN(degOfFreedom) || degOfFreedom < 1) {
+            alert("Please Enter All Details.");
+            return;
+          }
+
+          try {
+            const results = 0
+            
+            calcResultsEl.innerHTML = `<p> P-value: ${results.toFixed(10) * 1}</p>`
+          } catch (error) {
+            alert("Something Went Wrong!!!");
+            resethandler()
+          }
+      }
+
+      function resetForm() {
+        x2ValueEl.value = ""
+        degOfFreedomEl.selectedIndex = "0"
+      }
+
+      function resetResult() {
+        calcResultsEl.innerHTML = "<p>Result will appear here...</p>";
+      } 
+
+      function resethandler() {
+        resetForm();
+        resetResult();
+      }
+
+      resetBtnEl.addEventListener("click", resethandler);
+      calcBtnEl.addEventListener("click", calculateResults);
+
+      [x2ValueEl, degOfFreedomEl].forEach((el) => {
+        el.addEventListener("input", resetResult);
+      });  
+    </script>
+</body>
+</html>

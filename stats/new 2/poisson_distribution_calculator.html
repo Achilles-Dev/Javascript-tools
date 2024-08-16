@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Poisson Distribution Calculator</title>
+</head>
+<body>
+    <h1>Poisson Distribution Calculator</h1>
+    <p>Enter the average rate of success and the number of occurrences in the calculator below to <br />
+      find the probabilities of an event occurring using the Poisson distribution.</p>
+    <p>
+      Number of Successes (x):
+      <input type="number" id="successNum" min="0">
+    </p>
+    <p>
+      Average Rate of Success (λ):
+      <input type="number" id="avgRateSuccess" min="0">
+    </p>
+    
+    <button id="calcBtn">Calculate</button>
+    <button id="resetBtn">Reset</button>
+    <hr>
+    <div>
+      <h3>Result:</h3>
+      <h3 id="calcResults">Result will appear here...</h3>
+    </div>
+
+    <script>
+      // Get required elements from the HTML
+      const successNumEl = document.getElementById("successNum");
+      const avgRateSuccessEl = document.getElementById("avgRateSuccess");
+      const repeatUnitEl = document.getElementById("repeatUnit")
+
+      const calcBtnEl = document.getElementById('calcBtn');
+      const resetBtnEl = document.getElementById('resetBtn');
+      const calcResultsEl = document.getElementById('calcResults')
+      
+      function calcFactorialOfNum(num) {
+        if (num == 0) {
+          return 1;
+        } else {
+          return num * calcFactorialOfNum(num - 1);
+        }
+      }
+
+      function calculateResults() {
+          // Retrieve input values
+          const successNum = parseFloat(successNumEl.value);
+          const avgRateSuccess = parseFloat(avgRateSuccessEl.value);
+
+          if (isNaN(successNum) || successNum < 0 || isNaN(avgRateSuccess) || avgRateSuccess < 0) {
+            alert("Please Enter All Details.");
+            return;
+          }
+
+          try {
+            const xFact = calcFactorialOfNum(successNum)
+            const results = ((avgRateSuccess ** successNum) * (Math.E ** (-1 * avgRateSuccess))) / xFact
+            let lessEqualResults = 0
+            let lessEqualNum = successNum
+            while (lessEqualNum >= 0) {
+              const numFact = calcFactorialOfNum(lessEqualNum)
+              lessEqualResults += ((avgRateSuccess ** lessEqualNum) * (Math.E ** (-1 * avgRateSuccess))) / numFact
+              lessEqualNum -= 1
+            }
+            let lessResults = 0
+            let lessNum = (successNum - 1) < 0 ? 0 : successNum - 1
+            while (lessNum >= 0) {
+              const numFact = calcFactorialOfNum(lessNum)
+              lessResults += ((avgRateSuccess ** lessNum) * (Math.E ** (-1 * avgRateSuccess))) / numFact
+              lessNum -= 1
+            }
+          
+            calcResultsEl.innerHTML = `<p> Probabilities:</p>
+                                      <p>P(X = x):	${results.toFixed(6) * 1} (${(results * 100).toFixed(6) * 1}%)</p>   
+                                      <p>P(X < x):	${lessResults.toFixed(6) * 1} (${(lessResults * 100).toFixed(4) * 1}%)</p>  
+                                      <p>P(X ≤ x): ${lessEqualResults.toFixed(6) * 1} (${(lessEqualResults * 100).toFixed(4) * 1}%)</p>  
+                                      <p>P(X > x):	${(1 - lessEqualResults).toFixed(6) * 1} (${((1 - lessEqualResults) * 100).toFixed(4) * 1}%)</p>
+                                      <p>P(X ≥ x): ${(1 - lessResults).toFixed(6) * 1} (${((1- lessResults) * 100).toFixed(4) * 1}%)</p>                 
+            `
+          } catch (error) {
+            alert("Something Went Wrong!!!");
+            resethandler()
+          }
+      }
+
+      function resetForm() {
+        successNumEl.value = ""
+        avgRateSuccessEl.value = ""
+      }
+
+      function resetResult() {
+        calcResultsEl.innerHTML = "<p>Result will appear here...</p>";
+      } 
+
+      function resethandler() {
+        resetForm();
+        resetResult();
+      }
+
+      resetBtnEl.addEventListener("click", resethandler);
+      calcBtnEl.addEventListener("click", calculateResults);
+
+      [successNumEl, avgRateSuccessEl].forEach((el) => {
+        el.addEventListener("input", resetResult);
+      });  
+    </script>
+</body>
+</html>

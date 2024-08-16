@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Sample Size Calculator</title>
+</head>
+<body>
+    <h1>Sample Size Calculator</h1>
+    <p>Use this advanced sample size calculator to calculate the sample size required for a one-sample statistic, or for <br />
+      differences between two proportions or means (two independent samples). More than two groups supported for binomial data.<br />
+      Calculate power given sample size, alpha, and the minimum detectable effect (MDE, minimum effect of interest).</p>
+    <p>
+      Calculate:
+      <select id="typeSelect">
+        <option value="sample" selected>Sample Size</option>
+        <option value="power">Power</option>
+      </select>
+    </p>
+    <h4>Experimental design</h4>
+    <div>
+      <p>
+        Experiment for:
+        <select id="typeSelect">
+          <option value="single" selected>a single sample</option>
+          <option value="difference">difference between samples</option>
+        </select>
+      </p>
+      <p>
+        The data is :
+        <select id="typeSelect">
+          <option value="means" selected>means (continuous)</option>
+          <option value="binomial">proportions (binomial)</option>
+        </select>
+      </p>
+      <p>
+        Alternative H<sub>1</sub> is for:
+        <select id="typeSelect">
+          <option value="super" selected>Superiority</option>
+          <option value="nonInf">Non-inferiority</option>
+          <option value="equiv">Equivalence</option>
+        </select>
+      </p>
+      <p>
+        Inference about:
+        <select id="typeSelect">
+          <option value="absDiff" selected>absolute difference</option>
+          <option value="relDiff">relative difference</option>
+        </select>
+      </p>
+      <p>
+        Type I error rate (α):
+        <select id="typeSelect">
+          <option value="fifty">50% (0.5)</option>
+          <option value="twenty">20% (0.2)</option>
+          <option value="ten">10% (0.1)</option>
+          <option value="five" selected>5% (0.05)</option>
+          <option value="twoP5">2.5% (0.025)</option>
+          <option value="two">2% (0.02)</option>
+          <option value="one">1% (0.01)</option>
+          <option value="zeroP5">0.5% (0.005)</option>
+          <option value="zeroP1">0.1% (0.001)</option>
+        </select>
+      </p>
+      <p id="powerInput">
+        Power (1 - β):
+        <select id="typeSelect">
+          <option value="fifty">50% (0.50)</option>
+          <option value="eighty" selected>80% (0.80)</option>
+          <option value="eighty5">85% (0.85)</option>
+          <option value="ninety">90% (0.90)</option>
+          <option value="ninety5">95% (0.95)</option>
+          <option value="ninety7P5">97.5% (0.975)</option>
+          <option value="ninety8">1% (0.98)</option>
+          <option value="ninety9">99% (0.99)</option>
+          <option value="zeroP1">0.1% (0.001)</option>
+        </select>
+      </p>
+    </div>
+    <h4>Data parameters</h4>
+    <div>
+      <p>
+        Amount
+        <input type="number" placeholder="GHS" id="amount">
+      </p>
+      <h4>Odds</h4>
+      <p>
+        Odds of winning
+        <input type="number" id="winOdds" disabled>
+      </p>
+      <p>
+        Odds of winning (%)
+        <input type="number" id="winOddsPercent" disabled>%
+      </p>
+    </div>
+    <button id="calcBtn">Calculate</button>
+    <button id="resetBtn">Reset</button>
+    <hr>
+    <div>
+      <h3>Result:</h3>
+      <h3 id="calcResults">Result will appear here...</h3>
+    </div>
+
+    <script>
+      // Get required elements from the HTML
+      const typeSelectEL = document.getElementById("typeSelect");
+      const betTypeSelectEl = document.getElementById("betTypeSelect");
+      const amountEl = document.getElementById("amount");
+      const winOddsEl = document.getElementById("winOdds");
+      const winOddsPercentEl = document.getElementById("winOddsPercent");
+
+      const calcBtnEl = document.getElementById('calcBtn');
+      const resetBtnEl = document.getElementById('resetBtn');
+      const calcResultsEl = document.getElementById('calcResults') 
+
+      function calculateResults() {
+          // Retrieve input values
+          const amountEl = parseFloat(probAEl.value);
+          const winOddsEl = parseFloat(probBEl.value);
+
+          if (isNaN(amountEl) || amountEl <= 0) {
+            alert("Please Enter All Details.");
+            return;
+          }
+
+          try {
+            const results = 0
+            
+            calcResultsEl.innerHTML = `<p> Percent error: ${results.toFixed(2) * 1}%</p>`
+          } catch (error) {
+            alert("Something Went Wrong!!!");
+            resethandler()
+          }
+      }
+
+      function resetForm() {
+        typeSelectEL.selectedIndex = "1"
+        betTypeSelectEl.selectedIndex = "1"
+        amountEl.value = ""
+        
+      }
+
+      function resetResult() {
+        calcResultsEl.innerHTML = "<p>Result will appear here...</p>";
+      } 
+
+      function resethandler() {
+        resetForm();
+        resetResult();
+      }
+
+      resetBtnEl.addEventListener("click", resethandler);
+      calcBtnEl.addEventListener("click", calculateResults);
+
+      amountEl.addEventListener("input", resetResult);
+    </script>
+</body>
+</html>

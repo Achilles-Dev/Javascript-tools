@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Hazard Ratio Calculator</title>
+</head>
+<body>
+    <h1>Hazard Ratio Calculator</h1>
+    <h4>Use this hazard ratio calculator to easily calculate the relative hazard, confidence intervals <br>
+       and p-values for the hazard ratio (HR) between an exposed/treatment and control group. One and <br>
+       two-sided confidence intervals are reported, as well as Z-scores based on the log-rank test.
+    </h4>
+    <p>Raw data (Enter 5 columns of numbers separated by commas, spaces or tabs <br>
+      <strong>column 1:</strong> time, <br><strong>column 2:</strong> events in treatment group, <br>
+      <strong>column 3:</strong>: number at risk in treatment group, <br>
+      <strong>column 4:</strong>: events in control group,<br> <strong>column 5:</strong> number at risk in control group):
+    </p>
+    <p>
+      <textarea id="numbersInput" rows="6" cols="30" placeholder="Example data:
+      1 2 50 4 51
+      2 0 48 2 47
+      3 1 47 1 45
+      (copy/paste from spreadsheet works fine)"></textarea>
+    </p>
+    <p>
+      Confidence level  :
+      <input type="number" min="1" value="95" id="confInterval">%
+    </p>
+    <button id="calcBtn">Calculate</button>
+    <button id="resetBtn">Reset</button>
+    <hr>
+    <div>
+      <h3>Result:</h3>
+      <h3 id="calcResults">Result will appear here...</h3>
+    </div>
+
+    <script>
+      // Get required elements from the HTML
+      const numbersInputEl = document.getElementById("numbersInput");
+      const confIntervalEl = document.getElementById("confInterval");
+
+      const calcBtnEl = document.getElementById('calcBtn');
+      const resetBtnEl = document.getElementById('resetBtn');
+      const calcResultsEl = document.getElementById('calcResults')
+
+      
+      // Function to extract numbers from the input text
+      function extractNumbers(inputText) {
+        const regex = /[+\-]?\d*\.?\d+(?:[Ee][+\-]?\d+)?/g;
+        const matches = inputText.match(regex);
+        const numbers = matches ? matches.map(Number) : [];
+        return numbers;
+      }
+
+      function calculateResults() {
+          // Retrieve input values
+          const numbers = numbersInputEl.value;
+          let numbersArray = numbers.split('\n');
+          numbersArray = numbersArray.filter((num) => num.length > 0)
+          const confInterval = parseFloat(confIntervalEl.value)
+          console.log(numbersArray)
+          if (numbersArray.length < 1 || isNaN(confInterval)) {
+            alert("Please Enter All Details.");
+            return;
+          } else if (numbersArray.length != 5 ) {
+            let status = false
+            let colNum = 0;
+            let rowNum = 0;
+            numbersArray.forEach((numStr, idx) => {
+              const row = extractNumbers(numStr)
+              if (row.length == 0) {
+                return;
+              } else if (row.length != 5) {
+                status = true;
+                colNum = row.length;
+                rowNum = idx + 1;
+              }
+            })
+            if (status == true) {
+              alert(`Exactly 5 columns required. ${colNum} columns at row ${rowNum}`);
+              return;
+            }
+          } else if (confInterval < 1 ) {
+            alert("Value must be greater or equal to 1");
+            return;
+          }
+
+          try {   
+            const results = 0;
+            
+            calcResultsEl.innerHTML = `<p> Hazard Ratio: ${results.toFixed(2) * 1}</p>
+                                        <p> ${confInterval}% Confidence Interval: ${results.toFixed(2) * 1}</p>
+                                        <p> ${confInterval}% Left-Sided Interval: ${results.toFixed(2) * 1}</p>
+                                        <p> ${confInterval}% Right-Sided Interval: ${results.toFixed(2) * 1}</p>
+                                        <p> P-value: ${results.toFixed(2) * 1}</p>
+                                        <p> X<sup>2</sup>: ${results.toFixed(2) * 1}</p>
+            `
+          } catch (error) {
+            alert("Something Went Wrong!!!");
+            resethandler()
+          }
+      }
+
+      function resetForm() {
+        numbersInputEl.value = ""
+        confIntervalEl.value = "95"
+      }
+
+      function resetResult() {
+        calcResultsEl.innerHTML = "<p>Result will appear here...</p>";
+      } 
+
+      function resethandler() {
+        resetForm();
+        resetResult();
+      }
+
+      resetBtnEl.addEventListener("click", resethandler);
+      calcBtnEl.addEventListener("click", calculateResults);
+
+      [numbersInputEl, confIntervalEl].forEach((el) => {
+        el.addEventListener("input", resetResult);
+      });
+
+    </script>
+</body>
+</html>

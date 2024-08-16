@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Relative Standard Deviation Calculator</title>
+</head>
+<body>
+    <h1>Relative Standard Deviation Calculator</h1>
+    <p>Enter a data set or the standard deviation and mean if known to calculate relative standard <br />
+      deviation using the calculator below.</p>
+    <p>
+      Find:
+      <select id="findUnit">
+        <option value="dataset" selected>Using Data Set</option>
+        <option value="sdMean">Using Standard Deviation and Mean</option>
+      </select>
+    </p>
+    <div id="datasetInput">
+      <p>Data Set:</p>
+      <p>
+        <textarea id="numbersInput" rows="5"></textarea><br >
+        <span>Separate numbers using a comma (,)</span>
+      </p>
+    </div>
+    <div id="sdMeanInputs" style="display: none;">
+      <p>
+        Standard Deviation:
+        <input type="number" id="sdVal">
+      </p>
+      <p>
+        Mean:
+        <input type="number" id="meanVal">
+      </p>
+    </div>
+    
+    <button id="calcBtn">Calculate</button>
+    <button id="resetBtn">Reset</button>
+    <hr>
+    <div>
+      <h3>Result:</h3>
+      <h3 id="calcResults">Result will appear here...</h3>
+    </div>
+
+    <script>
+      // Get required elements from the HTML
+      const findUnitEl = document.getElementById("findUnit")
+      const numbersInputEl = document.getElementById("numbersInput");
+      const datasetInputEl = document.getElementById("datasetInput");
+      const sdMeanInputsEl = document.getElementById("sdMeanInputs");
+      const sdValEl = document.getElementById("sdVal");
+      const meanValEl = document.getElementById("meanVal");
+
+      const calcBtnEl = document.getElementById('calcBtn');
+      const resetBtnEl = document.getElementById('resetBtn');
+      const calcResultsEl = document.getElementById('calcResults')
+
+      function calculationChange(e) {
+        const value = e.target.value
+        scoreNameEl.innerHTML = value == 'percentile' ? "Score:" : "Percentile:"
+      }
+
+      // Function to extract numbers from the input text
+      function extractNumbers(inputText) {
+        const regex = /[+\-]?\d*\.?\d+(?:[Ee][+\-]?\d+)?/g;
+        const matches = inputText.match(regex);
+        const numbers = matches ? matches.map(Number) : [];
+        return numbers;
+      }
+
+      function calculateResults() {
+          // Retrieve input values
+          const numbers = extractNumbers(numbersInputEl.value);
+          const sdVal = parseFloat(sdValEl.value);
+          const meanVal = parseFloat(meanValEl.value);
+          
+          if ((findUnitEl.value == 'dataset' && numbers.length < 1) || (findUnitEl.value == 'sdMean' && isNaN(sdVal)) || 
+              (findUnitEl.value == 'sdMean' && isNaN(meanVal))
+          ) {
+            alert("Please Enter All Details.");
+            return;
+          }
+
+          try {   
+            let results =  0;
+            if (findUnitEl.value == "sdMean") {
+              
+              calcResultsEl.innerHTML = `<p>Relative Standard Deviation: </p>`
+            } else {
+              
+              calcResultsEl.innerHTML = `<p> Relative Standard Deviation: </p>
+                                        <p>Standard Deviation: </p>
+                                        <p>Mean:	</p>
+              `
+            }            
+            
+          } catch (error) {
+            alert("Something Went Wrong!!!");
+            resethandler()
+          }
+      }
+
+      function resetForm() {
+        numbersInputEl.value = ""
+        sdValEl.value = ""
+        meanValEl.value = ""
+        findUnitEl.selectedIndex = "0"
+      }
+
+      function resetResult() {
+        calcResultsEl.innerHTML = "<p>Result will appear here...</p>";
+      } 
+
+      function resethandler() {
+        resetForm();
+        resetResult();
+      }
+
+      resetBtnEl.addEventListener("click", resethandler);
+      calcBtnEl.addEventListener("click", calculateResults);
+
+      findUnitEl.addEventListener("change", calculationChange);
+      [numbersInputEl, sdValEl, meanValEl].forEach((el) => {
+        el.addEventListener("input", resetResult);
+      });
+
+    </script>
+</body>
+</html>

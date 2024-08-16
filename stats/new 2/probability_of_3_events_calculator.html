@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Probability of 3 Events Calculator</title>
+</head>
+<body>
+    <h1>Probability of 3 Events Calculator</h1>
+    <p>Probability of events</p> 
+    <p>
+      P(A):
+      <input type="number" id="probA" min="0">
+      <select id="formUnitA">
+        <option value="decimal">decimals (.)</option>
+        <option value="percent" selected>percent (%)</option>
+      </select>
+    </p>
+    <p>
+      P(B): 
+      <input type="number" id="probB" min="0">
+      <select id="formUnitB">
+        <option value="decimal">decimals (.)</option>
+        <option value="percent" selected>percent (%)</option>
+      </select>
+    </p>
+    <p>
+      P(C):
+      <input type="number" id="probC" min="0">
+      <select id="formUnitC">
+        <option value="decimal">decimals (.)</option>
+        <option value="percent" selected>percent (%)</option>
+      </select>
+    </p>
+    <button id="calcBtn">Calculate</button>
+    <button id="resetBtn">Reset</button>
+    <hr>
+    <div>
+      <h3>Result:</h3>
+      <h3 id="calcResults">Result will appear here...</h3>
+    </div>
+
+    <script>
+      // Get required elements from the HTML
+      const probAEl = document.getElementById("probA")
+      const formUnitAEl = document.getElementById("formUnitA");
+      const probBEl = document.getElementById("probB");
+      const formUnitBEl = document.getElementById("formUnitB");
+      const probCEl = document.getElementById("probC");
+      const formUnitCEl = document.getElementById("formUnitC");
+
+      const calcBtnEl = document.getElementById('calcBtn');
+      const resetBtnEl = document.getElementById('resetBtn');
+      const calcResultsEl = document.getElementById('calcResults')
+
+      function formUnitsChange(e) {
+        const value = e.target.value
+        const id = e.target.id
+        probAEl.value = probAEl.value != "" && (value == 'decimal' && id == "formUnitAEl") ? probAEl.value / 100 : probAEl.value
+      }
+
+      // Function to extract numbers from the input text
+      function extractNumbers(inputText) {
+        const regex = /[+\-]?\d*\.?\d+(?:[Ee][+\-]?\d+)?/g;
+        const matches = inputText.match(regex);
+        const numbers = matches ? matches.map(Number) : [];
+        return numbers;
+      }
+
+      function calculateResults() {
+          // Retrieve input values
+          const probA = parseFloat(probAEl.value);
+          const probB = parseFloat(probBEl.value);
+          const probC = parseFloat(probCEl.value);
+          const formUnitA = parseFloat(formUnitAEl.value);
+          const formUnitB = parseFloat(formUnitBEl.value);
+          const formUnitC = parseFloat(formUnitCEl.value);
+          
+          if (isNaN(probA) || isNaN(probB) || isNaN(probC) || probA < 0 || probB < 0 || probC < 0
+          ) {
+            alert("Please Enter All Details.");
+            return;
+          } else if ((formUnitAEl == 'percent' && probA > 100) || (formUnitBEl == 'percent' && probB > 100) ||
+                  (formUnitCEl == 'percent' && probC > 100)
+          ) {
+            alert("Value must be less than or equal to 100");
+            return;
+          } else if ((formUnitAEl == 'decimal' && probA > 1) || (formUnitBEl == 'decimal' && probB > 1) ||
+                  (formUnitCEl == 'decimal' && probC > 1)
+          ) {
+            alert("Value must be less than or equal to 1");
+            return;
+          }
+
+          try {   
+            let results =  0;
+            calcResultsEl.innerHTML = `<p>Probability of...</p>
+                                      <p>All three occurring:</p>
+                                      <p>At least one occurring:</p>
+                                      <p>Exactly one occurring:</p>
+                                      <p>None of them occurring:	</p>
+            `          
+            
+          } catch (error) {
+            alert("Something Went Wrong!!!");
+            resethandler()
+          }
+      }
+
+      function resetForm() {
+        probAEl.value = ""
+        probBEl.value = ""
+        probCEl.value = ""
+        formUnitAEl.selectedIndex = "1"
+        formUnitBEl.selectedIndex = "1"
+        formUnitCEl.selectedIndex = "1"
+      }
+
+      function resetResult() {
+        calcResultsEl.innerHTML = "<p>Result will appear here...</p>";
+      } 
+
+      function resethandler() {
+        resetForm();
+        resetResult();
+      }
+
+      resetBtnEl.addEventListener("click", resethandler);
+      calcBtnEl.addEventListener("click", calculateResults);
+
+      [formUnitAEl,  formUnitBEl, formUnitCEl].forEach((el) => {
+        el.addEventListener("change", formUnitsChange);
+      });
+
+      [probAEl,  probBEl, probCEl].forEach((el) => {
+        el.addEventListener("input", resetResult);
+      });
+
+    </script>
+</body>
+</html>

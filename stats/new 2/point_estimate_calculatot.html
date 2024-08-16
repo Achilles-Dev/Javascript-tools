@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Point Estimate Calculator</title>
+</head>
+<body>
+    <h1>Point Estimate Calculator</h1>
+    <p>
+      Number of successes:
+      <input type="number" id="successNum">
+    </p>
+    <p>
+      Number of trials: 
+      <input type="number" id="trialsNum">
+    </p>
+    <p>
+      Confidence level:
+      <input type="number" id="confLevel" value="95">%
+    </p>
+    <p>
+      Z score:
+      <input type="number" id="zScore" value="-1.959">
+    </p>
+
+    <button id="calcBtn">Calculate</button>
+    <button id="resetBtn">Reset</button>
+    <hr>
+    <div>
+      <h3>Result:</h3>
+      <h3 id="calcResults">Result will appear here...</h3>
+    </div>
+
+    <script>
+      // Get required elements from the HTML
+      const successNumEl = document.getElementById("successNum");
+      const trialsNumEl = document.getElementById("trialsNum");
+      const confLevelEl = document.getElementById("confLevel");
+      const zScoreEl = document.getElementById("zScore")
+
+      const calcBtnEl = document.getElementById('calcBtn');
+      const resetBtnEl = document.getElementById('resetBtn');
+      const calcResultsEl = document.getElementById('calcResults')
+      
+      function calcFactorialOfNum(num) {
+        if (num == 0) {
+          return 1;
+        } else {
+          return num * calcFactorialOfNum(num - 1);
+        }
+      }
+
+      function calculateResults() {
+          // Retrieve input values
+          const successNum = parseFloat(successNumEl.value);
+          const trialsNum = parseFloat(trialsNumEl.value);
+          const confLevel = parseFloat(confLevelEl.value);
+          const zScore = parseFloat(zScoreEl.value);
+
+          if (isNaN(successNum) || isNaN(trialsNum) || isNaN(confLevel) || isNaN(zScore)) {
+            alert("Please Enter All Details.");
+            return;
+          } else if (trialsNum < successNum ) {
+            alert("Number of successes cannot exceed number of trials.");
+              return;
+          }
+
+          try {
+            let results = 0;
+           
+            if (repeatUnitEl.value === "yes") {
+              results = successNum ** trialsNum
+            } else {
+              const nFact = calcFactorialOfNum(successNum);
+              if (successNum < trialsNum) {
+                results = nFact
+              } else {
+                const nrFact = calcFactorialOfNum(successNum - trialsNum);
+                results = nFact / nrFact
+              }              
+            }
+          
+            calcResultsEl.innerHTML = `<p> Best point estimate: ${results.toFixed(2) * 1}</p>
+                                      <p>MLE: </p>
+                                      <p>Laplace estimation: </p>
+                                      <p>Jeffrey estimation: </p>
+                                      <p>Wilson estimation: </p>
+            `
+          } catch (error) {
+            alert("Something Went Wrong!!!");
+            resethandler()
+          }
+      }
+
+      function resetForm() {
+        successNumEl.value = ""
+        trialsNumEl.value = ""
+      }
+
+      function resetResult() {
+        calcResultsEl.innerHTML = "<p>Result will appear here...</p>";
+      } 
+
+      function resethandler() {
+        resetForm();
+        resetResult();
+      }
+
+      resetBtnEl.addEventListener("click", resethandler);
+      calcBtnEl.addEventListener("click", calculateResults);
+
+      [successNumEl, trialsNumEl].forEach((el) => {
+        el.addEventListener("input", resetResult);
+      });  
+    </script>
+</body>
+</html>

@@ -55,7 +55,7 @@
     const calcBtnEl = document.getElementById('calcBtn');
     const resetBtnEl = document.getElementById('resetBtn');
     const calcResultsEl = document.getElementById('calcResults')
-    let equation = 'a + b '
+    let equation = 'a + b'
 
     /********************************** FUNCTIONS **********************************/
     // Conversion functions
@@ -160,7 +160,8 @@
     operationUnitEl.addEventListener('change', (e) => {
       selectOperation(e)
       resetResult()
-    })
+    });
+    
     [numAEl, numBEl].forEach((el) => {
       el.addEventListener("input", resetResult);
     });

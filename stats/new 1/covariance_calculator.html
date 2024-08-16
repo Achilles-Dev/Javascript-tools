@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Covariance Calculator</title>
+</head>
+<body>
+    <h1>Covariance Calculator</h1>
+    <h4>Use this calculator to estimate the covariance of any two sets of data. It computes <br>
+       the sample covariance and population covariance of two variables. The calculator supports <br>
+       weighted covariance and also outputs the sample means.
+    </h4>
+    <p>Values (x,y):  <br></strong>
+      First column contains values of the <strong>independent variable (X)</strong>,
+      second column contains values of the <strong>dependent variable (Y)</strong>,<br>
+      third column is an optional weight which will result in a weighted covariance.<br>
+      Column delimiter is space or comma. Number of rows should be equal in all columns.
+      All values should be positive.
+    <p>
+      <textarea id="numbersInput" rows="8" cols="30" placeholder="x,y,w (w is weight, optional) column delimiter is space or comma. Copy/paste from spreadsheet works fine. Example:
+      1 5
+      2 9
+      3 19
+      5 25"></textarea>
+    </p>
+    <button id="calcBtn">Calculate</button>
+    <button id="resetBtn">Reset</button>
+    <hr>
+    <div>
+      <h3>Result:</h3>
+      <h3 id="calcResults">Result will appear here...</h3>
+    </div>
+
+    <script>
+      // Get required elements from the HTML
+      const numbersInputEl = document.getElementById("numbersInput");
+
+      const calcBtnEl = document.getElementById('calcBtn');
+      const resetBtnEl = document.getElementById('resetBtn');
+      const calcResultsEl = document.getElementById('calcResults')
+
+      
+      // Function to extract numbers from the input text
+      function extractNumbers(inputText) {
+        const regex = /[+\-]?\d*\.?\d+(?:[Ee][+\-]?\d+)?/g;
+        const matches = inputText.match(regex);
+        const numbers = matches ? matches.map(Number) : [];
+        return numbers;
+      }
+
+      // Function to calculate the mean of an array of numbers
+      function calculateMean(numbers) {
+        const sum = numbers.reduce((acc, num) => acc + num, 0);
+        const mean = sum / numbers.length;
+        return mean;
+      }
+
+      // Function to calculate the covariance of X and Y
+      function sumNumMinusMeanXY(xValues, yValues, xValuesMean, yValuesMean) {
+        const XMinusXMean = xValues.map((xVal) => xVal - xValuesMean)
+        const yMinusYMean = yValues.map((yVal) => yVal - yValuesMean)
+        const result = XMinusXMean.reduce((a, b, index) => a + (b * yMinusYMean[index]), 0)
+        return result
+      }
+
+      function calculateResults() {
+          // Retrieve input values
+          const numbers = numbersInputEl.value
+          let numbersArray = numbers.split('\n');
+          numbersArray = numbersArray.filter((num) => num.length > 0)
+          
+          if (numbers.length < 1 ) {
+            alert("Please Enter All Details.");
+            return;
+          } else {
+            let status = false
+            numbersArray.forEach((numStr) => {
+              const row = extractNumbers(numStr)
+              if (row.length == 0) {
+                return
+              } else if (row.length < 2 ) {
+                status = true
+              }
+            })
+            if (status == true) {
+              alert(`At least 2 rows are required`);
+              return;
+            }          
+          }
+
+          try {   
+            const xValues = numbersArray.map((num) => {
+              const row = extractNumbers(num)
+              console.log(row)
+              return parseFloat(row[0])
+            })
+            const yValues = numbersArray.map((num) => {
+              const row = extractNumbers(num)
+              return parseFloat(row[1])
+            })
+
+            const xValuesMean = calculateMean(xValues) 
+            const yValuesMean = calculateMean(yValues)
+
+            const popCovXY = sumNumMinusMeanXY(xValues, yValues, xValuesMean, yValuesMean) / xValues.length;
+            const sampCovXY =  sumNumMinusMeanXY(xValues, yValues, xValuesMean, yValuesMean) / (xValues.length - 1);
+            
+            calcResultsEl.innerHTML = `<p> Sample covariance: ${sampCovXY.toFixed(8) * 1}</p>
+                                        <p> Population covariance: ${popCovXY.toFixed(8) * 1}</p>
+                                        <p> Mean of X: ${xValuesMean.toFixed(2) * 1}</p>
+                                        <p> Mean of Y: ${yValuesMean.toFixed(2) * 1}</p>
+                                        <p>Number of (x,y) pairs: ${xValues.length}</p>
+            `
+          } catch (error) {
+            alert("Something Went Wrong!!!");
+            resethandler()
+          }
+      }
+
+      function resetForm() {
+        numbersInputEl.value = "";
+      }
+
+      function resetResult() {
+        calcResultsEl.innerHTML = "<p>Result will appear here...</p>";
+      } 
+
+      function resethandler() {
+        resetForm();
+        resetResult();
+      }
+
+      resetBtnEl.addEventListener("click", resethandler);
+      calcBtnEl.addEventListener("click", calculateResults);
+
+      [numbersInputEl].forEach((el) => {
+        el.addEventListener("input", resetResult);
+      });
+
+    </script>
+</body>
+</html>

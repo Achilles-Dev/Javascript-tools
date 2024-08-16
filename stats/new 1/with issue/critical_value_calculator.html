@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Critical Value Calculator
+    </title>
+  </head>
+  <body>
+    <h1>Critical Value Calculator</h1>
+    <h4>
+      Use this calculator for critical values to easily convert a significance level to its corresponding Z value, <br>
+      T score, F-score, or Chi-square value. Outputs the critical region as well. The tool supports one-tailed and <br>
+      two-tailed significance tests / probability values.
+    </h4>
+    <p>
+      Significance level:
+      <input type="number" id="sigLevel" placeholder="eg. 0.05" />
+    </p>
+    <p>
+      The statistic is:
+      <select id="statsSelect">
+        <option value="tDist" selected>T-distributed</option>
+        <option value="zDist">Z-distributed</option>
+        <option value="x2Dist">Chi-square distributed</option>
+        <option value="fDist">F-distributed</option>
+      </select>
+    </p>
+    <p id="degOfFreedomInput">
+      Degrees of freedom:
+      <input type="number" min="0" id="degOfFreedom" />
+    </p>
+    <div id="fDistInputs" style="display: none;">
+      <p>
+        degrees of freedom numerator:
+        <input type="number" min="0" id="degOfFreedomNum" />
+      </p>
+      <p>
+        degrees of freedom denominator:
+        <input type="number" min="0" id="degOfFreedomDen" />
+      </p>
+    </div>
+    <p id="typeSelectInput">
+      Type of test:
+      <select id="typeSelect">
+        <option value="one" selected>One-tailed</option>
+        <option value="two">Two-tailed</option>
+      </select>
+    </p>
+
+    <button id="calcBtn">Calculate</button>
+    <button id="resetBtn">Reset</button>
+    <hr />
+    <div>
+      <h3>Result:</h3>
+      <h3 id="calcResults">Result will appear here...</h3>
+    </div>
+
+    <script>
+      // Get required elements from the HTML
+      const statsSelectEl = document.getElementById("statsSelect");
+      const sigLevelEl = document.getElementById("sigLevel");
+      let degOfFreedomInputEl = document.getElementById("degOfFreedomInput");
+      let degOfFreedomEl = document.getElementById("degOfFreedom");
+      let typeSelectInputEl = document.getElementById("typeSelectInput");
+      let typeSelectEl = document.getElementById("typeSelect");
+      let fDistInputsEl = document.getElementById("fDistInputs");
+      let degOfFreedomNumEl = '';
+      let degOfFreedomDenEl = '';
+
+      const calcBtnEl = document.getElementById("calcBtn");
+      const resetBtnEl = document.getElementById("resetBtn");
+      const calcResultsEl = document.getElementById("calcResults");
+
+      function handleStatsSelectChange() {
+        const statsSelect = statsSelectEl.value;
+
+        degOfFreedomInputEl.style.display = (statsSelect == "tDist" || statsSelect == "x2Dist") ? "block" : 'none';
+        degOfFreedomEl = (statsSelect == "tDist" || statsSelect == "x2Dist") ? document.getElementById("degOfFreedom") : '';
+        typeSelectInputEl.style.display = statsSelect != "x2Dist" ? 'block' : 'none';
+        typeSelectEl = statsSelect != "x2Dist" ? document.getElementById("typeSelect") : '';
+        fDistInputsEl.style.display = statsSelect == "fDist" ? "block" : 'none';
+        degOfFreedomNumEl = statsSelect == "fDist" ? document.getElementById("degOfFreedomNum") : '';
+        degOfFreedomDenEl = statsSelect == "fDist" ? document.getElementById("degOfFreedomDen") : '';
+
+        if (statsSelect == "fDist") {
+          [degOfFreedomNumEl, degOfFreedomDenEl].forEach((el) => {
+            el.addEventListener("input", resetResult);
+          });
+        }
+        resetResult()
+      }
+
+      function calculateResults() {
+        // Retrieve input values
+        const sigLevel = parseFloat(sigLevelEl.value);
+        const statsSelect = statsSelectEl.value;
+        const typeSelect = typeSelectEl.value;
+        const degOfFreedom = parseFloat(degOfFreedomEl.value);
+        const degOfFreedomNum = parseFloat(degOfFreedomNumEl.value);
+        const degOfFreedomDen = parseFloat(degOfFreedomDenEl.value);
+
+        if (
+          isNaN(sigLevel) ||
+          (degOfFreedomEl != "" && isNaN(degOfFreedom)) || degOfFreedom < 0 ||
+          (degOfFreedomNumEl != "" && isNaN(degOfFreedomNum)) || degOfFreedomNum < 0 ||
+          (degOfFreedomDenEl != "" && isNaN(degOfFreedomDen)) || degOfFreedomDen < 0
+        ) {
+          alert("Please Enter All Details.");
+          return;
+        } else if (sigLevel >= 1 || sigLevel <= 0) {
+          alert("Please Enter All Details.");
+          return;
+        }
+
+        try {
+          let results = 0;
+          if (statsSelect == "tDist") {
+            calcResultsEl.innerHTML = `<p> Critical T ${typeSelect == "one" ? "value" : "values"}: ${results.toFixed(6) * 1}</p>
+                                      ${typeSelect == "one" ? 
+                                      `<p> Critical Region (Right-Sided) :	 ${results.toFixed(6) * 1}</p>
+                                        <p> Critical Region (Left-Sided) :	 ${results.toFixed(6) * 1}</p>
+                                     `
+                                      : 
+                                      `<p> Critical Regions :	 ${results.toFixed(6) * 1}</p>`                                     
+                                      }
+            `;
+          } else if (statsSelect == "zDist") {
+            calcResultsEl.innerHTML = `<p> Critical Z ${typeSelect == "one" ? "value" : "values"}: ${results.toFixed(6) * 1}</p>
+                                      ${typeSelect == "one" ? 
+                                      `<p> Critical Region (Right-Sided) :	 ${results.toFixed(6) * 1}</p>
+                                        <p> Critical Region (Left-Sided) :	 ${results.toFixed(6) * 1}</p>
+                                     `
+                                      : 
+                                      `<p> Critical Regions :	 ${results.toFixed(6) * 1}</p>`                                     
+                                      }
+            `;
+          } else if (statsSelect == "x2Dist") {
+            calcResultsEl.innerHTML = `<p> Critical X<sup>2</sup> value: ${results.toFixed(6) * 1}</p>                               
+                                        <p> Critical Region :	 ${results.toFixed(6) * 1}</p>                                                          
+            `;
+          } else if (statsSelect == "fDist") {
+            calcResultsEl.innerHTML = `<p> Critical F ${typeSelect == "one" ? "value" : "values"}: ${results.toFixed(6) * 1}</p>                               
+                                        <p> Critical Region (Right-Sided) :	 ${results.toFixed(6) * 1}</p>                                                          
+            `;
+          }
+         
+        } catch (error) {
+          alert("Something Went Wrong!!!");
+          resethandler();
+        }
+      }
+
+      function resetForm() {
+        sigLevelEl.value = "";
+        typeSelectEl.selectedIndex = "0";
+        statsSelectEl.selectedIndex = "0";
+        degOfFreedomEl.value = "";
+        degOfFreedomNumEl.value = "";
+        degOfFreedomDenEl.value = "";
+      }
+
+      function resetResult() {
+        calcResultsEl.innerHTML = "<p>Result will appear here...</p>";
+      }
+
+      function resethandler() {
+        resetForm();
+        resetResult();
+        handleStatsSelectChange();
+      }
+
+      resetBtnEl.addEventListener("click", resethandler);
+      calcBtnEl.addEventListener("click", calculateResults);
+      statsSelectEl.addEventListener("change", handleStatsSelectChange);
+
+      [statsSelectEl, sigLevelEl, degOfFreedomEl, typeSelectEl].forEach((el) => {
+        el.addEventListener("input", resetResult);
+      });
+    </script>
+  </body>
+</html>

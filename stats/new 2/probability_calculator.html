@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Probability Calculator</title>
+</head>
+<body>
+    <h1>Probability Calculator</h1>
+    <p>Calculate the probability of two events or a series of events using the calculator below.</p>
+    <p>
+      Events:
+      <select id="eventsUnit">
+        <option value="two" selected>Two Events</option>
+        <option value="series">Series of Events</option>
+      </select>
+    </p>
+    <p>
+      Probability of A | P(A):
+      <input type="number" id="probAGvnPA" min="0">%
+    </p>
+    <p>
+      Probability of B | P(B): 
+      <input type="number" id="probBGvnPB" min="0">%
+    </p>
+    <p id="seriesNum" style="display: none;">
+      Number of Events: 
+      <input type="number" id="eventsNum" min="0">
+    </p>
+    <button id="calcBtn">Calculate</button>
+    <button id="resetBtn">Reset</button>
+    <hr>
+    <div>
+      <h3>Result:</h3>
+      <h3 id="calcResults">Result will appear here...</h3>
+    </div>
+
+    <script>
+      // Get required elements from the HTML
+      const eventsUnitEl = document.getElementById("eventsUnit")
+      const probAGvnPAEl = document.getElementById("probAGvnPA");
+      const probBGvnPBEl = document.getElementById("probBGvnPB");
+      const eventsNumEl = document.getElementById("eventsNum");
+      const seriesNumEl = document.getElementById("seriesNum");
+
+      const calcBtnEl = document.getElementById('calcBtn');
+      const resetBtnEl = document.getElementById('resetBtn');
+      const calcResultsEl = document.getElementById('calcResults')
+
+      function eventsUnitChange(e) {
+        const value = e.target.value
+        seriesNumEl.style.display = value == "series" ? 'block' : 'none'
+      }
+
+      // Function to extract numbers from the input text
+      function extractNumbers(inputText) {
+        const regex = /[+\-]?\d*\.?\d+(?:[Ee][+\-]?\d+)?/g;
+        const matches = inputText.match(regex);
+        const numbers = matches ? matches.map(Number) : [];
+        return numbers;
+      }
+
+      function calculateResults() {
+          // Retrieve input values
+          const probAGvnPA = parseFloat(probAGvnPAEl.value);
+          const probBGvnPB = parseFloat(probBGvnPBEl.value);
+          const eventsNum = parseFloat(eventsNumEl.value);
+          console.log(eventsUnitEl.value)
+          if (isNaN(probAGvnPA) || isNaN(probBGvnPB) || (eventsUnitEl.value == "series" && isNaN(eventsNum)) || 
+              (eventsUnitEl.value == "series" && eventsNum < 0)
+          ) {
+            alert("Please Enter All Details.");
+            return;
+          } else if (probAGvnPA > 100 || probBGvnPB > 100 || probAGvnPA < 0 || probBGvnPB < 0) {
+            alert("Value must be less than or equal to 100 and greater than or equal to 0");
+            return;
+          }
+
+          try {   
+            let results =  0;
+            if (eventsUnitEl.value == "two") {
+              
+              calcResultsEl.innerHTML = `<p> Probability Of:</p>
+                                        <p>Intersection of A and B:</p>
+                                        <p>P(A∩B):	:</p>
+                                        <p>Union of A and B:</p>
+                                        <p>P(A∪B):	</p>
+                                        p>Symmetric Difference of A and B:</p>
+                                        <p>P(A∆B):</p>
+                                        <p>Complement of A and B:</p>
+                                        <p>P((A∪B)'):	</p>
+                                        p>Complement of A:</p>
+                                        <p>P(A'):	</p>
+                                        p>Complement of B:</p>
+                                        <p>P(B'):	</p>
+              `
+            } else {
+
+              calcResultsEl.innerHTML = `<p> Probability Of:</p>
+                                        <p>A occurring each time:: ${results.toFixed(2) * 1}</p>
+                                        <p>A never occurring:</p>
+                                        <p>A occurring at least once:	</p>
+                                        <p>B occurring each time:</p>
+                                        p>B never occurring:</p>
+                                        <p>B occurring at least once:		</p>
+              `
+            }            
+            
+          } catch (error) {
+            alert("Something Went Wrong!!!");
+            resethandler()
+          }
+      }
+
+      function resetForm() {
+        eventsUnitEl.selectedIndex = "0"
+        probAGvnPAEl.value = ""
+        probBGvnPBEl.value = ""
+        eventsNumEl.value = ""
+      }
+
+      function resetResult() {
+        calcResultsEl.innerHTML = "<p>Result will appear here...</p>";
+      } 
+
+      function resethandler() {
+        resetForm();
+        resetResult();
+      }
+
+      resetBtnEl.addEventListener("click", resethandler);
+      calcBtnEl.addEventListener("click", calculateResults);
+
+      eventsUnitEl.addEventListener("change", eventsUnitChange);
+      [eventsUnitEl,  probAGvnPAEl, probBGvnPBEl, eventsNumEl].forEach((el) => {
+        el.addEventListener("input", resetResult);
+      });
+
+    </script>
+</body>
+</html>

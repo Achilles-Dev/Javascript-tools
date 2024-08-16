@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Degrees of Freedom Calculator</title>
+  </head>
+  <body>
+    <h1>Degrees of Freedom Calculator</h1>
+    <p>
+      Test type:
+      <select id="testSelect">
+        <option value="oneSample" selected>1-sample</option>
+        <option value="twoSampleEqual">2-sample t-test with equal variances</option>
+        <option value="twoSampleUnequal">2-sample t-test with unequal variances</option>
+        <option value="x2">Chi-square</option>
+        <option value="anova">ANOVA</option>
+      </select>
+    </p>
+    <p id="sampleSize1Input">
+      Sample size (N):
+      <input type="number" id="sampleSize1" />
+    </p>
+    <p id="sampleSize2Input" style="display: none;">
+      Sample size (N<sub>2</sub>):
+      <input type="number" id="sampleSize2" />
+    </p>
+    <div id="uneqVarInputs" style="display: none;">
+      <p>
+        Variance (σ₁):
+        <input type="number" id="variance1" />
+      </p>
+      <p>
+        Variance (σ₂):
+        <input type="number" id="variance2" />
+      </p>
+    </div>
+
+    <div id="x2Inputs" style="display: none;">
+      <p>
+        Number of columns in the table:
+        <input type="number" min="0" id="colsNum" />
+      </p>
+      <p>
+        Number of rows in the table:
+        <input type="number" min="0" id="rowsNum" />
+      </p>
+    </div>
+    <p id="anovaInput" style="display: none;">
+      Number of groups (k):
+      <input type="number" min="0" id="groupsNum" />
+    </p>
+     
+
+    <button id="calcBtn">Calculate</button>
+    <button id="resetBtn">Reset</button>
+    <hr />
+    <div>
+      <h3>Result:</h3>
+      <h3 id="calcResults">Result will appear here...</h3>
+    </div>
+
+    <script>
+      // Get required elements from the HTML
+      const testSelectEl = document.getElementById("testSelect");
+      let sampleSize1El = document.getElementById("sampleSize1");
+      let sampleSize1InputEl = document.getElementById("sampleSize1Input");
+      let sampleSize2El = "";
+      let sampleSize2InputEl = document.getElementById("sampleSize2Input");
+      let uneqVarInputsEl = document.getElementById("uneqVarInputs");
+      let variance1El = "";
+      let variance2El = "";
+      let x2InputsEl = document.getElementById("x2Inputs");
+      let colsNumEl = '';
+      let rowsNumEl = '';
+      let anovaInputEl = document.getElementById("anovaInput");
+      let groupsNumEl = '';
+
+      const calcBtnEl = document.getElementById("calcBtn");
+      const resetBtnEl = document.getElementById("resetBtn");
+      const calcResultsEl = document.getElementById("calcResults");
+
+      function handletestSelectChange() {
+        const testSelect = testSelectEl.value;
+
+        sampleSize1InputEl.style.display = testSelect != "x2" ? "block" : 'none';
+        sampleSize1El = testSelect != "x2" ? document.getElementById("sampleSize1") : '';
+        sampleSize2InputEl.style.display = (testSelect != "oneSample" && testSelect != "x2" && testSelect != "anova" ) ? 'block' : 'none';
+        sampleSize2El = (testSelect && "oneSample" && testSelect != "x2" && testSelect != "anova") ? document.getElementById("sampleSize2") : '';
+        uneqVarInputsEl.style.display = testSelect == "twoSampleUnequal" ? "block" : 'none';
+        variance1El = testSelect == "twoSampleUnequal" ? document.getElementById("variance1") : '';
+        variance2El = testSelect == "twoSampleUnequal" ? document.getElementById("variance2") : '';
+        x2InputsEl.style.display = testSelect == "x2" ? "block" : 'none';
+        colsNumEl = testSelect == "x2" ? document.getElementById("colsNum") : '';
+        rowsNumEl = testSelect == "x2" ? document.getElementById("rowsNum") : '';
+        anovaInputEl.style.display = testSelect == "anova" ? "block" : 'none';
+        groupsNumEl = testSelect == "anova" ? document.getElementById("groupsNum") : '';
+
+        if (testSelect == "twoSample") {
+          sampleSize2El.addEventListener("input", resetResult);
+        } else if (testSelect == "twoSampleUnequal") {
+          [sampleSize2El, variance1El, variance2El].forEach((el) => {
+            el.addEventListener("input", resetResult);
+          });
+        } else if (testSelect == "x2") {
+          [colsNumEl, rowsNumEl].forEach((el) => {
+            el.addEventListener("input", resetResult);
+          });
+        } else if (testSelect == "anova") {
+          groupsNumEl.addEventListener("input", resetResult);
+        }
+        resetResult()
+      }
+
+      function calculateResults() {
+        // Retrieve input values
+        const sampleSize1 = parseFloat(sampleSize1El.value);
+        const testSelect = testSelectEl.value;
+        const sampleSize2 = parseFloat(sampleSize2El.value);
+        const variance1 = parseFloat(variance1El.value);
+        const variance2 = parseFloat(variance2El.value);
+        const colsNum = parseFloat(colsNumEl.value);
+        const rowsNum = parseFloat(rowsNumEl.value);
+        const groupsNum = parseFloat(groupsNumEl.value);
+
+        if (
+          (sampleSize1El != "" && isNaN(sampleSize1)) || sampleSize1 < 1 ||
+          (sampleSize2El != "" && isNaN(sampleSize2)) || sampleSize2 < 1 || (variance1El != "" && isNaN(variance1)) ||
+          variance1 < 1 || (variance2El != "" && isNaN(variance2)) || variance2 < 1 || (colsNumEl != "" && isNaN(colsNum)) ||
+          colsNum < 1 || (rowsNumEl != "" && isNaN(rowsNum)) || rowsNum < 1 || (groupsNumEl != "" && isNaN(groupsNum))
+          || groupsNum < 1
+        ) {
+          alert("Please Enter All Details. Values should be positive");
+          return;
+        } else if (groupsNum > sampleSize1) {
+          alert("N should not be less than k");
+          return;
+        }
+
+        try {
+          let results = 0;
+          if (testSelect == "oneSample") {
+            results = sampleSize1 - 1;
+            calcResultsEl.innerHTML = `<p> Degrees of freedom: ${results}</p>`;
+
+          } else if (testSelect == "twoSampleEqual") {
+            results = sampleSize1 + sampleSize2 - 1;
+            calcResultsEl.innerHTML = `<p> Degrees of freedom: ${results}</p>                                  
+            `;
+          } else if (testSelect == "twoSampleUnequal") {
+            let numVal = (((variance1 / sampleSize1) + (variance2 / sampleSize2)) ** 2);
+            let denVal = ((variance1 ** 2) / ((sampleSize1 ** 2) * (sampleSize1 - 1))) + ((variance2 ** 2) / ((sampleSize2 ** 2) * (sampleSize2 - 1)));
+            results = numVal / denVal
+            calcResultsEl.innerHTML = `<p> Degrees of freedom: ${results.toFixed(3) * 1}</p>
+                                        <p> Standard deviation (s₁): ${(Math.sqrt(variance1)).toFixed(3) * 1}</p>                               
+                                        <p> Standard deviation (s₂):	${(Math.sqrt(variance2)).toFixed(3) * 1}</p>                                                          
+            `;
+          } else if (testSelect == "x2") {
+            results = (rowsNum - 1) * (colsNum - 1);
+            calcResultsEl.innerHTML = `<p> Degrees of freedom: ${results.toFixed(3) * 1}</p>`;
+          } else {
+            results = sampleSize1 - 1;
+            const dfBetween = groupsNum - 1;
+            const dfWithin = sampleSize1 - groupsNum;
+            calcResultsEl.innerHTML = `<p>Degrees of freedom: ${results.toFixed(3) * 1}</p>
+                                        <p>Degrees of freedom between groups:	${dfBetween.toFixed(3) * 1}</p> 
+                                        <p>Degrees of freedom within groups: ${dfWithin.toFixed(3) * 1}</p>                                                                                        
+            `;
+          }
+         
+        } catch (error) {
+          alert("Something Went Wrong!!!");
+          resethandler();
+        }
+      }
+
+      function resetForm() {
+        sampleSize1El.value = "";
+        sampleSize2El.value = "";
+        testSelectEl.selectedIndex = "0";
+        variance1El.value = "";
+        variance2El.value = "";
+        colsNumEl.value = "";
+        rowsNumEl.value = "";
+        groupsNumEl.value = "";
+      }
+
+      function resetResult() {
+        calcResultsEl.innerHTML = "<p>Result will appear here...</p>";
+      }
+
+      function resethandler() {
+        resetForm();
+        resetResult();
+        handletestSelectChange();
+      }
+
+      resetBtnEl.addEventListener("click", resethandler);
+      calcBtnEl.addEventListener("click", calculateResults);
+      testSelectEl.addEventListener("change", handletestSelectChange);
+
+      [testSelectEl, sampleSize1El].forEach((el) => {
+        el.addEventListener("input", resetResult);
+      });
+    </script>
+  </body>
+</html>

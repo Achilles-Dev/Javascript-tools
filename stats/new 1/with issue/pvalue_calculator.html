@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>P-Value Calculator</title>
+  </head>
+  <body>
+    <h1>P-Value Calculator</h1>
+    <h4>
+      Calculate the p-value given a z-score, t-score, chi-square score, or an
+      f-value using the calculator below.
+    </h4>
+    <p>
+      Calculate:
+      <select id="typeSelect">
+        <option value="zscorePval" selected>P-Value From Z-Score</option>
+        <option value="tscorePval">P-Value From T-Score</option>
+        <option value="x2scorePval">P-Value From χ²-Score</option>
+        <option value="fratioPval">P-Value From F-Ratio</option>
+      </select>
+    </p>
+    <p id="zscoreInput">
+      z-score:
+      <input type="number" id="zScore" />
+    </p>
+    <div id="tscorex2scoreInputs" style="display: none;">
+      <p id="tscoreInput">
+        t-score:
+        <input type="number" id="tScore" />
+      </p>
+      <p id="x2scoreInput">
+        χ²-score:
+        <input type="number" id="x2Score" />
+      </p>
+      <p>
+        degrees of freedom:
+        <input type="number" id="degOfFreedom" />
+      </p>
+    </div>
+    <div id="fRatioInputs" style="display: none;">
+      <p>
+        f-value:
+        <input type="number" id="fValue" />
+      </p>
+      <p>
+        degrees of freedom numerator:
+        <input type="number" id="degOfFreedomNum" />
+      </p>
+      <p>
+        degrees of freedom denominator::
+        <input type="number" id="degOfFreedomDen" />
+      </p>
+    </div>
+
+    <button id="calcBtn">Calculate</button>
+    <button id="resetBtn">Reset</button>
+    <hr />
+    <div>
+      <h3>Result:</h3>
+      <h3 id="calcResults">Result will appear here...</h3>
+    </div>
+
+    <script>
+      // Get required elements from the HTML
+      const typeSelectEl = document.getElementById("typeSelect");
+      let zscoreInputEl = document.getElementById("zscoreInput");
+      let zScoreEl = document.getElementById("zScore");
+      let tscorex2scoreInputsEl = document.getElementById(
+        "tscorex2scoreInputs"
+      );
+      let tscoreInputEl = document.getElementById("tscoreInput");
+      let tScoreEl = '';
+      let x2scoreInputEl = document.getElementById("x2scoreInput");
+      let x2ScoreEl = '';
+      let degOfFreedomEl = '';
+      let fRatioInputsEl = document.getElementById("fRatioInputs");
+      let fValueEl = '';
+      let degOfFreedomNumEl = '';
+      let degOfFreedomDenEl = '';
+
+      const calcBtnEl = document.getElementById("calcBtn");
+      const resetBtnEl = document.getElementById("resetBtn");
+      const calcResultsEl = document.getElementById("calcResults");
+
+      function handleTypeSelectChange() {
+        const typeSelect = typeSelectEl.value;
+
+        zscoreInputEl.style.display = typeSelect == "zscorePval" ? "block" : 'none';
+        zScoreEl = typeSelect == "zscorePval" ? document.getElementById("zScore") : '';
+        tscorex2scoreInputsEl.style.display = (typeSelect == "tscorePval" || typeSelect == "x2scorePval") ? 'block' : 'none';
+        tscoreInputEl.style.display = typeSelect == "tscorePval" ? "block" : 'none';
+        tScoreEl = typeSelect == "tscorePval" ? document.getElementById("tScore") : '';
+        x2scoreInputEl.style.display = typeSelect == "x2scorePval" ? "block" : 'none';
+        x2ScoreEl = typeSelect == "x2scorePval" ? document.getElementById("x2Score") : '';
+        degOfFreedomEl = (typeSelect == "tscorePval" || typeSelect == "x2scorePval") ? document.getElementById("degOfFreedom") : '';
+        fRatioInputsEl.style.display = typeSelect == "fratioPval" ? "block" : 'none';
+        fValueEl = typeSelect == "fratioPval" ? document.getElementById("fValue") : '';
+        degOfFreedomNumEl = typeSelect == "fratioPval" ? document.getElementById("degOfFreedomNum") : '';
+        degOfFreedomDenEl = typeSelect == "fratioPval" ? document.getElementById("degOfFreedomDen") : '';
+
+
+        if (typeSelect == "tscorePval") {
+          [tScoreEl, degOfFreedomEl].forEach((el) => {
+            el.addEventListener("input", resetResult);
+          });
+        } else if (typeSelect == "x2scorePval") {
+          [x2ScoreEl, degOfFreedomEl].forEach((el) => {
+            el.addEventListener("input", resetResult);
+          });
+        } else if (typeSelect == "fratioPval") {
+          [fValueEl, degOfFreedomNumEl, degOfFreedomDenEl].forEach((el) => {
+            el.addEventListener("input", resetResult);
+          });
+        }
+        resetResult()
+      }
+
+      function calculateResults() {
+        // Retrieve input values
+        const zScore = parseFloat(zScoreEl.value);
+        const typeSelect = typeSelectEl.value;
+        const tScore = parseFloat(tScoreEl.value);
+        const x2Score = parseFloat(x2ScoreEl.value);
+        const fValue = parseFloat(fValueEl.value);
+        const degOfFreedom = parseFloat(degOfFreedomEl.value);
+        const degOfFreedomNum = parseFloat(degOfFreedomNumEl.value);
+        const degOfFreedomDen = parseFloat(degOfFreedomDenEl.value);
+
+        if (
+          (zScoreEl != "" && isNaN(zScore)) ||
+          (tScoreEl != "" && isNaN(tScore)) ||
+          (x2ScoreEl != "" && isNaN(x2Score)) ||
+          (fValueEl != "" && isNaN(fValue)) ||
+          (degOfFreedomEl != "" && isNaN(degOfFreedom)) ||
+          (degOfFreedomNumEl != "" && isNaN(degOfFreedomNum)) ||
+          (degOfFreedomDenEl != "" && isNaN(degOfFreedomDen))
+        ) {
+          alert("Please Enter All Details.");
+          return;
+        }
+
+        try {
+          let results = 0;
+         
+
+          calcResultsEl.innerHTML = `<p> Left-tailed p-value: ${results.toFixed(6) * 1}</p>
+                                      <p> Right-tailed p-value:	 ${results.toFixed(6) * 1}</p>
+                                      ${typeSelect == "zscorePval" || typeSelect == "tscorePval" ? 
+                                        `<p> Two-tailed p-value:	 ${results.toFixed(6) * 1}</p>`
+                                      : ''} 
+          `;
+        } catch (error) {
+          alert("Something Went Wrong!!!");
+          resethandler();
+        }
+      }
+
+      function resetForm() {
+        zScoreEl.value = "";
+        typeSelectEl.selectedIndex = "0";
+        tScoreEl.value = "";
+        x2ScoreEl.value = "";
+        degOfFreedomEl.value = "";
+        fValueEl.value = "";
+        degOfFreedomNumEl.value = "";
+        degOfFreedomDenEl.value = "";
+      }
+
+      function resetResult() {
+        calcResultsEl.innerHTML = "<p>Result will appear here...</p>";
+      }
+
+      function resethandler() {
+        resetForm();
+        resetResult();
+        handleTypeSelectChange();
+      }
+
+      resetBtnEl.addEventListener("click", resethandler);
+      calcBtnEl.addEventListener("click", calculateResults);
+      typeSelectEl.addEventListener("change", handleTypeSelectChange);
+
+      [zScoreEl, typeSelectEl].forEach((el) => {
+        el.addEventListener("input", resetResult);
+      });
+    </script>
+  </body>
+</html>

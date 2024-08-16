@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Decile Calculator</title>
+</head>
+<body>
+    <h1>Decile Calculator</h1>
+    <h4>You may enter up to 50 numbers</h4>
+    <p>
+      #1:
+      <input type="number" name="decile">
+    </p>
+    <p>
+      #2:
+      <input type="number" name="decile">
+    </p>
+    <p>
+      #3:
+      <input type="number" name="decile">
+    </p>
+    <p>
+      #4:
+      <input type="number" name="decile">
+    </p>
+    <p>
+      #5:
+      <input type="number" name="decile">
+    </p>
+    <p>
+      #6:
+      <input type="number" name="decile">
+    </p>
+    <p>
+      #7:
+      <input type="number" name="decile">
+    </p>
+    <p>
+      #8:
+      <input type="number" name="decile">
+    </p>
+    <p>
+      #9:
+      <input type="number" name="decile">
+    </p>
+    <p>
+      #10:
+      <input type="number" name="decile">
+    </p>
+    <div id="additions"></div>
+    <p>
+      <button id="addInput">Add Input</button>
+      <button id="removeInput">Remove Input</button>
+    </p>
+
+    <button id="calcBtn">Calculate</button>
+    <button id="resetBtn">Reset</button>
+    <hr>
+    <div>
+      <h3>Result:</h3>
+      <h3 id="calcResults">Result will appear here...</h3>
+    </div>
+
+    <script>
+      // Get required elements from the HTML
+      const decilesEl = document.getElementsByName("decile");
+      const additionsEl = document.getElementById("additions");
+      const addInputEl = document.getElementById("addInput");
+      const removeInputEl = document.getElementById("removeInput");
+
+      const calcBtnEl = document.getElementById('calcBtn');
+      const resetBtnEl = document.getElementById('resetBtn');
+      const calcResultsEl = document.getElementById('calcResults') 
+
+      let decileValues = {};
+
+
+      let index = 10;
+
+      function getDecileValues(e, idx) {
+        let decileValue = e.target.value;
+        decileValues[idx] = decileValue
+        if (decileValue == "" ) {
+          delete decileValues[idx]
+        }
+      }
+
+      function handleAddInput() {
+        let addIndex = index + 1;
+        if (index > 50) {
+          return;
+        }
+        const newP = document.createElement('p');
+        newP.id = `input${addIndex}`
+        let input = `
+            #${addIndex}:
+            <input type="number" id="decile${addIndex}">
+        `
+        newP.innerHTML = input
+        
+        additionsEl.appendChild(newP);
+        document.getElementById(`decile${addIndex}`).addEventListener("input", (e) => {
+          getDecileValues(e, addIndex - 1)
+          resetResult()
+        });
+        index += 1;
+        resetResult()
+      }
+
+       function handleRemoveInput() {
+        let removeIndex = index;
+        const lastP = document.getElementById(`input${removeIndex}`)
+        if (index > 10) {
+          lastP.remove()
+          delete decileValues[removeIndex - 1]
+          index -=  1;
+        }
+      }
+
+      function calculateResults() {
+          // Retrieve input values
+          const deciles = Object.values(decileValues).map((num) => parseFloat(num));
+          
+          if (deciles.length < 9) {
+            alert("Please Enter All Details.");
+            return;
+          }
+
+          try {
+            const sortedArray = (deciles.sort((a,b) => a - b))
+            let decileNumbers = [];
+            let position = 0;
+            sortedArray.forEach((num, idx) => { 
+              position = idx + 1;
+              if (position < 11) {
+                if (position == 10) {
+                  decileNumbers.push(sortedArray[sortedArray.length - 1])
+                }
+                let number = (position * (deciles.length + 1)) / 10
+                if (number % 1 != 0) {
+                  let decimal = number % 1
+                  let wholeNum = Math.floor(number)
+                  let diff = (sortedArray[wholeNum] - sortedArray[wholeNum - 1]) * decimal
+                  let decileNum = sortedArray[wholeNum - 1] + diff
+                  decileNumbers.push(decileNum.toFixed(1) * 1)
+                } else {
+                  decileNumbers.push(sortedArray[number - 1])
+                }    
+              }                         
+            })
+
+            decileNumbers = decileNumbers.filter((num, index) => index < 10)
+
+            let table = [];
+            let freqs = {}
+            let decileIndex = 0;
+            let sortedIndex = 0;
+            while (sortedIndex < sortedArray.length) {
+              let sortNum = sortedArray[sortedIndex];
+              let decileNum = decileNumbers[decileIndex]
+              if (sortNum <= decileNum) {
+                if (freqs[decileNum]) {
+                  freqs[decileNum] += 1;
+                } else {
+                  freqs[decileNum] = 1;
+                }
+                sortedIndex += 1;
+              } else {
+                decileIndex += 1;
+              }                             
+            } 
+            
+            let cumulativeFreq = 0;
+            decileNumbers.forEach((num, index) => {      
+              cumulativeFreq += freqs[num] ? freqs[num] : 0  
+              table.push(`
+                <tr>
+                  <td style="border: 1px solid black; border-collapse: collapse;">${index + 1}</td>
+                  <td style="border: 1px solid black; border-collapse: collapse;">${num}</td>
+                  <td style="border: 1px solid black; border-collapse: collapse;">
+                    ${index == 0 ? sortedArray[index] : decileNumbers[index - 1]} to ${num}
+                  </td>
+                  <td style="border: 1px solid black; border-collapse: collapse;"> ${freqs[num] ? freqs[num] : 0}</td>
+                  <td style="border: 1px solid black; border-collapse: collapse;">${cumulativeFreq}</td>
+                </tr>
+              `)
+            })
+
+            const results = 0;
+            
+            calcResultsEl.innerHTML = `<table style="border: 1px solid black; border-collapse: collapse;">
+                  <tr>
+                    <th style="border: 1px solid black; border-collapse: collapse;">Decile position</th>
+                    <th style="border: 1px solid black; border-collapse: collapse;">Decile number</th>
+                    <th style="border: 1px solid black; border-collapse: collapse;">Numbers</th>
+                    <th style="border: 1px solid black; border-collapse: collapse;">Frequency</th>
+                    <th style="border: 1px solid black; border-collapse: collapse;">Cumulative Frequency</th>
+                  </tr>
+                  ${table}
+                </table>
+            `
+          } catch (error) {
+            alert("Something Went Wrong!!!");
+            resethandler()
+          }
+      }
+
+      function resetForm() {
+        decilesEl.forEach((el) => {
+          el.value = "";
+      }); 
+      }
+
+      function resetResult() {
+        calcResultsEl.innerHTML = "<p>Result will appear here...</p>";
+      } 
+
+      function resethandler() {
+        resetForm();
+        resetResult();
+      }
+
+      resetBtnEl.addEventListener("click", resethandler);
+      calcBtnEl.addEventListener("click", calculateResults);
+      addInputEl.addEventListener("click", handleAddInput);
+      removeInputEl.addEventListener("click", handleRemoveInput);
+
+      decilesEl.forEach((el, idx) => {
+        el.addEventListener("input", (e) => {
+          getDecileValues(e, idx)
+          resetResult()
+        });
+      });  
+    </script>
+</body>
+</html>

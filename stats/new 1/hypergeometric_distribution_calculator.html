@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Hypergeometric Distribution Calculator</title>
+</head>
+<body>
+    <h1>Hypergeometric Distribution Calculator</h1>
+    <p>
+      Population size (N):
+      <input type="number" id="popSize">
+    </p>
+    <p>
+      Number of success states in population (K):
+      <input type="number" id="popSuccessNum">
+    </p>
+    <p>
+      Sample size (n):
+      <input type="number" id="sampleSize">
+    </p>
+    <p>
+      Number of success states in sample (k):
+      <input type="number" id="samSuccessNum">
+    </p>
+    <p>
+      What to compute?: 
+      <select id="computeSelect">
+        <option value="xEqualK">P(X = k) </option>
+        <option value="xGrtEqualK">P(X >= k) </option>
+        <option value="xGrtK">P(X > k) </option>
+        <option value="xLessEqualK" selected>P(X <= k) </option>
+        <option value="xLessK">P(X < k) </option>
+      </select>
+    </p>
+
+    <button id="calcBtn">Calculate</button>
+    <button id="resetBtn">Reset</button>
+    <hr>
+    <div>
+      <h3>Result:</h3>
+      <h3 id="calcResults">Result will appear here...</h3>
+    </div>
+
+    <script>
+      // Get required elements from the HTML
+      const popSizeEl = document.getElementById("popSize");
+      const popSuccessNumEl = document.getElementById("popSuccessNum");
+      const sampleSizeEl = document.getElementById("sampleSize");
+      const samSuccessNumEl = document.getElementById("samSuccessNum");
+      const computeSelectEl = document.getElementById("computeSelect");
+
+      const calcBtnEl = document.getElementById('calcBtn');
+      const resetBtnEl = document.getElementById('resetBtn');
+      const calcResultsEl = document.getElementById('calcResults') 
+
+      function calcFactorialOfNum(num) {
+        if (num == 0) {
+          return 1;
+        } else {
+          return (num * calcFactorialOfNum(num - 1))
+        }
+      }
+
+      function calcProbXEqualK(N, K, n, k) {
+        let numPart = calcFactorialOfNum(K) * calcFactorialOfNum(N - K) * calcFactorialOfNum(n) * calcFactorialOfNum(N - n)
+        let denPart = calcFactorialOfNum(N) * calcFactorialOfNum(k) * calcFactorialOfNum(K - k) * calcFactorialOfNum(n - k) * 
+                      calcFactorialOfNum(N - K - n + k)
+        let results = numPart / denPart
+        return results
+      }
+
+      function calculateResults() {
+          // Retrieve input values
+          const popSize = parseFloat(popSizeEl.value);
+          const popSuccessNum = parseFloat(popSuccessNumEl.value);
+          const sampleSize = parseFloat(sampleSizeEl.value);
+          const samSuccessNum = parseFloat(samSuccessNumEl.value);
+          const computeSelect = computeSelectEl.value;
+
+          if (isNaN(popSize) || popSize < 0 || popSize % 1 != 0 || isNaN(popSuccessNum) || 
+            popSuccessNum < 0 || popSuccessNum % 1 != 0 || isNaN(sampleSize) || sampleSize < 0 || 
+            sampleSize % 1 != 0 || isNaN(samSuccessNum) || samSuccessNum < 0 || samSuccessNum % 1 != 0 
+          ) {
+            alert("Please Enter All Details.");
+            return;
+          } else if (sampleSize > popSize) {
+            alert("n cannot not exceed N.");
+            return;
+          } else if (samSuccessNum > popSuccessNum) {
+            alert("k cannot exceed K.");
+            return;
+          } else if (popSuccessNum > popSize) {
+            alert("K cannot exceed N.");
+            return;
+          } else if (samSuccessNum > sampleSize) {
+            alert("k cannot exceed n.");
+            return;
+          }
+
+          try {
+            let results = 0
+            if (computeSelect == "xEqualK") {
+              results = calcProbXEqualK(popSize, sampleSize, popSuccessNum, samSuccessNum)
+            } else if (computeSelect == "xGrtEqualK") {
+              let kValue = samSuccessNum 
+              while (kValue <=  popSuccessNum) {
+                results += calcProbXEqualK(popSize, sampleSize, popSuccessNum, kValue)
+                kValue += 1;
+              }
+            } else if (computeSelect == "xGrtK") {
+              let kValue = samSuccessNum + 1;
+              while (kValue <=  popSuccessNum) {
+                results += calcProbXEqualK(popSize, sampleSize, popSuccessNum, kValue)
+                kValue += 1;
+              }
+            } else if (computeSelect == "xLessEqualK") {
+              let kValue = samSuccessNum + 1;
+              while (kValue <=  popSuccessNum) {
+                results += calcProbXEqualK(popSize, sampleSize, popSuccessNum, kValue)
+                kValue += 1;
+              }
+              results = 1 - results;
+            } else if (computeSelect == "xLessK") {
+              let kValue = samSuccessNum;
+              while (kValue <=  popSuccessNum) {
+                results += calcProbXEqualK(popSize, sampleSize, popSuccessNum, kValue)
+                kValue += 1;
+              }
+              results = 1 - results;
+            }
+            
+            calcResultsEl.innerHTML = `<p> Hypergeometric Distribution: ${results.toFixed(6) * 1}</p>`
+          } catch (error) {
+            alert("Something Went Wrong!!!");
+            resethandler()
+          }
+      }
+
+      function resetForm() {
+        popSizeEl.value = ""
+        popSuccessNumEl.value = ""
+        sampleSizeEl.value = ""
+        samSuccessNumEl.value = ""
+        computeSelectEl.selectedIndex = "3"
+      }
+
+      function resetResult() {
+        calcResultsEl.innerHTML = "<p>Result will appear here...</p>";
+      } 
+
+      function resethandler() {
+        resetForm();
+        resetResult();
+      }
+
+      resetBtnEl.addEventListener("click", resethandler);
+      calcBtnEl.addEventListener("click", calculateResults);
+
+      [popSizeEl, popSuccessNumEl, sampleSizeEl, samSuccessNumEl, computeSelectEl].forEach((el) => {
+        el.addEventListener("input", resetResult);
+      });  
+    </script>
+</body>
+</html>
