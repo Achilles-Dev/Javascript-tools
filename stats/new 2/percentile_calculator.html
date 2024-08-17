@@ -55,6 +55,20 @@
         return numbers;
       }
 
+      function getScore(scoreVal, sortArray) {
+        let scoreNum = 0
+        let index = ((scoreVal / 100) * (sortArray.length - 1)) + 1
+        
+        if (index % 1 == 0) {
+          scoreNum = sortArray[index - 1]
+        } else {
+          let newIndex = Math.floor(index)
+          let rF = (index % 1).toFixed(4)
+          scoreNum = sortArray[newIndex - 1] + parseFloat(rF) * (sortArray[newIndex] - sortArray[newIndex - 1])
+        }
+        return scoreNum
+      }
+
       function calculateResults() {
           // Retrieve input values
           const numbers = extractNumbers(numbersInputEl.value);
@@ -73,21 +87,31 @@
               calcResultsEl.innerHTML = `<p> Percentile for Score: ${results.toFixed(2) * 1}</p>`
             } else {
               const sortArray = (numbers.sort((a,b) => a - b))
-              let scoreNum = 0
-              let index = ((scoreVal / 100) * (numbers.length - 1)) + 1
-              if (index % 1 == 0) {
-                scoreNum = sortArray[index - 1]
-              } else {
-                console.log("test", index)
-                let newIndex = Math.floor(index)
-                let rF = (index % 2).toFixed(4)
-                console.log(newIndex, parseFloat(rF), sortArray[newIndex + 1], sortArray[newIndex - 1])
-                scoreNum = sortArray[newIndex - 1] + parseFloat(rF) * (sortArray[newIndex] - sortArray[newIndex - 1])
-                console.log(sortArray, rF)
-              }
-               
+              const otherValues = [0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60, 65, 70, 75, 80, 85, 90, 95, 100]
+              const scoreNum = getScore(scoreVal, sortArray)
+              let table = []
+              otherValues.forEach((num) => {
+                let scoreNum = getScore(num, sortArray)
+                table.push(`
+                  <tr>
+                    <td>${num}th</td>
+                    <td>${scoreNum}</td>
+                  </tr>
+                `)
+              })
+              table = table.toString().replace(/,/g, "");
+              
               calcResultsEl.innerHTML = `<p> Score at Percentile: </p>
                                         <p>${scoreVal}th percentile: ${scoreNum.toFixed(2) * 1}</p>
+                                        <p>Other Percentile Values</p>
+                                        <table>
+                                          <tr>
+                                            <th>Percentile</th>
+                                            <th>Value</th>
+                                          </tr>
+                                          ${table}
+                                        </table>
+
               `
             }            
             
