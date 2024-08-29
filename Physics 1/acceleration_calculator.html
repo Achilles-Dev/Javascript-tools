@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Acceleration Calculator</title>
+  </head>
+  <body>
+    <h1>Acceleration Calculator</h1>
+    <!-- radion section -->
+    <p>
+      Find:
+      <select id="findUnit">
+        <option value="a" selected>Acceleration</option>
+        <option value="vf">Final Speed</option>
+        <option value="vi">Initial Speed</option>
+        <option value="t">Time Needed</option>
+      </select>
+    </p>
+    <!-- input section -->
+      <!-- initial speed -->
+      <p id="vi-container" class="container">
+        <label for="vi-input">Initial Speed</label>
+        <input
+          type="number"
+          min="0"
+          class="input-numbers vi-input"
+          step="any"
+          id="vi-input"
+        />
+        <select id="vi-select">
+          <option value="miles/h">miles/h</option>
+          <option value="km/h">km/h</option>
+          <option value="miles/s">miles/s</option>
+          <option value="km/s">km/s</option>
+          <option value="m/s" selected="selected">m/s</option>
+          <option value="yd/s">yd/s</option>
+          <option value="ft/s">ft/s</option>
+          <option value="knots">knots</option>
+        </select>
+      </p>
+      <!-- final speed  -->
+      <p id="vf-container" class="container">
+        <label for="vf-input">Final Speed </label>
+        <input
+          type="number"
+          min="0"
+          class="input-numbers vf-input"
+          step="any"
+          id="vf-input"
+        />
+        <select id="vf-select">
+          <option value="miles/h">miles/h</option>
+          <option value="km/h">km/h</option>
+          <option value="miles/s">miles/s</option>
+          <option value="km/s">km/s</option>
+          <option value="m/s" selected="selected">m/s</option>
+          <option value="yd/s">yd/s</option>
+          <option value="ft/s">ft/s</option>
+          <option value="knots">knots</option>
+        </select>
+      </p>
+      <!-- acceleration -->
+      <p id="a-container" class="container" style="display: none;">
+        <label for="a-input">Acceleration </label>
+        <input
+          type="number"
+          class="input-numbers a-input"
+          step="any"
+          id="a-input"
+        />
+        <select id="a-select">
+          <option value="miles/h&sup2;">miles/h&sup2;</option>
+          <option value="km/h&sup2;">km/h&sup2;</option>
+          <option value="miles/s&sup2;">miles/s&sup2;</option>
+          <option value="km/s&sup2;">km/s&sup2;</option>
+          <option value="m/s&sup2;" selected="selected">m/s&sup2;</option>
+          <option value="yd/s&sup2;">yd/s&sup2;</option>
+          <option value="ft/s&sup2;">ft/s&sup2;</option>
+        </select>
+      </p>
+      <!-- duration -->
+      <p id="t-container" class="container">
+        <label for="h-input">Duration </label>
+        <input
+          type="number"
+          min="0"
+          class="input-numbers t-input"
+          step="any"
+          id="h-input"
+          value="0"
+        /><span>h</span>
+        <input
+          type="number"
+          min="0"
+          class="input-numbers t-input"
+          step="any"
+          id="m-input"
+          value="0"
+        /><span>m</span>
+        <input
+          type="number"
+          min="0"
+          class="input-numbers t-input"
+          step="any"
+          id="s-input"
+          value="0"
+        /><span>s</span>
+      </p>
+      
+      <button id="calcBtn">Calculate</button>
+      <button id="resetBtn">Reset</button>
+      <hr>
+      <div>
+        <h3>Result:</h3>
+        <h3 id="calcResults">Result will appear here...</h3>
+      </div>
+    <script>
+      /*************** ELEMENTS ***************/
+
+      const findUnitEl = document.getElementById("findUnit");
+      const viInput = document.getElementById("vi-input");
+      const vfInput = document.getElementById("vf-input");
+      const aInput = document.getElementById("a-input");
+      const hInput = document.getElementById("h-input");
+      const mInput = document.getElementById("m-input");
+      const sInput = document.getElementById("s-input");
+      const a2nput = document.getElementById("a-input2");
+
+      const vfInputContainerEl = document.getElementById("vi-container");
+      const viInputContainerEl = document.getElementById("vf-container");
+      const aInputContainerEl = document.getElementById("a-container");
+      const tInputContainerEl = document.getElementById("t-container");
+
+      const viSelect = document.getElementById("vi-select");
+      const vfSelect = document.getElementById("vf-select");
+      const aSelect = document.getElementById("a-select");
+
+      const calcBtnEl = document.getElementById('calcBtn');
+      const resetBtnEl = document.getElementById('resetBtn');
+      const calcResultsEl = document.getElementById('calcResults')
+
+      /*************** GLOBAL VARIABLES ***************/
+      const UNITS = {
+        speed: {
+          "miles/h": 2.2369362920544,
+          "km/h": 3.6,
+          "miles/s": 0.000621371,
+          "km/s": 0.001,
+          "m/s": 1,
+          "yd/s": 1.09361,
+          "ft/s": 3.28084,
+          knots: 1.94384,
+        },
+        acceleration: {
+          "miles/h²": 8052.9692102775,
+          "km/h²": 3.6,
+          "miles/s²": 0.000621371,
+          "km/s²": 0.001,
+          "m/s²": 1,
+          "yd/s²": 1.09361,
+          "ft/s²": 3.28084,
+          g: 0.10197162129779283,
+        },
+        time: {
+          hour: 0.0002777777777777778,
+          minute: 0.016666666666666666,
+          second: 1,
+        },
+      };
+      /*************** FUNCTIONS ***************/
+      function toSIUnit(type, unit, value) {
+        return value / UNITS[type][unit];
+      }
+
+      function fromSIUnit(type, unit, value) {
+        return value * UNITS[type][unit];
+      }
+  
+      function handlefindUnitChange(e) {
+        const value = e.target.value
+        vfInputContainerEl.style.display = value === "vi" ? 'none' : 'block'
+        viInputContainerEl.style.display = value === "vf" ? 'none' : 'block'
+        aInputContainerEl.style.display = value === "a" ? 'none' : 'block'
+        tInputContainerEl.style.display = value === "t" ? 'none' : 'block'
+        
+      }  
+
+      function createElements(resultObj) {
+        const elementNodes = Object.keys(resultObj).map((key, index) => {
+          //create elements to put the results in
+          const div = document.createElement("div");
+          const span = document.createElement("span");
+          const span2 = document.createElement("span");
+
+          // give the elements id
+          div.setAttribute("id", `${key.split(" ").join("-")}-container`);
+          span.setAttribute("id", `${key.split(" ").join("-")}-title`);
+          span2.setAttribute("id", `${key.split(" ").join("-")}-value`);
+
+          // put the values in the elements
+          span.textContent = key;
+          span2.textContent = resultObj[key];
+
+          // appened them to an element that contians them
+          div.append(span, span2);
+
+          // return that element
+          return div;
+        });
+
+        return elementNodes;
+      }
+      
+      function calculateUnit(checked) {
+        const calculateVf = () => {
+          const { vi, a, t } = prepareUnits();
+          return { result: vi + a * t, type: "speed", name: "Final Speed" };
+        };
+        const calculateVi = () => {
+          const { vf, a, t } = prepareUnits();
+          return { result: vf - a * t, type: "speed", name: "Initial Speed" };
+        };
+        const calculateA = () => {
+          const { vf, vi, t } = prepareUnits();
+          return {
+            result: (vf - vi) / t,
+            type: "acceleration",
+            name: "Acceleration",
+          };
+        };
+
+        const calculateT = () => {
+          const { vf, vi, a } = prepareUnits();
+          return { result: (vf - vi) / a, type: "time", name: "Time (duration)" };
+        };
+
+        switch (checked) {
+          case "vf":
+            return calculateVf();
+          case "vi":
+            return calculateVi();
+          case "a":
+            return calculateA();
+          case "t":
+            return calculateT();
+          default:
+        }
+      }
+
+      function calculateResults() {
+        const findUnit = findUnitEl.value
+        try {
+          let { result, type, name } = calculateUnit(findUnit);
+          if (isNaN(result)) {
+            alert("Your input resulted in NAN. Try again with valid input.");
+            resetResult();
+            return;
+          }
+          if (Math.abs(result) === Infinity) {
+            alert("Your input resulted in Infinity. Try again with valid input.");
+            resetResult();
+            return;
+          }
+
+          const resultObj = prepareResults(result, type, name);
+          const elementNodes = createElements(resultObj); // getting elements array from createElements funtion
+
+          // appending all the elements in node array to the result container div that is in html file
+          calcResultsEl.innerHTML = ''
+          elementNodes.forEach((element) => {
+            calcResultsEl.append(element);
+          });
+        } catch {
+          alert("An error ocurred. Try again with valid input.");
+          resethandler()
+          return;
+        }
+      }
+
+      function makeSecond(hr, min, s) {
+        return hr * 3600 + min * 60 + s;
+      }
+
+      function prepareUnits() {
+        const t = makeSecond(
+          parseFloat(hInput.value) ?? 0,
+          parseFloat(mInput.value) ?? 0,
+          parseFloat(sInput.value) ?? 0
+        );
+        let vi = viInput.value ?? 0;
+        let a = aInput.value ?? 0;
+        let vf = vfInput.value ?? 0;
+
+        const viUnit = viSelect.value;
+        const aUnit = aSelect.value;
+        const vfUnit = vfSelect.value;
+
+        a = toSIUnit("acceleration", aUnit, parseFloat(a));
+
+        vi = toSIUnit("speed", viUnit, parseFloat(vi));
+        vf = toSIUnit("speed", vfUnit, parseFloat(vf));
+        return { a, vi, vf, t };
+      }
+
+      function prepareResults(result, type, name) {
+        let resultObj = {};
+        Object.keys(UNITS[type]).forEach((key) => {
+          let ans = fromSIUnit(type, key, result);
+          ans =
+            ans > 1 || ans < -1
+              ? parseFloat(ans.toFixed(2))
+              : parseFloat(ans.toFixed(6));
+          resultObj[`${name} (${key})`] = `     ${ans.toLocaleString()} ${key}`;
+        });
+        return resultObj;
+      }
+
+      function resetForm() {
+        viInput.value = ""
+        vfInput.value = ""
+        aInput.value = ""
+        hInput.value = "0"
+        mInput.value = "0"
+        sInput.value = "0"
+        viSelect.selectedIndex = '4'
+        vfSelect.selectedIndex = '4'
+        aSelect.selectedIndex = '4'
+      }
+
+      function resetResult() {
+        calcResultsEl.innerHTML = "<p>Result will appear here...</p>";
+      } 
+
+      function resethandler() {
+        resetForm();
+        resetResult();
+      }
+
+      /*************** EVENTLISTINERS ***************/
+      [viInput, vfInput, aInput, hInput, mInput, sInput].forEach((el) => {
+        el.addEventListener("input", resetResult);
+      });
+
+      findUnitEl.addEventListener("change", handlefindUnitChange)
+      resetBtnEl.addEventListener("click", resethandler);
+      calcBtnEl.addEventListener("click", calculateResults);
+    </script>
+  </body>
+</html>

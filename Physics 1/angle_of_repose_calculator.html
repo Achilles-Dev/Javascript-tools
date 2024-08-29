@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Angle of Repose Calculator</title>
+  </head>
+  <body>
+    <h1>Angle of Repose Calculator</h1>
+      <div>
+        <p>
+          <label for="i1-input">Height of the heap</label>
+          <input
+            type="number"
+            min="0"
+            autocomplete="off"
+            data-id="i1"
+            step="any"
+            id="i1-input"
+            class="inputs"
+            data-name="Height"
+          />
+          <select
+            class="selects"
+            id="i1-select"
+            data-type="distance"
+            data-prev="m"
+            data-id="i1"
+          >
+            <option value="mm">millimeters (mm)</option>
+            <option value="cm">centimeters (cm)</option>
+            <option value="dm">decimeters (dm)</option>
+            <option value="m" selected>meters (m)</option>
+            <option value="in">inches (in)</option>
+            <option value="ft">feet (ft)</option>
+            <option value="yd">yards (yd)</option>
+          </select>
+        </p>
+
+        <p>
+          <label for="i2-input">Radius of the heap</label>
+          <input
+            type="number"
+            min="0"
+            autocomplete="off"
+            data-id="i2"
+            step="any"
+            id="i2-input"
+            class="inputs"
+            data-name="Radius"
+          />
+
+          <select
+            class="selects"
+            id="i2-select"
+            data-type="distance"
+            data-prev="m"
+            data-id="i2"
+          >
+            <option value="mm">millimeters (mm)</option>
+            <option value="cm">centimeters (cm)</option>
+            <option value="dm">decimeters (dm)</option>
+            <option value="m" selected>meters (m)</option>
+            <option value="in">inches (in)</option>
+            <option value="ft">feet (ft)</option>
+            <option value="yd">yards (yd)</option>
+          </select>
+        </p>
+
+        <!-- <p>
+          <label for="i4-input"> Static friction coefficient</label>
+          <input
+            type="number"
+            min="0"
+            autocomplete="off"
+            data-id="i4"
+            step="any"
+            id="i4-input"
+            data-name="Static friction coefficient"
+            disabled
+          />
+          <select
+            class="selects"
+            id="i4-select"
+            data-type="unit"
+            data-prev="unit"
+            data-id="i4"
+            style="display: none"
+          >
+            <option value="unit">Unit</option>
+          </select>
+        </p> -->
+
+        <!-- <p>
+          <label for="i3-input">Angle of repose</label>
+          <input
+            type="number"
+            min="0"
+            autocomplete="off"
+            data-id="i3"
+            step="any"
+            class="inputs"
+            id="i3-input"
+            data-name="Angle"
+          />
+          <select
+            class="selects"
+            id="i3-select"
+            data-type="angel"
+            data-prev="deg"
+            data-id="i3"
+          >
+            <option value="deg" selected>degrees (deg)</option>
+            <option value="rad">radians (rad)</option>
+            <option value="gon">gradians (gon)</option>
+            <option value="tr">turns (tr)</option>
+            <option value="arcmin">minutes of arc (arcmin)</option>
+            <option value="arcsec">seconds of arc (arcsec)</option>
+            <option value="mrad">milliradians (mrad)</option>
+            <option value="μrad">microradians (μrad)</option>
+            <option value="πrad">π radians (× π rad)</option>
+          </select>
+        </p> -->
+      </div>
+
+      <button id="calcBtn">Calculate</button>
+      <button id="resetBtn">Reset</button>
+      <hr>
+      <div>
+        <h3>Result:</h3>
+        <h3 id="calcResults">Result will appear here...</h3>
+      </div>
+    <script>
+      /*************** ELEMENTS ***************/
+      const selects = document.querySelectorAll(".selects");
+      const inputs = document.querySelectorAll(".inputs");
+      const resetBtn = document.getElementById("clear-btn");
+
+      const input1 = document.getElementById("i1-input");
+      const input2 = document.getElementById("i2-input");
+      
+      let i3Select = 'deg'
+      let angleVal = 0
+
+      const calcBtnEl = document.getElementById('calcBtn');
+      const resetBtnEl = document.getElementById('resetBtn');
+      const calcResultsEl = document.getElementById('calcResults')
+
+      /*************** GLOBAL VARIBLES ***************/
+      const UNITS = {
+        unit: {
+          unit: 1,
+        },
+        angel: {
+          deg: 1,
+          rad: 0.017453292519943295,
+          gon: 1.111111111111111111111111111111112,
+          tr: 0.0027777777777777775,
+          arcmin: 60,
+          arcsec: 3600,
+          mrad: 17.453292519943293,
+          μrad: 17453.292519943294,
+          πrad: 0.0055555555555555556,
+        },
+        distance: {
+          mm: 1e3,
+          cm: 1e2,
+          dm: 1e1,
+          m: 1,
+          in: 39.37007874015748,
+          ft: 3.2808398950131235,
+          yd: 1.0936132983377078,
+        },
+      };
+
+      /*************** FUNCTIONS ***************/
+      function toSIUnit(type, unit, value) {
+        if (type === "exp") {
+          unit = parseFloat("1e" + unit);
+          return value * unit;
+        }
+        return value / UNITS[type][unit];
+      }
+
+      function fromSIUnit(type, unit, value) {
+        if (type === "exp") {
+          unit = parseFloat("1e" + unit);
+          return value / unit;
+        }
+        return value * UNITS[type][unit];
+      }
+
+      function customPercision(ans, to = 8) {
+        return parseFloat(parseFloat(ans).toPrecision(to));
+      }
+
+      function radiansToDegrees(radians) {
+        return (radians * 180) / Math.PI;
+      }
+
+      function degreesToRadians(degrees) {
+        return degrees * (Math.PI / 180);
+      }
+
+      function validateInput(id) {
+        const input = document.getElementById(`${id}-input`);
+        const label = input.getAttribute("data-name").trim();
+        let value = parseFloat(input.value);
+
+        if (value <= 0) {
+          alert(`${label} must be greater than zero!`)
+          return false;
+        }
+
+        return true;
+      }
+
+      // related to caculation
+      function prepareUnit(...args) {
+        const resultArr = [];
+        for (id of args) {
+          const input = document.getElementById(`${id}-input`);
+          const select = document.getElementById(`${id}-select`);
+          const type = select.getAttribute("data-type");
+          let val = parseFloat(input.value);
+          val = isNaN(val) ? 0 : val;
+          let inUnit = select.value;
+          val = toSIUnit(type, inUnit, val);
+          resultArr.push(val);
+        }
+
+        return resultArr;
+      }
+
+      function setResult(resultObj) {
+        for (key of Object.keys(resultObj)) {
+          let val = resultObj[key].result;
+          let id = resultObj[key].type;
+          if (isNaN(val)) {
+            alert("Your input resulted in NAN.\n 0/0 \n Try again with valid input.");
+            return;
+          }
+          if (Math.abs(val) === Infinity) {
+            alert(
+              "Your input resulted in Infinity. \nDivision by zero. \nTry again with valid input."
+            );
+            return;
+          }
+
+          const input = document.getElementById(`${id}-input`);
+
+          if (id == 'i3') {
+            let outUnit = i3Select;
+            val = fromSIUnit('angel', outUnit, val);
+          } 
+
+          return customPercision(val)
+        }
+      }
+
+      function calculateResult() {
+        function calculateI3() {
+          let [val1, val2] = prepareUnit("i1", "i2");
+          let result = radiansToDegrees(Math.atan(val1 / val2));
+          return {
+            1: { result, type: "i3" },
+            values: [val1, val2]
+          };
+        }
+        return calculateI3()
+      }
+
+      function handleResultsChange(e) {
+        let select = e.target;
+        let id = select.getAttribute("data-id");
+
+        let prevUnit = i3Select
+        let currentUnit = select.value;
+        i3Select = currentUnit
+        
+        let si = toSIUnit('angel', prevUnit, angleVal);
+        let result = fromSIUnit('angel', currentUnit, si);
+        angleVal = customPercision(result, 12);
+        const angleReposePara = document.getElementById('angReposePara')
+        angleReposePara.innerHTML = `
+        Angle of repose: ${angleVal}
+        `
+      }
+
+      function calculateResults() {
+        for (el of ["i1", "i2"]) {
+          if (!validateInput(el)) return;
+        }
+        const result = calculateResult();
+        angleVal = setResult(result);
+        if (!angleVal) return
+        
+        const statFricCoeff = customPercision(parseFloat(result.values[0]) / parseFloat(result.values[1]), 8) 
+        const resultsSelect = document.createElement('select')
+        resultsSelect.id = "i3-select";
+        resultsSelect["data-type"] = "angel"
+        resultsSelect["data-prev"] = "deg"
+        resultsSelect["data-id"] = "i3"
+
+        resultsSelect.innerHTML = `
+            <option value="deg" selected>degrees (deg)</option>
+            <option value="rad">radians (rad)</option>
+            <option value="gon">gradians (gon)</option>
+            <option value="tr">turns (tr)</option>
+            <option value="arcmin">minutes of arc (arcmin)</option>
+            <option value="arcsec">seconds of arc (arcsec)</option>
+            <option value="mrad">milliradians (mrad)</option>
+            <option value="μrad">microradians (μrad)</option>
+            <option value="πrad">π radians (× π rad)</option>
+          `
+        resultsSelect.addEventListener("change", handleResultsChange)
+        calcResultsEl.innerHTML = `
+          <p>Static friction coefficient: ${statFricCoeff}</p>
+          <span id="angReposePara">Angle of repose:  ${angleVal}  &nbsp; &nbsp;</span>
+        `
+        calcResultsEl.append(resultsSelect)
+      }
+
+      function resetForm() {
+        input1.value = ""
+        input2.value = ""
+        selects.forEach((select) => {
+          select.selectedIndex = '3'
+        });
+      }
+
+      function resetResult() {
+        calcResultsEl.innerHTML = "<p>Result will appear here...</p>";
+      } 
+
+      function resethandler() {
+        resetForm();
+        resetResult();
+      }
+
+      /*************** EVENT LISTINERS ***************/
+      selects.forEach((select) => {
+        select.addEventListener("change", resetResult);
+      });
+
+      [input1, input2].forEach((el) => {
+        el.addEventListener("input", resetResult);
+      });
+
+      resetBtnEl.addEventListener("click", resethandler);
+      calcBtnEl.addEventListener("click", calculateResults);
+
+    </script>
+  </body>
+</html>
