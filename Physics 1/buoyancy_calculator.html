@@ -81,10 +81,6 @@
       </div>
     <script>
       /*************** ELEMENTS ***************/
-      const formEl = document.getElementById("form-1");
-      const resultEl = document.getElementById("result-div");
-      const clearBtn = document.getElementById("clear-btn");
-
       const i1InputEl = document.getElementById("i1-input");
       const i2InputEl = document.getElementById("i2-input");
       const i3InputEl = document.getElementById("i3-input");
@@ -223,47 +219,7 @@
         return resultObj;
       }
 
-      function submitHandler(e) {
-        e.preventDefault();
-
-        try {
-          const { force, mass } = calculateResult();
-          let { result, type, name } = force;
-          let { result2, type2, name2 } = mass;
-          if (isNaN(result) || isNaN(result2)) {
-            alert("Your input resulted in NAN.\n 0/0 \n Try again with valid input.");
-            resultEl.innerHTML = "";
-            return;
-          }
-          if (Math.abs(result) === Infinity || Math.abs(result2) === Infinity) {
-            alert(
-              "Your input resulted in Infinity. \nDivision by zero. \nTry again with valid input."
-            );
-            resultEl.innerHTML = "";
-            return;
-          }
-
-          const resultObj = prepareResults(result, type, name);
-          const resultObj2 = prepareResults(result2, type2, name2);
-          const elementNodes = createElements(resultObj);
-          const elementNodes2 = createElements(resultObj2);
-          resultEl.innerHTML = `<p> Calculation Results </p>`;
-
-          elementNodes.forEach((element) => {
-            resultEl.append(element);
-          });
-          resultEl.innerHTML += ` <br/>`;
-          elementNodes2.forEach((element) => {
-            resultEl.append(element);
-          });
-        } catch (error) {
-          console.log(error);
-          alert("An error ocurred. Try again with valid input.");
-          resultEl.innerHTML = "";
-          return;
-        }
-      }
-
+      
       function calculateResults() {
         try {
           const { force, mass } = calculateResult();
