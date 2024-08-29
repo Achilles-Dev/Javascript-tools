@@ -102,7 +102,6 @@
       /*************** ELEMENTS ***************/
       const selects = document.querySelectorAll(".selects");
       const inputs = document.querySelectorAll(".inputs");
-      const resetBtn = document.getElementById("clear-btn");
 
       let i4Select = 'm';
       let i5Select = 'm'
@@ -244,7 +243,6 @@
         let prevUnit = i4Select;
         let currentUnit = select.value;
         i4Select = currentUnit
-        console.log(id)
 
         let si = toSIUnit("distance", prevUnit, beltLength1);
         let result = fromSIUnit("distance", currentUnit, si);

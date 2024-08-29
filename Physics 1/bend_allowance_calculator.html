@@ -108,65 +108,6 @@
             <option value="unit">Unit</option>
           </select>
         </p>
-
-        <!-- <div>
-          <p>
-            The following fields are calculated automatically, and cannot be
-            changed.
-          </p>
-        </div>
-
-        <p>
-          <label for="i5-input">Bend allowance (BA)</label>
-          <input
-            type="number"
-            autocomplete="off"
-            data-id="i5"
-            step="any"
-            id="i5-input"
-            disabled
-          />
-          <select
-            class="selects"
-            id="i5-select"
-            data-type="distance"
-            data-prev="yd"
-            data-id="i5"
-          >
-            <option value="mm">millimeters (mm)</option>
-            <option value="cm">centimeters (cm)</option>
-            <option value="m">meters (m)</option>
-            <option value="in">inches (in)</option>
-            <option value="ft">feet (ft)</option>
-            <option value="yd" selected>yards (yd)</option>
-          </select>
-        </p>
-
-        <p>
-          <label for="i6-input">Bend deduction (BD)</label>
-          <input
-            type="number"
-            autocomplete="off"
-            data-id="i6"
-            step="any"
-            id="i6-input"
-            disabled
-          />
-          <select
-            class="selects"
-            id="i6-select"
-            data-type="distance"
-            data-prev="mm"
-            data-id="i6"
-          >
-            <option value="mm" selected>millimeters (mm)</option>
-            <option value="cm">centimeters (cm)</option>
-            <option value="m">meters (m)</option>
-            <option value="in">inches (in)</option>
-            <option value="ft">feet (ft)</option>
-            <option value="yd">yards (yd)</option>
-          </select>
-        </p> -->
       </div>
 
       <button id="calcBtn">Calculate</button>
@@ -180,7 +121,6 @@
       /*************** ELEMENTS ***************/
       const selects = document.querySelectorAll(".selects");
       const inputs = document.querySelectorAll(".inputs");
-      const resetBtn = document.getElementById("clear-btn");
 
       let i5Select = 'yd';
       let i6Select = 'mm'
@@ -213,7 +153,6 @@
 
       /*************** FUNCTIONS ***************/
       function toSIUnit(type, unit, value) {
-        console.log(type, unit, value)
         return value / UNITS[type][unit];
       }
 
@@ -232,59 +171,6 @@
 
         return false;
       }
-
-      function selectChangeHandler(e) {
-        let select = e.target;
-        let id = select.getAttribute("data-id");
-        let input = document.getElementById(`${id}-input`);
-
-        let prevUnit = select.getAttribute("data-prev");
-        let currentUnit = select.value;
-        select.setAttribute("data-prev", currentUnit);
-
-        if (input.value === "") {
-          return;
-        }
-
-        let type = select.getAttribute("data-type");
-
-        let value = input.value;
-        value = parseFloat(value);
-        if (isNaN(value)) value = 0.0;
-
-        let si = toSIUnit(type, prevUnit, value);
-        let result = fromSIUnit(type, currentUnit, si);
-        input.value = result.toPrecision(6);
-      }
-
-      function selectClickHandler(e) {
-        let value = e.target.value;
-        e.target.setAttribute("data-prev", value);
-      }
-
-      function inputHandler(e) {
-        try {
-          const input = e.target;
-          let id = input.getAttribute("data-id");
-          if (input.value == "") {
-            deleteHandler("i5", "i6");
-            return;
-          }
-
-          for (id of ["i1", "i2", "i3", "i4"]) {
-            if (!validateInput(id)) return;
-          }
-
-          const result = calculateResult("i1", "i2", "i3", "i4");
-          setResult(result);
-        } catch (error) {
-          alert(
-            "An error occurred. Try again with valid input, or try contacting us."
-          );
-          console.log(error);
-        }
-      }
-      1;
 
       function validateInput(id) {
         const input = document.getElementById(`${id}-input`);
@@ -328,24 +214,7 @@
           result2: { result: bd, type: "i6" },
         };
       }
-
-      function inputCounter() {
-        let count = 0;
-
-        inputs.forEach((input) => {
-          if (input.value !== "") {
-            count++;
-          }
-        });
-
-        return count;
-      }
-      
-      function deleteHandler(id1, id2) {
-        document.getElementById(`${id1}-input`).value = "";
-        document.getElementById(`${id2}-input`).value = "";
-      }
-
+     
       // related to caculation
       function prepareUnit(in1, in2, in3, in4) {
         const input1 = document.getElementById(`${in1}-input`);
@@ -358,7 +227,6 @@
         const select3 = document.getElementById(`${in3}-select`);
         const select4 = document.getElementById(`${in4}-select`);
 
-        console.log(in1, in2, in3, in4)
         const type1 = select1.getAttribute("data-type");
         const type2 = select2.getAttribute("data-type");
         const type3 = select3.getAttribute("data-type");
@@ -406,7 +274,6 @@
 
         const id1 = result1.type;
         const id2 = result2.type;
-        console.log("My IDS",id1, id2)
 
         let type1 = ''
         let outUnit2 = ''
@@ -435,11 +302,8 @@
         let currentUnit = select.value;
         i5Select = currentUnit
 
-        console.log(prevUnit, currentUnit)
-
         let si = toSIUnit("distance", prevUnit, bendAllow);
         let result = fromSIUnit("distance", currentUnit, si);
-        console.log(si, result)
         bendAllow = result.toPrecision(6)
 
         const bendAllowSpan = document.getElementById('bendAllow')
@@ -486,7 +350,6 @@
         results2Select.id = "i6-select";
         results2Select.setAttribute("data-id", "i6");
 
-        console.log(results1Select, results2Select)
         results1Select.innerHTML = `
             <option value="mm">millimeters (mm)</option>
             <option value="cm">centimeters (cm)</option>

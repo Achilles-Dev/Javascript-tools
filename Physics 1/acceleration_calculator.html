@@ -184,6 +184,7 @@
         aInputContainerEl.style.display = value === "a" ? 'none' : 'block'
         tInputContainerEl.style.display = value === "t" ? 'none' : 'block'
         
+        resetResult()
       }  
 
       function createElements(resultObj) {
@@ -340,6 +341,10 @@
       /*************** EVENTLISTINERS ***************/
       [viInput, vfInput, aInput, hInput, mInput, sInput].forEach((el) => {
         el.addEventListener("input", resetResult);
+      });
+
+      [viSelect, vfSelect, aSelect].forEach((el) => {
+        el.addEventListener("change", resetResult);
       });
 
       findUnitEl.addEventListener("change", handlefindUnitChange)
