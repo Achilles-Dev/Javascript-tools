@@ -66,61 +66,6 @@
             <option value="yd">yards (yd)</option>
           </select>
         </p>
-
-        <!-- <p>
-          <label for="i4-input"> Static friction coefficient</label>
-          <input
-            type="number"
-            min="0"
-            autocomplete="off"
-            data-id="i4"
-            step="any"
-            id="i4-input"
-            data-name="Static friction coefficient"
-            disabled
-          />
-          <select
-            class="selects"
-            id="i4-select"
-            data-type="unit"
-            data-prev="unit"
-            data-id="i4"
-            style="display: none"
-          >
-            <option value="unit">Unit</option>
-          </select>
-        </p> -->
-
-        <!-- <p>
-          <label for="i3-input">Angle of repose</label>
-          <input
-            type="number"
-            min="0"
-            autocomplete="off"
-            data-id="i3"
-            step="any"
-            class="inputs"
-            id="i3-input"
-            data-name="Angle"
-          />
-          <select
-            class="selects"
-            id="i3-select"
-            data-type="angel"
-            data-prev="deg"
-            data-id="i3"
-          >
-            <option value="deg" selected>degrees (deg)</option>
-            <option value="rad">radians (rad)</option>
-            <option value="gon">gradians (gon)</option>
-            <option value="tr">turns (tr)</option>
-            <option value="arcmin">minutes of arc (arcmin)</option>
-            <option value="arcsec">seconds of arc (arcsec)</option>
-            <option value="mrad">milliradians (mrad)</option>
-            <option value="μrad">microradians (μrad)</option>
-            <option value="πrad">π radians (× π rad)</option>
-          </select>
-        </p> -->
       </div>
 
       <button id="calcBtn">Calculate</button>
@@ -282,7 +227,7 @@
         let result = fromSIUnit('angel', currentUnit, si);
         angleVal = customPercision(result, 12);
         const angleReposePara = document.getElementById('angReposePara')
-        angleReposePara.innerHTML = `
+        angleReposePara.textContent = `
         Angle of repose: ${angleVal}
         `
       }
@@ -296,6 +241,7 @@
         if (!angleVal) return
         
         const statFricCoeff = customPercision(parseFloat(result.values[0]) / parseFloat(result.values[1]), 8) 
+        
         const resultsSelect = document.createElement('select')
         resultsSelect.id = "i3-select";
         resultsSelect["data-type"] = "angel"

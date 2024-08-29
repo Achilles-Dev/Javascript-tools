@@ -1,0 +1,559 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Bend Allowance Calculator</title>
+  </head>
+  <body>
+    <h1>Bend Allowance Calculator</h1>
+
+      <div>
+        <p>
+          <label for="i1-input">Bend angle (θ)</label>
+          <input
+            type="number"
+            autocomplete="off"
+            data-id="i1"
+            step="any"
+            id="i1-input"
+            class="inputs"
+            data-name="Bend angle (θ)"
+          />
+          <select
+            class="selects"
+            id="i1-select"
+            data-type="angle"
+            data-prev="deg"
+            data-id="i1"
+          >
+            <option value="deg" selected>degrees (deg)</option>
+            <option value="rad">radians (rad)</option>
+          </select>
+        </p>
+
+        <p>
+          <label for="i2-input">Inside radius (r)</label>
+          <input
+            type="number"
+            autocomplete="off"
+            data-id="i2"
+            step="any"
+            id="i2-input"
+            class="inputs"
+            data-name="Inside radius (r)"
+          />
+          <select
+            class="selects"
+            id="i2-select"
+            data-type="distance"
+            data-prev="m"
+            data-id="i2"
+          >
+            <option value="mm">millimeters (mm)</option>
+            <option value="cm">centimeters (cm)</option>
+            <option value="m" selected>meters (m)</option>
+            <option value="in">inches (in)</option>
+            <option value="ft">feet (ft)</option>
+            <option value="yd">yards (yd)</option>
+          </select>
+        </p>
+
+        <p>
+          <label for="i3-input">Material thickness (T)</label>
+          <input
+            type="number"
+            autocomplete="off"
+            data-id="i3"
+            step="any"
+            id="i3-input"
+            class="inputs"
+            data-name="Material thickness (T)"
+          />
+          <select
+            class="selects"
+            id="i3-select"
+            data-type="distance"
+            data-prev="mm"
+            data-id="i3"
+          >
+            <option value="mm" selected>millimeters (mm)</option>
+            <option value="cm">centimeters (cm)</option>
+            <option value="m">meters (m)</option>
+            <option value="in">inches (in)</option>
+            <option value="ft">feet (ft)</option>
+            <option value="yd">yards (yd)</option>
+          </select>
+        </p>
+
+        <p>
+          <label for="i4-input">K-factor</label>
+          <input
+            type="number"
+            autocomplete="off"
+            data-id="i4"
+            step="any"
+            id="i4-input"
+            class="inputs"
+            data-name="K-factor"
+          />
+          <select
+            class="selects"
+            id="i4-select"
+            data-type="K"
+            data-prev="unit"
+            data-id="i4"
+            style="display: none"
+          >
+            <option value="unit">Unit</option>
+          </select>
+        </p>
+
+        <!-- <div>
+          <p>
+            The following fields are calculated automatically, and cannot be
+            changed.
+          </p>
+        </div>
+
+        <p>
+          <label for="i5-input">Bend allowance (BA)</label>
+          <input
+            type="number"
+            autocomplete="off"
+            data-id="i5"
+            step="any"
+            id="i5-input"
+            disabled
+          />
+          <select
+            class="selects"
+            id="i5-select"
+            data-type="distance"
+            data-prev="yd"
+            data-id="i5"
+          >
+            <option value="mm">millimeters (mm)</option>
+            <option value="cm">centimeters (cm)</option>
+            <option value="m">meters (m)</option>
+            <option value="in">inches (in)</option>
+            <option value="ft">feet (ft)</option>
+            <option value="yd" selected>yards (yd)</option>
+          </select>
+        </p>
+
+        <p>
+          <label for="i6-input">Bend deduction (BD)</label>
+          <input
+            type="number"
+            autocomplete="off"
+            data-id="i6"
+            step="any"
+            id="i6-input"
+            disabled
+          />
+          <select
+            class="selects"
+            id="i6-select"
+            data-type="distance"
+            data-prev="mm"
+            data-id="i6"
+          >
+            <option value="mm" selected>millimeters (mm)</option>
+            <option value="cm">centimeters (cm)</option>
+            <option value="m">meters (m)</option>
+            <option value="in">inches (in)</option>
+            <option value="ft">feet (ft)</option>
+            <option value="yd">yards (yd)</option>
+          </select>
+        </p> -->
+      </div>
+
+      <button id="calcBtn">Calculate</button>
+      <button id="resetBtn">Reset</button>
+      <hr>
+      <div>
+        <h3>Result:</h3>
+        <h3 id="calcResults">Result will appear here...</h3>
+      </div>
+    <script>
+      /*************** ELEMENTS ***************/
+      const selects = document.querySelectorAll(".selects");
+      const inputs = document.querySelectorAll(".inputs");
+      const resetBtn = document.getElementById("clear-btn");
+
+      let i5Select = 'yd';
+      let i6Select = 'mm'
+
+      let bendAllow = 0;
+      let bendDeduct = 0;
+
+      const calcBtnEl = document.getElementById('calcBtn');
+      const resetBtnEl = document.getElementById('resetBtn');
+      const calcResultsEl = document.getElementById('calcResults')
+
+      /*************** GLOBAL VARIBLES ***************/
+      const UNITS = {
+        distance: {
+          mm: 1e3,
+          cm: 1e2,
+          m: 1,
+          in: 39.370078740157474,
+          ft: 3.280839895013123,
+          yd: 1.0936132983377078,
+        },
+        angle: {
+          deg: 1,
+          rad: 0.0174532925199433,
+        },
+        K: {
+          unit: 1,
+        },
+      };
+
+      /*************** FUNCTIONS ***************/
+      function toSIUnit(type, unit, value) {
+        console.log(type, unit, value)
+        return value / UNITS[type][unit];
+      }
+
+      function fromSIUnit(type, unit, value) {
+        return value * UNITS[type][unit];
+      }
+      function degreesToRadians(degrees) {
+        return degrees * (Math.PI / 180);
+      }
+
+      function isEmpty(...args) {
+        for (id of args) {
+          const input = document.getElementById(`${id}-input`);
+          if (input.value == "") return true;
+        }
+
+        return false;
+      }
+
+      function selectChangeHandler(e) {
+        let select = e.target;
+        let id = select.getAttribute("data-id");
+        let input = document.getElementById(`${id}-input`);
+
+        let prevUnit = select.getAttribute("data-prev");
+        let currentUnit = select.value;
+        select.setAttribute("data-prev", currentUnit);
+
+        if (input.value === "") {
+          return;
+        }
+
+        let type = select.getAttribute("data-type");
+
+        let value = input.value;
+        value = parseFloat(value);
+        if (isNaN(value)) value = 0.0;
+
+        let si = toSIUnit(type, prevUnit, value);
+        let result = fromSIUnit(type, currentUnit, si);
+        input.value = result.toPrecision(6);
+      }
+
+      function selectClickHandler(e) {
+        let value = e.target.value;
+        e.target.setAttribute("data-prev", value);
+      }
+
+      function inputHandler(e) {
+        try {
+          const input = e.target;
+          let id = input.getAttribute("data-id");
+          if (input.value == "") {
+            deleteHandler("i5", "i6");
+            return;
+          }
+
+          for (id of ["i1", "i2", "i3", "i4"]) {
+            if (!validateInput(id)) return;
+          }
+
+          const result = calculateResult("i1", "i2", "i3", "i4");
+          setResult(result);
+        } catch (error) {
+          alert(
+            "An error occurred. Try again with valid input, or try contacting us."
+          );
+          console.log(error);
+        }
+      }
+      1;
+
+      function validateInput(id) {
+        const input = document.getElementById(`${id}-input`);
+        const label = input.getAttribute("data-name").trim();
+        let value = parseFloat(input.value);
+        if (isEmpty("i1", "i2", "i3", "i4")) {
+          alert(`Please Enter All Details.`)
+          return;
+        }
+
+        if (label == "K-factor") {
+          if (value >= 1 || value <= 0) {
+            alert(`K-factor must be between 0 and 1! (0 < K < 1)`)
+            return false;
+          }
+        }
+        if (value <= 0) {
+          alert(`${label} must be greater than zero!`)
+          return false;
+        }
+        if (label == "Bend angle (θ)") {
+          let unit = document.getElementById(`${id}-select`).value;
+          value = toSIUnit("angle", unit, value);
+          if (value > 180) {
+            alert(`It's not physically possible to produce a bend greater than 180°!`);
+            return false;
+          }
+        }
+
+        return true;
+      }
+
+      function calculateResult(in1, in2, in3, in4) {
+        const { val1, val2, val3, val4 } = prepareUnit(in1, in2, in3, in4);
+        const rad = degreesToRadians(val1);
+        let ba = ((val1 * Math.PI) / 180) * (val2 + val4 * val3);
+        let bd = 2 * (val2 + val3) * Math.tan(rad / 2) - ba;
+
+        return {
+          result1: { result: ba, type: "i5" },
+          result2: { result: bd, type: "i6" },
+        };
+      }
+
+      function inputCounter() {
+        let count = 0;
+
+        inputs.forEach((input) => {
+          if (input.value !== "") {
+            count++;
+          }
+        });
+
+        return count;
+      }
+      
+      function deleteHandler(id1, id2) {
+        document.getElementById(`${id1}-input`).value = "";
+        document.getElementById(`${id2}-input`).value = "";
+      }
+
+      // related to caculation
+      function prepareUnit(in1, in2, in3, in4) {
+        const input1 = document.getElementById(`${in1}-input`);
+        const input2 = document.getElementById(`${in2}-input`);
+        const input3 = document.getElementById(`${in3}-input`);
+        const input4 = document.getElementById(`${in4}-input`);
+
+        const select1 = document.getElementById(`${in1}-select`);
+        const select2 = document.getElementById(`${in2}-select`);
+        const select3 = document.getElementById(`${in3}-select`);
+        const select4 = document.getElementById(`${in4}-select`);
+
+        console.log(in1, in2, in3, in4)
+        const type1 = select1.getAttribute("data-type");
+        const type2 = select2.getAttribute("data-type");
+        const type3 = select3.getAttribute("data-type");
+        const type4 = select4.getAttribute("data-type");
+
+        let val1 = parseFloat(input1.value);
+        let val2 = parseFloat(input2.value);
+        let val3 = parseFloat(input3.value);
+        let val4 = parseFloat(input4.value);
+
+        val1 = isNaN(val1) ? 0 : val1;
+        val2 = isNaN(val2) ? 0 : val2;
+        val3 = isNaN(val3) ? 0 : val3;
+        val4 = isNaN(val4) ? 0 : val4;
+
+        let in1Unit = select1.value;
+        let in2Unit = select2.value;
+        let in3Unit = select3.value;
+        let in4Unit = select4.value;
+
+        val1 = toSIUnit(type1, in1Unit, val1);
+        val2 = toSIUnit(type2, in2Unit, val2);
+        val3 = toSIUnit(type3, in3Unit, val3);
+        val4 = toSIUnit(type4, in4Unit, val4);
+
+        return { val1, val2, val3, val4 };
+      }
+
+      function setResult(result) {
+        const { result1, result2 } = result;
+
+        let val1 = result1.result;
+        let val2 = result2.result;
+
+        if (isNaN(val1) || isNaN(val2)) {
+          alert("Your input resulted in NAN.\n 0/0 \n Try again with valid input.");
+          return;
+        }
+        if (Math.abs(val1) === Infinity || Math.abs(val2) === Infinity) {
+          alert(
+            "Your input resulted in Infinity. \nDivision by zero. \nTry again with valid input."
+          );
+          return;
+        }
+
+        const id1 = result1.type;
+        const id2 = result2.type;
+        console.log("My IDS",id1, id2)
+
+        let type1 = ''
+        let outUnit2 = ''
+        let type2 = ''
+        let outUnit3 = ''
+        if (id1 == 'i5') {
+          type1 = 'distance'
+          outUnit1 = i5Select
+        } 
+        if (id2 == 'i6') {
+          type2 = 'distance'
+          outUnit2 = i6Select
+        }
+
+        val1 = fromSIUnit(type1, outUnit1, val1);
+        val2 = fromSIUnit(type2, outUnit2, val2);
+
+        return [val1, val2]
+      }
+
+      function handleResults1Change(e) {
+        let select = e.target;
+        let id = select.getAttribute("data-id");
+
+        let prevUnit = i5Select;
+        let currentUnit = select.value;
+        i5Select = currentUnit
+
+        console.log(prevUnit, currentUnit)
+
+        let si = toSIUnit("distance", prevUnit, bendAllow);
+        let result = fromSIUnit("distance", currentUnit, si);
+        console.log(si, result)
+        bendAllow = result.toPrecision(6)
+
+        const bendAllowSpan = document.getElementById('bendAllow')
+        bendAllowSpan.textContent = `
+          Bend allowance (BA): ${bendAllow}
+        `
+      }
+
+      function handleResults2Change(e) {
+        let select = e.target;
+        let id = select.getAttribute("data-id");
+
+        let prevUnit = i6Select;
+        let currentUnit = select.value;
+        i6Select = currentUnit
+
+
+        let si = toSIUnit("distance", prevUnit, bendDeduct);
+        let result = fromSIUnit("distance", currentUnit, si);
+        bendDeduct = result.toPrecision(6)
+
+        const bendDeductSpan = document.getElementById('bendDeduct')
+        bendDeductSpan.textContent = `
+          Bend deduction (BD): ${bendDeduct}
+        `
+      }
+
+
+      function calculateResults() {
+        for (id of ["i1", "i2", "i3", "i4"]) {
+          if (!validateInput(id)) return;
+        }
+
+        const result = calculateResult("i1", "i2", "i3", "i4");
+
+        const results = setResult(result);
+        bendAllow = results[0]
+        bendDeduct = results[1]
+
+        const results1Select = document.createElement('select')
+        results1Select.id = "i5-select";
+        results1Select.setAttribute("data-id", "i5");
+        const results2Select = document.createElement('select')
+        results2Select.id = "i6-select";
+        results2Select.setAttribute("data-id", "i6");
+
+        console.log(results1Select, results2Select)
+        results1Select.innerHTML = `
+            <option value="mm">millimeters (mm)</option>
+            <option value="cm">centimeters (cm)</option>
+            <option value="m">meters (m)</option>
+            <option value="in">inches (in)</option>
+            <option value="ft">feet (ft)</option>
+            <option value="yd" selected>yards (yd)</option>
+        `
+        results2Select.innerHTML = `
+            <option value="mm" selected>millimeters (mm)</option>
+            <option value="cm">centimeters (cm)</option>
+            <option value="m">meters (m)</option>
+            <option value="in">inches (in)</option>
+            <option value="ft">feet (ft)</option>
+            <option value="yd">yards (yd)</option>
+        `
+        results1Select.addEventListener("change", handleResults1Change)
+        results2Select.addEventListener("change", handleResults2Change)
+
+        calcResultsEl.innerHTML = `
+          <p>
+          <span id="bendAllow">Bend allowance (BA): ${results[0]} &nbsp; &nbsp;</span>
+          <span id="resultSelect1"></span>
+          </p>
+          <p>
+          <span id="bendDeduct">Bend deduction (BD): ${results[1]} &nbsp; &nbsp;</span>
+          <span id="resultSelect2"></span>
+          </p>
+        `
+        const resultSelect1Span = document.getElementById('resultSelect1')
+        resultSelect1Span.append(results1Select)
+
+        const resultSelect2Span = document.getElementById('resultSelect2')
+        resultSelect2Span.append(results2Select)
+      }
+
+      function resetForm() {
+        inputs.forEach((input) => {
+          input.value = ""
+        });
+        
+        selects.forEach((select) => {
+          select.selectedIndex = '3'
+        });
+      }
+
+      function resetResult() {
+        calcResultsEl.innerHTML = "<p>Result will appear here...</p>";
+      } 
+
+      function resethandler() {
+        resetForm();
+        resetResult();
+      }
+
+      /*************** EVENT LISTINERS ***************/
+      selects.forEach((select) => {
+        select.addEventListener("change", resetResult);
+      });
+
+      inputs.forEach((input) => {
+        input.addEventListener("input", resetResult);
+      });
+
+      resetBtnEl.addEventListener("click", resethandler);
+      calcBtnEl.addEventListener("click", calculateResults);
+
+    </script>
+  </body>
+</html>
