@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Delta V Calculator</title>
+  </head>
+  <body>
+    <h1>Delta V Calculator</h1>
+      <p>
+        Calculate:
+        <select id="calculateUnit">
+          <option value="si" selected>Specific impulse</option>
+          <option value="ev">Exhaust velocity</option>
+        </select>
+      </p>
+
+      <div>
+        <p id="si-container">
+          <label for="i1-input">Specific impulse (Iₛₚ) </label>
+          <input
+            type="number"
+            min="0"
+            autocomplete="off"
+            data-id="i1"
+            step="any"
+            id="i1-input"
+            class="inputs"
+            data-name="Specific impulse"
+            data-turn="si"
+          />
+          <select
+            class="selects"
+            id="i1-select"
+            data-type="time"
+            data-prev="sec"
+            data-id="i1"
+            data-turn="si"
+          >
+            <option value="sec" selected>seconds (sec)</option>
+            <option value="min">minutes (min)</option>
+            <option value="hrs">hour (hrs)</option>
+          </select>
+        </p>
+
+        <p id="ev-container" style="display: none;">
+          <label for="i12-input">Exhaust velocity (vₑ) </label>
+          <input
+            type="number"
+            min="0"
+            autocomplete="off"
+            data-id="i12"
+            step="any"
+            id="i12-input"
+            class=""
+            data-name="Exhaust velocity"
+            data-turn="ev"
+          />
+          <select
+            class=""
+            id="i12-select"
+            data-type="speed"
+            data-prev="km/s"
+            data-id="i12"
+            data-turn="ev"
+          >
+            <option value="m/s">meters per second (m/s)</option>
+            <option value="ft/s">feet per second (ft/s)</option>
+            <option value="mph">miles per hour (mph)</option>
+            <option value="km/s" selected>kilometers per second (km/s)</option>
+            <option value="ft/min">feet per minute (ft/min)</option>
+            <option value="m/min">meters per minute (m/min)</option>
+            <option value="cm/s">centimeters per second (cm/s)</option>
+          </select>
+        </p>
+
+        <p>
+          <label for="i2-input">Initial mass (m₀)</label>
+          <input
+            type="number"
+            min="0"
+            autocomplete="off"
+            data-id="i2"
+            step="any"
+            id="i2-input"
+            class="inputs"
+            data-name="Initial mass"
+          />
+
+          <select
+            class="selects"
+            id="i2-select"
+            data-type="mass"
+            data-prev="kg"
+            data-id="i2"
+          >
+            <option value="kg" selected>kilograms (kg)</option>
+            <option value="t">metric tons (t)</option>
+            <option value="kt">metric kilotons (kt)</option>
+            <option value="lb">pounds (lb)</option>
+            <option value="US ton">US short tons (US ton)</option>
+          </select>
+        </p>
+
+        <p>
+          <label for="i3-input">Final mass (mₜ)</label>
+          <input
+            type="number"
+            min="0"
+            autocomplete="off"
+            data-id="i3"
+            step="any"
+            class="inputs"
+            id="i3-input"
+            data-name="Final mass"
+          />
+          <select
+            class="selects"
+            id="i3-select"
+            data-type="mass"
+            data-prev="kg"
+            data-id="i3"
+          >
+            <option value="kg" selected>kilograms (kg)</option>
+            <option value="t">metric tons (t)</option>
+            <option value="kt">metric kilotons (kt)</option>
+            <option value="lb">pounds (lb)</option>
+            <option value="US ton">US short tons (US ton)</option>
+          </select>
+        </p>
+      </div>
+
+      <button id="calcBtn">Calculate</button>
+      <button id="resetBtn">Reset</button>
+      <hr>
+      <div>
+        <h3>Result:</h3>
+        <h3 id="calcResults">Result will appear here...</h3>
+      </div>
+    <script>
+      /*************** ELEMENTS ***************/
+      const selects = document.querySelectorAll(".selects");
+      const inputs = document.querySelectorAll(".inputs");
+      const calculateUnitEl = document.getElementById('calculateUnit');
+
+      const siInputContainerEl = document.getElementById('si-container')
+      const evInputContainerEl = document.getElementById('ev-container')
+
+      let deltaVal = 0
+      let i4Select = 'm/s'
+
+      const calcBtnEl = document.getElementById('calcBtn');
+      const resetBtnEl = document.getElementById('resetBtn');
+      const calcResultsEl = document.getElementById('calcResults')
+
+      /*************** GLOBAL VARIBLES ***************/
+      const UNITS = {
+        time: {
+          sec: 1,
+          min: 0.01666666666666666666666666666666666666666666667,
+          hrs: 0.00027777777777777777777777777777777777777777778,
+        },
+
+        mass: {
+          kg: 1,
+          t: 1e-3,
+          kt: 1e-6,
+          lb: 2.204623,
+          "US ton": 0.0011023,
+        },
+
+        speed: {
+          "m/s": 1,
+          "km/h": 3.6,
+          "ft/s": 3.2808398950131235,
+          mph: 2.2369362920544025,
+          "km/s": 0.001,
+          "mi/s": 0.0006213711922373339,
+          "ft/min": 196.8503937007874,
+          "m/min": 60,
+          "cm/s": 100,
+        },
+      };
+
+      let queue = ["i1", "i2", "i3", "i4"];
+      /*************** FUNCTIONS ***************/
+      function toSIUnit(type, unit, value) {
+        if (type === "exp") {
+          unit = parseFloat("1e" + unit);
+          return value * unit;
+        }
+        return value / UNITS[type][unit];
+      }
+
+      function fromSIUnit(type, unit, value) {
+        if (type === "exp") {
+          unit = parseFloat("1e" + unit);
+          return value / unit;
+        }
+        return value * UNITS[type][unit];
+      }
+
+      function handleCalculateUnitChange(e) {
+        const value = e.target.value
+        siInputContainerEl.style.display = value === "si" ? 'block' : 'none'
+        evInputContainerEl.style.display = value === "ev" ? 'block' : 'none'
+
+        resetResult()
+      }
+
+      function customPercision(ans, to = 8) {
+        return parseFloat(parseFloat(ans).toPrecision(to));
+      }
+
+      function isEmpty(...args) {
+        for (id of args) {
+          const input = document.getElementById(`${id}-input`);
+          if (input.value == "") return true;
+        }
+
+        return false;
+      }
+
+
+      function validateInput(id) {
+        const input = document.getElementById(`${id}-input`);
+        const label = input.getAttribute("data-name").trim();
+        let value = parseFloat(input.value);
+
+        if (isEmpty("i1", "i2", "i3")) {
+          alert(`Please Enter All Details.`)
+          return;
+        }
+
+        if (value <= 0) {
+          alert(`${label} must be greater than zero!`);
+          return false;
+        }
+
+        return true;
+      }
+
+      // related to caculation
+      function prepareUnit(...args) {
+        const resultArr = [];
+        for (id of args) {
+          const input = document.getElementById(`${id}-input`);
+          const select = document.getElementById(`${id}-select`);
+          const type = select.getAttribute("data-type");
+          let val = parseFloat(input.value);
+          val = isNaN(val) ? 0 : val;
+          let inUnit = select.value;
+          val = toSIUnit(type, inUnit, val);
+          resultArr.push(val);
+        }
+
+        return resultArr;
+      }
+
+      function setResult(resultObj) {
+        for (key of Object.keys(resultObj)) {
+          let val = resultObj[key].result;
+          let id = resultObj[key].type;
+          if (isNaN(val)) {
+            alert("Your input resulted in NAN.\n 0/0 \n Try again with valid input.");
+            return;
+          }
+          if (Math.abs(val) === Infinity) {
+            alert(
+              "Your input resulted in Infinity. \nDivision by zero. \nTry again with valid input."
+            );
+            return;
+          }
+
+          const type = 'speed'
+          let outUnit = i4Select
+          val = fromSIUnit(type, outUnit, val);
+
+          return customPercision(val, 16);
+        }
+      }
+
+      function calculateResult() {
+        let gravity = 1;
+        let mode = calculateUnitEl.value;
+        
+        if (mode === "si") gravity = 9.80665;
+
+        function calculateI4() {
+          let [val1, val2, val3] = prepareUnit("i1", "i2", "i3");
+          if (mode === "ev") [val1] = prepareUnit("i12");
+          let result = val1 * gravity * Math.log(val2 / val3);
+
+          return {
+            1: { result, type: "i4" },
+          };
+        }
+        return calculateI4()
+      }
+
+      function handleResultsChange(e) {
+        let select = e.target;
+        let id = select.getAttribute("data-id");
+
+        let prevUnit = i4Select;
+        let currentUnit = select.value;
+        i4Select = currentUnit
+
+        let si = toSIUnit("speed", prevUnit, deltaVal);
+        let result = fromSIUnit("speed", currentUnit, si);
+        deltaVal = customPercision(result, 13);
+
+        const deltaVSpan = document.getElementById('deltaV')
+        deltaVSpan.textContent = `
+          Delta-v (Δv): ${deltaVal}
+        `
+      }
+
+      function calculateResults() {
+        const calculateUnit = calculateUnitEl.value
+        for (el of ["i1", "i2", "i3"]) {
+          if (!validateInput(el)) return;
+        }
+
+        try {
+          const result = calculateResult();
+          
+          deltaVal = setResult(result);
+
+          const resultsSelect = document.createElement('select')
+          resultsSelect.id = "i4-select";
+          resultsSelect.setAttribute("data-id", "i4");
+
+          resultsSelect.innerHTML = `
+            <option value="m/s" selected>meters per second (m/s)</option>
+            <option value="km/h">kilometers per hour (km/h)</option>
+            <option value="ft/s">feet per second (ft/s)</option>
+            <option value="mph">miles per hour (mph)</option>
+            <option value="km/s">kilometers per second (km/s)</option>
+            <option value="mi/s">miles per second (mi/s)</option>
+            <option value="ft/min">feet per minute (ft/min)</option>
+            <option value="m/min">meters per minute (m/min)</option>
+          `
+          
+          
+          resultsSelect.addEventListener("change", handleResultsChange)
+          
+
+          calcResultsEl.innerHTML = `
+            <p>
+            <span id="deltaV">Delta-v (Δv) : ${deltaVal} &nbsp; &nbsp;</span>
+            <span id="resultSelect"></span>
+            </p>
+          `
+          const resultSelectSpan = document.getElementById('resultSelect')
+          resultSelectSpan.append(resultsSelect)
+
+
+        } catch(error) {
+          alert("An error ocurred. Try again with valid input.");
+          resetResult()
+          return;
+        }
+      }
+
+      function resetForm() {
+        selects.forEach((select, index) => {
+            select.selectedIndex = '0'
+        });
+
+        inputs.forEach((input) => {
+          input.value = ""
+        });
+        calculateUnitEl.selectedIndex = '0';
+        siInputContainerEl.style.display = 'block'
+        evInputContainerEl.style.display = 'none'
+      }
+
+      function resetResult() {
+        calcResultsEl.innerHTML = "<p>Result will appear here...</p>";
+      } 
+
+      function resethandler() {
+        resetForm();
+        resetResult();
+      }
+
+      /*************** EVENT LISTINERS ***************/
+      selects.forEach((select) => {
+        select.addEventListener("change", resetResult);
+      });
+      inputs.forEach((input) => {
+        input.addEventListener("input", resetResult);
+      });
+
+      calculateUnitEl.addEventListener("change", handleCalculateUnitChange);
+
+      resetBtnEl.addEventListener("click", resethandler);
+      calcBtnEl.addEventListener("click", calculateResults);
+
+    </script>
+  </body>
+</html>
