@@ -323,105 +323,6 @@
         return resultObj;
       }
       
-      function submitHandler(e) {
-        e.preventDefault();
-
-        const checkRadio = document
-          .querySelector('input[name="group-togglers"]:checked')
-          .getAttribute("data-toggle");
-
-        try {
-          const { result, type, name } = calculateResult(checkRadio);
-
-          if (isNaN(result)) {
-            alert("Your input resulted in NAN.\n 0/0 \n Try again with valid input.");
-            resultEl.innerHTML = "";
-            return;
-          }
-          if (Math.abs(result) === Infinity) {
-            alert(
-              "Your input resulted in Infinity. \nDivision by zero. \nTry again with valid input."
-            );
-
-            resultEl.innerHTML = "";
-            return;
-          }
-
-          const resultObj = prepareResults(result, type, name);
-          const elementNodes = createElements(resultObj);
-          resultEl.innerHTML = `<p> Calculation Results </p>`;
-
-          elementNodes.forEach((element) => {
-            resultEl.append(element);
-          });
-        } catch (error) {
-          console.log(error);
-          alert("An error ocurred. Try again with valid input.");
-          resultEl.innerHTML = "";
-          return;
-        }
-      }
-
-      function toggleGroup(e) {
-        const toBeToggled = e.target.getAttribute("data-toggle");
-        containers.forEach((container) => {
-          container.style.display = "";
-        });
-        document.getElementById(`${toBeToggled}-contianer`).style.display = "none";
-
-        //   add required to elements
-        inputs.forEach((input) => {
-          input.setAttribute("required", "required");
-        });
-
-        // remove required from element beign calculated
-        const notRequired = document.getElementById(`${toBeToggled}-input`);
-        notRequired.removeAttribute("required");
-
-        //   clear result elemetn
-        ctChangeHandler(toBeToggled);
-
-        resultEl.innerHTML = "";
-      }
-
-      function ctChangeHandler(tb = "null") {
-        const type = circuitTypeSelect.value;
-        const checkRadio = document
-          .querySelector('input[name="group-togglers"]:checked')
-          .getAttribute("data-toggle");
-        if (type === "rc") {
-          document.getElementById("ic-contianer").style.display = "none";
-          document.getElementById("ic-input").removeAttribute("required");
-          document.getElementById("ic-radio").style.display = "none";
-          document.querySelector('[for = "ic-radio"]').style.display = "none";
-
-          if (tb !== "cp") {
-            document.getElementById("cp-contianer").style.display = "";
-            document.getElementById("cp-input").setAttribute("required", "required");
-            document.getElementById("cp-radio").style.display = "";
-            document.querySelector('[for = "cp-radio"]').style.display = "";
-          }
-          if (checkRadio === "ic") {
-            document.getElementById("cp-radio").click();
-          }
-        } else if (type === "rl") {
-          document.getElementById("cp-contianer").style.display = "none";
-          document.getElementById("cp-input").removeAttribute("required");
-          document.getElementById("cp-radio").style.display = "none";
-          document.querySelector('[for = "cp-radio"]').style.display = "none";
-
-          if (tb !== "ic") {
-            document.getElementById("ic-contianer").style.display = "";
-            document.getElementById("ic-input").setAttribute("required", "required");
-            document.getElementById("ic-radio").style.display = "";
-            document.querySelector('[for = "ic-radio"]').style.display = "";
-          }
-          if (checkRadio === "cp") {
-            document.getElementById("ic-radio").click();
-          }
-        }
-      }
-
       function calculateResults() {
         calcUnit = calcUnitEl.value
 
@@ -458,24 +359,13 @@
       }
 
       function resetForm() {
-        selects.forEach((select, index) => {
-          if (index == 3) {
-            select.selectedIndex = '8'
-          } else if (index == 2) {
-            select.selectedIndex = '9'
-          } else if (index == 5) {
-            select.selectedIndex = '2'
-          } else  {
-            select.selectedIndex = '1'
-          }   
-        });
+        rtSelect.selectedIndex = '1'
+        icSelect.selectedIndex = '1'
+        cpSelect.selectedIndex = '2'
+        cfSelect.selectedIndex = '1'
         inputs.forEach((input) => {
           input.value = ""
         });
-
-        input5.value = "8.987551787368176"
-        input7.value = "1"
-        input6.value = "8.854"
       }
 
       function resetResult() {
@@ -488,6 +378,12 @@
       }
 
       /*************** EVENT LISTINERS ***************/
+      [rtSelect, icSelect, cpSelect, cfSelect].forEach((select) => {
+        select.addEventListener("change", resetResult);
+      });
+      inputs.forEach((input) => {
+        input.addEventListener("input", resetResult);
+      });
       circuitTypeSelect.addEventListener("change", handleCTSelectChange);
 
       calcUnitEl.addEventListener("change", handleCalcUnitChange)

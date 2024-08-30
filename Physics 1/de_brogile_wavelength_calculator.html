@@ -1,0 +1,609 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>De Broglie Wavelength Calculator</title>
+  </head>
+  <body>
+    <h1>De Broglie Wavelength Calculator</h1>
+      <div>
+        <p>
+          <label for="i1-input">Rest mass (m)</label>
+          <input
+            type="number"
+            min="0"
+            data-id="i1"
+            step="any"
+            id="i1-input"
+            class="inputs"
+            data-name="Rest mass"
+          />
+          <select
+            class="selects"
+            id="i1-select"
+            data-type="exp"
+            data-prev="-31"
+            data-id="i1"
+          >
+            <option value="-35">×10⁻³⁵</option>
+            <option value="-34">×10⁻³⁴</option>
+            <option value="-33">×10⁻³³</option>
+            <option value="-32">×10⁻³²</option>
+            <option value="-31" selected>×10⁻³¹</option>
+            <option value="-30">×10⁻³⁰</option>
+            <option value="-29">×10⁻²⁹</option>
+            <option value="-28">×10⁻²⁸</option>
+            <option value="-27">×10⁻²⁷</option>
+            <option value="-26">×10⁻²⁶</option>
+            <option value="-25">×10⁻²⁵</option>
+            <option value="-24">×10⁻²⁴</option>
+            <option value="-23">×10⁻²³</option>
+            <option value="-22">×10⁻²²</option>
+            <option value="-21">×10⁻²¹</option>
+            <option value="-20">×10⁻²⁰</option>
+            <option value="-19">×10⁻¹⁹</option>
+            <option value="-18">×10⁻¹⁸</option>
+            <option value="-17">×10⁻¹⁷</option>
+            <option value="-16">×10⁻¹⁶</option>
+            <option value="-15">×10⁻¹⁵</option>
+            <option value="-14">×10⁻¹⁴</option>
+            <option value="-13">×10⁻¹³</option>
+            <option value="-12">×10⁻¹²</option>
+            <option value="-11">×10⁻¹¹</option>
+            <option value="-10">×10⁻¹⁰</option>
+            <option value="-9">×10⁻⁹</option>
+            <option value="-8">×10⁻⁸</option>
+            <option value="-7">×10⁻⁷</option>
+            <option value="-6">×10⁻⁶</option>
+            <option value="-5">×10⁻⁵</option>
+            <option value="-4">×10⁻⁴</option>
+            <option value="-3">×10⁻³</option>
+            <option value="-2">×10⁻²</option>
+            <option value="-1">×10⁻¹</option>
+            <option value="0">×10⁰</option>
+            <option value="1">×10¹</option>
+            <option value="2">×10²</option>
+            <option value="3">×10³</option>
+            <option value="4">×10⁴</option>
+            <option value="5">×10⁵</option>
+            <option value="6">×10⁶</option>
+            <option value="7">×10⁷</option>
+            <option value="8">×10⁸</option>
+            <option value="9">×10⁹</option>
+            <option value="10">×10¹⁰</option>
+            <option value="11">×10¹¹</option>
+            <option value="12">×10¹²</option>
+            <option value="13">×10¹³</option>
+            <option value="14">×10¹⁴</option>
+            <option value="15">×10¹⁵</option>
+            <option value="16">×10¹⁶</option>
+            <option value="17">×10¹⁷</option>
+            <option value="18">×10¹⁸</option>
+            <option value="19">×10¹⁹</option>
+            <option value="20">×10²⁰</option>
+            <option value="21">×10²¹</option>
+            <option value="22">×10²²</option>
+            <option value="23">×10²³</option>
+            <option value="24">×10²⁴</option>
+            <option value="25">×10²⁵</option>
+            <option value="26">×10²⁶</option>
+            <option value="27">×10²⁷</option>
+            <option value="28">×10²⁸</option>
+            <option value="29">×10²⁹</option>
+            <option value="30">×10³⁰</option>
+            <option value="31">×10³¹</option>
+            <option value="32">×10³²</option>
+            <option value="33">×10³³</option>
+            <option value="34">×10³⁴</option>
+            <option value="35">×10³⁵</option>
+          </select>
+          <span> kg</span>
+        </p>
+
+        <p>
+          <label for="i2-input">Velocity (v) </label>
+          <input
+            type="number"
+            min="0"
+            data-id="i2"
+            step="any"
+            id="i2-input"
+            class="inputs"
+            data-name="Velocity"
+          />
+          <select
+            class="selects"
+            id="i2-select"
+            data-type="speed"
+            data-prev="m/s"
+            data-id="i2"
+          >
+            <option value="m/s" selected>meters per second (m/s)</option>
+            <option value="km/s">kilometers per second (km/s)</option>
+            <option value="mi/s">miles per second (mi/s)</option>
+            <option value="c">light speed (c)</option>
+          </select>
+        </p>
+
+        <!-- <p>
+          <label for="i3-input">Momentum (p)</label>
+          <input
+            type="number"
+            min="0"
+            data-id="i3"
+            step="any"
+            id="i3-input"
+            class="inputs"
+            data-name="Momentum"
+          />
+          <select
+            class="selects"
+            id="i3-select"
+            data-type="exp"
+            data-prev="-24"
+            data-id="i3"
+          >
+            <option value="-35">×10⁻³⁵</option>
+            <option value="-34">×10⁻³⁴</option>
+            <option value="-33">×10⁻³³</option>
+            <option value="-32">×10⁻³²</option>
+            <option value="-31">×10⁻³¹</option>
+            <option value="-30">×10⁻³⁰</option>
+            <option value="-29">×10⁻²⁹</option>
+            <option value="-28">×10⁻²⁸</option>
+            <option value="-27">×10⁻²⁷</option>
+            <option value="-26">×10⁻²⁶</option>
+            <option value="-25">×10⁻²⁵</option>
+            <option value="-24" selected>×10⁻²⁴</option>
+            <option value="-23">×10⁻²³</option>
+            <option value="-22">×10⁻²²</option>
+            <option value="-21">×10⁻²¹</option>
+            <option value="-20">×10⁻²⁰</option>
+            <option value="-19">×10⁻¹⁹</option>
+            <option value="-18">×10⁻¹⁸</option>
+            <option value="-17">×10⁻¹⁷</option>
+            <option value="-16">×10⁻¹⁶</option>
+            <option value="-15">×10⁻¹⁵</option>
+            <option value="-14">×10⁻¹⁴</option>
+            <option value="-13">×10⁻¹³</option>
+            <option value="-12">×10⁻¹²</option>
+            <option value="-11">×10⁻¹¹</option>
+            <option value="-10">×10⁻¹⁰</option>
+            <option value="-9">×10⁻⁹</option>
+            <option value="-8">×10⁻⁸</option>
+            <option value="-7">×10⁻⁷</option>
+            <option value="-6">×10⁻⁶</option>
+            <option value="-5">×10⁻⁵</option>
+            <option value="-4">×10⁻⁴</option>
+            <option value="-3">×10⁻³</option>
+            <option value="-2">×10⁻²</option>
+            <option value="-1">×10⁻¹</option>
+            <option value="0">×10⁰</option>
+            <option value="1">×10¹</option>
+            <option value="2">×10²</option>
+            <option value="3">×10³</option>
+            <option value="4">×10⁴</option>
+            <option value="5">×10⁵</option>
+            <option value="6">×10⁶</option>
+            <option value="7">×10⁷</option>
+            <option value="8">×10⁸</option>
+            <option value="9">×10⁹</option>
+            <option value="10">×10¹⁰</option>
+            <option value="11">×10¹¹</option>
+            <option value="12">×10¹²</option>
+            <option value="13">×10¹³</option>
+            <option value="14">×10¹⁴</option>
+            <option value="15">×10¹⁵</option>
+            <option value="16">×10¹⁶</option>
+            <option value="17">×10¹⁷</option>
+            <option value="18">×10¹⁸</option>
+            <option value="19">×10¹⁹</option>
+            <option value="20">×10²⁰</option>
+            <option value="21">×10²¹</option>
+            <option value="22">×10²²</option>
+            <option value="23">×10²³</option>
+            <option value="24">×10²⁴</option>
+            <option value="25">×10²⁵</option>
+            <option value="26">×10²⁶</option>
+            <option value="27">×10²⁷</option>
+            <option value="28">×10²⁸</option>
+            <option value="29">×10²⁹</option>
+            <option value="30">×10³⁰</option>
+            <option value="31">×10³¹</option>
+            <option value="32">×10³²</option>
+            <option value="33">×10³³</option>
+            <option value="34">×10³⁴</option>
+            <option value="35">×10³⁵</option>
+          </select>
+          <span>kg·m/s</span>
+        </p> -->
+
+        <!-- <p>
+          <label for="i4-input">Wavelength (λ)</label>
+          <input
+            type="number"
+            min="0"
+            data-id="i4"
+            step="any"
+            id="i4-input"
+            data-name="Wavelength"
+          />
+          <select
+            class="selects"
+            id="i4-select"
+            data-type="distance"
+            data-prev="m"
+            data-id="i4"
+          >
+            <option value="Å">ångström (Å)</option>
+            <option value="nm">nanometers (nm)</option>
+            <option value="μm">micrometers (μm)</option>
+            <option value="mm">millimeters (mm)</option>
+            <option value="m" selected>meters (m)</option>
+            <option value="km">kilometers (km)</option>
+          </select>
+        </p> -->
+      </div>
+
+      <button id="calcBtn">Calculate</button>
+      <button id="resetBtn">Reset</button>
+      <hr>
+      <div>
+        <h3>Result:</h3>
+        <h3 id="calcResults">Result will appear here...</h3>
+      </div>
+     
+    <script>
+      /*************** ELEMENTS ***************/
+      const selects = document.querySelectorAll(".selects");
+      const inputs = document.querySelectorAll(".inputs");
+      const input3 = document.getElementById("i3-input");
+      const input4 = document.getElementById("i4-input");
+
+      let i3Select = '-24';
+      let i4Select = 'm';
+      let momentVal = 0;
+      let waveLenVal = 0;
+
+      const calcBtnEl = document.getElementById('calcBtn');
+      const resetBtnEl = document.getElementById('resetBtn');
+      const calcResultsEl = document.getElementById('calcResults')
+
+      /*************** GLOBAL VARIBLES ***************/
+      const UNITS = {
+        speed: {
+          "m/s": 1,
+          "km/s": 1e-3,
+          "mi/s": 0.0006213711922373339,
+          c: 3.3356409519815204e-9,
+        },
+        distance: {
+          Å: 1e10,
+          nm: 1e9,
+          μm: 1e6,
+          mm: 1e3,
+          m: 1,
+          km: 1e-3,
+        },
+      };
+      const queue = ["i1", "i2", "i3"];
+      /*************** FUNCTIONS ***************/
+      function toSIUnit(type, unit, value) {
+        if (type === "exp") {
+          unit = parseFloat("1e" + unit);
+          return value * unit;
+        }
+        return value / UNITS[type][unit];
+      }
+
+      function fromSIUnit(type, unit, value) {
+        if (type === "exp") {
+          unit = parseFloat("1e" + unit);
+          return value / unit;
+        }
+        return value * UNITS[type][unit];
+      }
+
+      function isEmpty(...args) {
+        for (id of args) {
+          const input = document.getElementById(`${id}-input`);
+          if (input.value == "") return true;
+        }
+
+        return false;
+      }
+
+      function validateInput(id) {
+        const input = document.getElementById(`${id}-input`);
+        const label = input.getAttribute("data-name").trim();
+        let value = parseFloat(input.value);
+
+        if (isEmpty("i1", "i2")) {
+          alert(`Please Enter All Details.`)
+          return;
+        }
+
+        if (value <= 0) {
+          errorP.textContent = `${label} must be greater than zero!`;
+          return false;
+        }
+
+        return true;
+      }
+
+      // related to caculation
+      function prepareUnit(...args) {
+        const resultArr = [];
+        for (id of args) {
+          const input = document.getElementById(`${id}-input`);
+          const select = document.getElementById(`${id}-select`);
+          const type = select.getAttribute("data-type");
+          let val = parseFloat(input.value);
+          val = isNaN(val) ? 0 : val;
+          let inUnit = select.value;
+          val = toSIUnit(type, inUnit, val);
+          resultArr.push(val);
+        }
+
+        return resultArr;
+      }
+      
+      function setResult(resultObj) {
+        let allResults = []
+        for (key of Object.keys(resultObj)) {
+          let val = resultObj[key].result;
+          let id = resultObj[key].type;
+          if (isNaN(val)) {
+            alert("Your input resulted in NAN.\n 0/0 \n Try again with valid input.");
+            return;
+          }
+          if (Math.abs(val) === Infinity) {
+            alert(
+              "Your input resulted in Infinity. \nDivision by zero. \nTry again with valid input."
+            );
+            return;
+          }
+
+          let type = ''
+          let outUnit = ''
+          if (id == 'i3') {
+            type = 'exp'
+            outUnit = i3Select
+          } else if (id == 'i4') {
+            type = 'distance'
+            outUnit = i4Select
+          }
+
+          val = fromSIUnit(type, outUnit, val);
+
+          let num = 32.2;
+
+          allResults.push(val.toPrecision(6))
+        }
+        return allResults
+      }
+      
+      function calculateResult() {
+        function calculateI3() {
+          let [val1, val2] = prepareUnit("i1", "i2");
+          const h = 6.6261e-34;
+
+          let result = val1 * val2;
+          let result1 = h / result;
+          return {
+            1: { result, type: "i3" },
+            2: {result: result1, type: "i4"}
+          };
+        }
+        return calculateI3()
+      }
+
+      function handleResults1Change(e) {
+        let select = e.target;
+        let id = select.getAttribute("data-id");
+
+        let prevUnit = i3Select;
+        let currentUnit = select.value;
+        i3elect = currentUnit
+
+        let si = toSIUnit("exp", prevUnit, momentVal);
+        let result = fromSIUnit("exp", currentUnit, si);
+        momentVal = result.toPrecision(6)
+
+        const momentumSpan = document.getElementById('momentum')
+        momentumSpan.textContent = `
+          Momentum (p): ${momentVal}
+        `
+      }
+
+      function handleResults2Change(e) {
+        let select = e.target;
+        let id = select.getAttribute("data-id");
+
+        let prevUnit = i4Select;
+        let currentUnit = select.value;
+        i4Select = currentUnit
+
+
+        let si = toSIUnit("distance", prevUnit, waveLenVal);
+        let result = fromSIUnit("distance", currentUnit, si);
+        waveLenVal = result.toPrecision(6)
+
+        const waveLenSpan = document.getElementById('waveLen')
+        waveLenSpan.textContent = `
+          Wavelength (λ): ${waveLenVal}
+        `
+      }
+
+      function calculateResults() {
+        for (el of ["i1", "i2"]) {
+          if (!validateInput(el)) return;
+        }
+
+        try {
+          const result = calculateResult();
+          
+          results = setResult(result);
+          console.log("test")
+          momentVal = results[0]
+          waveLenVal = results[1]
+
+          const results1Select = document.createElement('select')
+          results1Select.id = "i3-select";
+          results1Select.setAttribute("data-id", "i3");
+          const results2Select = document.createElement('select')
+          results2Select.id = "i4-select";
+          results2Select.setAttribute("data-id", "i4");
+
+          results1Select.innerHTML = `
+            <option value="-35">×10⁻³⁵</option>
+            <option value="-34">×10⁻³⁴</option>
+            <option value="-33">×10⁻³³</option>
+            <option value="-32">×10⁻³²</option>
+            <option value="-31">×10⁻³¹</option>
+            <option value="-30">×10⁻³⁰</option>
+            <option value="-29">×10⁻²⁹</option>
+            <option value="-28">×10⁻²⁸</option>
+            <option value="-27">×10⁻²⁷</option>
+            <option value="-26">×10⁻²⁶</option>
+            <option value="-25">×10⁻²⁵</option>
+            <option value="-24" selected>×10⁻²⁴</option>
+            <option value="-23">×10⁻²³</option>
+            <option value="-22">×10⁻²²</option>
+            <option value="-21">×10⁻²¹</option>
+            <option value="-20">×10⁻²⁰</option>
+            <option value="-19">×10⁻¹⁹</option>
+            <option value="-18">×10⁻¹⁸</option>
+            <option value="-17">×10⁻¹⁷</option>
+            <option value="-16">×10⁻¹⁶</option>
+            <option value="-15">×10⁻¹⁵</option>
+            <option value="-14">×10⁻¹⁴</option>
+            <option value="-13">×10⁻¹³</option>
+            <option value="-12">×10⁻¹²</option>
+            <option value="-11">×10⁻¹¹</option>
+            <option value="-10">×10⁻¹⁰</option>
+            <option value="-9">×10⁻⁹</option>
+            <option value="-8">×10⁻⁸</option>
+            <option value="-7">×10⁻⁷</option>
+            <option value="-6">×10⁻⁶</option>
+            <option value="-5">×10⁻⁵</option>
+            <option value="-4">×10⁻⁴</option>
+            <option value="-3">×10⁻³</option>
+            <option value="-2">×10⁻²</option>
+            <option value="-1">×10⁻¹</option>
+            <option value="0">×10⁰</option>
+            <option value="1">×10¹</option>
+            <option value="2">×10²</option>
+            <option value="3">×10³</option>
+            <option value="4">×10⁴</option>
+            <option value="5">×10⁵</option>
+            <option value="6">×10⁶</option>
+            <option value="7">×10⁷</option>
+            <option value="8">×10⁸</option>
+            <option value="9">×10⁹</option>
+            <option value="10">×10¹⁰</option>
+            <option value="11">×10¹¹</option>
+            <option value="12">×10¹²</option>
+            <option value="13">×10¹³</option>
+            <option value="14">×10¹⁴</option>
+            <option value="15">×10¹⁵</option>
+            <option value="16">×10¹⁶</option>
+            <option value="17">×10¹⁷</option>
+            <option value="18">×10¹⁸</option>
+            <option value="19">×10¹⁹</option>
+            <option value="20">×10²⁰</option>
+            <option value="21">×10²¹</option>
+            <option value="22">×10²²</option>
+            <option value="23">×10²³</option>
+            <option value="24">×10²⁴</option>
+            <option value="25">×10²⁵</option>
+            <option value="26">×10²⁶</option>
+            <option value="27">×10²⁷</option>
+            <option value="28">×10²⁸</option>
+            <option value="29">×10²⁹</option>
+            <option value="30">×10³⁰</option>
+            <option value="31">×10³¹</option>
+            <option value="32">×10³²</option>
+            <option value="33">×10³³</option>
+            <option value="34">×10³⁴</option>
+            <option value="35">×10³⁵</option>
+          `
+          
+          results2Select.innerHTML = `
+            <option value="Å">ångström (Å)</option>
+            <option value="nm">nanometers (nm)</option>
+            <option value="μm">micrometers (μm)</option>
+            <option value="mm">millimeters (mm)</option>
+            <option value="m" selected>meters (m)</option>
+            <option value="km">kilometers (km)</option>
+          `
+          results1Select.addEventListener("change", handleResults1Change)
+          results2Select.addEventListener("change", handleResults2Change)
+
+          calcResultsEl.innerHTML = `
+            <p>
+            <span id="momentum">Momentum (p): ${momentVal} &nbsp; &nbsp;</span>
+            <span id="resultSelect1"></span> kg·m/s
+            </p>
+            <p>
+            <span id="waveLen">Wavelength (λ): ${waveLenVal} &nbsp; &nbsp;</span>
+            <span id="resultSelect2"></span>
+            </p>
+          `
+          const resultSelect1Span = document.getElementById('resultSelect1')
+          resultSelect1Span.append(results1Select)
+
+          const resultSelect2Span = document.getElementById('resultSelect2')
+          resultSelect2Span.append(results2Select)
+
+        } catch(error) {
+          alert("An error ocurred. Try again with valid input.");
+          resetResult()
+          return;
+        }
+      }
+
+      function resetForm() {
+        selects.forEach((select, index) => {
+          if (index == 0) {
+            select.selectedIndex = '4'
+          } else {
+            select.selectedIndex = '0'
+          }
+        
+        });
+
+        inputs.forEach((input) => {
+          input.value = ""
+        });
+      }
+
+      function resetResult() {
+        calcResultsEl.innerHTML = "<p>Result will appear here...</p>";
+      } 
+
+      function resethandler() {
+        resetForm();
+        resetResult();
+      }
+
+      /*************** EVENT LISTINERS ***************/
+
+      // input3.addEventListener("input", Input34InputHanlder);
+      // input4.addEventListener("input", Input34InputHanlder);
+
+      selects.forEach((select) => {
+        select.addEventListener("change", resetResult);
+      });
+
+      inputs.forEach((input) => {
+        input.addEventListener("input", resetResult);
+      });
+
+      resetBtnEl.addEventListener("click", resethandler);
+      calcBtnEl.addEventListener("click", calculateResults);
+
+    </script>
+  </body>
+</html>
