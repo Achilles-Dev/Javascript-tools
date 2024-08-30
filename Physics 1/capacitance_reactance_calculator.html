@@ -127,13 +127,6 @@
         },
       };
 
-      // function handlemodeUnitChange(e) {
-      //   const value = e.target.value
-      //   i4InputContainerEl.style.display = value === "sm" ? 'none' : 'block'
-
-      //   resetResult()
-      // }
-
       /*************** FUNCTIONS ***************/
       function toSIUnit(type, unit, value) {
         if (type === "exp") {
@@ -341,7 +334,7 @@
         selects.forEach((select, index) => {
           if (index == 0) {
             select.selectedIndex = '3'
-          } if (index == 1) {
+          } else if (index == 1) {
             select.selectedIndex = '0'
           }        
         });
