@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Elastic Potential Energy Calculator</title>
+  </head>
+  <body>
+    <h1>Elastic Potential Energy Calculator</h1>
+    <p>U = &frac12; k&Delta;x&sup2;</p>
+      <p>
+        Calculate:
+        <select id="calculateUnit">
+          <option value="k">Spring force constant (k)</option>
+          <option value="x">Spring stretch length (Δx)</option>
+          <option value="u" selected>Spring potential energy (U)</option>
+        </select>
+      </p>
+      <div>
+        <p id="k-contianer" class="containers">
+          <label for="k-input">Spring force constant (k) </label>
+          <input type="number" step="any" id="k-input" class="inputs" />
+          <select id="k-select">
+            <option value="n/m" selected>N/m</option>
+          </select>
+        </p>
+        <p id="x-contianer" class="containers">
+          <label for="x-input">Spring stretch length (Δx) </label>
+          <input type="number" step="any" id="x-input" class="inputs" />
+          <select id="x-select">
+            <option value="mm">millimeters (mm)</option>
+            <option value="cm">centimeters (cm)</option>
+            <option value="m" selected>meters (m)</option>
+            <option value="in">inches (in)</option>
+            <option value="ft">feet (ft)</option>
+            <option value="yd">yards (yd)</option>
+          </select>
+        </p>
+        <p id="u-contianer" class="containers" style="display: none;">
+          <label for="u-input">Spring potential energy (U)</label>
+          <input type="number" id="u-input" step="any" class="inputs" />
+          <select id="u-select">
+            <option value="J" selected>joules (J)</option>
+            <option value="kJ">kilojoules (kJ)</option>
+            <option value="MJ">megajoules (MJ)</option>
+            <option value="Wh">watt hours (Wh)</option>
+            <option value="kWh">kilowatt hours (kWh)</option>
+            <option value="lbs">foot-pounds (ft-lbs)</option>
+            <option value="kcal">kilocalories (kcal)</option>
+            <option value="eV">electronvolts (eV)</option>
+          </select>
+        </p>
+      </div>
+
+      <button id="calcBtn">Calculate</button>
+      <button id="resetBtn">Reset</button>
+      <hr>
+      <div>
+        <h3>Result:</h3>
+        <h3 id="calcResults">Result will appear here...</h3>
+      </div>
+    <script>
+      /*************** ELEMENTS ***************/
+      const containers = document.querySelectorAll(".containers");
+      const inputs = document.querySelectorAll(".inputs");
+      const calculateUnitEl = document.getElementById("calculateUnit");
+
+      const xInput = document.getElementById("x-input");
+      const kInput = document.getElementById("k-input");
+      const uInput = document.getElementById("u-input");
+
+      const xSelect = document.getElementById("x-select");
+      const kSelect = document.getElementById("k-select");
+      const uSelect = document.getElementById("u-select");
+
+      const calcBtnEl = document.getElementById('calcBtn');
+      const resetBtnEl = document.getElementById('resetBtn');
+      const calcResultsEl = document.getElementById('calcResults')
+
+      /*************** GLOBAL VARIBLES ***************/
+      const UNITS = {
+        force: {
+          "n/m": 1,
+        },
+        distance: {
+          mm: 1000,
+          cm: 100,
+          m: 1,
+          in: 39.3701,
+          ft: 3.28084,
+          yd: 1.09361,
+        },
+        energy: {
+          J: 1,
+          kJ: 0.001,
+          MJ: 0.000001,
+          Wh: 0.000277778,
+          kWh: 0.000000277778,
+          lbs: 0.737562,
+          kcal: 0.000239006,
+          eV: 6.2415090744607626077762409809304458998869658961709711215274158092608907689262930544023899427308712080493367125212986972071e18,
+        },
+      };
+      /*************** FUNCTIONS ***************/
+      function toSIUnit(type, unit, value) {
+        return value / UNITS[type][unit];
+      }
+
+      function fromSIUnit(type, unit, value) {
+        return value * UNITS[type][unit];
+      }
+
+      function createElements(resultObj) {
+        const elementNodes = Object.keys(resultObj).map((key) => {
+          //create elements to put the results in
+          const div = document.createElement("div");
+          const span = document.createElement("span");
+          const span2 = document.createElement("span");
+
+          // give the elements id
+          div.setAttribute("class", `result-container`);
+          span.setAttribute("class", `result-title`);
+          span2.setAttribute("class", `result-value`);
+
+          // put the values in the elements
+
+          span.textContent = resultObj[key]["title"];
+          span2.textContent = resultObj[key]["value"];
+
+          // appened them to an element that contians them
+          div.append(span, span2);
+
+          // return that element
+          return div;
+        });
+
+        return elementNodes;
+      }
+
+      function handleCalculateUnitChange(e) {
+        const value = e.target.value
+        
+        containers.forEach((container) => {
+          let idVal = container.id.slice(0, 1)
+          if (idVal == value) {
+            container.style.display = 'none'
+          } else {
+            container.style.display = 'block'
+          }
+        })
+
+        resetResult()
+      }
+
+      
+      function calculateResult(input) {
+        const calculateX = () => {
+          const { k, u } = prepareUnits();
+
+          return {
+            result: Math.sqrt((2 * u) / k),
+            type: "distance",
+            name: `Spring stretch length (Δx)`,
+          };
+        };
+        const calculateU = () => {
+          const { k, x } = prepareUnits();
+          return {
+            result: 0.5 * k * x * x,
+            type: "energy",
+            name: "Spring potential energy (U)",
+          };
+        };
+        const calculateK = () => {
+          const { u, x } = prepareUnits();
+          return {
+            result: (2 * u) / (x * x),
+            type: "force",
+            name: "Spring force constant (k)",
+          };
+        };
+
+        switch (input) {
+          case "x":
+            return calculateX();
+          case "k":
+            return calculateK();
+          case "u":
+            return calculateU();
+          default:
+            console.log("error in calculate result switch");
+        }
+      }
+
+      function prepareUnits() {
+        let u = parseFloat(uInput.value) ?? 0;
+        let k = parseFloat(kInput.value) ?? 0;
+        let x = parseFloat(xInput.value) ?? 0;
+
+        let uUnit = uSelect.value;
+        let kUnit = kSelect.value;
+        let xUnit = xSelect.value;
+
+        u = toSIUnit("energy", uUnit, u);
+        k = toSIUnit("force", kUnit, k);
+        x = toSIUnit("distance", xUnit, x);
+
+        return { u, k, x };
+      }
+
+      function prepareResults(result, type, name) {
+        let resultObj = {};
+        Object.keys(UNITS[type]).forEach((key) => {
+          let ans = fromSIUnit(type, key, result);
+          // ans =
+          //   ans > 1 || ans < -1
+          //     ? parseFloat(parseFloat(ans.toExponential(10)).toFixed(4))
+          //     : ans.toExponential(10);
+
+          resultObj[key] = {
+            title: `${name}: `,
+            value: ` ${ans} ${key}`,
+          };
+        });
+        return resultObj;
+      }
+      
+      function calculateResults() {
+        const calculateUnit = calculateUnitEl.value
+
+        try {
+          const { result, type, name } = calculateResult(calculateUnit);
+
+          if (isNaN(result)) {
+            alert("Your input resulted in NAN. Try again with valid input.");
+            resetResult()
+            return;
+          }
+          if (Math.abs(result) === Infinity) {
+            alert("Your input resulted in Infinity. Try again with valid input.");
+            resetResult()
+            return;
+          }
+
+          const resultObj = prepareResults(result, type, name);
+          const elementNodes = createElements(resultObj);
+          calcResultsEl.innerHTML = "";
+
+          elementNodes.forEach((element) => {
+            calcResultsEl.append(element);
+          });
+        } catch (error) {
+          console.log(error);
+          alert("An error ocurred. Try again with valid input.");
+          resetResult()
+          return;
+        }
+      }
+
+      function resetForm() {
+        [xSelect, kSelect, uSelect].forEach((select, index) => {
+          if (index == 0) {
+            select.selectedIndex = '2'
+          } else {
+            select.selectedIndex = '0'
+          }       
+        });
+
+        inputs.forEach((input) => {
+          input.value = ""
+        });
+
+        containers.forEach((container) => {
+          let idVal = container.id.slice(0, 1)
+          if (idVal == 'u') {
+            container.style.display = 'none'
+          } else {
+            container.style.display = 'block'
+          }
+        })
+        calculateUnitEl.selectedIndex = '2'
+      }
+
+      function resetResult() {
+        calcResultsEl.innerHTML = "<p>Result will appear here...</p>";
+      } 
+
+      function resethandler() {
+        resetForm();
+        resetResult();
+      }
+
+      /*************** EVENT LISTINERS ***************/
+      [xSelect, kSelect, uSelect].forEach((select) => {
+        select.addEventListener("change", resetResult);
+      });
+
+      inputs.forEach((input) => {
+        input.addEventListener("click", resetResult);
+      });
+
+      calculateUnitEl.addEventListener("change", handleCalculateUnitChange)
+      
+      resetBtnEl.addEventListener("click", resethandler);
+      calcBtnEl.addEventListener("click", calculateResults);
+
+    </script>
+  </body>
+</html>
