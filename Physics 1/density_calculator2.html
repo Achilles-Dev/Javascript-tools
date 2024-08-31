@@ -1,0 +1,602 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Density Calculator</title>
+  </head>
+  <body>
+    <h1>Density Calculator</h1>
+      <div>
+        <p>
+          <label for="i1-input">Weight/mass </label>
+          <input
+            type="number"
+            min="0"
+            autocomplete="off"
+            data-id="i1"
+            step="any"
+            id="i1-input"
+            class="inputs"
+            data-name="Mass"
+          />
+          <select
+            class="selects"
+            id="i1-select"
+            data-type="mass"
+            data-prev="kg"
+            data-id="i1"
+          >
+            <option value="µg">micrograms (µg)</option>
+            <option value="mg">milligrams (mg)</option>
+            <option value="g">grams (g)</option>
+            <option value="dag">decagrams (dag)</option>
+            <option value="kg" selected>kilograms (kg)</option>
+            <option value="t">metric tons (t)</option>
+            <option value="gr">grains (gr)</option>
+            <option value="dr">drachms (dr)</option>
+            <option value="oz">ounces (oz)</option>
+            <option value="lb">pounds (lb)</option>
+            <option value="st">stones (st)</option>
+            <option value="US ton">US short tons (US ton)</option>
+            <option value="long ton">imperial tons (long ton)</option>
+            <option value="Earths">masses of the Earth (Earths)</option>
+            <option value="Suns">masses of the Sun (Suns)</option>
+            <option value="me">electron rest masses (me)</option>
+            <option value="mp">proton rest masses (mp)</option>
+            <option value="mn">neutron rest masses (mn)</option>
+            <option value="u">atomic mass units (u)</option>
+            <option value="oz t">troy ounces (oz t)</option>
+          </select>
+        </p>
+
+        <p>
+          <label for="i2-input">Volume </label>
+          <input
+            type="number"
+            min="0"
+            autocomplete="off"
+            data-id="i2"
+            step="any"
+            id="i2-input"
+            class="inputs"
+            data-name="Volume"
+          />
+
+          <select
+            class="selects"
+            id="i2-select"
+            data-type="volume"
+            data-prev="m³"
+            data-id="i2"
+          >
+            <option value="mm³">cubic millimeters (mm³)</option>
+            <option value="cm³">cubic centimeters (cm³)</option>
+            <option value="dm³">cubic decimeters (dm³)</option>
+            <option value="m³" selected>cubic meters (m³)</option>
+            <option value="in³">cubic inches ( in³)</option>
+            <option value="ft³">cubic feet (ft³)</option>
+            <option value="yd³">cubic yards (yd³)</option>
+            <option value="ml">milliliters (ml)</option>
+            <option value="cl">centiliters (cl)</option>
+
+            <option value="l">liters (l)</option>
+            <option value="hl">hectoliters (hl)</option>
+            <option value="US gal">gallons (US) (US gal)</option>
+            <option value="UK gal">gallons (UK) (UK gal)</option>
+            <option value="US fl oz">fluid ounces (US) (US fl oz)</option>
+            <option value="UK fl oz">fluid ounces (UK) (UK fl oz)</option>
+            <option value="cups">US customary cups (cups)</option>
+            <option value="tbsp">tablespoons (15ml) (tbsp)</option>
+            <option value="tsp">teaspoons (5ml) (tsp)</option>
+
+            <option value="US qt">quarts (US) (US qt)</option>
+            <option value="UK qt">quarts (UK) (UK qt)</option>
+            <option value="US pt">pints (US) (US pt)</option>
+            <option value="UK pt">pints (UK) (UK pt)</option>
+          </select>
+        </p>
+      </div>
+      
+      <p>Lookup density</p>
+      <div>
+        <div>
+          <p>
+            <label for="i1II-select">Material category </label>
+            <select id="i1II-select">
+              <option value="Metals">Metals</option>
+              <option value="Non-metals">Non-metals</option>
+              <option value="Gases">Gases</option>
+              <option value="Liquids">Liquids</option>
+              <option value="Astronomy">Astronomy</option>
+            </select>
+          </p>
+          <p>
+            <label>Material </label>
+            <select id="Metals-select" class="selectsII">
+              <option value="2700" selected>Aluminum</option>
+              <option value="1850">Beryllium</option>
+              <option value="8600">Brass</option>
+              <option value="8940">Copper</option>
+              <option value="19320">Gold</option>
+              <option value="7870">Iron</option>
+              <option value="11340">Lead</option>
+              <option value="1740">Magnesium</option>
+              <option value="13546">Mercury</option>
+              <option value="8900">Nickel</option>
+              <option value="22590">Osmium</option>
+              <option value="21450">Platinum</option>
+              <option value="19840">Plutonium</option>
+              <option value="860">Potassium</option>
+              <option value="10500">Silver</option>
+              <option value="970">Sodium</option>
+              <option value="7310">Tin</option>
+              <option value="4510">Titanium</option>
+              <option value="18800">Uranium</option>
+              <option value="7000">Zinc</option>
+            </select>
+
+            <select id="Non-metals-select" class="selectsII" style="display: none;">
+              <option value="2400" selected>Concrete</option>
+              <option value="240">Cork</option>
+              <option value="3500">Diamond</option>
+              <option value="916.7">Ice</option>
+              <option value="1150">Nylon</option>
+              <option value="710">oak</option>
+              <option value="373">Pine</option>
+              <option value="1175">Plastics</option>
+              <option value="75">Styrofoam</option>
+              <option value="700">Wood (typical)</option>
+            </select>
+
+            <select id="Gases-select" class="selectsII" style="display: none;">
+              <option value="1.293" selected>Air (sea level, 0°C)</option>
+              <option value="1.205">Air (sea level, 20°C)</option>
+              <option value="1.977">Carbon dioxide (sea level, 0°C)</option>
+              <option value="1.842">Carbon dioxide (sea level, 20°C)</option>
+              <option value="1.25">Carbon monoxide (sea level, 0°C)</option>
+              <option value="1.165">Carbon monoxide (sea level, 20°C)</option>
+              <option value="0.0898">Hydrogen</option>
+              <option value="0.179">Helium</option>
+              <option value="0.717">Methane (sea level, 0°C)</option>
+              <option value="0.688">Methane (sea level, 20°C)</option>
+              <option value="1.2506">Nitrogen (sea level, 0°C)</option>
+              <option value="1.165">Nitrogen (sea level, 20°C)</option>
+              <option value="1.429">Oxygen (sea level, 0°C)</option>
+              <option value="1.331">Oxygen (sea level, 20°C)</option>
+              <option value="1.882">Propane (sea level, 20°C)</option>
+              <option value="0.804">Water vapor</option>
+            </select>
+
+            <select id="Liquids-select" class="selectsII" style="display: none;">
+              <option value="920" selected>Cooking oil</option>
+              <option value="70">Liquid hydrogen (-255°C)</option>
+              <option value="1141">Liquid oxygen (-219°C)</option>
+              <option value="1000">Water (fresh, 4°C)</option>
+              <option value="1030">Water (salt, 3%)</option>
+            </select>
+
+            <select id="Astronomy-select" class="selectsII" style="display: none;">
+              <option value="5e-27" selected>The Universe</option>
+              <option value="1e-19">Interstellar medium</option>
+              <option value="5515">The Earth</option>
+              <option value="13000">Earth's inner core</option>
+              <option value="33000">Sun's core (min)</option>
+              <option value="160000">Sun's core (max)</option>
+              <option value="900000">Super-massive black hole</option>
+              <option value="2100000000">White dwarf star</option>
+              <option value="230000000000000000">Atomic nuclei</option>
+              <option value="480000000000000000">Neutron star</option>
+              <option value="1000000000000000000">Stellar-mass black hole</option>
+            </select>
+          </p>
+        </div>
+
+        <p>
+          <label for="i2II-input">Speed</label>
+          <input
+            type="number"
+            min="0"
+            autocomplete="off"
+            data-id="i2II"
+            step="any"
+            id="i2II-input"
+            data-name="Density"
+            disabled
+          />
+
+          <select
+            class="selects"
+            id="i2II-select"
+            data-type="density"
+            data-prev="kg/m³"
+            data-id="i2II"
+          >
+            <option value="t/m³">tons per cubic meter (t/m³)</option>
+            <option value="kg/m³" selected>
+              kilograms per cubic meter (kg/m³)
+            </option>
+            <option value="kg/dm³">
+              kilograms per cubic decimeter (kg/dm³)
+            </option>
+            <option value="kg/L">kilograms per liter (kg/L)</option>
+            <option value="g/L">grams per liter (g/L)</option>
+            <option value="g/dL">grams per deciliter (g/dL)</option>
+            <option value="g/mL">grams per milliliter (g/mL)</option>
+            <option value="g/cm³">grams per cubic centimeter (g/cm³)</option>
+            <option value="oz/in³">ounces per cubic inch (oz/in³)</option>
+            <option value="lb/in³">pounds per cubic inch (lb/in³)</option>
+            <option value="lb/ft³">pounds per cubic feet (lb/ft³)</option>
+            <option value="lb/yd³">pounds per cubic yard (lb/yd³)</option>
+            <option value="lb/US gal">
+              pounds per gallon (US) (lb/US gal)
+            </option>
+            <option value="mg/L">milligrams per liter (mg/L)</option>
+          </select>
+        </p>
+      </div>
+
+      <button id="calcBtn">Calculate</button>
+      <button id="resetBtn">Reset</button>
+      <hr>
+      <div>
+        <h3>Result:</h3>
+        <h3 id="calcResults">Result will appear here...</h3>
+      </div>
+    <script>
+      /*************** ELEMENTS ***************/
+      const selects = document.querySelectorAll(".selects");
+      const inputs = document.querySelectorAll(".inputs");
+
+      const tempSelect = document.getElementById("i1II-select");
+
+      const selectsII = document.querySelectorAll(".selectsII");
+
+      let i3Select = 'kg/m³'
+      let densityVal = 0;
+
+      const calcBtnEl = document.getElementById('calcBtn');
+      const resetBtnEl = document.getElementById('resetBtn');
+      const calcResultsEl = document.getElementById('calcResults')
+
+      /*************** GLOBAL VARIBLES ***************/
+      const UNITS = {
+        mass: {
+          µg: 1000000000,
+          mg: 999999.9999999999,
+          g: 999.9999999999999,
+          dag: 100,
+          kg: 1,
+          t: 0.001,
+          gr: 15432.35835294143,
+          dr: 564.3833911932866,
+          oz: 35.27396194958041,
+          lb: 2.2046226218487757,
+          st: 0.1574730444177697,
+          "US ton": 0.001102311310924388,
+          "long ton": 0.0009842065276110606,
+          Earths: 1.6744248350691536e-25,
+          Suns: 5.027652086475616e-31,
+          me: 1.0977691228098864e30,
+          mp: 5.978633201944897e26,
+          mn: 5.970403753330142e26,
+          u: 6.02214e26,
+          "oz t": 32.15074656862798,
+        },
+        volume: {
+          "mm³": 1000000000,
+          "cm³": 1000000,
+          "dm³": 1000,
+          "m³": 1,
+          "in³": 61023.74409473229,
+          "ft³": 35.314666721488585,
+          "yd³": 1.3079506193143922,
+          ml: 1000000,
+          cl: 100000,
+          l: 1000,
+          hl: 10,
+          "US gal": 264.1721768579889,
+          "UK gal": 219.96924829908778,
+          "US fl oz": 33814.02,
+          "UK fl oz": 35195.07972785405,
+          cups: 4226.721332262563,
+          tbsp: 66666.66666666667,
+          tsp: 200000,
+          "US qt": 1056.6882094325936,
+          "UK qt": 879.8769931963511,
+          "US pt": 2113.376418865187,
+          "UK pt": 1759.7539863927022,
+        },
+        density: {
+          "t/m³": 0.001,
+          "kg/m³": 1,
+          "kg/dm³": 0.001,
+          "kg/L": 0.001,
+          "g/L": 1,
+          "g/dL": 0.09999999999999999,
+          "g/mL": 0.001,
+          "g/cm³": 0.001,
+          "oz/in³": 0.000578036672,
+          "lb/in³": 0.000036127292,
+          "lb/ft³": 0.0624279606,
+          "lb/yd³": 1.68555494,
+          "lb/US gal": 0.00834540445,
+          "mg/L": 1000,
+        },
+      };
+      const queue = ["i1", "i2", "i3"];
+      /*************** FUNCTIONS ***************/
+      function toSIUnit(type, unit, value) {
+        if (type === "exp") {
+          unit = parseFloat("1e" + unit);
+          return value * unit;
+        }
+        return value / UNITS[type][unit];
+      }
+
+      function fromSIUnit(type, unit, value) {
+        if (type === "exp") {
+          unit = parseFloat("1e" + unit);
+          return value / unit;
+        }
+        return value * UNITS[type][unit];
+      }
+
+      function customPercision(ans, to = 12) {
+        return parseFloat(ans.toPrecision(to));
+      }
+
+      function isEmpty(...args) {
+        for (id of args) {
+          const input = document.getElementById(`${id}-input`);
+          if (input.value == "") return true;
+        }
+
+        return false;
+      }
+      
+      function validateInput(id) {
+        const input = document.getElementById(`${id}-input`);
+        const label = input.getAttribute("data-name").trim();
+        let value = parseFloat(input.value);
+
+        if (isEmpty("i1", "i2")) {
+          alert(`Please Enter All Details.`)
+          return;
+        }
+
+        if (value <= 0) {
+          alert(`${label} must be greater than zero!`);
+          return false;
+        }
+
+        return true;
+      }
+
+      // related to caculation
+      function prepareUnit(...args) {
+        const resultArr = [];
+        for (id of args) {
+          const input = document.getElementById(`${id}-input`);
+          const select = document.getElementById(`${id}-select`);
+          const type = select.getAttribute("data-type");
+          let val = parseFloat(input.value);
+          val = isNaN(val) ? 0 : val;
+          let inUnit = select.value;
+          val = toSIUnit(type, inUnit, val);
+          resultArr.push(val);
+        }
+
+        return resultArr;
+      }
+
+      function setResult(resultObj) {
+        for (key of Object.keys(resultObj)) {
+          let val = resultObj[key].result;
+          let id = resultObj[key].type;
+          if (isNaN(val)) {
+            alert("Your input resulted in NAN.\n 0/0 \n Try again with valid input.");
+            return;
+          }
+          if (Math.abs(val) === Infinity) {
+            alert(
+              "Your input resulted in Infinity. \nDivision by zero. \nTry again with valid input."
+            );
+            return;
+          }
+
+          if (id == 'i3') {
+            let type = 'density'
+
+            let outUnit = i3Select
+            val = fromSIUnit(type, outUnit, val);
+
+            return customPercision(val);
+          } else {
+            const input = document.getElementById(`${id}-input`);
+            const select = document.getElementById(`${id}-select`);
+            const type = select.getAttribute("data-type");
+            let outUnit = select.value;
+            val = fromSIUnit(type, outUnit, val);
+
+            input.value = customPercision(val);
+          }
+        }
+      }
+
+      function calculateResult() {
+        function calculateI3() {
+          let [val1, val2] = prepareUnit("i1", "i2");
+
+          let result = val1 / val2;
+          return {
+            1: { result, type: "i3" },
+          };
+        }
+        return calculateI3()
+      }
+      
+      function selectsIIChangeHandler(e, inp = false) {
+        let select;
+        if (e) {
+          select = e.target;
+        } else select = inp;
+        let val = parseFloat(select.value);
+        let resultObj = {
+          1: { result: val, type: "i2II" },
+        };
+        setResult(resultObj, "II");
+      }
+      
+      function lookupSelectHandler() {
+        const id = tempSelect.value;
+        for (let select of selectsII) {
+          if (select.getAttribute("id") === `${id}-select`) {
+            select.style.display = "";
+            continue;
+          }
+          select.style.display = "none";
+        }
+
+        const select = document.getElementById(`${id}-select`);
+        selectsIIChangeHandler(false, select);
+      }
+
+      function handleResultsChange(e) {
+        let select = e.target;
+        let id = select.getAttribute("data-id");
+
+        let prevUnit = i3Select;
+        let currentUnit = select.value;
+        i3Select = currentUnit
+
+        let si = toSIUnit("density", prevUnit, densityVal);
+        let result = fromSIUnit("density", currentUnit, si);
+        densityVal = customPercision(result);
+
+        const densityVSpan = document.getElementById('densityV')
+        densityVSpan.textContent = `
+          Density: ${densityVal}
+        `
+      }
+
+      function calculateResults() {
+        for (el of ["i1", "i2"]) {
+          if (!validateInput(el)) return;
+        }
+
+        try {
+          const result = calculateResult();
+          
+          densityVal = setResult(result);
+
+          const resultsSelect = document.createElement('select')
+          resultsSelect.id = "i3-select";
+          resultsSelect.setAttribute("data-id", "i3");
+
+          resultsSelect.innerHTML = `
+            <option value="t/m³">tons per cubic meter (t/m³)</option>
+            <option value="kg/m³" selected>
+              kilograms per cubic meter (kg/m³)
+            </option>
+            <option value="kg/dm³">
+              kilograms per cubic decimeter (kg/dm³)
+            </option>
+            <option value="kg/L">kilograms per liter (kg/L)</option>
+            <option value="g/L">grams per liter (g/L)</option>
+            <option value="g/dL">grams per deciliter (g/dL)</option>
+            <option value="g/mL">grams per milliliter (g/mL)</option>
+            <option value="g/cm³">grams per cubic centimeter (g/cm³)</option>
+            <option value="oz/in³">ounces per cubic inch (oz/in³)</option>
+            <option value="lb/in³">pounds per cubic inch (lb/in³)</option>
+            <option value="lb/ft³">pounds per cubic feet (lb/ft³)</option>
+            <option value="lb/yd³">pounds per cubic yard (lb/yd³)</option>
+            <option value="lb/US gal">
+              pounds per gallon (US) (lb/US gal)
+            </option>
+            <option value="mg/L">milligrams per liter (mg/L)</option>
+          `
+          
+          
+          resultsSelect.addEventListener("change", handleResultsChange)
+          
+
+          calcResultsEl.innerHTML = `
+            <p>
+            <span id="densityV">Density : ${densityVal} &nbsp; &nbsp;</span>
+            <span id="resultSelect"></span>
+            </p>
+          `
+          const resultSelectSpan = document.getElementById('resultSelect')
+          resultSelectSpan.append(resultsSelect)
+
+
+        } catch(error) {
+          alert("An error ocurred. Try again with valid input.");
+          resetResult()
+          return;
+        }
+      }
+
+      function windowLoadHandler() {
+        selects.forEach((select) => {
+          let value = select.value;
+          select.setAttribute("data-prev", value);
+        });
+
+        lookupSelectHandler();
+        let selectID = document.getElementById("i1II-select").value;
+        let select = document.getElementById(`${selectID}-select`);
+        selectsIIChangeHandler(false, select);
+      }
+
+      function resetForm() {
+        selects.forEach((select, index) => {
+          if (index == 0) {
+            select.selectedIndex = '4'
+          } else if (index == 1) {
+            select.selectedIndex = '3'
+          } else {
+            select.selectedIndex = '1'
+          }
+        });
+
+        inputs.forEach((input) => {
+          input.value = ""
+        });
+
+        tempSelect.selectedIndex = '0'
+        lookupSelectHandler()
+      }
+
+      function resetResult() {
+        calcResultsEl.innerHTML = "<p>Result will appear here...</p>";
+      } 
+
+      function resethandler() {
+        resetForm();
+        resetResult();
+      }
+
+      /*************** EVENT LISTINERS ***************/
+      window.addEventListener("load", windowLoadHandler);
+      tempSelect.addEventListener("change", lookupSelectHandler);
+
+      selects.forEach((select) => {
+        select.addEventListener("change", resetResult);
+      });
+
+      inputs.forEach((input) => {
+        input.addEventListener("input", resetResult);
+      });
+
+      selectsII.forEach((select) => {
+        select.addEventListener("change", selectsIIChangeHandler);
+      });
+
+      resetBtnEl.addEventListener("click", resethandler);
+      calcBtnEl.addEventListener("click", calculateResults);
+
+    </script>
+  </body>
+</html>
