@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Distance to Horizon Calculator</title>
+  </head>
+  <body>
+    <h1>Distance to Horizon Calculator</h1>
+      <p>
+        Calculate:
+        <select id="calculateUnit">
+          <option value="ha">Height above average surface level </option>
+          <option value="cb">Celestial body radius</option>
+          <option value="dh" selected>Distance to horizon</option>
+        </select>
+      </p>
+
+      <div>
+        <p id="ha-contianer" class="containers">
+          <label for="ha-input">Height above average surface level </label>
+          <input
+            type="number"
+            step="any"
+            id="ha-input"
+            class="inputs"
+            min="1e-15"
+          />
+          <select id="ha-select">
+            <option value="mm">millimeters (mm)</option>
+            <option value="cm">centimeters (cm)</option>
+            <option value="m">meters (m)</option>
+            <option value="km" selected>kilometers (km)</option>
+            <option value="in">inches (in)</option>
+            <option value="ft">feet (ft)</option>
+            <option value="yd">yards (yd)</option>
+            <option value="mi">miles (mi)</option>
+            <option value="nmi">nautical miles (nmi)</option>
+          </select>
+        </p>
+        <p id="cb-contianer" class="containers">
+          <label for="cb-select">Celestial body </label>
+
+          <select id="cb-select">
+            <option value="Custom">Custom</option>
+            <option value="Sun">Sun</option>
+            <option value="Mercury">Mercury</option>
+            <option value="Venus">Venus</option>
+            <option value="Earth" selected>Earth</option>
+            <option value="Moon">Moon</option>
+            <option value="Mars">Mars</option>
+            <option value="Jupiter">Jupiter</option>
+            <option value="Saturn">Saturn</option>
+            <option value="Uranus">Uranus</option>
+            <option value="Neptune">Neptune</option>
+            <option value="Pluto">Pluto</option>
+          </select>
+        </p>
+        <p id="rd-contianer" class="containers" style="display: none;">
+          <label for="rd-input">Radius </label>
+          <input
+            type="number"
+            step="any"
+            id="rd-input"
+            class="inputs"
+            min="1e-15"
+          />
+          <select id="rd-select">
+            <option value="mm">millimeters (mm)</option>
+            <option value="cm">centimeters (cm)</option>
+            <option value="m">meters (m)</option>
+            <option value="km" selected>kilometers (km)</option>
+            <option value="in">inches (in)</option>
+            <option value="ft">feet (ft)</option>
+            <option value="yd">yards (yd)</option>
+            <option value="mi">miles (mi)</option>
+            <option value="nmi">nautical miles (nmi)</option>
+          </select>
+        </p>
+        <p id="dh-contianer" class="containers" style="display: none;">
+          <label for="dh-input">Distance to horizon </label>
+          <input
+            type="number"
+            id="dh-input"
+            step="any"
+            class="inputs"
+            min="1e-15"
+          />
+          <select id="dh-select">
+            <option value="mm">millimeters (mm)</option>
+            <option value="cm">centimeters (cm)</option>
+            <option value="m">meters (m)</option>
+            <option value="km" selected>kilometers (km)</option>
+            <option value="in">inches (in)</option>
+            <option value="ft">feet (ft)</option>
+            <option value="yd">yards (yd)</option>
+            <option value="mi">miles (mi)</option>
+            <option value="nmi">nautical miles (nmi)</option>
+          </select>
+        </p>
+      </div>
+      <button id="calcBtn">Calculate</button>
+      <button id="resetBtn">Reset</button>
+      <hr>
+      <div>
+        <h3>Result:</h3>
+        <h3 id="calcResults">Result will appear here...</h3>
+      </div>
+    <script>
+      /*************** ELEMENTS ***************/
+      const calculateUnitEl = document.getElementById("calculateUnit");
+    
+      const containers = document.querySelectorAll(".containers");
+      const rdInputContainerEl = document.getElementById('rd-contianer')
+      const inputs = document.querySelectorAll(".inputs");
+
+      const rdInput = document.getElementById("rd-input");
+      const haInput = document.getElementById("ha-input");
+      const dhInput = document.getElementById("dh-input");
+
+      const cbSelect = document.getElementById("cb-select");
+      const rdSelect = document.getElementById("rd-select");
+      const haSelect = document.getElementById("ha-select");
+      const dhSelect = document.getElementById("dh-select");
+
+      const calcBtnEl = document.getElementById('calcBtn');
+      const resetBtnEl = document.getElementById('resetBtn');
+      const calcResultsEl = document.getElementById('calcResults')
+
+      /*************** GLOBAL VARIBLES ***************/
+      const UNITS = {
+        distance: {
+          mm: 100,
+          cm: 100,
+          m: 1,
+          km: 1e-3,
+          in: 39.37,
+          ft: 3.281,
+          yd: 1.0936,
+          mi: 0.0006214,
+          nmi: 0.00054,
+        },
+      };
+      /*************** FUNCTIONS ***************/
+      function toSIUnit(type, unit, value) {
+        return value / UNITS[type][unit];
+      }
+
+      function fromSIUnit(type, unit, value) {
+        return value * UNITS[type][unit];
+      }
+      
+      function createElements(resultObj) {
+        const elementNodes = Object.keys(resultObj).map((key) => {
+          //create elements to put the results in
+          const div = document.createElement("div");
+          const span = document.createElement("span");
+          const span2 = document.createElement("span");
+
+          // give the elements id
+          div.setAttribute("class", `result-container`);
+          span.setAttribute("class", `result-title`);
+          span2.setAttribute("class", `result-value`);
+
+          // put the values in the elements
+
+          span.textContent = resultObj[key]["title"];
+          span2.textContent = resultObj[key]["value"];
+
+          // appened them to an element that contians them
+          div.append(span, span2);
+
+          // return that element
+          return div;
+        });
+
+        return elementNodes;
+      }
+
+      function handlecbSelectChange(e) {
+        const value = e.target.value
+        rdInputContainerEl.style.display = value !== "Custom" ? 'none' : 'block'
+
+        resetResult()
+      }
+
+      function handleCalculateUnitChange(e) {
+        const value = e.target.value
+
+        containers.forEach((container) => {
+          let idVal = container.id.slice(0, 2)
+          if (idVal == 'rd' && cbSelect.value != "Custom") {
+            container.style.display = 'none'
+          }  else if (idVal == value) {
+            container.style.display = 'none'
+          } else {
+            container.style.display = 'block'
+          }
+        })
+        if (value == 'cb') {
+            rdInputContainerEl.style.display = 'none'
+          }
+
+        resetResult()
+      }
+
+      function calculateResult(input) {
+        const calculateCb = () => {
+          const { ha, dh } = prepareUnits();
+          let h = ha;
+          let d = dh;
+
+          let result = (d * d - h * h) / (2 * h);
+          return {
+            result,
+            type: "distance",
+            name: `Celestial body radius`,
+          };
+        };
+        const calculateDh = () => {
+          const { ha, cb } = prepareUnits();
+          let r = cb;
+          let h = ha;
+
+          let result = Math.sqrt((r + h) * (r + h) - r * r);
+          return {
+            result,
+            type: "distance",
+            name: "Distance to horizon",
+          };
+        };
+        const calculateHa = () => {
+          const { dh, cb } = prepareUnits();
+          let r = cb;
+          let d = dh;
+          let result = Math.sqrt(d * d + r * r) - r;
+
+          return {
+            result,
+            type: "distance",
+            name: "Height above average surface level",
+          };
+        };
+
+        switch (input) {
+          case "cb":
+            return calculateCb();
+          case "ha":
+            return calculateHa();
+          case "dh":
+            return calculateDh();
+          default:
+            console.log("error in calculate result switch");
+        }
+      }
+
+      function getRadius() {
+        let cbUnit = cbSelect.value;
+        switch (cbUnit) {
+          case "Custom":
+            let rd = parseFloat(rdInput.value) ?? 0;
+            let rdUnit = rdSelect.value;
+            rd = toSIUnit("distance", rdUnit, rd);
+            return rd;
+          case "Sun":
+            return 6.957e8;
+          case "Mercury":
+            return 2.4397e6;
+          case "Venus":
+            return 6.0518e6;
+          case "Earth":
+            return 6.371e6;
+          case "Moon":
+            return 1.7374e6;
+          case "Mars":
+            return 3.3895e6;
+          case "Jupiter":
+            return 6.9911e7;
+          case "Saturn":
+            return 5.8232e7;
+          case "Uranus":
+            return 2.5362e7;
+          case "Neptune":
+            return 2.4622e7;
+          case "Pluto":
+            return 1.188e6;
+          default:
+            console.log("error in get radius switch");
+            return 0;
+        }
+      }
+
+      function prepareUnits() {
+        let dh = parseFloat(dhInput.value) ?? 0;
+        let ha = parseFloat(haInput.value) ?? 0;
+
+        let haUnit = haSelect.value;
+        let dhUnit = dhSelect.value;
+
+        cb = getRadius();
+        ha = toSIUnit("distance", haUnit, ha);
+        dh = toSIUnit("distance", dhUnit, dh);
+
+        return { dh, ha, cb };
+      }
+
+      function prepareResults(result, type, name) {
+        let resultObj = {};
+        Object.keys(UNITS[type]).forEach((key) => {
+          let ans = fromSIUnit(type, key, result);
+          ans = parseFloat(ans.toFixed(9));
+          if (!(ans > 0 && ans < 1) && !(ans < 0 && ans > -1)) {
+            ans = ans.toLocaleString();
+          }
+
+          resultObj[key] = {
+            title: `${name} (${key}): `,
+            value: ` ${ans} ${key}`,
+          };
+        });
+        return resultObj;
+      }
+
+      function calculateResults() {
+        const calculateUnit = calculateUnitEl.value
+
+        try {
+          const { result, type, name } = calculateResult(calculateUnit);
+
+          if (isNaN(result)) {
+            alert("Your input resulted in NAN.\n 0/0 \n Try again with valid input.");
+            resetResult()
+            return;
+          }
+          if (result <= 0) {
+            alert(
+              `${name} must be positive number.\n${name}: ${result}\nTry again with valid input.`
+            );
+            resetResult()
+            return;
+          }
+          if (Math.abs(result) === Infinity) {
+            alert(
+              "Your input resulted in Infinity. \nDivision by zero. \nTry again with valid input."
+            );
+            resetResult()
+            return;
+          }
+
+          const resultObj = prepareResults(result, type, name);
+          const elementNodes = createElements(resultObj);
+          calcResultsEl.innerHTML = '';
+
+          elementNodes.forEach((element) => {
+            calcResultsEl.append(element);
+          });
+        } catch (error) {
+          console.log(error);
+          alert("An error ocurred. Try again with valid input.");
+          resetResult()
+          return;
+        }
+      }
+
+      function resetForm() {
+        [rdSelect, haSelect, dhSelect].forEach((select, index) => {
+          select.selectedIndex = '3'
+        });
+        cbSelect.selectedIndex = "4"
+
+        inputs.forEach((input) => {
+          input.value = ""
+        });
+        calculateUnitEl.selectedIndex = '2'
+
+        containers.forEach((container) => {
+          let idVal = container.id.slice(0, 2)
+          if (idVal == 'dh') {
+            container.style.display = 'none'
+          } else {
+            container.style.display = 'block'
+          }
+        })
+        rdInputContainerEl.style.display = "none"
+      }
+
+      function resetResult() {
+        calcResultsEl.innerHTML = "<p>Result will appear here...</p>";
+      } 
+
+      function resethandler() {
+        resetForm();
+        resetResult();
+      }
+
+      /*************** EVENT LISTINERS ***************/
+      calculateUnitEl.addEventListener("change", handleCalculateUnitChange);
+      
+      [rdSelect, haSelect, dhSelect].forEach((select, index) => {
+        select.addEventListener("change", resetResult);
+      });
+
+      inputs.forEach((input) => {
+        input.addEventListener("click", resetResult);
+      });
+
+      resetBtnEl.addEventListener("click", resethandler);
+      calcBtnEl.addEventListener("click", calculateResults);
+
+    </script>
+  </body>
+</html>

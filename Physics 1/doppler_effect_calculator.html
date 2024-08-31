@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Doppler Effect Calculator</title>
+  </head>
+  <body>
+    <h1>Doppler Effect Calculator</h1>
+      <p>f = f₀(v + vr)/(v + vs)</p>
+      <p>
+        Calculate:
+        <select id="calculateUnit">
+          <option value="ef">Emitted frequency (f₀)</option>
+          <option value="wv">Wave velocity (v)</option>
+          <option value="rv">Receiver velocity (vr) </option>
+          <option value="sv">Source velocity (vs)</option>
+          <option value="of" selected>Observed frequency (f)</option>
+        </select>
+      </p>        
+      <div>
+        <p id="ef-contianer" class="containers">
+          <label for="ef-input">Emitted frequency (f₀) </label>
+          <input type="number" step="any" id="ef-input" class="inputs" />
+          <select id="ef-select">
+            <option value="Hz" selected>hertz (Hz)</option>
+            <option value="kHz">kilohertz (kHz)</option>
+            <option value="MHz">megahertz (MHz)</option>
+            <option value="GHz">gigahertz (GHz)</option>
+            <option value="THz">terahertz (THz)</option>
+          </select>
+        </p>
+        <p id="wv-contianer" class="containers">
+          <label for="wv-input">Wave velocity (v) </label>
+          <input
+            type="number"
+            step="any"
+            id="wv-input"
+            class="inputs"
+            value="343.2"
+          />
+          <select id="wv-select">
+            <option value="m/s" selected>meters per second (m/s)</option>
+            <option value="km/h">kilometers per hour (km/h)</option>
+            <option value="ft/s">feet per second (ft/s)</option>
+            <option value="mph">miles per hour (mph)</option>
+            <option value="km/s">kilometers/second (km/s)</option>
+            <option value="mi/s">miles/second (mi/s)</option>
+            <option value="c">light speed (c)</option>
+          </select>
+        </p>
+        <p id="rv-contianer" class="containers">
+          <label for="rv-input">Receiver velocity (vr) </label>
+          <input type="number" id="rv-input" step="any" class="inputs" />
+          <select id="rv-select">
+            <option value="m/s" selected>meters per second (m/s)</option>
+            <option value="km/h">kilometers per hour (km/h)</option>
+            <option value="ft/s">feet per second (ft/s)</option>
+            <option value="mph">miles per hour (mph)</option>
+            <option value="knots">knots</option>
+            <option value="ft/min">feet per minute (ft/min)</option>
+          </select>
+        </p>
+        <p id="sv-contianer" class="containers">
+          <label for="sv-input">Source velocity (vs) </label>
+          <input type="number" step="any" id="sv-input" class="inputs" />
+          <select id="sv-select">
+            <option value="m/s" selected>meters per second (m/s)</option>
+            <option value="km/h">kilometers per hour (km/h)</option>
+            <option value="ft/s">feet per second (ft/s)</option>
+            <option value="mph">miles per hour (mph)</option>
+            <option value="knots">knots</option>
+            <option value="ft/min">feet per minute (ft/min)</option>
+          </select>
+        </p>
+        <p id="of-contianer" class="containers" style="display: none;">
+          <label for="of-input">Observed frequency (f) </label>
+          <input type="number" step="any" id="of-input" class="inputs" />
+          <select id="of-select">
+            <option value="Hz" selected>hertz (Hz)</option>
+            <option value="kHz">kilohertz (kHz)</option>
+            <option value="MHz">megahertz (MHz)</option>
+            <option value="GHz">gigahertz (GHz)</option>
+            <option value="THz">terahertz (THz)</option>
+          </select>
+        </p>
+      </div>
+      <button id="calcBtn">Calculate</button>
+      <button id="resetBtn">Reset</button>
+      <hr>
+      <div>
+        <h3>Result:</h3>
+        <h3 id="calcResults">Result will appear here...</h3>
+      </div>
+    <script>
+      /*************** ELEMENTS ***************/
+      const containers = document.querySelectorAll(".containers");
+      const inputs = document.querySelectorAll(".inputs");
+
+      const calculateUnitEl = document.getElementById("calculateUnit");
+
+      const efInput = document.getElementById("ef-input");
+      const wvInput = document.getElementById("wv-input");
+      const rvInput = document.getElementById("rv-input");
+      const svInput = document.getElementById("sv-input");
+      const ofInput = document.getElementById("of-input");
+
+      const efSelect = document.getElementById("ef-select");
+      const wvSelect = document.getElementById("wv-select");
+      const rvSelect = document.getElementById("rv-select");
+      const svSelect = document.getElementById("sv-select");
+      const ofSelect = document.getElementById("of-select");
+
+      const calcBtnEl = document.getElementById('calcBtn');
+      const resetBtnEl = document.getElementById('resetBtn');
+      const calcResultsEl = document.getElementById('calcResults')
+
+      /*************** GLOBAL VARIBLES ***************/
+      const UNITS = {
+        frequency: {
+          Hz: 1,
+          kHz: 1e-3,
+          MHz: 1e-6,
+          GHz: 1e-9,
+          THz: 1e-12,
+        },
+        speed: {
+          "m/s": 1,
+          "km/h": 3.6,
+          "ft/s": 3.28084,
+          mph: 2.236936,
+          knots: 1.943844,
+          "ft/min": 196.850394,
+          "km/s": 0.001,
+          "mi/s": 0.0006213712,
+          c: 3.33564e-9,
+        },
+      };
+      /*************** FUNCTIONS ***************/
+      function toSIUnit(type, unit, value) {
+        return value / UNITS[type][unit];
+      }
+
+      function fromSIUnit(type, unit, value) {
+        return value * UNITS[type][unit];
+      }
+
+      function handleCalculateUnitChange(e) {
+        const value = e.target.value
+
+        containers.forEach((container) => {
+          let idVal = container.id.slice(0, 2)
+          if (idVal == value) {
+            container.style.display = 'none'
+          } else {
+            container.style.display = 'block'
+          }
+        })
+
+        resetResult()
+      }
+
+      function createElements(resultObj) {
+        const elementNodes = Object.keys(resultObj).map((key) => {
+          //create elements to put the results in
+          const div = document.createElement("div");
+          const span = document.createElement("span");
+          const span2 = document.createElement("span");
+
+          // give the elements id
+          div.setAttribute("class", `result-container`);
+          span.setAttribute("class", `result-title`);
+          span2.setAttribute("class", `result-value`);
+
+          // put the values in the elements
+
+          span.textContent = resultObj[key]["title"];
+          span2.textContent = resultObj[key]["value"];
+
+          // appened them to an element that contians them
+          div.append(span, span2);
+
+          // return that element
+          return div;
+        });
+
+        return elementNodes;
+      }
+
+      function calculateResult(input) {
+        const calculateEF = () => {
+          const { of, wv, sv, rv } = prepareUnits();
+          let result = (of * (wv + sv)) / (wv + rv);
+          return {
+            result,
+            type: "frequency",
+            name: `Emitted frequency (f₀)`,
+          };
+        };
+        const calculateWV = () => {
+          const { of, sv, rv, ef } = prepareUnits();
+          let result = (rv - (of / ef) * sv) / (of / ef - 1);
+          return {
+            result,
+            type: "speed",
+            name: "Wave velocity (v)",
+          };
+        };
+        const calculateRV = () => {
+          const { wv, of, sv, ef } = prepareUnits();
+          let result = (of * (wv + sv)) / ef - wv;
+          return {
+            result,
+            type: "speed",
+            name: "Receiver velocity (vr)",
+          };
+        };
+        const calculateSV = () => {
+          const { wv, rv, ef, of } = prepareUnits();
+          let result = (ef * (wv + rv)) / of - wv;
+          return {
+            result,
+            type: "speed",
+            name: "Source velocity (vs)",
+          };
+        };
+        const calculateOF = () => {
+          const { ef, wv, rv, sv } = prepareUnits();
+          let result = (ef * (wv + rv)) / (wv + sv);
+          return {
+            result,
+            type: "frequency",
+            name: "Observed frequency (f)",
+          };
+        };
+
+        switch (input) {
+          case "ef":
+            return calculateEF();
+          case "wv":
+            return calculateWV();
+          case "rv":
+            return calculateRV();
+          case "sv":
+            return calculateSV();
+          case "of":
+            return calculateOF();
+          default:
+            console.log("error in calculate result switch");
+        }
+      }
+
+      function prepareUnits() {
+        let ef = parseFloat(efInput.value) ?? 0;
+        let wv = parseFloat(wvInput.value) ?? 0;
+        let rv = parseFloat(rvInput.value) ?? 0;
+        let sv = parseFloat(svInput.value) ?? 0;
+        let of = parseFloat(ofInput.value) ?? 0;
+
+        let efUnit = efSelect.value;
+        let wvUnit = wvSelect.value;
+        let rvUnit = rvSelect.value;
+        let svUnit = svSelect.value;
+        let ofUnit = ofSelect.value;
+
+        ef = toSIUnit("frequency", efUnit, ef);
+        wv = toSIUnit("speed", wvUnit, wv);
+        rv = toSIUnit("speed", rvUnit, rv);
+        sv = toSIUnit("speed", svUnit, sv);
+        of = toSIUnit("frequency", ofUnit, of);
+        return { ef, wv, rv, sv, of };
+      }
+
+      function prepareResults(result, type, name) {
+        let resultObj = {};
+        Object.keys(UNITS[type]).forEach((key) => {
+          let ans = fromSIUnit(type, key, result);
+          // ans =
+          //   ans > 1 || ans < -1
+          //     ? parseFloat(parseFloat(ans.toExponential(10)).toFixed(4))
+          //     : ans.toExponential(10);
+
+          resultObj[key] = {
+            title: `${name}: `,
+            value: ` ${ans} ${key}`,
+          };
+        });
+        return resultObj;
+      }
+      
+      function calculateResults() {
+
+        const calculateUnit = calculateUnitEl.value
+
+        try {
+          const { result, type, name } = calculateResult(calculateUnit);
+
+          if (isNaN(result)) {
+            alert("Your input resulted in NAN.\n 0/0 \n Try again with valid input.");
+            resetResult()
+            return;
+          }
+          if (Math.abs(result) === Infinity) {
+            alert(
+              "Your input resulted in Infinity. \nDivision by zero. \nTry again with valid input."
+            );
+            resetResult()
+            return;
+          }
+
+          const resultObj = prepareResults(result, type, name);
+          const elementNodes = createElements(resultObj);
+          calcResultsEl.innerHTML = '';
+
+          elementNodes.forEach((element) => {
+            calcResultsEl.append(element);
+          });
+        } catch (error) {
+          console.log(error);
+          alert("An error ocurred. Try again with valid input.");
+          resetResult()
+          return;
+        }
+      }
+
+      function resetForm() {
+        [efSelect, wvInput, rvInput, svInput, ofInput].forEach((select, index) => {
+          select.selectedIndex = '3'
+        });
+
+        inputs.forEach((input) => {
+          input.value = ""
+        });
+        calculateUnitEl.selectedIndex = '4'
+
+        containers.forEach((container) => {
+          let idVal = container.id.slice(0, 2)
+          if (idVal == 'of') {
+            container.style.display = 'none'
+          } else {
+            container.style.display = 'block'
+          }
+        })
+      }
+
+      function resetResult() {
+        calcResultsEl.innerHTML = "<p>Result will appear here...</p>";
+      } 
+
+      function resethandler() {
+        resetForm();
+        resetResult();
+      }
+
+      /*************** EVENT LISTINERS ***************/
+      calculateUnitEl.addEventListener("change", handleCalculateUnitChange);
+
+      [efSelect, wvInput, rvInput, svInput, ofInput].forEach((select, index) => {
+        select.addEventListener("change", resetResult);
+      });
+
+      inputs.forEach((input) => {
+        input.addEventListener("click", resetResult);
+      });
+      
+      resetBtnEl.addEventListener("click", resethandler);
+      calcBtnEl.addEventListener("click", calculateResults);
+
+    </script>
+  </body>
+</html>
