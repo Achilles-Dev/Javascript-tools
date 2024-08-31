@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Electron Speed Calculator</title>
+  </head>
+  <body>
+    <h1>Electron Speed Calculator</h1>
+      <div>
+        <p>
+          <label for="i1-input">Accelerating potential</label>
+          <input
+            type="number"
+            autocomplete="off"
+            data-id="i1"
+            step="any"
+            id="i1-input"
+            class="inputs"
+            data-name="Accelerating potential"
+          />
+          <select
+            class="selects"
+            id="i1-select"
+            data-type="voltage"
+            data-prev="V"
+            data-id="i1"
+          >
+            <option value="mV">millivolts (mV)</option>
+            <option value="V" selected>volts (V)</option>
+            <option value="kV">kilovolts (kV)</option>
+            <option value="MV">megavolts (MV)</option>
+          </select>
+        </p>
+      </div>
+
+      <button id="calcBtn">Calculate</button>
+      <button id="resetBtn">Reset</button>
+      <hr>
+      <div>
+        <h3>Result:</h3>
+        <h3 id="calcResults">Result will appear here...</h3>
+      </div>
+    <script>
+      /*************** ELEMENTS ***************/
+      const selects = document.querySelectorAll(".selects");
+      const inputs = document.querySelectorAll(".inputs");
+      
+      const calcBtnEl = document.getElementById('calcBtn');
+      const resetBtnEl = document.getElementById('resetBtn');
+      const calcResultsEl = document.getElementById('calcResults')
+
+      /*************** GLOBAL VARIBLES ***************/
+      const UNITS = {
+        velocity: {
+          "m/s": 1,
+          "km/h": 3.6,
+          "ft/s": 3.2808398950131235,
+          mph: 2.2369362920544025,
+          "km/s": 0.001,
+          c: 3.3356409519815204e-9,
+        },
+        voltage: {
+          mV: 1e3,
+          V: 1,
+          kV: 1e-3,
+          MV: 1e-6,
+        },
+      };
+
+      /*************** FUNCTIONS ***************/
+      function toSIUnit(type, unit, value) {
+        if (type === "exp") {
+          unit = parseFloat("1e" + unit);
+          return value * unit;
+        }
+        return value / UNITS[type][unit];
+      }
+
+      function fromSIUnit(type, unit, value) {
+        if (type === "exp") {
+          unit = parseFloat("1e" + unit);
+          return value / unit;
+        }
+        return value * UNITS[type][unit];
+      }
+
+      function customPercision(ans, place = 8) {
+        return parseFloat(parseFloat(ans).toPrecision(place));
+      }
+
+      function selectChangeHandler(e) {
+        let select = e.target;
+        let id = select.getAttribute("data-id");
+        let input = document.getElementById(`${id}-input`);
+
+        let prevUnit = select.getAttribute("data-prev");
+        let currentUnit = select.value;
+        select.setAttribute("data-prev", currentUnit);
+
+        if (input.value === "") {
+          return;
+        }
+
+        let type = select.getAttribute("data-type");
+
+        let value = input.value;
+        value = parseFloat(value);
+        if (isNaN(value)) value = 0.0;
+
+        let si = toSIUnit(type, prevUnit, value);
+        let result = fromSIUnit(type, currentUnit, si);
+        input.value = customPercision(result, 10);
+      }
+
+      function createElement() {
+        const newDiv = `
+          <div>
+            <p>
+              <label for="i2-span">Classical velocity: &nbsp;</label>
+              <span
+                type="number"
+                autocomplete="off"
+                data-id="i2"
+                step="any"
+                id="i2-span"
+                class="spans"
+                data-name="Classical velocity"
+              ></span>
+
+              <select
+                class="selectsResult"
+                id="i2-select"
+                data-type="velocity"
+                data-prev="km/s"
+                data-id="i2"
+              >
+                <option value="m/s">meters per second (m/s)</option>
+                <option value="km/h">kilometers per hour (km/h)</option>
+                <option value="ft/s">feet per second (ft/s)</option>
+                <option value="mph">miles per hour (mph)</option>
+                <option value="km/s" selected>kilometers per second (km/s)</option>
+                <option value="c">light speed (c)</option>
+              </select>
+            </p>
+
+            <p>
+              <label for="i3-span">Relativistic velocity: &nbsp;</label>
+              <span
+                type="number"
+                autocomplete="off"
+                data-id="i3"
+                step="any"
+                class="spans"
+                id="i3-span"
+                data-name="Relativistic velocity"
+              ></span>
+              <select
+                class="selectsResult"
+                id="i3-select"
+                data-type="velocity"
+                data-prev="km/s"
+                data-id="i3"
+              >
+                <option value="m/s">meters per second (m/s)</option>
+                <option value="km/h">kilometers per hour (km/h)</option>
+                <option value="ft/s">feet per second (ft/s)</option>
+                <option value="mph">miles per hour (mph)</option>
+                <option value="km/s" selected>kilometers per second (km/s)</option>
+                <option value="c">light speed (c)</option>
+              </select>
+            </p>
+
+            <p>
+              <label for="i4-span"> Velocity difference: &nbsp;</label>
+              <span
+                type="number"
+                autocomplete="off"
+                data-id="i4"
+                step="any"
+                class="spans"
+                id="i4-span"
+                data-name="Velocity difference"
+              ></span>
+              <select
+                class="selectsResult"
+                id="i4-select"
+                data-type="velocity"
+                data-prev="km/s"
+                data-id="i4"
+              >
+                <option value="m/s">meters per second (m/s)</option>
+                <option value="km/h">kilometers per hour (km/h)</option>
+                <option value="ft/s">feet per second (ft/s)</option>
+                <option value="mph">miles per hour (mph)</option>
+                <option value="km/s" selected>kilometers per second (km/s)</option>
+                <option value="c">light speed (c)</option>
+              </select>
+            </p>
+          </div>
+        `
+        return newDiv
+      }
+
+      function validateInput(id) {
+        if (id === "i4") return true;
+        const input = document.getElementById(`${id}-input`);
+        const label = input.getAttribute("data-name").trim();
+        let value = parseFloat(input.value);
+
+        if (id === "i3") {
+          let [speed] = prepareUnit(id);
+          if (speed > 299792458) {
+            alert(`An electron's ${label} cannot exceed the speed of light in vacuum.`);
+            return;
+          }
+        }
+        if (value <= 0 || isNaN(value)) {
+          alert(`${label} must be greater than zero!`);
+          return false;
+        }
+
+        return true;
+      }
+
+      // related to caculation
+      function prepareUnit(...args) {
+        const resultArr = [];
+        for (id of args) {
+          if (id == 'i1') {
+            const input = document.getElementById(`${id}-input`);
+            const select = document.getElementById(`${id}-select`);
+            const type = select.getAttribute("data-type");
+            let val = parseFloat(input.value);
+            val = isNaN(val) ? 0 : val;
+            let inUnit = select.value;
+            val = toSIUnit(type, inUnit, val);
+            resultArr.push(val);
+          } else {
+            const span = document.getElementById(`${id}-span`);
+            const select = document.getElementById(`${id}-select`);
+            const type = select.getAttribute("data-type");
+            let val = parseFloat(span.textContent);
+            val = isNaN(val) ? 0 : val;
+            let inUnit = select.value;
+            val = toSIUnit(type, inUnit, val);
+            resultArr.push(val);
+          }
+        }
+
+        return resultArr;
+      }
+
+      function setResult(resultObj) {
+        for (key of Object.keys(resultObj)) {
+          let val = resultObj[key].result;
+          let id = resultObj[key].type;
+          if (isNaN(val)) {
+            alert("Your input resulted in NAN.\n 0/0 \n Try again with valid input.");
+            return;
+          }
+          if (Math.abs(val) === Infinity) {
+            alert(
+              "Your input resulted in Infinity. \nDivision by zero. \nTry again with valid input."
+            );
+            return;
+          }
+
+          const span = document.getElementById(`${id}-span`);
+          const select = document.getElementById(`${id}-select`);
+          const type = select.getAttribute("data-type");
+          let outUnit = select.value;
+          val = fromSIUnit(type, outUnit, val);
+
+          span.textContent = customPercision(val, 11);
+        }
+      }
+
+      function calculateResult(id) {
+        const Ec = 1.602 * 10e-19;
+        const Em = 9.109 * 10e-31;
+        const C = 299792458;
+        let [val1] = prepareUnit('i1')
+        
+        let i2Val = Math.sqrt((2 * Ec * val1) / Em);
+        let i3Val = C * Math.sqrt(1 - 1 / Math.pow(1 + (Ec * val1) / (Em * C * C), 2));
+        const i2i3Vals = {
+          1: { result: i2Val, type: "i2" },
+          2: { result: i3Val, type: "i3" },
+        }
+        setResult(i2i3Vals)
+        const [newi2Val, newi3Val] = prepareUnit('i2', 'i3')
+        let i4Val = newi3Val - newi2Val
+
+        return {
+          1: { result: i2Val, type: "i2" },
+          2: { result: i3Val, type: "i3" },
+          3: { result: i4Val, type: "i4" }
+        };
+
+      }
+
+      function handleResultsChange(e) {
+        let select = e.target;
+        let id = select.getAttribute("data-id");
+        let span = document.getElementById(`${id}-span`);
+
+        let prevUnit = select.getAttribute("data-prev");
+        let currentUnit = select.value;
+        select.setAttribute("data-prev", currentUnit);
+
+        if (span.textContent === "") {
+          return;
+        }
+
+        let type = select.getAttribute("data-type");
+
+        let value = parseFloat(span.textContent);
+        value = parseFloat(value);
+        if (isNaN(value)) value = 0.0;
+
+        let si = toSIUnit(type, prevUnit, value);
+        let result = fromSIUnit(type, currentUnit, si);
+        span.textContent = customPercision(result);
+      }
+
+      function calculateResults() {
+        for (el of ["i1"]) {
+          if (!validateInput(el)) return;
+        }
+
+        try {
+          const resultElement = createElement()
+          calcResultsEl.innerHTML = resultElement
+
+          const newSelects = document.querySelectorAll(".selectsResult");
+
+          newSelects.forEach((select) => {
+            select.addEventListener("change", handleResultsChange);
+          });
+          
+          const result = calculateResult();
+          setResult(result)
+
+        } catch(error) {
+          alert("An error ocurred. Try again with valid input.");
+          resetResult()
+          return;
+        }
+      }
+
+      function resetForm() {
+        selects.forEach((select, index) => {
+          select.selectedIndex = '1'
+        });
+
+        inputs.forEach((input) => {
+          input.value = ""
+        });
+      }
+
+      function resetResult() {
+        calcResultsEl.innerHTML = "<p>Result will appear here...</p>";
+      } 
+
+      function resethandler() {
+        resetForm();
+        resetResult();
+      }
+
+      /*************** EVENT LISTINERS ***************/
+      selects.forEach((select) => {
+        select.addEventListener("change", resetResult);
+      });
+
+      inputs.forEach((input) => {
+        input.addEventListener("input", resetResult);
+      });
+
+      resetBtnEl.addEventListener("click", resethandler);
+      calcBtnEl.addEventListener("click", calculateResults);
+
+    </script>
+  </body>
+</html>
