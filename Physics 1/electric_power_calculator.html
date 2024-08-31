@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Electrical Power Calculator</title>
+  </head>
+  <body>
+    <h1>Electrical Power Calculator</h1>
+      <p>
+        Calculate:
+        <select id="calculateUnit">
+          <option value="vl">Voltage</option>
+          <option value="cr">Current</option>
+          <option value="pf">Power factor</option>
+          <option value="pw" selected>Power</option>
+        </select>
+      </p>
+      <div>
+        <p id="vl-contianer" class="containers">
+          <label for="vl-input">Voltage </label>
+          <input
+            type="number"
+            step="any"
+            id="vl-input"
+            class="inputs"
+            min="0"
+          />
+          <select id="vl-select">
+            <option value="mV">millivolts</option>
+            <option value="V" selected>volts</option>
+            <option value="kV">kilovolts</option>
+            <option value="MV">megavolts</option>
+          </select>
+        </p>
+
+        <p id="cr-contianer" class="containers">
+          <label for="cr-input">Current </label>
+          <input
+            type="number"
+            step="any"
+            id="cr-input"
+            class="inputs"
+            min="0"
+          />
+          <select id="cr-select">
+            <option value="A" selected>amperes</option>
+            <option value="mA">milliamperes</option>
+            <option value="μA">microamperes</option>
+          </select>
+        </p>
+
+        <p id="pf-contianer" class="containers">
+          <label for="pf-input">Power factor </label>
+          <input
+            type="number"
+            id="pf-input"
+            step="any"
+            class="inputs"
+            min="0"
+            max="1"
+            value="1"
+          />
+          <select id="pf-select">
+            <option value="units" selected disabled>units</option>
+          </select>
+        </p>
+
+        <p id="pw-contianer" class="containers" style="display: none;">
+          <label for="pw-input">Power </label>
+          <input
+            type="number"
+            step="any"
+            id="pw-input"
+            class="inputs"
+            min="0"
+          />
+          <select id="pw-select">
+            <option value="W" selected>watts</option>
+            <option value="kW">kilowatts</option>
+            <option value="MW">megawatts</option>
+            <option value="GW">gigawatts</option>
+            <option value="BTU/h">British thermal units per hour</option>
+          </select>
+        </p>
+      </div>
+
+      <button id="calcBtn">Calculate</button>
+      <button id="resetBtn">Reset</button>
+      <hr>
+      <div>
+        <h3>Result:</h3>
+        <h3 id="calcResults">Result will appear here...</h3>
+      </div>
+    <script>
+      /*************** ELEMENTS ***************/
+      const containers = document.querySelectorAll(".containers");
+      const inputs = document.querySelectorAll(".inputs");
+
+      const calculateUnitEl = document.getElementById("calculateUnit");
+
+      const vlInput = document.getElementById("vl-input");
+      const crInput = document.getElementById("cr-input");
+      const pfInput = document.getElementById("pf-input");
+      const pwInput = document.getElementById("pw-input");
+
+      const vlSelect = document.getElementById("vl-select");
+      const crSelect = document.getElementById("cr-select");
+      const pfSelect = document.getElementById("pf-select");
+      const pwSelect = document.getElementById("pw-select");
+
+      const calcBtnEl = document.getElementById('calcBtn');
+      const resetBtnEl = document.getElementById('resetBtn');
+      const calcResultsEl = document.getElementById('calcResults')
+
+      /*************** GLOBAL VARIBLES ***************/
+      const UNITS = {
+        current: {
+          μA: 1e6,
+          mA: 1e3,
+          A: 1,
+        },
+        voltage: {
+          mV: 1e3,
+          V: 1,
+          kV: 1e-3,
+          MV: 1e-6,
+        },
+        pf: {
+          units: 1,
+        },
+        power: {
+          W: 1,
+          kW: 1e-3,
+          MW: 1e-6,
+          GW: 1e-9,
+          "BTU/h": 3.412141633,
+        },
+      };
+      /*************** FUNCTIONS ***************/
+      function toSIUnit(type, unit, value) {
+        return value / UNITS[type][unit];
+      }
+
+      function fromSIUnit(type, unit, value) {
+        return value * UNITS[type][unit];
+      }
+
+      function createElements(resultObj) {
+        const elementNodes = Object.keys(resultObj).map((key) => {
+          //create elements to put the results in
+          const div = document.createElement("div");
+          const span = document.createElement("span");
+          const span2 = document.createElement("span");
+
+          // give the elements id
+          div.setAttribute("class", `result-container`);
+          span.setAttribute("class", `result-title`);
+          span2.setAttribute("class", `result-value`);
+
+          // put the values in the elements
+
+          span.textContent = resultObj[key]["title"];
+          span2.textContent = resultObj[key]["value"];
+
+          // appened them to an element that contians them
+          div.append(span, span2);
+
+          // return that element
+          return div;
+        });
+
+        return elementNodes;
+      }
+
+      function handleCalculateUnitChange(e) {
+        const value = e.target.value
+        
+        containers.forEach((container) => {
+          let idVal = container.id.slice(0, 2)
+          if (idVal == value) {
+            container.style.display = 'none'
+          } else {
+            container.style.display = 'block'
+          }
+        })
+
+        resetResult()
+      }
+
+      function calculateResult(input) {
+        const calculateCr = () => {
+          const { vl, pf, pw } = prepareUnits();
+
+          let result = pw / (vl * pf);
+          return {
+            result,
+            type: "current",
+            name: `Current`,
+          };
+        };
+        const calculatePf = () => {
+          const { vl, cr, pw } = prepareUnits();
+          let result = pw / (vl * cr);
+          return {
+            result,
+            type: "pf",
+            name: "Power factor",
+          };
+        };
+        const calculateVl = () => {
+          const { pf, cr, pw } = prepareUnits();
+          let result = pw / (pf * cr);
+          return {
+            result,
+            type: "voltage",
+            name: "Voltage",
+          };
+        };
+        const calculatePw = () => {
+          const { pf, cr, vl } = prepareUnits();
+          let result = pf * cr * vl;
+          return {
+            result,
+            type: "power",
+            name: "Power",
+          };
+        };
+
+        switch (input) {
+          case "cr":
+            return calculateCr();
+          case "vl":
+            return calculateVl();
+          case "pf":
+            return calculatePf();
+          case "pw":
+            return calculatePw();
+          default:
+            console.log("error in calculate result switch");
+        }
+      }
+
+      function prepareUnits() {
+        let vl = parseFloat(vlInput.value) ?? 0;
+        let cr = parseFloat(crInput.value) ?? 0;
+        let pf = parseFloat(pfInput.value) ?? 0;
+        let pw = parseFloat(pwInput.value) ?? 0;
+
+        let vlUnit = vlSelect.value;
+        let crUnit = crSelect.value;
+        let pfUnit = pfSelect.value;
+        let pwUnit = pwSelect.value;
+
+        vl = toSIUnit("voltage", vlUnit, vl);
+        cr = toSIUnit("current", crUnit, cr);
+        pf = toSIUnit("pf", pfUnit, pf);
+        pw = toSIUnit("power", pwUnit, pw);
+
+        return { pf, vl, cr, pw };
+      }
+
+      function prepareResults(result, type, name) {
+        let resultObj = {};
+        Object.keys(UNITS[type]).forEach((key) => {
+          let ans = fromSIUnit(type, key, result);
+          ans = parseFloat(ans.toFixed(8));
+          if (!(ans > 0 && ans < 1) && !(ans < 0 && ans > -1)) {
+            ans = ans.toLocaleString();
+          }
+
+          resultObj[key] = {
+            title: `${name} (${key}): `,
+            value: ` ${ans} ${key}`,
+          };
+        });
+        return resultObj;
+      }
+
+      function calculateResults() {
+        const calculateUnit = calculateUnitEl.value
+
+        try {
+          const { result, type, name } = calculateResult(calculateUnit);
+
+          if (isNaN(result)) {
+            alert("Your input resulted in NAN.\n 0/0 \n Try again with valid input.");
+            resetResult()
+            return;
+          }
+          if (Math.abs(result) === Infinity) {
+            alert(
+              "Your input resulted in Infinity. \nDivision by zero. \nTry again with valid input."
+            );
+            resetResult()
+            return;
+          }
+          if (result > 1 && type === "pf") {
+            alert(
+              `Power factor cannot be greater than 1. \n${name}: ${result} \nTry again with valid input.`
+            );
+            resetResult()
+            return;
+          }
+
+          const resultObj = prepareResults(result, type, name);
+          const elementNodes = createElements(resultObj);
+          calcResultsEl.innerHTML = "";
+
+          elementNodes.forEach((element) => {
+            calcResultsEl.append(element);
+          });
+        } catch (error) {
+          console.log(error);
+          alert("An error ocurred. Try again with valid input.");
+          resetResult()
+          return;
+        }
+      }
+
+      function resetForm() {
+        [vlSelect, crSelect, pfSelect, pwSelect].forEach((select, index) => {
+          if (index == 0) {
+            select.selectedIndex = '1'
+          } else {
+            select.selectedIndex = '0'
+          }       
+        });
+
+        inputs.forEach((input) => {
+          input.value = ""
+        });
+
+        containers.forEach((container) => {
+          let idVal = container.id.slice(0, 2)
+          if (idVal == 'pw') {
+            container.style.display = 'none'
+          } else {
+            container.style.display = 'block'
+          }
+        })
+        calculateUnitEl.selectedIndex = '3'
+      }
+
+      function resetResult() {
+        calcResultsEl.innerHTML = "<p>Result will appear here...</p>";
+      } 
+
+      function resethandler() {
+        resetForm();
+        resetResult();
+      }
+
+      /*************** EVENT LISTINERS ***************/
+      [vlSelect, crSelect, pfSelect, pwSelect].forEach((select) => {
+        select.addEventListener("change", resetResult);
+      });
+
+      inputs.forEach((input) => {
+        input.addEventListener("input", resetResult);
+      });
+
+      calculateUnitEl.addEventListener("change", handleCalculateUnitChange);
+
+      resetBtnEl.addEventListener("click", resethandler);
+      calcBtnEl.addEventListener("click", calculateResults);
+
+    </script>
+  </body>
+</html>

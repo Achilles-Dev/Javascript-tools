@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Z-Score Calculator</title>
+</head>
+<body>
+    <h1>Z-Score Calculator</h1>
+    <p>Enter the raw score, population mean, and standard deviation to find the z-score using the calculator below.</p>
+    <p>
+      Raw Score (x):
+      <input type="number" id="score">
+    </p>
+    <p>
+      Population Mean (μ):
+        <input type="number" id="popuMean">
+    </p>
+    <p>
+      Standard Deviation (σ):
+        <input type="number" id="sdVal">
+    </p>
+
+    <button id="calcBtn">Calculate</button>
+    <button id="resetBtn">Reset</button>
+    <hr>
+    <div>
+      <h3>Result:</h3>
+      <h3 id="calcResults">Result will appear here...</h3>
+    </div>
+
+    <script>
+      // Get required elements from the HTML
+      const scoreEl = document.getElementById("score");
+      const popuMeanEl = document.getElementById("popuMean");
+      const sdValEl = document.getElementById("sdVal");
+
+      const calcBtnEl = document.getElementById('calcBtn');
+      const resetBtnEl = document.getElementById('resetBtn');
+      const calcResultsEl = document.getElementById('calcResults') 
+
+      function calculateResults() {
+          // Retrieve input values
+          const score = parseFloat(scoreEl.value);
+          const popuMean = parseFloat(popuMeanEl.value);
+          const sdVal = parseFloat(sdValEl.value);
+
+          if (isNaN(score) || isNaN(popuMean) || isNaN(sdVal)) {
+            alert("Please Enter All Details.");
+            return;
+          }
+
+          try {
+            const results = (score - popuMean) / sdVal
+            
+            calcResultsEl.innerHTML = `<p> Z-Score: ${results.toFixed(4) * 1}</p>`
+          } catch (error) {
+            alert("Something Went Wrong!!!");
+            resethandler()
+          }
+      }
+
+      function resetForm() {
+        scoreEl.value = ""
+        popuMeanEl.value = ""
+        sdValEl.value = ""
+      }
+
+      function resetResult() {
+        calcResultsEl.innerHTML = "<p>Result will appear here...</p>";
+      } 
+
+      function resethandler() {
+        resetForm();
+        resetResult();
+      }
+
+      resetBtnEl.addEventListener("click", resethandler);
+      calcBtnEl.addEventListener("click", calculateResults);
+
+      [scoreEl, popuMeanEl, sdValEl].forEach((el) => {
+        el.addEventListener("input", resetResult);
+      });  
+    </script>
+</body>
+</html>

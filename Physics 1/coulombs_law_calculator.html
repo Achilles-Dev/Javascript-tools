@@ -1,0 +1,557 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Coulomb's Law Calculator</title>
+  </head>
+  <body>
+    <h1>Coulomb's Law Calculator</h1>
+      <p>
+        Mode:
+        <select id="modeUnit">
+          <option value="am" selected>Advanced mode</option>
+          <option value="sm">Simple mode</option>
+        </select>
+      </p>
+
+      <div>
+        <p>
+          <label for="i1-input">Charge 1 (q₁) </label>
+          <input
+            type="number"
+            min="0"
+            autocomplete="off"
+            data-id="i1"
+            step="any"
+            id="i1-input"
+            class="inputs"
+            data-name="Charge"
+          />
+          <select
+            class="selects"
+            id="i1-select"
+            data-type="charge"
+            data-prev="nC"
+            data-id="i1"
+          >
+            <option value="pC">pico coulombs (pC)</option>
+            <option value="nC" selected>nano coulombs (nC)</option>
+            <option value="μC">micro coulombs (μC)</option>
+            <option value="mC">milli coulombs (mC)</option>
+            <option value="C">coulombs (C)</option>
+            <option value="e">elementary charges (e)</option>
+            <option value="Ah">ampere hours (Ah)</option>
+            <option value="mAh">milliampere hours (mAh)</option>
+          </select>
+        </p>
+
+        <p>
+          <label for="i2-input">Charge 2 (q₂) </label>
+          <input
+            type="number"
+            min="0"
+            autocomplete="off"
+            data-id="i2"
+            step="any"
+            id="i2-input"
+            class="inputs"
+            data-name="Charge"
+          />
+
+          <select
+            class="selects"
+            id="i2-select"
+            data-type="charge"
+            data-prev="nC"
+            data-id="i2"
+          >
+            <option value="pC">pico coulombs (pC)</option>
+            <option value="nC" selected>nano coulombs (nC)</option>
+            <option value="μC">micro coulombs (μC)</option>
+            <option value="mC">milli coulombs (mC)</option>
+            <option value="C">coulombs (C)</option>
+            <option value="e">elementary charges (e)</option>
+            <option value="Ah">ampere hours (Ah)</option>
+            <option value="mAh">milliampere hours (mAh)</option>
+          </select>
+        </p>
+
+        <div id="ad-container">
+          <!-- exp 1 -->
+          <p>
+            <label for="i5-input">Coulomb's constant (kₑ) </label>
+            <input
+              type="number"
+              min="0"
+              autocomplete="off"
+              data-id="i5"
+              step="any"
+              id="i5-input"
+              data-name="Coulomb's constant"
+              value="8.987551787368176"
+            />
+
+            <select
+              class="selects"
+              id="i5-select"
+              data-type="exp"
+              data-prev="9"
+              data-id="i5"
+            >
+              <option value="0">×10⁰</option>
+              <option value="1">×10¹</option>
+              <option value="2">×10²</option>
+              <option value="3">×10³</option>
+              <option value="4">×10⁴</option>
+              <option value="5">×10⁵</option>
+              <option value="6">×10⁶</option>
+              <option value="7">×10⁷</option>
+              <option value="8">×10⁸</option>
+              <option value="9" selected>×10⁹</option>
+              <option value="10">×10¹⁰</option>
+              <option value="11">×10¹¹</option>
+              <option value="12">×10¹²</option>
+            </select>
+            <span>N·m²/C² </span>
+          </p>
+          <!-- exp 2 -->
+          <p>
+            <label for="i6-input">Vacuum permittivity </label>
+            <input
+              type="number"
+              min="0"
+              autocomplete="off"
+              data-id="i6"
+              step="any"
+              id="i6-input"
+              data-name="Vacuum permittivity"
+              value="8.854"
+              disabled
+            />
+
+            <select
+              class="selects"
+              id="i6-select"
+              data-type="exp"
+              data-prev="-12"
+              data-id="i6"
+            >
+              <option value="-20">×10⁻²⁰</option>
+              <option value="-19">×10⁻¹⁹</option>
+              <option value="-18">×10⁻¹⁸</option>
+              <option value="-17">×10⁻¹⁷</option>
+              <option value="-16">×10⁻¹⁶</option>
+              <option value="-15">×10⁻¹⁵</option>
+              <option value="-14">×10⁻¹⁴</option>
+              <option value="-13">×10⁻¹³</option>
+              <option value="-12" selected>×10⁻¹²</option>
+              <option value="-11">×10⁻¹¹</option>
+              <option value="-10">×10⁻¹⁰</option>
+              <option value="-9">×10⁻⁹</option>
+              <option value="-8">×10⁻⁸</option>
+              <option value="-7">×10⁻⁷</option>
+              <option value="-6">×10⁻⁶</option>
+              <option value="-5">×10⁻⁵</option>
+              <option value="-4">×10⁻⁴</option>
+              <option value="-3">×10⁻³</option>
+              <option value="-2">×10⁻²</option>
+              <option value="-1">×10⁻¹</option>
+              <option value="0">×10⁰</option>
+            </select>
+            <span> F/m</span>
+          </p>
+
+          <p>
+            <label for="i7-input">Relative permittivity </label>
+            <input
+              type="number"
+              min="0"
+              autocomplete="off"
+              data-id="i7"
+              step="any"
+              id="i7-input"
+              data-name="Relative permeability "
+              value="1"
+            />
+
+            <select
+              class="selects"
+              id="i7-select"
+              data-type="rp"
+              data-prev="rp"
+              data-id="i7"
+              style="display: none"
+            >
+              <option value="rp">unit</option>
+            </select>
+          </p>
+        </div>
+
+        <p>
+          <label for="i3-input">Distance (r) </label>
+          <input
+            type="number"
+            min="0"
+            autocomplete="off"
+            data-id="i3"
+            step="any"
+            class="inputs"
+            id="i3-input"
+            data-name="Distance"
+          />
+          <select
+            class="selects"
+            id="i3-select"
+            data-type="distance"
+            data-prev="mm"
+            data-id="i3"
+          >
+            <option value="nm">nanometers (nm)</option>
+            <option value="μm">micrometers (μm)</option>
+            <option value="mm" selected>millimeters (mm)</option>
+            <option value="cm">centimeters (cm)</option>
+            <option value="m">meters (m)</option>
+            <option value="km">kilometers (km)</option>
+            <option value="in">inches (in)</option>
+            <option value="ft">feet (ft)</option>
+            <option value="yd">yards (yd)</option>
+            <option value="mi">miles (mi)</option>
+          </select>
+        </p>
+      </div>
+
+      <button id="calcBtn">Calculate</button>
+      <button id="resetBtn">Reset</button>
+      <hr>
+      <div>
+        <h3>Result:</h3>
+        <h3 id="calcResults">Result will appear here...</h3>
+      </div>
+    <script>
+      /*************** ELEMENTS ***************/
+      const selects = document.querySelectorAll(".selects");
+      const inputs = document.querySelectorAll(".inputs");
+      const input5 = document.getElementById("i5-input");
+      const input6 = document.getElementById("i6-input");
+      const input7 = document.getElementById("i7-input");
+
+      const resetBtn = document.getElementById("clear-btn");
+      const modeUnitEl = document.getElementById("modeUnit");
+
+      const addInputsContainerEl = document.getElementById("ad-container");
+      const modeTogglers = document.querySelectorAll(".mode-togglers");
+
+      let forceVal = 0;
+      i4Select = 'N';
+      i6Select = '-12';
+      
+      const calcBtnEl = document.getElementById('calcBtn');
+      const resetBtnEl = document.getElementById('resetBtn');
+      const calcResultsEl = document.getElementById('calcResults')
+
+      /*************** GLOBAL VARIBLES ***************/
+      const UNITS = {
+        force: {
+          mN: 1e3,
+          N: 1,
+          kN: 1e-3,
+          MN: 1e-6,
+          GN: 1e-9,
+          TN: 1e-12,
+          pdl: 7.23301146432317,
+          lbf: 0.22480894387096184,
+        },
+
+        distance: {
+          nm: 999999999.9999999,
+          μm: 1000000,
+          mm: 1000,
+          cm: 100,
+          m: 1,
+          km: 0.001,
+          in: 39.37007874015748,
+          ft: 3.2808398950131235,
+          yd: 1.0936132983377078,
+          mi: 0.0006213711922373339,
+        },
+        rp: {
+          rp: 1,
+        },
+
+        charge: {
+          pC: 1000000000000.0,
+          nC: 1000000000.0,
+          μC: 1000000,
+          mC: 1000.0,
+          C: 1,
+          e: 6241509074460763000.0,
+          Ah: 0.0002777777777777778,
+          mAh: 0.2777777777777778,
+        },
+      };
+      let queue = ["i1", "i2", "i3", "i4"];
+      /*************** FUNCTIONS ***************/
+      function toSIUnit(type, unit, value) {
+        if (type === "exp") {
+          unit = parseFloat("1e" + unit);
+          return value * unit;
+        }
+        return value / UNITS[type][unit];
+      }
+
+      function fromSIUnit(type, unit, value) {
+        if (type === "exp") {
+          unit = parseFloat("1e" + unit);
+          return value / unit;
+        }
+        return value * UNITS[type][unit];
+      }
+
+      function handleModeUnitChange(e) {
+        const value = e.target.value
+        addInputsContainerEl.style.display = value === "sm" ? 'none' : 'block'
+
+        resetResult()
+      }
+
+      function customPercision(ans, to = 8) {
+        return parseFloat(parseFloat(ans).toPrecision(to));
+      }
+
+      function input5Hanlder() {
+        if (input5.value === "") {
+          input6.value = ""
+          return;
+        }
+        let Ke = prepareUnit("i5");
+        let vp = 1 / (Ke * 4 * Math.PI);
+
+        const result = {
+          1: {
+            result: vp,
+            type: "i6",
+          },
+        };
+
+        input6.value = setResult(result);
+      }
+
+      function isEmpty(...args) {
+        for (id of args) {
+          const input = document.getElementById(`${id}-input`);
+          if (input.value == "") return true;
+        }
+
+        return false;
+      }
+
+      function validateInput(id) {
+        const input = document.getElementById(`${id}-input`);
+        const label = input.getAttribute("data-name").trim();
+        let value = parseFloat(input.value);
+
+        if (isEmpty("i1", "i2", "i3")) {
+          alert(`Please Enter All Details.`)
+          return;
+        }
+
+        if (id == 'i5' || id == "i7") {
+          if (isEmpty("i5", "i7")) {
+            alert(`Please Enter All Details.`)
+            return;
+          }
+        }
+
+        if (id === "i3") {
+          if (value <= 0) {
+            alert(`Distance must be a positive value greater than 0.`);
+            return false;
+          }
+          return true;
+        }
+
+        if (value == 0) {
+          alert(`${label} cannot be zero!`);
+          return false;
+        }
+
+        return true;
+      }
+      
+      // related to caculation
+      function prepareUnit(...args) {
+        const resultArr = [];
+        for (id of args) {
+          const input = document.getElementById(`${id}-input`);
+          const select = document.getElementById(`${id}-select`);
+          const type = select.getAttribute("data-type");
+          let val = parseFloat(input.value);
+          val = isNaN(val) ? 0 : val;
+          let inUnit = select.value;
+          val = toSIUnit(type, inUnit, val);
+          resultArr.push(val);
+        }
+
+        return resultArr;
+      }
+      
+      function setResult(resultObj) {
+        for (key of Object.keys(resultObj)) {
+          let val = resultObj[key].result;
+          let id = resultObj[key].type;
+          if (isNaN(val)) {
+            alert("Your input resulted in NAN.\n 0/0 \n Try again with valid input.");
+            return;
+          }
+          if (Math.abs(val) === Infinity) {
+            alert(
+              "Your input resulted in Infinity. \nDivision by zero. \nTry again with valid input."
+            );
+            return;
+          }
+
+          if (id == 'i4') {
+            type = 'force'
+            outUnit = i4Select
+            val = fromSIUnit(type, outUnit, val);
+          }
+
+          if (id == 'i6') {
+            type = 'exp'
+            outUnit = i6Select
+            val = fromSIUnit(type, outUnit, val);
+          }
+
+          return customPercision(val, 16);
+        }
+      }
+
+      function calculateResult() {
+        const Ke = prepareUnit("i5");
+        const R = prepareUnit("i7");
+
+        function calculateI4() {
+          let [val1, val2, val3] = prepareUnit("i1", "i2", "i3");
+
+          let result = Ke * ((val1 * val2) / (val3 * val3 * R));
+
+          return {
+            1: { result, type: "i4" },
+          };
+        }
+
+        return calculateI4()
+      }
+
+      function handleResultsChange(e) {
+        let select = e.target;
+        let id = select.getAttribute("data-id");
+
+        let prevUnit = i4Select;
+        let currentUnit = select.value;
+        i4Select = currentUnit
+
+
+        let si = toSIUnit("force", prevUnit, forceVal);
+        let result = fromSIUnit("force", currentUnit, si);
+        forceVal = result.toPrecision(16)
+
+        const forceValSpan = document.getElementById('forceVal')
+        forceValSpan.textContent = `
+          Force (F):: ${forceVal}
+        `
+      }
+
+      function calculateResults() {
+        const modeUnit = modeUnitEl.value
+        for (el of ["i1", "i2", "i3"]) {
+          if (!validateInput(el)) return;
+        }
+        if (modeUnit == "am") {
+          for (el of ["i5", "i7"]) {
+          if (!validateInput(el)) return;
+        }
+        }
+
+        const result = calculateResult();
+        
+        forceVal = setResult(result);
+
+        const resultsSelect = document.createElement('select')
+        resultsSelect.id = "i4-select";
+        resultsSelect.setAttribute("data-id", "i4");
+
+        resultsSelect.innerHTML = `
+            <option value="mN">millinewtons (mN)</option>
+            <option value="N" selected>newtons (N)</option>
+            <option value="kN">kilonewtons (kN)</option>
+            <option value="MN">meganewtons (MN)</option>
+            <option value="GN">giganewtons (GN)</option>
+            <option value="TN">teranewtons (TN)</option>
+            <option value="pdl">poundals (pdl)</option>
+            <option value="lbf">pounds-force (lbf)</option>
+        `
+        resultsSelect.addEventListener("change", handleResultsChange)
+        calcResultsEl.innerHTML = `
+          <p>
+          <span id="forceVal">Force (F): ${forceVal} &nbsp; &nbsp;</span>
+          <span id="resultSelect"></span>
+          </p>
+        `
+        const resultSelectSpan = document.getElementById('resultSelect')
+        resultSelectSpan.append(resultsSelect)
+      }
+
+      function resetForm() {
+        selects.forEach((select, index) => {
+          if (index == 3) {
+            select.selectedIndex = '8'
+          } else if (index == 2) {
+            select.selectedIndex = '9'
+          } else if (index == 5) {
+            select.selectedIndex = '2'
+          } else  {
+            select.selectedIndex = '1'
+          }   
+        });
+        inputs.forEach((input) => {
+          input.value = ""
+        });
+
+        input5.value = "8.987551787368176"
+        input7.value = "1"
+        input6.value = "8.854"
+      }
+
+      function resetResult() {
+        calcResultsEl.innerHTML = "<p>Result will appear here...</p>";
+      } 
+
+      function resethandler() {
+        resetForm();
+        resetResult();
+      }
+
+     /*************** EVENT LISTINERS ***************/     
+      input5.addEventListener("input", input5Hanlder);
+
+      selects.forEach((select) => {
+        select.addEventListener("change", resetResult);
+      });
+      inputs.forEach((input) => {
+        input.addEventListener("input", resetResult);
+      });
+
+      [input5, input7].forEach((input) => {
+        input.addEventListener("input", resetResult);
+      });
+
+      modeUnitEl.addEventListener("change", handleModeUnitChange)
+
+      resetBtnEl.addEventListener("click", resethandler);
+      calcBtnEl.addEventListener("click", calculateResults);
+
+    </script>
+  </body>
+</html>

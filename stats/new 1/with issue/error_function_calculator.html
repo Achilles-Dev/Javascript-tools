@@ -45,6 +45,47 @@
       const resetBtnEl = document.getElementById("resetBtn");
       const calcResultsEl = document.getElementById("calcResults");
 
+      function erfc(x) {
+        const z = Math.abs(x);
+        const t = 1 / (1 + z / 2);
+        const r = t * Math.exp(-z * z - 1.26551223 + t * (1.00002368 +
+                t * (0.37409196 + t * (0.09678418 + t * (-0.18628806 +
+                t * (0.27886807 + t * (-1.13520398 + t * (1.48851587 +
+                t * (-0.82215223 + t * 0.17087277)))))))))
+        return x >= 0 ? r : 2 - r;
+      };
+
+      function ierf(x) {
+
+      };
+
+      function erfinv(y) {
+        // Coefficients for the approximation
+        const a = 0.147;
+
+        if (y > 1) {
+            return Infinity;
+        }
+        if (y < -1) {
+            return -Infinity;
+        }
+        if (y == 1) {
+          return 4.4512770219174555563768081
+        }
+        if (y == -1) {
+          return -4.4390462629491649337865056
+        }
+
+        // Formula for the inverse error function approximation
+        const ln = Math.log(1 - y * y);
+        const term1 = 2 / (Math.PI * a) + ln / 2;
+        const term2 = 1 / a * ln;
+
+        const result = Math.sign(y) * Math.sqrt(Math.sqrt(term1 * term1 - term2) - term1);
+
+        return result;
+      }
+  
       function calculateResults() {
         // Retrieve input values
         const xValue = parseFloat(xValueEl.value);
@@ -54,19 +95,31 @@
         if (isNaN(precision) || isNaN(xValue)) {
           alert("Please Enter All Details.");
           return;
+        } else if (precision > 25) {
+          alert("Precision value should not be greater than 12");
+          return;
+        } else if (functionSelect == "invErrorFn" && xValue > 1) {
+          alert("Value must be less than or equal to 1");
+          return;
+        } else if (functionSelect == "invErrorFn" && xValue < -1) {
+          alert("Value must be greater than or equal to -1");
+          return;
         }
 
         try {
-          const results = 0
-          if (selectValue == 'errorFn') {
+          let results = 0
+          if (functionSelect == 'errorFn') {
+            results = erfc(xValue)
             calcResultsEl.innerHTML = `
-              <p>erf(${xValue})</p>
-              <p>erfc(${xValue})</p>
+              <p>erf(${xValue}): ${(1 - results).toFixed(precision) * 1}</p>
+              <p>erfc(${xValue}): ${results .toFixed(precision) * 1}</p>
             `;
           } else {
+            results = erfinv(xValue)
+            const inverse = erfinv(1 - xValue)
             calcResultsEl.innerHTML = `
-              <p>erf<sup>-1</sup>(${xValue})</p>
-              <p>erf<sup>-1</sup>(${xValue})</p>
+              <p>erf<sup>-1</sup>(${xValue}): ${results .toFixed(precision) * 1}</p>
+              <p>erf<sup>-1</sup>(${xValue}): ${inverse.toFixed(precision) * 1}</p>
             `;
           }
           

@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Capacitive Reactance Calculator</title>
+  </head>
+  <body>
+    <h1>Capacitive Reactance Calculator</h1>
+      <div>
+        <p>
+          <label for="i1-input">Capacitance (C)</label>
+          <input
+            type="number"
+            min="0"
+            autocomplete="off"
+            data-id="i1"
+            step="any"
+            id="i1-input"
+            class="inputs"
+            data-name="Capacitance"
+          />
+          <select
+            class="selects"
+            id="i1-select"
+            data-type="capacitance"
+            data-prev="nF"
+            data-id="i1"
+          >
+            <option value="F">farads (F)</option>
+            <option value="mF">millifarads (mF)</option>
+            <option value="μF">microfarads (μF)</option>
+            <option value="nF" selected>nanofarads (nF)</option>
+            <option value="pF">picofarads (pF)</option>
+          </select>
+        </p>
+
+        <p>
+          <label for="i3-input">Frequency (f)</label>
+          <input
+            type="number"
+            min="0"
+            autocomplete="off"
+            data-id="i3"
+            step="any"
+            class="inputs"
+            id="i3-input"
+            data-name="Frequency"
+          />
+          <select
+            class="selects"
+            id="i3-select"
+            data-type="frequency"
+            data-prev="Hz"
+            data-id="i3"
+          >
+            <option value="Hz" selected>hertz (Hz)</option>
+            <option value="kHz">kilohertz (kHz)</option>
+            <option value="MHz">megahertz (MHz)</option>
+            <option value="GHz">gigahertz (GHz)</option>
+            <option value="THz">terahertz (THz)</option>
+          </select>
+        </p>
+      </div>
+
+      <p>
+        Mode:
+        <select id="modeUnit">
+          <option value="am">Advanced mode</option>
+          <option value="sm" selected>Simple mode</option>
+        </select>
+      </p>
+
+      <button id="calcBtn">Calculate</button>
+      <button id="resetBtn">Reset</button>
+      <hr>
+      <div>
+        <h3>Result:</h3>
+        <h3 id="calcResults">Result will appear here...</h3>
+      </div>
+    <script>
+      /*************** ELEMENTS ***************/
+      const selects = document.querySelectorAll(".selects");
+      const inputs = document.querySelectorAll(".inputs");
+
+      const modeUnitEl = document.getElementById("modeUnit");
+      const input3 = document.getElementById("i3-input");
+      const input4 = document.getElementById("i4-input");
+
+      const i4InputContainerEl = document.getElementById("i4-contianer");
+
+      let i2Select = 'Ω';
+      let i4Select = 'rad/s';
+      let capReact = 0;
+      let angFreqVal = 0;
+
+      const calcBtnEl = document.getElementById('calcBtn');
+      const resetBtnEl = document.getElementById('resetBtn');
+      const calcResultsEl = document.getElementById('calcResults')
+
+      /*************** GLOBAL VARIBLES ***************/
+      const UNITS = {
+        reactance: {
+          mΩ: 1e3,
+          Ω: 1,
+          kΩ: 1e-3,
+          MΩ: 1e-6,
+        },
+        angularFrequency: {
+          rpm: 1,
+          "rad/s": 0.10471975511965977,
+          Hz: 0.0166666666666666667,
+        },
+        frequency: {
+          Hz: 1,
+          kHz: 1e-3,
+          MHz: 1e-6,
+          GHz: 1e-9,
+          THz: 1e-12,
+        },
+        capacitance: {
+          F: 1,
+          mF: 1e3,
+          μF: 1e6,
+          nF: 1e9,
+          pF: 1e12,
+        },
+      };
+
+      /*************** FUNCTIONS ***************/
+      function toSIUnit(type, unit, value) {
+        if (type === "exp") {
+          unit = parseFloat("1e" + unit);
+          return value * unit;
+        }
+        return value / UNITS[type][unit];
+      }
+
+      function fromSIUnit(type, unit, value) {
+        if (type === "exp") {
+          unit = parseFloat("1e" + unit);
+          return value / unit;
+        }
+        return value * UNITS[type][unit];
+      }
+
+      function customPercision(ans, to = 8) {
+        return parseFloat(parseFloat(ans).toPrecision(to));
+      }
+
+      function isEmpty(...args) {
+        for (id of args) {
+          const input = document.getElementById(`${id}-input`);
+          if (input.value == "") return true;
+        }
+
+        return false;
+      }
+
+      function validateInput(id) {
+        const input = document.getElementById(`${id}-input`);
+        const label = input.getAttribute("data-name").trim();
+        let value = parseFloat(input.value);
+        if (isEmpty("i1", "i3")) {
+          alert(`Please Enter All Details.`)
+          return;
+        }
+
+        if (value <= 0) {
+          errorP.textContent = `${label} must be greater than zero!`;
+          return false;
+        }
+
+        return true;
+      }
+
+      // related to caculation
+      function prepareUnit(...args) {
+        const resultArr = [];
+        for (id of args) {
+          const input = document.getElementById(`${id}-input`);
+          const select = document.getElementById(`${id}-select`);
+          const type = select.getAttribute("data-type");
+          let val = parseFloat(input.value);
+          val = isNaN(val) ? 0 : val;
+          let inUnit = select.value;
+          val = toSIUnit(type, inUnit, val);
+          resultArr.push(val);
+        }
+
+        return resultArr;
+      }
+
+      function setResult(resultObj) {
+        let allResults = []
+        for (key of Object.keys(resultObj)) {
+          let val = resultObj[key].result;
+          let id = resultObj[key].type;
+
+          if (isNaN(val)) {
+            alert("Your input resulted in NAN.\n 0/0 \n Try again with valid input.");
+            return;
+          }
+          if (Math.abs(val) === Infinity) {
+            alert(
+              "Your input resulted in Infinity. \nDivision by zero. \nTry again with valid input."
+            );
+            return;
+          }
+
+          let type = ''
+          let outUnit = ''
+          if (id == 'i4') {
+            type = 'angularFrequency'
+            outUnit = i4Select
+          } else if (id == 'i2') {
+            type = 'reactance'
+            outUnit = i2Select
+          }
+          
+          val = fromSIUnit(type, outUnit, val);
+          allResults.push(customPercision(val, 16))
+        }
+        return allResults
+      }
+
+      function calculateResult() {
+        function calculateI2() {
+          let [val1, val2] = prepareUnit("i1", "i3");
+          let result = 1 / (2 * Math.PI * val1 * val2);
+          let result2 = val2 * (2 * Math.PI)
+          return {
+            1: { result, type: "i2" },
+            2: {result: result2, type: "i4"}
+          };
+        }
+  
+        return calculateI2()
+      }
+
+      function handleResults1Change(e) {
+        let select = e.target;
+        let id = select.getAttribute("data-id");
+
+        let prevUnit = i4Select;
+        let currentUnit = select.value;
+        i4Select = currentUnit
+
+        let si = toSIUnit("angularFrequency", prevUnit, angFreqVal);
+        let result = fromSIUnit("angularFrequency", currentUnit, si);
+        angFreqVal = result.toPrecision(16)
+
+        const angFreqSpan = document.getElementById('angFreq')
+        angFreqSpan.textContent = `
+          Angular frequency (ω): ${angFreqVal}
+        `
+      }
+
+      function handleResults2Change(e) {
+        let select = e.target;
+        let id = select.getAttribute("data-id");
+
+        let prevUnit = i2Select;
+        let currentUnit = select.value;
+        i2Select = currentUnit
+
+
+        let si = toSIUnit("reactance", prevUnit, capReact);
+        let result = fromSIUnit("reactance", currentUnit, si);
+        capReact = result.toPrecision(16)
+
+        const capReactSpan = document.getElementById('capReact')
+        capReactSpan.textContent = `
+          Reactance (X): ${capReact}
+        `
+      }
+
+
+      function calculateResults() {
+        const modeUnit = modeUnitEl.value
+        for (el of ["i1", "i3"]) {
+          if (!validateInput(el)) return;
+        }
+
+        const result = calculateResult();
+        
+        results = setResult(result);
+        capReact = results[0]
+        angFreqVal = results[1]
+
+        const results1Select = document.createElement('select')
+        results1Select.id = "i4-select";
+        results1Select.setAttribute("data-id", "i4");
+        const results2Select = document.createElement('select')
+        results2Select.id = "i2-select";
+        results2Select.setAttribute("data-id", "i2");
+
+        results1Select.innerHTML = `
+            <option value="rpm">rotations per minute (rpm)</option>
+            <option value="rad/s" selected>radians per second (rad/s)</option>
+            <option value="Hz">hertz (Hz)</option>
+        `
+        results2Select.innerHTML = `
+            <option value="mΩ">milliohms (mΩ)</option>
+            <option value="Ω" selected>ohms (Ω)</option>
+            <option value="kΩ">kiloohms (kΩ)</option>
+            <option value="MΩ">megaohms (MΩ)</option>
+        `
+        results1Select.addEventListener("change", handleResults1Change)
+        results2Select.addEventListener("change", handleResults2Change)
+
+        calcResultsEl.innerHTML = `
+          ${modeUnit == "am" ? 
+            `<p>
+            <span id="angFreq">Angular frequency (ω): ${angFreqVal} &nbsp; &nbsp;</span>
+            <span id="resultSelect1"></span>
+            </p>`
+          : ""}
+          <p>
+          <span id="capReact">Reactance (X): ${capReact} &nbsp; &nbsp;</span>
+          <span id="resultSelect2"></span>
+          </p>
+        `
+        if (modeUnit == "am") {
+          const resultSelect1Span = document.getElementById('resultSelect1')
+          resultSelect1Span.append(results1Select)
+        }
+
+        const resultSelect2Span = document.getElementById('resultSelect2')
+        resultSelect2Span.append(results2Select)
+      }
+
+      function resetForm() {
+        selects.forEach((select, index) => {
+          if (index == 0) {
+            select.selectedIndex = '3'
+          } else if (index == 1) {
+            select.selectedIndex = '0'
+          }        
+        });
+        inputs.forEach((input) => {
+          input.value = ""
+        });
+      }
+
+      function resetResult() {
+        calcResultsEl.innerHTML = "<p>Result will appear here...</p>";
+      } 
+
+      function resethandler() {
+        resetForm();
+        resetResult();
+      }
+
+      /*************** EVENTLISTINERS ***************/
+      selects.forEach((select) => {
+        select.addEventListener("change", resetResult);
+      });
+      inputs.forEach((input) => {
+        input.addEventListener("input", resetResult);
+      });
+
+      modeUnitEl.addEventListener("change", resetResult)
+
+      resetBtnEl.addEventListener("click", resethandler);
+      calcBtnEl.addEventListener("click", calculateResults);
+
+    </script>
+  </body>
+</html>

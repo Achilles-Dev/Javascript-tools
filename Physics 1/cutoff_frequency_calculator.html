@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Cutoff Frequency Calculator</title>
+  </head>
+  <body>
+    <h1>Cutoff Frequency Calculator</h1>
+      <p>
+        Circuit type:
+        <select id="ctSelect">
+          <option value="rc" selected>RC</option>
+          <option value="rl">RL</option>
+        </select>
+      </p>
+      <p>
+        Calculate:
+        <select id="calcUnit">
+          <option value="rt">Resistance (R)</option>
+          <option value="ic" id="inductOption" style="display: none;">Inductance (L)</option>
+          <option value="cp" id="capOption">Capacitance (C)</option>
+          <option value="cf" selected>Cutoff frequency (fc)</option>
+        </select>
+      </p>
+      <div>
+        <p id="rt-contianer" class="containers">
+          <label for="rt-input">Resistance (R) </label>
+          <input
+            type="number"
+            step="any"
+            id="rt-input"
+            class="inputs"
+            min="0"
+          />
+          <select id="rt-select">
+            <option value="mΩ">milliohms (mΩ)</option>
+            <option value="Ω" selected>ohms (Ω)</option>
+            <option value="kΩ">kiloohms (kΩ)</option>
+            <option value="MΩ">megaohms (MΩ)</option>
+          </select>
+        </p>
+
+        <p id="ic-contianer" class="containers" style="display: none;">
+          <label for="ic-input">Inductance (L) </label>
+          <input
+            type="number"
+            step="any"
+            id="ic-input"
+            class="inputs"
+            min="0"
+          />
+          <select id="ic-select">
+            <option value="H">henries (H)</option>
+            <option value="mH">millihenries (mH)</option>
+            <option value="μH" selected>microhenries (PH)</option>
+            <option value="nH">nanohenries (nH)</option>
+          </select>
+        </p>
+
+        <p id="cp-contianer" class="containers">
+          <label for="cp-input">Capacitance (C)</label>
+          <input
+            type="number"
+            id="cp-input"
+            step="any"
+            class="inputs"
+            min="0"
+          />
+          <select id="cp-select">
+            <option value="F">farads (F)</option>
+            <option value="mF">millifarads (mF)</option>
+            <option value="μF" selected>microfarads (μF)</option>
+            <option value="nF">nanofarads (nF)</option>
+            <option value="pF">picofarads (pF)</option>
+          </select>
+        </p>
+
+        <p id="cf-contianer" class="containers" style="display: none;">
+          <label for="cf-input">Cutoff frequency (fc) </label>
+          <input
+            type="number"
+            step="any"
+            id="cf-input"
+            class="inputs"
+            min="0"
+          />
+          <select id="cf-select">
+            <option value="Hz" selected>hertz (Hz)</option>
+            <option value="kHz">kilohertz (kHz)</option>
+            <option value="MHz">megahertz (MHz)</option>
+            <option value="GHz">gigahertz (GHz)</option>
+            <option value="THz">terahertz (THz)</option>
+            <option value="RPM">revolutions per minute (RPM)</option>
+          </select>
+        </p>
+      </div>
+      <button id="calcBtn">Calculate</button>
+      <button id="resetBtn">Reset</button>
+      <hr>
+      <div>
+        <h3>Result:</h3>
+        <h3 id="calcResults">Result will appear here...</h3>
+      </div>
+    <script>
+      /*************** ELEMENTS ***************/
+
+      const circuitTypeSelect = document.getElementById("ctSelect");
+      const calcUnitEl = document.getElementById("calcUnit");
+      const containers = document.querySelectorAll(".containers");
+      const inputs = document.querySelectorAll(".inputs");
+
+      const inductOptionEl = document.getElementById("inductOption");
+      const capOptionEl = document.getElementById("capOption");
+
+      const rtInput = document.getElementById("rt-input");
+      const icInput = document.getElementById("ic-input");
+      const cpInput = document.getElementById("cp-input");
+      const cfInput = document.getElementById("cf-input");
+
+      const rtSelect = document.getElementById("rt-select");
+      const icSelect = document.getElementById("ic-select");
+      const cpSelect = document.getElementById("cp-select");
+      const cfSelect = document.getElementById("cf-select");
+
+      const calcBtnEl = document.getElementById('calcBtn');
+      const resetBtnEl = document.getElementById('resetBtn');
+      const calcResultsEl = document.getElementById('calcResults')
+
+      /*************** GLOBAL VARIBLES ***************/
+      const UNITS = {
+        inductance: {
+          H: 1,
+          mH: 1e3,
+          μH: 1e6,
+          nH: 1e9,
+        },
+        capacitance: {
+          F: 1,
+          mF: 1e3,
+          μF: 1e6,
+          nF: 1e9,
+          pF: 1e12,
+        },
+        resistance: {
+          mΩ: 1e3,
+          Ω: 1,
+          kΩ: 1e-3,
+          MΩ: 1e-6,
+        },
+        frequency: {
+          Hz: 1,
+          kHz: 1e-3,
+          MHz: 1e-6,
+          GHz: 1e-9,
+          THz: 1e-12,
+          RPM: 60,
+        },
+      };
+      /*************** FUNCTIONS ***************/
+      function toSIUnit(type, unit, value) {
+        return value / UNITS[type][unit];
+      }
+
+      function fromSIUnit(type, unit, value) {
+        return value * UNITS[type][unit];
+      }
+
+      function handleCTSelectChange(e) {
+        const value = e.target.value
+        inductOptionEl.style.display = value === "rc" ? 'none' : 'block'
+        capOptionEl.style.display = value === "rl" ? 'none' : 'block'
+        calcUnitEl.selectedIndex = '3'
+        resetResult()
+      }
+
+      function handleCalcUnitChange(e) {
+        const value = e.target.value
+        containers.forEach((container) => {
+          let idVal = container.id.slice(0, 2)
+          if (idVal == 'ic' && circuitTypeSelect.value != "rl") {
+            container.style.display = 'none'
+          } else if (idVal == 'cp' && circuitTypeSelect.value != "rc") {
+            container.style.display = 'none'
+          } else if (idVal == value) {
+            container.style.display = 'none'
+          } else {
+            container.style.display = 'block'
+          }
+        })
+        
+        resetResult()
+      }
+
+
+      function createElements(resultObj) {
+        const elementNodes = Object.keys(resultObj).map((key) => {
+          //create elements to put the results in
+          const div = document.createElement("div");
+          const span = document.createElement("span");
+          const span2 = document.createElement("span");
+
+          // give the elements id
+          div.setAttribute("class", `result-container`);
+          span.setAttribute("class", `result-title`);
+          span2.setAttribute("class", `result-value`);
+
+          // put the values in the elements
+
+          span.textContent = resultObj[key]["title"];
+          span2.textContent = resultObj[key]["value"];
+
+          // appened them to an element that contians them
+          div.append(span, span2);
+
+          // return that element
+          return div;
+        });
+
+        return elementNodes;
+      }
+
+      function calculateResult(input) {
+        const calculateIc = () => {
+          const { rt, cf } = prepareUnits();
+
+          let result = rt / (2 * Math.PI * cf);
+          return {
+            result,
+            type: "inductance",
+            name: `Inductance`,
+          };
+        };
+        const calculateCp = () => {
+          const { rt, cf } = prepareUnits();
+          let result = 1 / (2 * Math.PI * cf * rt);
+          return {
+            result,
+            type: "capacitance",
+            name: "Capacitance",
+          };
+        };
+        const calculateRt = () => {
+          const { cp, ic, cf } = prepareUnits();
+          let ct = circuitTypeSelect.value;
+          let result = 0;
+          if (ct === "rc") {
+            result = 1 / (Math.PI * 2 * cf * cp);
+          }
+          if (ct === "rl") {
+            result = cf * ic * Math.PI * 2;
+          }
+          return {
+            result,
+            type: "resistance",
+            name: "Resistance",
+          };
+        };
+        const calculateCf = () => {
+          const { cp, ic, rt } = prepareUnits();
+          let ct = circuitTypeSelect.value;
+          let result = 0;
+          if (ct === "rc") {
+            result = 1 / (2 * Math.PI * rt * cp);
+          }
+          if (ct === "rl") {
+            result = rt / (2 * Math.PI * ic);
+          }
+          return {
+            result,
+            type: "frequency",
+            name: "Cutoff frequency",
+          };
+        };
+
+        switch (input) {
+          case "ic":
+            return calculateIc();
+          case "rt":
+            return calculateRt();
+          case "cp":
+            return calculateCp();
+          case "cf":
+            return calculateCf();
+          default:
+            console.log("error in calculate result switch");
+        }
+      }
+
+      function prepareUnits() {
+        let rt = parseFloat(rtInput.value) ?? 0;
+        let ic = parseFloat(icInput.value) ?? 0;
+        let cp = parseFloat(cpInput.value) ?? 0;
+        let cf = parseFloat(cfInput.value) ?? 0;
+
+        let rtUnit = rtSelect.value;
+        let icUnit = icSelect.value;
+        let cpUnit = cpSelect.value;
+        let cfUnit = cfSelect.value;
+
+        rt = toSIUnit("resistance", rtUnit, rt);
+        ic = toSIUnit("inductance", icUnit, ic);
+        cp = toSIUnit("capacitance", cpUnit, cp);
+        cf = toSIUnit("frequency", cfUnit, cf);
+
+        return { cp, rt, ic, cf };
+      }
+
+      function prepareResults(result, type, name) {
+        let resultObj = {};
+        Object.keys(UNITS[type]).forEach((key) => {
+          let ans = fromSIUnit(type, key, result);
+          ans = parseFloat(ans.toFixed(17));
+          if (!(ans > 0 && ans < 1) && !(ans < 0 && ans > -1)) {
+            ans = ans.toLocaleString();
+          }
+
+          resultObj[key] = {
+            title: `${name} (${key}): `,
+            value: ` ${ans} ${key}`,
+          };
+        });
+        return resultObj;
+      }
+      
+      function calculateResults() {
+        calcUnit = calcUnitEl.value
+
+        try {
+          const { result, type, name } = calculateResult(calcUnit);
+
+          if (isNaN(result)) {
+            alert("Your input resulted in NAN.\n 0/0 \n Try again with valid input.");
+            resetResult()
+            return;
+          }
+          if (Math.abs(result) === Infinity) {
+            alert(
+              "Your input resulted in Infinity. \nDivision by zero. \nTry again with valid input."
+            );
+
+            resetResult()
+            return;
+          }
+
+          const resultObj = prepareResults(result, type, name);
+          const elementNodes = createElements(resultObj);
+          calcResultsEl.innerHTML = "";
+
+          elementNodes.forEach((element) => {
+            calcResultsEl.append(element);
+          });
+        } catch (error) {
+          console.log(error);
+          alert("An error ocurred. Try again with valid input.");
+          calcResultsEl.innerHTML = "";
+          return;
+        }
+      }
+
+      function resetForm() {
+        rtSelect.selectedIndex = '1'
+        icSelect.selectedIndex = '1'
+        cpSelect.selectedIndex = '2'
+        cfSelect.selectedIndex = '1'
+        inputs.forEach((input) => {
+          input.value = ""
+        });
+      }
+
+      function resetResult() {
+        calcResultsEl.innerHTML = "<p>Result will appear here...</p>";
+      } 
+
+      function resethandler() {
+        resetForm();
+        resetResult();
+      }
+
+      /*************** EVENT LISTINERS ***************/
+      [rtSelect, icSelect, cpSelect, cfSelect].forEach((select) => {
+        select.addEventListener("change", resetResult);
+      });
+      inputs.forEach((input) => {
+        input.addEventListener("input", resetResult);
+      });
+      circuitTypeSelect.addEventListener("change", handleCTSelectChange);
+
+      calcUnitEl.addEventListener("change", handleCalcUnitChange)
+
+      resetBtnEl.addEventListener("click", resethandler);
+      calcBtnEl.addEventListener("click", calculateResults);
+
+    </script>
+  </body>
+</html>

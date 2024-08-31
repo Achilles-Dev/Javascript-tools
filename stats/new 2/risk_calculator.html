@@ -45,23 +45,38 @@
 
       function calculateResults() {
           // Retrieve input values
-          const probAEl = parseFloat(probAEl.value);
-          const probBEl = parseFloat(probBEl.value);
-          const lossAEl = parseFloat(lossAEl.value);
-          const lossBEl = parseFloat(lossBEl.value);
+          const probA = parseFloat(probAEl.value);
+          const probB = parseFloat(probBEl.value);
+          const lossA = parseFloat(lossAEl.value);
+          const lossB = parseFloat(lossBEl.value);
 
-          if (isNaN(probAEl) || isNaN(probBEl) || isNaN(lossAEl) || isNaN(lossBEl)) {
+          if (isNaN(probA) || isNaN(probB) || isNaN(lossA) || isNaN(lossB)) {
             alert("Please Enter All Details.");
             return;
-          } else if (trueVal < 0  ) {
-            alert("The relative uncertainty cannot be negative.");
+          } else if (probA < 0 || probB < 0 || probA > 100 || probB > 100) {
+            alert("Probability of failure for option A must between 0 and 100%.");
+              return;
+          } else if (lossA < 0 || lossB < 0) {
+            alert("The loss of option A or B cannot not be negative.");
               return;
           }
 
           try {
-            const results = 0
+            let results = ""
+            const riskA = (probA * lossA) / 100
+            const riskB = (probB * lossB) / 100
+            if (riskA < riskB) {
+              results = 'You should choose option A - it is far less risky!'
+            } else if (riskA > riskB) {
+              results = 'You should choose option B - it is far less risky!'
+            } else {
+              results = 'The risks associated with both options are equal. Choose whichever one you prefer!'
+            }
             
-            calcResultsEl.innerHTML = `<p> Percent error: ${results.toFixed(2) * 1}%</p>`
+            calcResultsEl.innerHTML = `<p>Risk A: ${riskA.toFixed(2) } </p>
+                                      <p>Risk B: ${riskB.toFixed(2) }</p>
+                                      <p>${results}</p>
+            `
           } catch (error) {
             alert("Something Went Wrong!!!");
             resethandler()

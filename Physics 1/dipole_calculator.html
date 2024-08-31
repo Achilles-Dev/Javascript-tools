@@ -1,0 +1,555 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Dipole Calculator</title>
+  </head>
+  <body>
+    <h1>Dipole Calculator</h1>
+      <div>
+        <p>
+          <label for="i1-input">Frequency</label>
+          <input
+            type="number"
+            min="0"
+            autocomplete="off"
+            data-id="i1"
+            step="any"
+            id="i1-input"
+            class="inputs"
+            data-name="Frequency"
+          />
+          <select
+            class="selects"
+            id="i1-select"
+            data-type="frequency"
+            data-prev="MHz"
+            data-id="i1"
+          >
+            <option value="Hz">hertz (Hz)</option>
+            <option value="kHz">kilohertz (kHz)</option>
+            <option value="MHz" selected>megahertz (MHz)</option>
+            <option value="GHz">gigahertz (GHz)</option>
+            <option value="THz">terahertz (THz)</option>
+            <option value="RPM">revolutions per minute (RPM)</option>
+          </select>
+        </p>
+
+        <p id="i2-contianer" style="display: none;">
+          <label for="i2-input">Diameter</label>
+          <input
+            type="number"
+            min="0"
+            autocomplete="off"
+            data-id="i2"
+            step="any"
+            id="i2-input"
+            class="inputs"
+            data-name="Diameter"
+          />
+          <select
+            class="selects"
+            id="i2-select"
+            data-type="distance"
+            data-prev="in"
+            data-id="i2"
+          >
+            <option value="mm">millimeters (mm)</option>
+            <option value="cm">centimeters (cm)</option>
+            <option value="m">meters (m)</option>
+            <option value="in" selected>inches (in)</option>
+          </select>
+        </p>
+        <p>
+          Mode:
+          <select id="modeUnit">
+            <option value="am">Advanced mode</option>
+            <option value="sm" selected>Simple mode</option>
+          </select>
+        </p>
+      </div>
+
+      <button id="calcBtn">Calculate</button>
+      <button id="resetBtn">Reset</button>
+      <hr>
+      <div>
+        <h3>Result:</h3>
+        <h3 id="calcResults">Result will appear here...</h3>
+      </div>
+    <script>
+      /*************** ELEMENTS ***************/
+      const selects = document.querySelectorAll(".selects");
+      const inputs = document.querySelectorAll(".inputs");
+      const modeUnitEl = document.getElementById('modeUnit');
+
+      const i2InputsContainerEl = document.getElementById('i2-contianer');
+
+      const calcBtnEl = document.getElementById('calcBtn');
+      const resetBtnEl = document.getElementById('resetBtn');
+      const calcResultsEl = document.getElementById('calcResults')
+
+      /*************** GLOBAL VARIBLES ***************/
+      const UNITS = {
+        frequency: {
+          Hz: 1,
+          kHz: 1e-3,
+          MHz: 1e-6,
+          GHz: 1e-9,
+          THz: 1e-12,
+          RPM: 60,
+        },
+        distance: {
+          mm: 1000,
+          cm: 100,
+          m: 1,
+          km: 1e-3,
+          in: 39.370078740157474,
+          ft: 3.280839895013123,
+          yd: 1.0936132983377078,
+          mi: 0.0006213711922373339,
+          nmi: 0.0005399568034557235,
+        },
+        distance_feet: {
+          mm: 304.8,
+          cm: 30.478,
+          m: 0.3048,
+          km: 0.0003048,
+          in: 12,
+          ft: 1,
+          yd: 0.33333333333333332,
+          mi: 0.00018939393939393937,
+          nmi: 0.00016457883369330452,
+        },
+        unit: {
+          unit: 1,
+        },
+      };
+
+      /*************** FUNCTIONS ***************/
+      function toSIUnit(type, unit, value) {
+        if (type === "exp") {
+          unit = parseFloat("1e" + unit);
+          return value * unit;
+        }
+        return value / UNITS[type][unit];
+      }
+
+      function fromSIUnit(type, unit, value) {
+        if (type === "exp") {
+          unit = parseFloat("1e" + unit);
+          return value / unit;
+        }
+        return value * UNITS[type][unit];
+      }
+
+      function handleModeUnitChange(e) {
+        const value = e.target.value
+        i2InputsContainerEl.style.display = value === "sm" ? 'none' : 'block'
+        resetResult()
+      }
+
+      function customPercision(ans) {
+        return parseFloat(parseFloat(ans).toPrecision(12));
+      }
+
+      function createElement() {
+        const newDiv = `
+          <div>
+            <p>
+              <label for="i3-span">Antenna length (L): &nbsp;</label>
+              <span
+                type="number"
+                min="0"
+                autocomplete="off"
+                data-id="i3"
+                step="any"
+                id="i3-span"
+                class="spans"
+                data-name="Antenna length"
+              ></span>&nbsp;
+              <select
+                class="selects"
+                id="i3-select"
+                data-type="distance_feet"
+                data-prev="ft"
+                data-id="i3"
+              >
+                <option value="mm">millimeters (mm)</option>
+                <option value="cm">centimeters (cm)</option>
+                <option value="m">meters (m)</option>
+                <option value="in">inches (in)</option>
+                <option value="ft" selected>feet (ft)</option>
+              </select>
+            </p>
+
+            <p>
+              <label for="i4-span">Dipole leg length (l): &nbsp;</label>
+              <span
+                type="number"
+                min="0"
+                autocomplete="off"
+                data-id="i4"
+                step="any"
+                id="i4-span"
+                class="spans"
+                data-name="Dipole leg length"
+              ></span>&nbsp;
+              <select
+                class="selects"
+                id="i4-select"
+                data-type="distance_feet"
+                data-prev="ft"
+                data-id="i4"
+              >
+                <option value="mm">millimeters (mm)</option>
+                <option value="cm">centimeters (cm)</option>
+                <option value="m">meters (m)</option>
+                <option value="km">kilometers (km)</option>
+                <option value="in">inches (in)</option>
+                <option value="ft" selected>feet (ft)</option>
+                <option value="yd">yards (yd)</option>
+                <option value="mi">miles (mi)</option>
+                <option value="nmi">nautical miles (nmi)</option>
+              </select>
+            </p>
+
+            <p>
+              <label for="i5-span">Wavelength: &nbsp;</label>
+              <span
+                type="number"
+                min="0"
+                autocomplete="off"
+                data-id="i5"
+                step="any"
+                id="i5-span"
+                class="spans"
+                data-name="Wavelength"
+              ></span>&nbsp;
+              <select
+                class="selects"
+                id="i5-select"
+                data-type="distance"
+                data-prev="ft"
+                data-id="i5"
+              >
+                <option value="mm">millimeters (mm)</option>
+                <option value="cm">centimeters (cm)</option>
+                <option value="m">meters (m)</option>
+                <option value="km">kilometers (km)</option>
+                <option value="in">inches (in)</option>
+                <option value="ft" selected>feet (ft)</option>
+                <option value="yd">yards (yd)</option>
+                <option value="mi">miles (mi)</option>
+                <option value="nmi">nautical miles (nmi)</option>
+              </select>
+            </p>
+
+            <p>
+              <label for="i6-span">½ wavelength: &nbsp;</label>
+              <span
+                type="number"
+                min="0"
+                autocomplete="off"
+                data-id="i6"
+                step="any"
+                id="i6-span"
+                class="spans"
+                data-name="½ wavelength"
+              ></span>&nbsp;
+              <select
+                class="selects"
+                id="i6-select"
+                data-type="distance"
+                data-prev="ft"
+                data-id="i6"
+              >
+                <option value="mm">millimeters (mm)</option>
+                <option value="cm">centimeters (cm)</option>
+                <option value="m">meters (m)</option>
+                <option value="km">kilometers (km)</option>
+                <option value="in">inches (in)</option>
+                <option value="ft" selected>feet (ft)</option>
+                <option value="yd">yards (yd)</option>
+                <option value="mi">miles (mi)</option>
+                <option value="nmi">nautical miles (nmi)</option>
+              </select>
+            </p>
+
+            <p>
+              <label for="i7-span">¼ wavelength: &nbsp;</label>
+              <span
+                type="number"
+                min="0"
+                autocomplete="off"
+                data-id="i7"
+                step="any"
+                id="i7-span"
+                class="spans"
+                data-name="Frequency"
+              ></span>&nbsp;
+              <select
+                class="selects"
+                id="i7-select"
+                data-type="distance"
+                data-prev="ft"
+                data-id="i7"
+              >
+                <option value="mm">millimeters (mm)</option>
+                <option value="cm">centimeters (cm)</option>
+                <option value="m">meters (m)</option>
+                <option value="km">kilometers (km)</option>
+                <option value="in">inches (in)</option>
+                <option value="ft" selected>feet (ft)</option>
+                <option value="yd">yards (yd)</option>
+                <option value="mi">miles (mi)</option>
+                <option value="nmi">nautical miles (nmi)</option>
+              </select>
+            </p>
+
+            <p id="i8-contianer" style="display: none;">
+              <label for="i8-span">Adjustment factor (k): &nbsp;</label>
+              <span
+                disabled
+                type="number"
+                min="0"
+                autocomplete="off"
+                data-id="i8"
+                step="any"
+                id="i8-span"
+                class="spans"
+                data-name="Adjustment factor (k)"
+              ></span>&nbsp;
+              <select
+                class="selects"
+                id="i8-select"
+                data-type="unit"
+                data-prev="unit"
+                data-id="i8"
+                style="display: none"
+              >
+                <option value="unit">unit</option>
+              </select>
+            </p>
+          </div>
+        `
+        return newDiv
+      }
+
+      function isEmpty(...args) {
+        for (id of args) {
+          const input = document.getElementById(`${id}-input`);
+          if (input.value == "") return true;
+        }
+
+        return false;
+      }
+
+      function validateInput(id) {
+        const input = document.getElementById(`${id}-input`);
+        const label = input.getAttribute("data-name").trim();
+        let value = parseFloat(input.value);
+        const mode = modeUnitEl.val
+
+        if (mode == 'am') {
+          if (isEmpty("i1", "i2")) {
+            alert(`Please Enter All Details.`)
+            return;
+          }
+        } else {
+          if (isEmpty("i1")) {
+            alert(`Please Enter All Details.`)
+            return;
+          }
+        }
+
+        if (value <= 0) {
+          alert(`${label} must be greater than zero!`);
+          return false;
+        }
+
+        return true;
+      }
+
+      function prepareUnit(...args) {
+        const resultArr = [];
+        for (id of args) {
+          if (id == 'i1' || id == 'i2') {
+            const input = document.getElementById(`${id}-input`);
+            const select = document.getElementById(`${id}-select`);
+            const type = select.getAttribute("data-type");
+            let val = parseFloat(input.value);
+            val = isNaN(val) ? 0 : val;
+            let inUnit = select.value;
+            val = toSIUnit(type, inUnit, val);
+            resultArr.push(val);
+          } else {
+            const span = document.getElementById(`${id}-span`);
+            const select = document.getElementById(`${id}-select`);
+            const type = select.getAttribute("data-type");
+            let val = parseFloat(span.textContent);
+            val = isNaN(val) ? 0 : val;
+            let inUnit = select.value;
+            val = toSIUnit(type, inUnit, val);
+            resultArr.push(val);
+          }
+          
+        }
+
+        return resultArr;
+      }
+
+      function setResult(resultObj, exclude) {
+        for (key of Object.keys(resultObj)) {
+          let val = resultObj[key].result;
+          let id = resultObj[key].type;
+
+          if (id === exclude) continue;
+          if (isNaN(val)) {
+            alert("Your input resulted in NAN.\n 0/0 \n Try again with valid input.");
+            return;
+          }
+          if (Math.abs(val) === Infinity) {
+            alert(
+              "Your input resulted in Infinity. \nDivision by zero. \nTry again with valid input."
+            );
+            return;
+          }
+
+          const span = document.getElementById(`${id}-span`);
+          const select = document.getElementById(`${id}-select`);
+          const type = select.getAttribute("data-type");
+          let outUnit = select.value;
+          val = fromSIUnit(type, outUnit, val);
+
+          span.textContent = customPercision(val);
+        }
+      }
+
+      // related to caculation
+      function calculateResult() {
+        const c = 299792458;
+        let [val] = prepareUnit('i1')
+        let frequency = val
+        let wavelength = c / frequency;
+        let antennaLenght = 468 / (frequency / 1000000);
+
+        return {
+          1: { result: antennaLenght, type: "i3" },
+          2: { result: antennaLenght / 2, type: "i4" },
+          3: { result: wavelength, type: "i5" },
+          4: { result: wavelength / 2, type: "i6" },
+          5: { result: wavelength / 4, type: "i7" },
+        };
+      }
+
+      function calculateAdjustment() {
+        let i6 = parseFloat(document.getElementById("i6-span").textContent);
+        let i2 = document.getElementById("i2-input").value;
+
+        if (!validateInput("i2")) {
+          return;
+        }
+
+        
+
+        [val1, val2] = prepareUnit("i6", "i2");
+        let R = val1 / val2;
+        let result =
+          0.9787 - 11.86497 / Math.pow(1 + Math.pow(R / 0.000449, 1.7925), 0.3);
+
+        setResult({ 1: { result, type: "i8" } });
+      }
+
+      function handleResultsChange(e) {
+        let select = e.target;
+        let id = select.getAttribute("data-id");
+        let span = document.getElementById(`${id}-span`);
+
+        let prevUnit = select.getAttribute("data-prev");
+        let currentUnit = select.value;
+        select.setAttribute("data-prev", currentUnit);
+
+        if (span.textContent === "") {
+          return;
+        }
+
+        let type = select.getAttribute("data-type");
+
+        let value = parseFloat(span.textContent);
+        value = parseFloat(value);
+        if (isNaN(value)) value = 0.0;
+
+        let si = toSIUnit(type, prevUnit, value);
+        let result = fromSIUnit(type, currentUnit, si);
+        span.textContent = customPercision(result);
+      }
+
+      function calculateResults() {
+        const modeUnit = modeUnitEl.value
+        for (el of ["i1", "i2"]) {
+          if (!validateInput(el)) return;
+        }
+
+        try {
+          const resultElement = createElement()
+          calcResultsEl.innerHTML = resultElement
+
+          const newSelects = document.querySelectorAll(".selects");
+          newSelects.forEach((select) => {
+            select.addEventListener("change", handleResultsChange);
+          });
+
+          const result = calculateResult();
+          setResult(result)
+
+          if (modeUnit == 'am') {
+            const adjContainer = document.getElementById('i8-contianer')
+            adjContainer.style.display = 'block'
+            calculateAdjustment()
+          }
+
+        } catch(error) {
+          alert("An error ocurred. Try again with valid input.");
+          resetResult()
+          return;
+        }
+      }
+
+      function resetForm() {
+        selects.forEach((select, index) => {
+          select.selectedIndex = '2'
+        });
+
+        inputs.forEach((input) => {
+          input.value = ""
+        });
+        i2InputsContainerEl.style.display = "none"
+        modeUnitEl.selectedIndex = '1'
+      }
+
+      function resetResult() {
+        calcResultsEl.innerHTML = "<p>Result will appear here...</p>";
+      } 
+
+      function resethandler() {
+        resetForm();
+        resetResult();
+      }
+
+      /*************** EVENT LISTINERS ***************/
+      selects.forEach((select) => {
+        select.addEventListener("change", resetResult);
+      });
+      inputs.forEach((input) => {
+        input.addEventListener("input", resetResult);
+      });
+
+      modeUnitEl.addEventListener("change", handleModeUnitChange);
+
+      resetBtnEl.addEventListener("click", resethandler);
+      calcBtnEl.addEventListener("click", calculateResults);
+
+    </script>
+  </body>
+</html>

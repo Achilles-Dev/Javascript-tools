@@ -73,11 +73,11 @@
         const newDiv = document.createElement('div');
         newDiv.id = `input${index}`
         let input = `
-          <p>
+          <p id="inputX${index}">
             x<sub>${index}</sub>: &nbsp;&nbsp;&nbsp;
             <input type="number" id="x${index}" />
           </p>
-          <p>
+          <p id="inputY${index}">
             y<sub>${index}</sub>: &nbsp;&nbsp;&nbsp;
             <input type="number" id="y${index}" />
           </p>
@@ -88,19 +88,31 @@
         xnEl[`x${index}El`] = document.getElementById(`x${index}`);
         xnEl[`y${index}El`] = document.getElementById(`y${index}`);
         document.getElementById(`x${index}`).addEventListener("input", resetResult)
+        document.getElementById(`y${index}`).addEventListener("input", resetResult)
         index += 1;
         resetResult()
       }
 
-      function handleRemoveInputs() {
+      function handleRemoveInputs() {  
+           
         let removeIndex = index - 1;
-        const lastDiv = document.getElementById(`input${removeIndex}`)
-        if (removeIndex > 5) {
+        const b4LastDiv = document.getElementById(`inputX${removeIndex}`)
+        const lastDiv = document.getElementById(`inputY${removeIndex}`)
+
+        if (removeIndex > 3) {
+          b4LastDiv.remove()
           lastDiv.remove()
           delete xnEl[`x${removeIndex}El`]
+          delete xnEl[`y${removeIndex}El`]
           index -=  1;
           resetResult()
         }
+      }
+
+      function calculateMean(numbers) {
+        const sum = numbers.reduce((acc, num) => acc + num, 0);
+        const mean = sum / numbers.length;
+        return mean;
       }
 
       function calculateResults() {
@@ -125,20 +137,65 @@
         }
 
         try {
-          let idx = index - 1;
-          let numbers = [x1, x2, x3, x4, x5]
-          const numberLessEqual = numbers.filter((num) => num <= scoreVal)
-          let count = numberLessEqual.length
-          while (idx > 5) {
-            if (xnEl[`x${idx}El`].value <= scoreVal) {
-              count += 1
-            }
-            idx -= 1;
+          let xNumbers = [x1, x2, x3]
+          let yNumbers = [y1, y2, y3]
+          
+          if (Object.values(xnEl).length > 0) {
+            Object.values(xnEl).forEach((num, idx) => {
+              let index = idx + 1
+              if (index % 2 == 0) {
+                yNumbers.push(parseFloat(num.value))
+              } else {
+                xNumbers.push(parseFloat(num.value))
+              }
+            })
           }
-          results = (count / (index - 1) * 100)
+         
+          const x2Numbers = xNumbers.map((num) => num ** 2)
+
+          const xMean = calculateMean(xNumbers)
+          const yMean = calculateMean(yNumbers)
+          const x2Mean = calculateMean(x2Numbers)
+
+          const xxMeanSqtArray = xNumbers.map((num) => (num - xMean) ** 2)
+          const xxMeanSqtSum = xxMeanSqtArray.reduce((a, b) => a + b, 0)
+
+          const xMeanyMeanArray = xNumbers.map((num, index) => (num - xMean) * (yNumbers[index] - yMean))
+          const xMeanyMeanSum = xMeanyMeanArray.reduce((a, b) => a + b, 0)
+
+          const xMeanx2MeanArray = xNumbers.map((num, index) => (num - xMean) * (x2Numbers[index] - x2Mean))
+          const xMeanx2MeanSum = xMeanx2MeanArray.reduce((a, b) => a + b, 0)
+
+          const x2x2MeanSqtArray = x2Numbers.map((num) => (num - x2Mean) ** 2)
+          const x2MeanSqtSum = x2x2MeanSqtArray.reduce((a, b) => a + b, 0)
+
+          const x2MeanyMeanArray = x2Numbers.map((num, index) => (num - x2Mean) * (yNumbers[index] - yMean))
+          const x2MeanyMeanSum = x2MeanyMeanArray.reduce((a, b) => a + b, 0)
+
+          const yyMeanSqtArray = yNumbers.map((num) => (num - yMean) ** 2)
+          const yyMeanSqtSum = yyMeanSqtArray.reduce((a, b) => a + b, 0)
+
+          const divisor = ((xxMeanSqtSum * x2MeanSqtSum) - (xMeanx2MeanSum ** 2))
+          const bVal = ((xMeanyMeanSum * x2MeanSqtSum) - (x2MeanyMeanSum * xMeanx2MeanSum)) / divisor
+          const cVal = ((x2MeanyMeanSum * xxMeanSqtSum) - (xMeanyMeanSum * xMeanx2MeanSum)) / divisor
+          const aVal = yMean - (bVal * xMean) - (cVal * x2Mean)
+
+          const r2NumeratorArray = yNumbers.map((num, index) => ((num - aVal - (bVal * xNumbers[index]) - (cVal * x2Numbers[index]))) ** 2)
+          const r2NumeratorSum = r2NumeratorArray.reduce((a, b) => a + b, 0)
+
+          const yValue = `${aVal} ${bVal < 0 ? `- ${bVal * -1}x` : `+ ${bVal}x`} ${cVal < 0 ? `- ${cVal * -1}x<sup>2</sup>` : `+ ${cVal}x<sup>2</sup>`}`
+
+          r2Val = 1 - (r2NumeratorSum / yyMeanSqtSum)
 
           calcResultsEl.innerHTML = `
-              <p>Percentile rank of the value ${scoreVal} is ${results.toFixed(1) * 1}</p>
+              <p>• Fitted coefficients: </p>
+              <p>a = ${aVal.toFixed(4) * 1} </p>
+              <p>b = ${bVal.toFixed(4) * 1}  </p>
+              <p>c = ${cVal.toFixed(4) * 1} </p>
+              <p>• Quadratic model:  </p>
+              <p>y = ${yValue} </p>
+              <p>• Coefficient of determination R²: </p>
+              <p>R²= ${r2Val.toFixed(5) * 1} </p>
             `;
         } catch (error) {
           alert("Something Went Wrong!!!");

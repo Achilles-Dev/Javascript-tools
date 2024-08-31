@@ -18,7 +18,7 @@
           </td>
           <td>
             p(X<sub>1</sub>): 
-            <input type="number" id="px1" min="0" max="1" style="width: 180px;">
+            <input type="number" id="px1" min="0" max="1" value="0.1" style="width: 180px;">
           </td>
         </tr>
         <tr>
@@ -28,7 +28,7 @@
           </td>
           <td>
             p(X<sub>2</sub>): 
-            <input type="number" id="px2" min="0" max="1" style="width: 180px;">
+            <input type="number" id="px2" min="0" max="1" value="0.1" style="width: 180px;">
           </td>
         </tr>
         <tr>
@@ -38,7 +38,7 @@
           </td>
           <td>
             p(X<sub>3</sub>): 
-            <input type="number" id="px3" min="0" max="1" style="width: 180px;">
+            <input type="number" id="px3" min="0" max="1" value="0.1" style="width: 180px;">
           </td>
         </tr>
         <tr>
@@ -48,7 +48,7 @@
           </td>
           <td>
             p(X<sub>4</sub>): 
-            <input type="number" id="px4" min="0" max="1" style="width: 180px;">
+            <input type="number" id="px4" min="0" max="1" value="0.1" style="width: 180px;">
           </td>
         </tr>
         <tr>
@@ -58,7 +58,7 @@
           </td>
           <td>
             p(X<sub>5</sub>): 
-            <input type="number" id="px5" min="0" max="1" style="width: 180px;">
+            <input type="number" id="px5" min="0" max="1" value="0.1" style="width: 180px;">
           </td>
         </tr>
         <tr>
@@ -68,7 +68,7 @@
           </td>
           <td>
             p(X<sub>6</sub>): 
-            <input type="number" id="px6" min="0" max="1" style="width: 180px;">
+            <input type="number" id="px6" min="0" max="1" value="0.1" style="width: 180px;">
           </td>
         </tr>
         <tr>
@@ -78,7 +78,7 @@
           </td>
           <td>
             p(X<sub>7</sub>): 
-            <input type="number" id="px7" min="0" max="1" style="width: 180px;">
+            <input type="number" id="px7" min="0" max="1" value="0.1" style="width: 180px;">
           </td>
         </tr>
         <tr>
@@ -88,7 +88,7 @@
           </td>
           <td>
             p(X<sub>8</sub>): 
-            <input type="number" id="px8" min="0" max="1" style="width: 180px;">
+            <input type="number" id="px8" min="0" max="1" value="0.1" style="width: 180px;">
           </td>
         </tr>
         <tr>
@@ -98,7 +98,7 @@
           </td>
           <td>
             p(X<sub>9</sub>): 
-            <input type="number" id="px9" min="0" max="1" style="width: 180px;">
+            <input type="number" id="px9" min="0" max="1" value="0.1" style="width: 180px;">
           </td>
         </tr>
         <tr>
@@ -108,7 +108,7 @@
           </td>
           <td>
             p(X<sub>10</sub>): 
-            <input type="number" id="px10" min="0" max="1" style="width: 180px;">
+            <input type="number" id="px10" min="0" max="1" value="0.1" style="width: 180px;">
           </td>
         </tr>
       </tbody>
@@ -158,39 +158,28 @@
 
       function calculateResults() {
           // Retrieve input values
-          const x1 = parseFloat(x1El.value);
-          const px1 = parseFloat(px1El.value);
-          const x2 = parseFloat(x2El.value);
-          const px2 = parseFloat(px2El.value);
-          const x3 = parseFloat(x3El.value);
-          const px3 = parseFloat(px3El.value);
-          const x4 = parseFloat(x4El.value);
-          const px4 = parseFloat(px4El.value);
-          const x5 = parseFloat(x5El.value);
-          const px5 = parseFloat(px5El.value);
-          const x6 = parseFloat(x6El.value);
-          const px6 = parseFloat(px6El.value);
-          const x7 = parseFloat(x7El.value);
-          const px7 = parseFloat(px7El.value);
-          const x8 = parseFloat(x8El.value);
-          const px8 = parseFloat(px8El.value);
-          const x9 = parseFloat(x9El.value);
-          const px9 = parseFloat(px9El.value);
-          const x10 = parseFloat(x10El.value);
-          const px10 = parseFloat(px10El.value);
-          const xValArray = [x1, x2, x3, x4, x5, x6, x7, x8, x9, x10]
-          const pxValArray = [px1, px2, px3, px4, px5, px6, px7, px8, px9, px10]
+          const xValArray = [
+            parseFloat(x1El.value), parseFloat(x2El.value), parseFloat(x3El.value), parseFloat(x4El.value), 
+            parseFloat(x5El.value), parseFloat(x6El.value), parseFloat(x7El.value), parseFloat(x8El.value), 
+            parseFloat(x9El.value), parseFloat(x10El.value)
+          ]
+
+          const pxValArray = [
+            parseFloat(px1El.value), parseFloat(px2El.value), parseFloat(px3El.value), parseFloat(px4El.value),
+            parseFloat(px5El.value), parseFloat(px6El.value), parseFloat(px7El.value), parseFloat(px8El.value), 
+            parseFloat(px9El.value), parseFloat(px10El.value)
+          ]
           
-          xValArray.forEach((num, index) => {
-            console.log(isNaN(num) && pxValArray[index] != '')
-            if (isNaN(num) && pxValArray[index] != '') {
+          xValArray.every((num, index) => {
+            if (isNaN(num) && pxValArray[index] == '') {
               alert("Please Enter All Details.");
               return;
             }
           })
+          let totalProbs = 0
           
-          pxValArray.forEach((num, index) => {
-            if (isNaN(num) && xValArray[index] != '') {
+          pxValArray.every((num, index) => {
+            if (isNaN(num) && xValArray[index] == '') {
               alert("Please Enter All Details.");
               return;
             } else if (num < 0 || num > 1) {
@@ -199,14 +188,28 @@
             }
           })
 
-          try {   
-            let results =  0;
+          pxValArray.forEach((num, index) => {
+            totalProbs += num
+          })
+
+          if (totalProbs.toFixed(1) != 1) {
+            alert(`The probabilities should add up to 1, they currently add up to ${totalProbs}`);
+              return;
+          }
+
+          try { 
+            const xPxArray = xValArray.map((num, index) => (num * pxValArray[index]))
+            const mean = xPxArray.reduce((a, b) => a + b, 0)
+            const x2PxArray = xValArray.map((num, index) => (num ** 2) * pxValArray[index])
+            const x2pxSum = x2PxArray.reduce((a, b) => a + b, 0)
+            const variance = x2pxSum - (mean ** 2)
+            const sd = Math.sqrt(variance)
             
-              calcResultsEl.innerHTML = `<p> Mean (μ):	</p>
-                                        <p>Standard Deviation (σ):	</p>
-                                        <p>Variance (σ²):</p>
-                                        
-              `           
+            calcResultsEl.innerHTML = `<p> Mean (μ):	${mean.toFixed(4) * 1} </p>
+                                      <p>Standard Deviation (σ): ${sd.toFixed(4) * 1}	</p>
+                                      <p>Variance (σ²): ${variance.toFixed(4) * 1} </p>
+                                      
+            `           
             
           } catch (error) {
             alert("Something Went Wrong!!!");

@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Efficiency Calculator</title>
+  </head>
+  <body>
+    <h1>Efficiency Calculator</h1>
+      <p>
+        Calculate:
+        <select id="calculateUnit">
+          <option value="e1">Energy input </option>
+          <option value="e2">Energy output </option>
+          <option value="ef" selected>Efficiency</option>
+        </select>
+      </p>
+      <div>
+        <p id="e1-contianer" class="containers">
+          <label for="e1-input">Energy input </label>
+          <input type="number" step="any" id="e1-input" class="inputs" />
+          <select id="e1-select">
+            <option value="J" selected>joules (J)</option>
+            <option value="kJ">kilojoules (kJ)</option>
+            <option value="MJ">megajoules (MJ)</option>
+            <option value="Wh">watt hours (Wh)</option>
+            <option value="kWh">kilowatt hours (kWh)</option>
+            <option value="ft-lbs">foot-pounds (ft-lbs)</option>
+            <option value="kcal">kilocalories (kcal)</option>
+            <option value="eV">electronvolts (eV)</option>
+          </select>
+        </p>
+
+        <p id="e2-contianer" class="containers">
+          <label for="e2-input">Energy output </label>
+          <input type="number" step="any" id="e2-input" class="inputs" />
+          <select id="e2-select">
+            <option value="J" selected>joules (J)</option>
+            <option value="kJ">kilojoules (kJ)</option>
+            <option value="MJ">megajoules (MJ)</option>
+            <option value="Wh">watt hours (Wh)</option>
+            <option value="kWh">kilowatt hours (kWh)</option>
+            <option value="ft-lbs">foot-pounds (ft-lbs)</option>
+            <option value="kcal">kilocalories (kcal)</option>
+            <option value="eV">electronvolts (eV)</option>
+          </select>
+        </p>
+
+        <p id="ef-contianer" class="containers" style="display: none;">
+          <label for="ef-input">Efficiency </label>
+          <input type="number" id="ef-input" step="any" class="inputs" />
+          <input type="button" value="%" id="ef-select" />
+        </p>
+      </div>
+
+      <button id="calcBtn">Calculate</button>
+      <button id="resetBtn">Reset</button>
+      <hr>
+      <div>
+        <h3>Result:</h3>
+        <h3 id="calcResults">Result will appear here...</h3>
+      </div>
+    <script>
+      /*************** ELEMENTS ***************/
+      const containers = document.querySelectorAll(".containers");
+      const inputs = document.querySelectorAll(".inputs");
+      const calculateUnitEl = document.getElementById("calculateUnit");
+
+      const e1Input = document.getElementById("e1-input");
+      const e2Input = document.getElementById("e2-input");
+      const efInput = document.getElementById("ef-input");
+
+      const e1Select = document.getElementById("e1-select");
+      const e2Select = document.getElementById("e2-select");
+      const efSelect = document.getElementById("ef-select");
+
+      const calcBtnEl = document.getElementById('calcBtn');
+      const resetBtnEl = document.getElementById('resetBtn');
+      const calcResultsEl = document.getElementById('calcResults')
+
+      /*************** GLOBAL VARIBLES ***************/
+      const UNITS = {
+        energy: {
+          J: 1,
+          kJ: 1e-3,
+          MJ: 1e-6,
+          Wh: 0.0002777778,
+          kWh: 2.777777777e-7,
+          "ft-lbs": 0.7375621493,
+          kcal: 0.0002390057,
+          eV: 6241509074460762608,
+        },
+        ratio: {
+          "%": 1,
+        },
+      };
+      /*************** FUNCTIONS ***************/
+      function toSIUnit(type, unit, value) {
+        return value / UNITS[type][unit];
+      }
+
+      function fromSIUnit(type, unit, value) {
+        return value * UNITS[type][unit];
+      }
+
+      function createElements(resultObj) {
+        const elementNodes = Object.keys(resultObj).map((key) => {
+          //create elements to put the results in
+          const div = document.createElement("div");
+          const span = document.createElement("span");
+          const span2 = document.createElement("span");
+
+          // give the elements id
+          div.setAttribute("class", `result-container`);
+          span.setAttribute("class", `result-title`);
+          span2.setAttribute("class", `result-value`);
+
+          // put the values in the elements
+
+          span.textContent = resultObj[key]["title"];
+          span2.textContent = resultObj[key]["value"];
+
+          // appened them to an element that contians them
+          div.append(span, span2);
+
+          // return that element
+          return div;
+        });
+
+        return elementNodes;
+      }
+
+      function handleCalculateUnitChange(e) {
+        const value = e.target.value
+        
+        containers.forEach((container) => {
+          let idVal = container.id.slice(0, 2)
+          if (idVal == value) {
+            container.style.display = 'none'
+          } else {
+            container.style.display = 'block'
+          }
+        })
+
+        resetResult()
+      }
+
+
+      function calculateResult(input) {
+        const calculateE1 = () => {
+          const { e2, ef } = prepareUnits();
+          let result = e2 / (ef / 100);
+          return {
+            result,
+            type: "energy",
+            name: `Energy input`,
+          };
+        };
+        const calculateE2 = () => {
+          const { ef, e1 } = prepareUnits();
+          let result = (ef / 100) * e1;
+          return {
+            result,
+            type: "energy",
+            name: "Energy output",
+          };
+        };
+        const calculateEF = () => {
+          const { e2, e1 } = prepareUnits();
+          let result = (e2 / e1) * 100;
+          return {
+            result,
+            type: "ratio",
+            name: "Efficiency",
+          };
+        };
+
+        switch (input) {
+          case "e1":
+            return calculateE1();
+          case "e2":
+            return calculateE2();
+          case "ef":
+            return calculateEF();
+
+          default:
+            console.log("error in calculate result switch");
+        }
+      }
+
+      function prepareUnits() {
+        let e1 = parseFloat(e1Input.value) ?? 0;
+        let e2 = parseFloat(e2Input.value) ?? 0;
+        let ef = parseFloat(efInput.value) ?? 0;
+
+        let p1Unit = e1Select.value;
+        let v1Unit = e2Select.value;
+        let p2Unit = efSelect.value;
+
+        e1 = toSIUnit("energy", p1Unit, e1);
+        e2 = toSIUnit("energy", v1Unit, e2);
+        ef = toSIUnit("ratio", p2Unit, ef);
+
+        return { e1, e2, ef };
+      }
+
+      function prepareResults(result, type, name) {
+        let resultObj = {};
+        Object.keys(UNITS[type]).forEach((key) => {
+          let ans = fromSIUnit(type, key, result);
+          // ans =
+          //   ans > 1 || ans < -1
+          //     ? parseFloat(parseFloat(ans.toExponential(10)).toFixed(4))
+          //     : ans.toExponential(10);
+
+          resultObj[key] = {
+            title: `${name}: `,
+            value: ` ${ans} ${key}`,
+          };
+        });
+        return resultObj;
+      }
+
+      function calculateResults() {
+        const calculateUnit = calculateUnitEl.value
+
+        try {
+          const { result, type, name } = calculateResult(calculateUnit);
+
+          if (isNaN(result)) {
+            alert("Your input resulted in NAN.\n 0/0 \n Try again with valid input.");
+            resetResult()
+            return;
+          }
+          if (Math.abs(result) === Infinity) {
+            alert(
+              "Your input resulted in Infinity. \nDivision by zero. \nTry again with valid input."
+            );
+            resetResult()
+            return;
+          }
+
+          const resultObj = prepareResults(result, type, name);
+          const elementNodes = createElements(resultObj);
+          calcResultsEl.innerHTML = "";
+
+          elementNodes.forEach((element) => {
+            calcResultsEl.append(element);
+          });
+        } catch (error) {
+          console.log(error);
+          alert("An error ocurred. Try again with valid input.");
+          resetResult()
+          return;
+        }
+      }
+
+      function resetForm() {
+        [e1Select, e2Select, efSelect].forEach((select, index) => {
+          select.selectedIndex = '0'
+        });
+
+        inputs.forEach((input) => {
+          input.value = ""
+        });
+
+        containers.forEach((container) => {
+          let idVal = container.id.slice(0, 2)
+          if (idVal == 'ef') {
+            container.style.display = 'none'
+          } else {
+            container.style.display = 'block'
+          }
+        })
+        calculateUnitEl.selectedIndex = '2'
+      }
+
+      function resetResult() {
+        calcResultsEl.innerHTML = "<p>Result will appear here...</p>";
+      } 
+
+      function resethandler() {
+        resetForm();
+        resetResult();
+      }
+
+      /*************** EVENT LISTINERS ***************/
+      [e1Select, e2Select, efSelect].forEach((select) => {
+        select.addEventListener("change", resetResult);
+      });
+
+      inputs.forEach((input) => {
+        input.addEventListener("input", resetResult);
+      });
+
+      calculateUnitEl.addEventListener("change", handleCalculateUnitChange)
+      
+      resetBtnEl.addEventListener("click", resethandler);
+      calcBtnEl.addEventListener("click", calculateResults);
+
+    </script>
+  </body>
+</html>

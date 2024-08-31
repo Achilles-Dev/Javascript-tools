@@ -17,8 +17,8 @@
     <p>
       Bet type:
       <select id="betTypeSelect">
-        <option value="red">Red</option>
-        <option value="black" selected>Black</option>
+        <option value="red" selected>Red</option>
+        <option value="black">Black</option>
         <option value="even">Even</option>
         <option value="odd">Odd</option>
         <option value="high">High (19-36)</option>
@@ -69,20 +69,105 @@
       const resetBtnEl = document.getElementById('resetBtn');
       const calcResultsEl = document.getElementById('calcResults') 
 
+      function handleoddsOfWinning() {
+        const {odds} = oddsOfWinning()
+        winOddsEl.value = odds
+        winOddsPercentEl.value = (odds * 100).toFixed(2)
+      }
+
+      function oddsOfWinning(amount = 0) {
+        const betType = betTypeSelectEl.value
+        let odds = 0
+        let expectedReturn = 0
+        let payoutFactor = 0
+        if (typeSelectEL.value == 'europe') {
+          if (betType == "red" || betType == "black" || betType == "even" || betType == "odd" || betType == "high") {
+            odds = 0.4865
+            expectedReturn = odds - (1 - odds)
+            payoutFactor = 1 
+          } else if (betType == "first12" || betType == "second12" || betType == "third12" || betType == "col1" || betType == "col2" || betType == "col3") {
+            odds = 0.3243
+            expectedReturn = (odds * 2) - (1 - odds)
+            payoutFactor = 2
+          } else if (betType == "singleNum") {
+            odds = 0.027027
+            expectedReturn = (odds * 35) - (1 - odds)
+            payoutFactor = 35
+          } else if (betType == "twoNum") {
+            odds = 0.05405
+            expectedReturn = (odds * 17) - (1 - odds)
+            payoutFactor = 17
+          } else if (betType == "threeNum") {
+            odds = 0.08108
+            expectedReturn = (odds * 11) - (1 - odds)
+            payoutFactor = 11
+          } else if (betType == "corner") {
+            odds = 0.1081
+            expectedReturn = (odds * 8) - (1 - odds)
+            payoutFactor = 8
+          } else if (betType == "double") {
+            odds = 0.16216
+            expectedReturn = (odds * 5) - (1 - odds)
+            payoutFactor = 5
+          }
+        } else if (typeSelectEL.value == 'america') {
+          if (betType == "red" || betType == "black" || betType == "even" || betType == "odd" || betType == "high") {
+            odds = 0.4737
+            expectedReturn = odds - (1 - odds)
+            payoutFactor = 1 
+          } else if (betType == "first12" || betType == "second12" || betType == "third12" || betType == "col1" || betType == "col2" || betType == "col3") {
+            odds = 0.3158
+            expectedReturn = (odds * 2) - (1 - odds)
+            payoutFactor = 2
+          } else if (betType == "singleNum") {
+            odds = 0.026316
+            expectedReturn = (odds * 35) - (1 - odds)
+            payoutFactor = 35
+          } else if (betType == "twoNum") {
+            odds = 0.05263
+            expectedReturn = (odds * 17) - (1 - odds)
+            payoutFactor = 17
+          } else if (betType == "threeNum") {
+            odds = 0.07895
+            expectedReturn = (odds * 11) - (1 - odds)
+            payoutFactor = 11
+          } else if (betType == "corner") {
+            odds = 0.10526
+            expectedReturn = (odds * 8) - (1 - odds)
+            payoutFactor = 8
+          } else if (betType == "double") {
+            odds = 0.1579
+            expectedReturn = (odds * 5) - (1 - odds)
+            payoutFactor = 5
+          }
+        }
+        return {odds, payoutFactor, expectedReturn}
+      }
+
+      const { odds } = oddsOfWinning()
+      winOddsEl.value = odds
+      winOddsPercentEl.value = (odds * 100).toFixed(2)
+
       function calculateResults() {
           // Retrieve input values
-          const amountEl = parseFloat(probAEl.value);
-          const winOddsEl = parseFloat(probBEl.value);
+          const amount = parseFloat(amountEl.value);
 
-          if (isNaN(amountEl) || amountEl <= 0) {
+          if (isNaN(amount)) {
             alert("Please Enter All Details.");
+            return;
+          } if (amount <= 0) {
+            alert("Your bet's amount must be greater than 0.")
             return;
           }
 
           try {
-            const results = 0
-            
-            calcResultsEl.innerHTML = `<p> Percent error: ${results.toFixed(2) * 1}%</p>`
+            const { payoutFactor, expectedReturn } = oddsOfWinning(amount)
+            const payout = payoutFactor * amount
+            const expectedReturnVal = expectedReturn * amount
+
+            calcResultsEl.innerHTML = `<p>Payout: GHS ${payout.toFixed(2)}</p>
+                                        <p>Expected return: ${expectedReturnVal.toFixed(4) * 1}</p>
+            `
           } catch (error) {
             alert("Something Went Wrong!!!");
             resethandler()
@@ -104,6 +189,10 @@
         resetForm();
         resetResult();
       }
+
+      [typeSelectEL, betTypeSelectEl].forEach((el) => {
+        el.addEventListener("change", handleoddsOfWinning);
+      });
 
       resetBtnEl.addEventListener("click", resethandler);
       calcBtnEl.addEventListener("click", calculateResults);

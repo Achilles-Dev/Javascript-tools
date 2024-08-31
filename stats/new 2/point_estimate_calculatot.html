@@ -61,29 +61,31 @@
             return;
           } else if (trialsNum < successNum ) {
             alert("Number of successes cannot exceed number of trials.");
-              return;
+            return;
+          } else if (confLevel >= 100 || confLevel < 0) {
+            alert("Confidence level must be greater than or equal to zero and less than 100");
+            return;
           }
 
           try {
-            let results = 0;
-           
-            if (repeatUnitEl.value === "yes") {
-              results = successNum ** trialsNum
-            } else {
-              const nFact = calcFactorialOfNum(successNum);
-              if (successNum < trialsNum) {
-                results = nFact
-              } else {
-                const nrFact = calcFactorialOfNum(successNum - trialsNum);
-                results = nFact / nrFact
-              }              
+            const MLE = successNum / trialsNum
+            const laplaceNum = (successNum + 1) / (trialsNum + 2)
+            const jeffreyNum = (successNum + 0.5) / (trialsNum + 1)
+            const wilsonNum = (successNum + ((zScore ** 2) / 2)) / (trialsNum + (zScore ** 2))
+            let results = 0
+            if (MLE <= 0.5) {
+              results = wilsonNum
+            } else if (MLE > 0.5 && MLE < 0.9) {
+              results = MLE
+            } else if (MLE >= 0.9) {
+              results = laplaceNum < jeffreyNum ? laplaceNum : jeffreyNum
             }
           
-            calcResultsEl.innerHTML = `<p> Best point estimate: ${results.toFixed(2) * 1}</p>
-                                      <p>MLE: </p>
-                                      <p>Laplace estimation: </p>
-                                      <p>Jeffrey estimation: </p>
-                                      <p>Wilson estimation: </p>
+            calcResultsEl.innerHTML = `<p> Best point estimate: ${results.toFixed(4) * 1}</p>
+                                      <p>MLE: ${MLE.toFixed(4) * 1} </p>
+                                      <p>Laplace estimation: ${laplaceNum.toFixed(4) * 1} </p>
+                                      <p>Jeffrey estimation: ${jeffreyNum.toFixed(4) * 1} </p>
+                                      <p>Wilson estimation: ${wilsonNum.toFixed(4) * 1} </p>
             `
           } catch (error) {
             alert("Something Went Wrong!!!");

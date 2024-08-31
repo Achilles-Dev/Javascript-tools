@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Capacitance Calculator</title>
+  </head>
+  <body>
+    <h1>Capacitance Calculator</h1>
+      <p>
+        <label for="cp-input">Capacitance </label>
+        <input
+          type="number"
+          id="cp-input"
+          required
+          step="any"
+          min="0.0000000000"
+        />
+        <select id="cp-select">
+          <option value="pF">pF</option>
+          <option value="nF">nF</option>
+          <option value="μF">μF</option>
+          <option value="mF">mF</option>
+          <option value="F" selected="selected">F</option>
+        </select>
+      </p>
+      <p>
+        <label for="vt-input">Voltage </label>
+        <input
+          type="number"
+          id="vt-input"
+          required
+          step="any"
+          min="0.0000000000"
+        />
+        <select id="vt-select">
+          <option value="nV">nV</option>
+          <option value="μV">μV</option>
+          <option value="mV">mV</option>
+          <option value="V" selected="selected">V</option>
+          <option value="kV">kV</option>
+          <option value="MV">MV</option>
+          <option value="GV">GV</option>
+        </select>
+      </p>
+      <p>
+        <label for="cu-select">Charge unit</label>
+        <select id="cu-select">
+          <option value="pC">pC</option>
+          <option value="nC">nC</option>
+          <option value="μC">μC</option>
+          <option value="mC">mC</option>
+          <option value="C" selected="selected">C</option>
+          <option value="kC">kC</option>
+          <option value="MC">MC</option>
+        </select>
+      </p>
+      <p>
+        <label for="eu-select">Energy unit</label>
+        <select id="eu-select">
+          <option value="nJ">nJ</option>
+          <option value="μJ">μJ</option>
+          <option value="mJ">mJ</option>
+          <option value="J" selected="selected">J</option>
+          <option value="kJ">kJ</option>
+          <option value="MJ">MJ</option>
+          <option value="GJ">GJ</option>
+          <option value="wh">Wh</option>
+          <option value="kwh">kWh</option>
+          <option value="ev">eV</option>
+          <option value="kev">keV</option>
+          <option value="cal">Cal</option>
+          <option value="kCal">kCal</option>
+          <option value="ft-lbs">ft-lbs</option>
+        </select>
+      </p>
+      <button id="calcBtn">Calculate</button>
+      <button id="resetBtn">Reset</button>
+      <hr>
+      <div>
+        <h3>Result:</h3>
+        <h3 id="calcResults">Result will appear here...</h3>
+      </div>
+    <script>
+      /**************************** ELEMENTS ****************************/
+      const cpInputEl = document.getElementById("cp-input");
+      const cpSelectEl = document.getElementById("cp-select");
+
+      const vtInputEl = document.getElementById("vt-input");
+      const vtSelectEl = document.getElementById("vt-select");
+
+      const cuSelectEl = document.getElementById("cu-select");
+      const euSelectEl = document.getElementById("eu-select");
+
+      const calcBtnEl = document.getElementById('calcBtn');
+      const resetBtnEl = document.getElementById('resetBtn');
+      const calcResultsEl = document.getElementById('calcResults')
+
+      /**************************** GLOBAL VARIABLES ****************************/
+      const UNITS = {
+        voltage: {
+          nV: 1e9,
+          μV: 1e6,
+          mV: 1e3,
+          V: 1,
+          kV: 1e-3,
+          MV: 1e-6,
+          GV: 1e-9,
+        },
+        capacitance: { pF: 1e12, nF: 1e9, μF: 1e6, mF: 1e3, F: 1 },
+        charge: {
+          pC: 1e12,
+          nC: 1e9,
+          μC: 1e6,
+          mC: 1e3,
+          C: 1,
+          kC: 1e-3,
+          MC: 1e-6,
+        },
+        energy: {
+          nJ: 1e9,
+          μJ: 1e6,
+          mJ: 1e3,
+          J: 1,
+          kJ: 1e-3,
+          MJ: 1e-6,
+          GJ: 1e-9,
+          wh: 0.000277778,
+          kwh: 2.77778e-7,
+          ev: 6.242e18,
+          kev: 6.242e15,
+          cal: 0.239006,
+          kCal: 0.000239006,
+          "ft-lbs": 0.73756296354588,
+        },
+      };
+
+      /**************************** FUNCTIONS ****************************/
+      function toSIUnit(type, unit, value) {
+        return value / UNITS[type][unit];
+      }
+
+      function fromSIUnit(type, unit, value) {
+        return value * UNITS[type][unit];
+      }
+
+      function createElements(resultObj) {
+        const elementNodes = Object.keys(resultObj).map((key) => {
+          //create elements to put the results in
+          const div = document.createElement("div");
+          const span = document.createElement("span");
+          const span2 = document.createElement("span");
+
+          // give the elements id
+          div.setAttribute("class", `result-container`);
+          span.setAttribute("class", `result-title`);
+          span2.setAttribute("class", `result-value`);
+
+          // put the values in the elements
+
+          span.textContent = resultObj[key]["title"];
+          span2.textContent = resultObj[key]["value"];
+
+          // appened them to an element that contians them
+          div.append(span, span2);
+
+          // return that element
+          return div;
+        });
+
+        return elementNodes;
+      }
+
+      function prepareUnits() {
+        let cp = parseFloat(cpInputEl.value) ?? 0;
+        let vt = parseFloat(vtInputEl.value) ?? 0;
+
+        let cpUnit = cpSelectEl.value;
+        let vtUnit = vtSelectEl.value;
+
+        cp = toSIUnit("capacitance", cpUnit, cp);
+        vt = toSIUnit("voltage", vtUnit, vt);
+
+        return { cp, vt };
+      }
+
+      function calculateResult() {
+        const { cp, vt } = prepareUnits();
+
+        const charge = cp * vt;
+        const energy = (1 / 2) * (cp * vt * vt);
+        return { charge, energy };
+      }
+
+      function prepareResults() {
+        const { charge, energy } = calculateResult();
+        const cuUnit = cuSelectEl.value;
+        const euUnit = euSelectEl.value;
+
+        let chargeResult = fromSIUnit("charge", cuUnit, charge);
+        let energyResult = fromSIUnit("energy", euUnit, energy);
+        energyResult = parseFloat(energyResult.toFixed(8));
+        chargeResult = parseFloat(chargeResult.toFixed(8));
+
+        if (
+          !(energyResult > 0 && energyResult < 1) &&
+          !(energyResult < 0 && energyResult > -1)
+        ) {
+          energyResult = energyResult.toLocaleString();
+        }
+        if (
+          !(chargeResult > 0 && chargeResult < 1) &&
+          !(chargeResult < 0 && chargeResult > -1)
+        ) {
+          chargeResult = chargeResult.toLocaleString();
+        }
+
+        return {
+          0: {
+            title: "Capacitor Energy ",
+            value: `${energyResult} ${euUnit}`,
+          },
+          1: {
+            title: "Capacitor Charge ",
+            value: `${chargeResult} ${cuUnit}`,
+          },
+        };
+      }
+
+      function calculateResults() {
+        calcResultsEl.innerHTML = ``;
+        try {
+          const resultObj = prepareResults();
+          const elementNodes = createElements(resultObj);
+
+          elementNodes.forEach((element) => {
+            calcResultsEl.append(element);
+          });
+        } catch (error) {
+          console.log(error);
+          alert(`An error occurred.\nTry again with valid value.`);
+          resultEl.innerHTML = ``;
+          return;
+        }
+      }
+      
+      function resetForm() {
+        cpInputEl.value = ""
+        vtInputEl.value = ""
+  
+        cpSelectEl.selectedIndex = '2'
+        vtSelectEl.selectedIndex = '2'
+        cuSelectEl.selectedIndex = '1'
+        euSelectEl.selectedIndex = '1'
+      }
+
+      function resetResult() {
+        calcResultsEl.innerHTML = "<p>Result will appear here...</p>";
+      } 
+
+      function resethandler() {
+        resetForm();
+        resetResult();
+      }
+
+      /*************** EVENTLISTINERS ***************/
+      [cpInputEl, vtInputEl].forEach((el) => {
+        el.addEventListener("input", resetResult);
+      });
+
+      [cpSelectEl, vtSelectEl, cuSelectEl, euSelectEl].forEach((el) => {
+        el.addEventListener("change", resetResult);
+      });
+
+      resetBtnEl.addEventListener("click", resethandler);
+      calcBtnEl.addEventListener("click", calculateResults);
+
+    </script>
+  </body>
+</html>

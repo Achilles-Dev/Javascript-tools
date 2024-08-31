@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Weighted Average Calculator</title>
+  </head>
+  <body>
+    <h1>Weighted Average Calculator</h1>
+    <p>Enter the values in a data set and their respective weights to calculate the weighted average.</p>
+    <table>
+      <tr>
+        <th>Value</th>
+        <th>Weight</th>
+      </tr>
+      <tbody id="tableBody">
+        <tr id="row1">
+          <td>
+            X<sub>1</sub>: &nbsp;&nbsp;&nbsp;
+            <input type="number" id="value1" />
+          </td>
+          <td><input type="number" id="weight1" /></td>
+        </tr>
+        <tr id="row2">
+          <td>
+            X<sub>2</sub>: &nbsp;&nbsp;&nbsp;
+            <input type="number" id="value2" />
+          </td>
+          <td><input type="number" id="weight2" /></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <p>
+      <button id="addInputs">Add Inputs</button>
+      <button id="removeInputs">Remove Inputs</button>
+    </p>
+    <button id="calcBtn">Calculate</button>
+    <button id="resetBtn">Reset</button>
+    <hr />
+    <div>
+      <h3>Result:</h3>
+      <h3 id="calcResults">Result will appear here...</h3>
+    </div>
+
+    <script>
+      // Get required elements from the HTML
+      const value1El = document.getElementById("value1");
+      const value2El = document.getElementById("value2");
+      
+      const weight1El = document.getElementById("weight1");
+      const weight2El = document.getElementById("weight2");
+
+      const tableBodyEl = document.getElementById("tableBody");
+      const additionsEl = document.getElementById("additions");
+      const addInputsEl = document.getElementById("addInputs");
+      const removeInputsEl = document.getElementById("removeInputs");
+      let xnEl = {};
+
+      const calcBtnEl = document.getElementById("calcBtn");
+      const resetBtnEl = document.getElementById("resetBtn");
+      const calcResultsEl = document.getElementById("calcResults");
+
+      let index = 3;
+
+      function handleAddInputs() {
+        const tableRow = document.createElement('tr');
+        tableRow.id = `row${index}`
+        let rowData = `
+          <td>
+            X<sub>${index}</sub>: &nbsp;&nbsp;&nbsp;
+            <input type="number" id="value${index}" />
+          </td>
+          <td><input type="number" id="weight${index}" /></td>
+        `
+        tableRow.innerHTML = rowData
+        
+        tableBodyEl.appendChild(tableRow);
+        xnEl[`value${index}El`] = document.getElementById(`value${index}`);
+        xnEl[`weight${index}El`] = document.getElementById(`weight${index}`);
+        document.getElementById(`value${index}`).addEventListener("input", resetResult)
+        document.getElementById(`weight${index}`).addEventListener("input", resetResult)
+        index += 1;
+        resetResult()
+      }
+
+      function handleRemoveInputs() {
+        let removeIndex = index - 1;
+        const lastDiv = document.getElementById(`row${removeIndex}`)
+        if (removeIndex > 2) {
+          lastDiv.remove()
+          delete xnEl[`value${removeIndex}El`]
+          delete xnEl[`weight${removeIndex}El`]
+          index -=  1;
+          resetResult()
+        }
+      }
+
+      function calculateResults() {
+        // Retrieve input values
+        const value1 = parseFloat(value1El.value);
+        const value2 = parseFloat(value2El.value);
+        const weight1 = parseFloat(weight1El.value)
+        const weight2 = parseFloat(weight2El.value)
+
+        if (isNaN(value1) || isNaN(value2) || isNaN(weight1) || isNaN(weight2)) {
+          alert("Please Enter All Details.");
+          return;
+        } else {
+          for (const [key, value] of Object.entries(xnEl)) {
+            if (isNaN(parseFloat(value.value))) {
+              alert("Please Enter All Details.");
+              return;
+            }
+          }
+        }
+
+        try {
+          let valueArray = [value1, value2]
+          let weightArray = [weight1, weight2]
+          if (Object.values(xnEl).length > 0) {
+            Object.values(xnEl).forEach((num, idx) => {
+              let index = idx + 1
+              if (index % 2 == 0) {
+                weightArray.push(parseFloat(num.value))
+              } else {
+                valueArray.push(parseFloat(num.value))
+              }
+            })
+          }
+
+          const weightSum = weightArray.reduce((a, b) => a + b, 0)
+          const valWeightSum = valueArray.map((num, index) => num * weightArray[index]).reduce((a, b) => a + b, 0)
+          const results = valWeightSum / weightSum
+          
+
+          calcResultsEl.innerHTML = `
+              <p>Weighted Average: ${results.toFixed(4) * 1}</p>
+            `;
+        } catch (error) {
+          alert("Something Went Wrong!!!");
+          resethandler();
+        }
+      }
+
+      function resetForm() {
+        value1El.value = "";
+        value2El.value = "";      
+        weight1El.value = "";
+        weight2El.value = "";
+      }
+
+      function resetResult() {
+        calcResultsEl.innerHTML = "<p>Result will appear here...</p>";
+      }
+
+      function resethandler() {
+        resetForm();
+        resetResult();
+      }
+
+      resetBtnEl.addEventListener("click", resethandler);
+      calcBtnEl.addEventListener("click", calculateResults);
+      addInputsEl.addEventListener("click", handleAddInputs);
+      removeInputsEl.addEventListener("click", handleRemoveInputs);
+
+      [value1El, value2El, weight1El, weight2El].forEach((el) => {
+        el.addEventListener("input", resetResult);
+      });
+    </script>
+  </body>
+</html>

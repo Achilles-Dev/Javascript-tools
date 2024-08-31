@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Earth Curvature Calculator</title>
+  </head>
+  <body>
+    <h1>Earth Curvature Calculator</h1>
+    <p>Provide distance to the object to calculate the Obscured object part.</p>
+      <p>
+        Calculate:
+        <select id="calculateUnit">
+          <option value="i2">Eyesight level </option>
+          <option value="i3" selected>Distance to horizon</option>
+        </select>
+      </p>
+      
+      <div>
+        <p id="i1-contianer" class="containers">
+          <label for="i1-input">Distance to the object </label>
+          <input
+            type="number"
+            step="any"
+            id="i1-input"
+            class="inputs"
+            value="1"
+            min="1e-18"
+          />
+          <select id="i1-select">
+            <option value="mm">millimeters (mm)</option>
+            <option value="cm">centimeters (cm)</option>
+            <option value="m">meters (m)</option>
+            <option value="km" selected>kilometers (km)</option>
+            <option value="in">inches (in)</option>
+            <option value="ft">feet (ft)</option>
+            <option value="yd">yards (yd)</option>
+            <option value="mi">miles (mi)</option>
+            <option value="nmi">nautical miles (nmi)</option>
+          </select>
+        </p>
+        <p id="i2-contianer" class="containers">
+          <label for="i2-input">Eyesight level </label>
+          <input
+            type="number"
+            step="any"
+            id="i2-input"
+            class="inputs"
+            min="1e-18"
+          />
+          <select id="i2-select">
+            <option value="mm">millimeters (mm)</option>
+            <option value="cm">centimeters (cm)</option>
+            <option value="m" selected>meters (m)</option>
+            <option value="km">kilometers (km)</option>
+            <option value="in">inches (in)</option>
+            <option value="ft">feet (ft)</option>
+            <option value="yd">yards (yd)</option>
+            <option value="mi">miles (mi)</option>
+            <option value="nmi">nautical miles (nmi)</option>
+          </select>
+        </p>
+        <p id="i3-contianer" class="containers" style="display: none;">
+          <label for="i3-input">Distance to horizon </label>
+          <input
+            type="number"
+            id="i3-input"
+            step="any"
+            class="inputs"
+            min="1e-18"
+          />
+          <select id="i3-select">
+            <option value="mm">millimeters (mm)</option>
+            <option value="cm">centimeters (cm)</option>
+            <option value="m">meters (m)</option>
+            <option value="km" selected>kilometers (km)</option>
+            <option value="in">inches (in)</option>
+            <option value="ft">feet (ft)</option>
+            <option value="yd">yards (yd)</option>
+            <option value="mi">miles (mi)</option>
+            <option value="nmi">nautical miles (nmi)</option>
+          </select>
+        </p>
+      </div>
+      <button id="calcBtn">Calculate</button>
+      <button id="resetBtn">Reset</button>
+      <hr>
+      <div>
+        <h3>Result:</h3>
+        <h3 id="calcResults">Result will appear here...</h3>
+      </div>
+    <script>
+      /*************** ELEMENTS ***************/
+      const containers = document.querySelectorAll(".containers");
+      const inputs = document.querySelectorAll(".inputs");
+
+      const calculateUnitEl = document.getElementById("calculateUnit");
+
+      const i1Input = document.getElementById("i1-input");
+      const i2Input = document.getElementById("i2-input");
+      const i3Input = document.getElementById("i3-input");
+
+      const i1Select = document.getElementById("i1-select");
+      const i2Select = document.getElementById("i2-select");
+      const i3Select = document.getElementById("i3-select");
+
+      const calcBtnEl = document.getElementById('calcBtn');
+      const resetBtnEl = document.getElementById('resetBtn');
+      const calcResultsEl = document.getElementById('calcResults')
+
+      /*************** GLOBAL VARIBLES ***************/
+      const UNITS = {
+        distance: {
+          m: 1,
+          km: 1e-3,
+          mm: 1e3,
+          cm: 1e2,
+          in: 39.370078740157474,
+          ft: 3.280839895013123,
+          yd: 1.0936132983377078,
+          mi: 0.000621371192237334,
+          nmi: 0.0005399568034557235,
+        },
+      };
+      /*************** FUNCTIONS ***************/
+      function toSIUnit(type, unit, value) {
+        return value / UNITS[type][unit];
+      }
+
+      function fromSIUnit(type, unit, value) {
+        return value * UNITS[type][unit];
+      }
+
+      function createElements(resultObj) {
+        const elementNodes = Object.keys(resultObj).map((key) => {
+          //create elements to put the results in
+          const div = document.createElement("div");
+          const span = document.createElement("span");
+          const span2 = document.createElement("span");
+
+          // give the elements id
+          div.setAttribute("class", `result-container`);
+          span.setAttribute("class", `result-title`);
+          span2.setAttribute("class", `result-value`);
+
+          // put the values in the elements
+
+          span.textContent = resultObj[key]["title"];
+          span2.textContent = resultObj[key]["value"];
+
+          // appened them to an element that contians them
+          div.append(span, span2);
+
+          // return that element
+          return div;
+        });
+
+        return elementNodes;
+      }
+
+      function handleCalculateUnitChange(e) {
+        const value = e.target.value
+        
+        containers.forEach((container) => {
+          let idVal = container.id.slice(0, 2)
+          if (idVal == value) {
+            container.style.display = 'none'
+          } else {
+            container.style.display = 'block'
+          }
+        })
+
+        resetResult()
+      }
+
+
+      function calculateResult(input) {
+        const r = 6.371e6;
+
+        const calculateI2 = () => {
+          console.log("I'm fired");
+          const { i1, i3 } = prepareUnits();
+
+          let value = Math.sqrt(i3 * i3 + r * r) - r;
+          let type = "distance";
+          let name = `Eyesight level`;
+
+          console.log(i3);
+
+          let value2 =
+            Math.sqrt(
+              Math.pow(i3, 2) - 2 * i3 * i1 + Math.pow(i1, 2) + Math.pow(r, 2)
+            ) - r;
+          let type2 = "distance";
+          let name2 = "Obscured object part";
+
+          return {
+            result: { value, type, name },
+            result2: { value: value2, type: type2, name: name2 },
+          };
+        };
+        const calculateI3 = () => {
+          const { i1, i2 } = prepareUnits();
+
+          let i3 = Math.sqrt(Math.pow(r + i2, 2) - r * r);
+          let value = i3;
+          console.log(i3);
+          let type = "distance";
+          let name = "Distance to horizon";
+
+          let value2 =
+            Math.sqrt(
+              Math.pow(i3, 2) - 2 * i3 * i1 + Math.pow(i1, 2) + Math.pow(r, 2)
+            ) - r;
+          let type2 = "distance";
+          let name2 = "Obscured object part";
+
+          return {
+            result: { value, type, name },
+            result2: { value: value2, type: type2, name: name2 },
+          };
+        };
+
+        switch (input) {
+          case "i2":
+            return calculateI2();
+          case "i3":
+            return calculateI3();
+          default:
+            console.log("error in calculate result switch");
+        }
+      }
+
+      function prepareUnits() {
+        let i1 = parseFloat(i1Input.value) ?? 0;
+        let i2 = parseFloat(i2Input.value) ?? 0;
+        let i3 = parseFloat(i3Input.value) ?? 0;
+
+        let i1Unit = i1Select.value;
+        let i2Unit = i2Select.value;
+        let i3Unit = i3Select.value;
+
+        i1 = toSIUnit("distance", i1Unit, i1);
+        i2 = toSIUnit("distance", i2Unit, i2);
+        i3 = toSIUnit("distance", i3Unit, i3);
+
+        return { i3, i1, i2 };
+      }
+
+      function prepareResults(result, type, name) {
+        let resultObj = {};
+        Object.keys(UNITS[type]).forEach((key) => {
+          let ans = fromSIUnit(type, key, result);
+          ans = parseFloat(ans.toFixed(10));
+          if (!(ans > 0 && ans < 1) && !(ans < 0 && ans > -1)) {
+            ans = ans.toLocaleString();
+          }
+
+          resultObj[key] = {
+            title: `${name} (${key}): `,
+            value: ` ${ans} ${key}`,
+          };
+        });
+        return resultObj;
+      }
+
+      function calculateResults() {
+        const calculateUnit = calculateUnitEl.value
+      
+        try {
+          const { result, result2 } = calculateResult(calculateUnit);
+
+          if (isNaN(result.value) || isNaN(result2.value)) {
+            alert("Your input resulted in NAN.\n 0/0 \n Try again with valid input.");
+            resetResult()
+            return;
+          }
+          if (
+            Math.abs(result.value) === Infinity ||
+            Math.abs(result2.value) === Infinity
+          ) {
+            alert(
+              "Your input resulted in Infinity. \nDivision by zero. \nTry again with valid input."
+            );
+            resetResult()
+            return;
+          }
+
+          const resultObj = prepareResults(result.value, result.type, result.name);
+          const elementNodes = createElements(resultObj);
+
+          const resultObj2 = prepareResults(
+            result2.value,
+            result2.type,
+            result2.name
+          );
+          const elementNodes2 = createElements(resultObj2);
+          calcResultsEl.innerHTML = ``;
+
+          elementNodes.forEach((element) => {
+            calcResultsEl.append(element);
+          });
+          calcResultsEl.innerHTML += `<br/> `;
+          elementNodes2.forEach((element) => {
+            calcResultsEl.append(element);
+          });
+        } catch (error) {
+          console.log(error);
+          alert("An error ocurred. Try again with valid input.");
+          resetResult()
+          return;
+        }
+      }
+
+      function resetForm() {
+        [i1Select, i2Select, i3Select].forEach((select, index) => {
+          select.selectedIndex = '3'
+          if (index == 1) {
+            select.selectedIndex = '2'
+          }
+        });
+
+        inputs.forEach((input) => {
+          input.value = ""
+        });
+
+        i1Input.value = '1'
+
+        containers.forEach((container) => {
+          let idVal = container.id.slice(0, 2)
+          if (idVal == 'i3') {
+            container.style.display = 'none'
+          } else {
+            container.style.display = 'block'
+          }
+        })
+        calculateUnitEl.selectedIndex = '1'
+      }
+
+      function resetResult() {
+        calcResultsEl.innerHTML = "<p>Result will appear here...</p>";
+      } 
+
+      function resethandler() {
+        resetForm();
+        resetResult();
+      }
+
+      /*************** EVENT LISTINERS ***************/
+      [i1Select, i2Select, i3Select].forEach((select) => {
+        select.addEventListener("change", resetResult);
+      });
+
+      inputs.forEach((input) => {
+        input.addEventListener("input", resetResult);
+      });
+
+      calculateUnitEl.addEventListener("change", handleCalculateUnitChange)
+      
+      resetBtnEl.addEventListener("click", resethandler);
+      calcBtnEl.addEventListener("click", calculateResults);
+
+    </script>
+  </body>
+</html>

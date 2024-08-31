@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Z-test Calculator</title>
+</head>
+<body>
+    <h1>Z-test Calculator</h1>
+    <p>Here, we perform a Z-test for population mean μ. <br />
+      Null hypothesis H₀: μ = μ₀.</p>
+    <p>
+      Alternative hypothesis H₁:
+      <select id="altHypoSelect">
+        <option value="two" selected>two-tailed (μ ≠ μ₀)</option>
+        <option value="left">left-tailed (μ < μ₀)</option>
+        <option value="right">right-tailed (μ > μ₀)</option>
+      </select>
+    </p>
+    <p>
+      Approach:
+      <select id="approachSelect">
+        <option value="pVal" selected>p-value</option>
+        <option value="critVal">critical values</option>
+      </select>
+    </p>
+    <p>
+      Significance level α:
+      <input type="number" value="0.05" id="sigLevel">
+    </p>
+    <p>
+      Is Z-score known?:
+      <select id="zTestSelect">
+        <option value="yes" selected>YES</option>
+        <option value="no">NO</option>
+      </select>
+    </p>
+    <p id="zScoreInput">
+      Z-score: 
+      <input type="number" id="zscoreNum">
+    </p>
+    <div id="noZScoreInputs" style="display: none;">
+      <p>
+        Sample mean x̄: 
+        <input type="number" id="sampMean">
+      </p>
+      <p>
+        Tested mean μ₀: 
+        <input type="number" id="testedMean">
+      </p>
+      <p>
+        Population standard deviation σ: 
+        <input type="number" id="popSd">
+      </p>
+      <p>
+        Sample size n: 
+        <input type="number" id="sampSize">
+      </p>
+    </div>
+    <p id="pricisionInput">
+      Precision for critical values: 
+      <input type="number" id="cVPrecision">
+    </p>
+
+    <button id="calcBtn">Calculate</button>
+    <button id="resetBtn">Reset</button>
+    <hr>
+    <div>
+      <h3>Result:</h3>
+      <h3 id="calcResults">Result will appear here...</h3>
+    </div>
+
+    <script>
+      // Get required elements from the HTML
+      const altHypoSelectEl = document.getElementById("altHypoSelect");
+      const approachSelectEl = document.getElementById("approachSelect");
+      const sigLevelEl = document.getElementById("sigLevel");
+      const zTestSelectEl = document.getElementById("zTestSelect");
+      const zScoreInputEl = document.getElementById("zScoreInput");
+      const zscoreNumEl = document.getElementById("zscoreNum");
+      const noZScoreInputsEl = document.getElementById("noZScoreInputs");
+      const sampMeanEl = document.getElementById("sampMean");
+      const testedMeanEl = document.getElementById("testedMean");
+      const popSdEl = document.getElementById("popSd");
+      const sampSizeEl = document.getElementById("sampSize");
+      const pricisionInputEl = document.getElementById("pricisionInput");
+      const cVPrecision = document.getElementById("cVPrecision");
+
+      const calcBtnEl = document.getElementById('calcBtn');
+      const resetBtnEl = document.getElementById('resetBtn');
+      const calcResultsEl = document.getElementById('calcResults') 
+
+      function handlezTestSelectChange(e) {
+        const value = e.target.value
+        zScoreInputEl.style.display = value == "yes" ? 'block' : 'none'
+        noZScoreInputsEl.style.display = value == "no" ? 'block' : 'none'
+        resetResult()
+      }
+
+      function erfc(x) {
+        const z = Math.abs(x);
+        const t = 1 / (1 + z / 2);
+        const r = t * Math.exp(-z * z - 1.26551223 + t * (1.00002368 +
+                t * (0.37409196 + t * (0.09678418 + t * (-0.18628806 +
+                t * (0.27886807 + t * (-1.13520398 + t * (1.48851587 +
+                t * (-0.82215223 + t * 0.17087277)))))))))
+        return x >= 0 ? r : 2 - r;
+      };
+
+      function calculateResults() {
+          // Retrieve input values
+          const sigLevel = parseFloat(sigLevelEl.value);
+          const zscoreNum = parseFloat(zscoreNumEl.value);
+          const sampMean = parseFloat(sampMeanEl.value);
+          const testedMean = parseFloat(testedMeanEl.value);
+          const popSd = parseFloat(popSdEl.value);
+          const sampSize = parseFloat(sampSizeEl.value);
+          const hypoTest = altHypoSelectEl.value
+
+          if (zTestSelectEl.value == "yes") {
+            if (isNaN(sigLevel) || isNaN(zscoreNum)) {
+              alert("Please Enter All Details.");
+              return;
+            } else if (sigLevel > 1 || sigLevel < 0) {
+              alert("Significance level must be between 0 and 1.")
+              return;
+            }           
+          } else {
+            if (isNaN(sampMean) || isNaN(testedMean) || isNaN(popSd) || isNaN(sampSize)) {
+              alert("Please Enter All Details.");
+              return;
+            }
+          }
+
+          try {
+            let results = ''
+            let approachVal = 0
+            let approachName = ''
+            let critRegion = ''
+      
+            if (zTestSelectEl.value == "yes") {
+              if (approachSelectEl.value == "critVal") {
+                approachName = 'Precision for critical values'
+
+                if (hypoTest == "two") {
+                  approachVal = 2 * (1 - approachVal)
+                } else if (hypoTest == "right") {
+                  approachVal = 1 - approachVal
+                }
+
+              } else {
+                approachName = 'p-value'
+                const xVal = Math.abs(zscoreNum) / Math.sqrt(2)
+                const erfVal =  1 - erfc(xVal)
+                approachVal = (1 / 2) * (1 + erfVal)
+                if (hypoTest == "two") {
+                  approachVal = 2 * (1 - approachVal)
+                } else if (hypoTest == "right") {
+                  approachVal = 1 - approachVal
+                }
+                if (approachVal > sigLevel) {
+                  results = `Your p-value is greater than ${sigLevel}. Therefore, there is not <br/> enough evidence 
+                    to reject H0 at the significance level ${sigLevel}.`
+                } else if (approachVal < sigLevel) {
+                  results = `Your p-value does not exceed ${sigLevel}. Therefore, 
+                    you can reject H0 at the significance level ${sigLevel}.`
+                }
+
+                calcResultsEl.innerHTML = `<p> ${approachName}: ${approachVal.toFixed(5) * 1}</p>
+                                          ${critRegion != '' ? `<p> ${critRegion}</p>` : ''}
+                                          <p> Decision: ${results}</p>
+                `
+              }
+            } else {
+              const zscore = (sampMean - testedMean) * (Math.sqrt(sampSize) / popSd)
+              const xVal = Math.abs(zscore) / Math.sqrt(2)
+              const erfVal =  1 - erfc(xVal)
+              approachVal = (1 / 2) * (1 + erfVal)
+              if (hypoTest == "two") {
+                approachVal = 2 * (1 - approachVal)
+              } else if (hypoTest == "right") {
+                approachVal = 1 - approachVal
+              }
+              console.log(approachVal)
+
+              if (approachVal > sigLevel) {
+                results = `Your p-value is greater than ${sigLevel}. Therefore, there is not enough evidence <br/>
+                  to reject H0 at the significance level ${sigLevel}.`
+              } else if (approachVal < sigLevel) {
+                results = `Your p-value does not exceed ${sigLevel}. Therefore, 
+                  you can reject H0 at the significance level ${sigLevel}.`
+              }
+
+              calcResultsEl.innerHTML = `<p> Z-score: ${zscore.toFixed(4) * 1}</p>
+                                        <p> ${approachName}: ${approachVal.toFixed(5) * 1}</p>
+                                        ${critRegion != '' ? `<p> ${critRegion}</p>` : ''}
+                                        <p> Decision: ${results}</p>
+              `
+            }
+            
+          } catch (error) {
+            alert("Something Went Wrong!!!");
+            resethandler()
+          }
+      }
+
+      function resetForm() {
+        sigLevelEl.value = "0.05"
+        zscoreNumEl.value = ""
+        sampMeanEl.value = ""
+        testedMeanEl.value = ""
+        popSdEl.value = ""
+        sampSizeEl.value = ""
+        altHypoSelectEl.selectedIndex = "0"
+        approachSelectEl.selectedIndex = "0"
+        zTestSelectEl.selectedIndex = "0"
+      }
+
+      function resetResult() {
+        calcResultsEl.innerHTML = "<p>Result will appear here...</p>";
+      } 
+
+      function resethandler() {
+        resetForm();
+        resetResult();
+      }
+
+      [sigLevelEl, zscoreNumEl, sampMeanEl, testedMeanEl, popSdEl, sampSizeEl].forEach((el) => {
+        el.addEventListener("input", resetResult);
+      }); 
+
+      [altHypoSelectEl, approachSelectEl].forEach((el) => {
+        el.addEventListener("change", resetResult);
+      }); 
+
+
+      resetBtnEl.addEventListener("click", resethandler);
+      calcBtnEl.addEventListener("click", calculateResults);
+      zTestSelectEl.addEventListener("change", handlezTestSelectChange)
+
+      
+    </script>
+</body>
+</html>

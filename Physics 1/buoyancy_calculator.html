@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Buoyancy Calculator</title>
+  </head>
+  <body>
+    <h1>Buoyancy Calculator</h1>
+
+    <p>Calculate</p>
+      <div>
+        <p id="i1-contianer" class="containers">
+          <label for="i1-input">Volume </label>
+          <input
+            type="number"
+            step="any"
+            id="i1-input"
+            class="inputs"
+            min="1e-7"
+            required
+          />
+          <select id="i1-select">
+            <option value="mm³">mm³</option>
+            <option value="cm³">cm³</option>
+            <option value="m³" selected>m³</option>
+            <option value="L">L</option>
+            <option value="ml">ml</option>
+            <option value="Gallons">Gallons</option>
+            <option value="oz">fl oz</option>
+            <option value="in³">in³</option>
+            <option value="ft³">ft³</option>
+            <option value="yd³">yd³</option>
+          </select>
+        </p>
+        <p id="i2-contianer" class="containers">
+          <label for="i2-input">Fluid density </label>
+          <input
+            type="number"
+            step="any"
+            id="i2-input"
+            class="inputs"
+            value="1024"
+            min="1e-7"
+            required
+          />
+          <select id="i2-select">
+            <option value="g/m³">g/m³</option>
+            <option value="g/cm³">g/cm³</option>
+            <option value="kg/m³" selected>kg/m³</option>
+            <option value="kg/cm³">kg/cm³</option>
+            <option value="in³">oz/in³</option>
+            <option value="ft³">lb/ft³</option>
+            <option value="yd³">lb/yd³</option>
+            <option value="g/litre">g/litre</option>
+          </select>
+        </p>
+        <p id="i3-contianer" class="containers">
+          <label for="i3-input">Gravity </label>
+          <input
+            type="number"
+            id="i3-input"
+            step="any"
+            class="inputs"
+            value="1"
+            min="1e-7"
+            required
+          />
+          <select id="i3-select">
+            <option value="m/s²">m/s²</option>
+            <option value="g" selected>g</option>
+          </select>
+        </p>
+      </div>
+      <button id="calcBtn">Calculate</button>
+      <button id="resetBtn">Reset</button>
+      <hr>
+      <div>
+        <h3>Result:</h3>
+        <h3 id="calcResults">Result will appear here...</h3>
+      </div>
+    <script>
+      /*************** ELEMENTS ***************/
+      const i1InputEl = document.getElementById("i1-input");
+      const i2InputEl = document.getElementById("i2-input");
+      const i3InputEl = document.getElementById("i3-input");
+
+      const i1SelectEl = document.getElementById("i1-select");
+      const i2SelectEl = document.getElementById("i2-select");
+      const i3SelectEl = document.getElementById("i3-select");
+
+      const calcBtnEl = document.getElementById('calcBtn');
+      const resetBtnEl = document.getElementById('resetBtn');
+      const calcResultsEl = document.getElementById('calcResults')
+
+      /*************** GLOBAL VARIBLES ***************/
+      const UNITS = {
+        volume: {
+          "mm³": 1000000000,
+          "cm³": 1000000,
+          "m³": 1,
+          L: 1000,
+          ml: 1000000,
+          Gallons: 264.17217686,
+          oz: 33814.038638,
+          "in³": 61023.744095,
+          "ft³": 35.314666721,
+          "yd³": 1.3079506193,
+        },
+        density: {
+          "g/m³": 1000,
+          "g/cm³": 0.001,
+          "kg/m³": 1,
+          "kg/cm³": 0.000001,
+          "in³": 0.000578037,
+          "ft³": 0.0624279606,
+          "yd³": 1.6855549356,
+          "g/litre": 1,
+        },
+        acceleration: {
+          "m/s²": 1,
+          g: 0.10197162129779,
+        },
+        mass: {
+          tons: 0.00110231,
+          tonnes: 0.001,
+          kg: 1,
+          lbs: 2.2046199999999998,
+        },
+        force: {
+          N: 1,
+          kN: 1e-3,
+          MN: 1e-6,
+        },
+      };
+      /*************** FUNCTIONS ***************/
+      function toSIUnit(type, unit, value) {
+        return value / UNITS[type][unit];
+      }
+
+      function fromSIUnit(type, unit, value) {
+        return value * UNITS[type][unit];
+      }
+      function createElements(resultObj) {
+        const elementNodes = Object.keys(resultObj).map((key) => {
+          //create elements to put the results in
+          const div = document.createElement("div");
+          const span = document.createElement("span");
+          const span2 = document.createElement("span");
+
+          // give the elements id
+          div.setAttribute("class", `result-container`);
+          span.setAttribute("class", `result-title`);
+          span2.setAttribute("class", `result-value`);
+
+          // put the values in the elements
+
+          span.textContent = resultObj[key]["title"];
+          span2.textContent = resultObj[key]["value"];
+
+          // appened them to an element that contians them
+          div.append(span, span2);
+
+          // return that element
+          return div;
+        });
+
+        return elementNodes;
+      }
+
+      function calculateResult() {
+        const { i3, i1, i2 } = prepareUnits();
+        let result = i3 * i2 * i1;
+        let result2 = i2 * i1;
+
+        let force = {
+          result,
+          type: "force",
+          name: "Buoyant Force",
+        };
+        let mass = {
+          result2,
+          type2: "mass",
+          name2: "Displaced Fluid Mass",
+        };
+        return { force, mass };
+      }
+
+      function prepareUnits() {
+        let i1 = parseFloat(i1InputEl.value) ?? 0;
+        let i2 = parseFloat(i2InputEl.value) ?? 0;
+        let i3 = parseFloat(i3InputEl.value) ?? 0;
+
+        let i1Unit = i1SelectEl.value;
+        let i2Unit = i2SelectEl.value;
+        let i3Unit = i3SelectEl.value;
+
+        i1 = toSIUnit("volume", i1Unit, i1);
+        i2 = toSIUnit("density", i2Unit, i2);
+        i3 = toSIUnit("acceleration", i3Unit, i3);
+
+        return { i3, i1, i2 };
+      }
+
+      function prepareResults(result, type, name) {
+        let resultObj = {};
+        Object.keys(UNITS[type]).forEach((key) => {
+          let ans = fromSIUnit(type, key, result);
+          ans = parseFloat(ans.toFixed(10));
+          if (!(ans > 0 && ans < 1) && !(ans < 0 && ans > -1)) {
+            ans = ans.toLocaleString();
+          }
+
+          resultObj[key] = {
+            title: `${name} (${key}): `,
+            value: ` ${ans} ${key}`,
+          };
+        });
+        return resultObj;
+      }
+
+      
+      function calculateResults() {
+        try {
+          const { force, mass } = calculateResult();
+          let { result, type, name } = force;
+          let { result2, type2, name2 } = mass;
+          if (isNaN(result) || isNaN(result2)) {
+            alert("Your input resulted in NAN.\n 0/0 \n Try again with valid input.");
+            resetResult();
+            return;
+          }
+          if (Math.abs(result) === Infinity || Math.abs(result2) === Infinity) {
+            alert(
+              "Your input resulted in Infinity. \nDivision by zero. \nTry again with valid input."
+            );
+            resetResult();
+            return;
+          }
+
+          const resultObj = prepareResults(result, type, name);
+          const resultObj2 = prepareResults(result2, type2, name2);
+          const elementNodes = createElements(resultObj);
+          const elementNodes2 = createElements(resultObj2);
+
+          calcResultsEl.innerHTML = ''
+          elementNodes.forEach((element) => {
+            calcResultsEl.append(element);
+          });
+          calcResultsEl.innerHTML += ` <br/>`;
+          elementNodes2.forEach((element) => {
+            calcResultsEl.append(element);
+          });
+        } catch (error) {
+          console.log(error);
+          alert("An error ocurred. Try again with valid input.");
+          resultEl.innerHTML = "";
+          return;
+        }
+      }
+
+      function resetForm() {
+        i1InputEl.value = ""
+        i2InputEl.value = ""
+        i3InputEl.value = ""
+  
+        i1SelectEl.selectedIndex = '2'
+        i2SelectEl.selectedIndex = '2'
+        i3SelectEl.selectedIndex = '1'
+      }
+
+      function resetResult() {
+        calcResultsEl.innerHTML = "<p>Result will appear here...</p>";
+      } 
+
+      function resethandler() {
+        resetForm();
+        resetResult();
+      }
+
+      /*************** EVENTLISTINERS ***************/
+      [i1InputEl, i2InputEl, i3InputEl].forEach((el) => {
+        el.addEventListener("input", resetResult);
+      });
+
+      [i1SelectEl, i2SelectEl, i3SelectEl].forEach((el) => {
+        el.addEventListener("change", resetResult);
+      });
+
+      resetBtnEl.addEventListener("click", resethandler);
+      calcBtnEl.addEventListener("click", calculateResults);
+
+    </script>
+  </body>
+</html>

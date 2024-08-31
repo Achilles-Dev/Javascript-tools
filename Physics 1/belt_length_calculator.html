@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Belt Length Calculator</title>
+  </head>
+  <body>
+    <h1>Belt Length Calculator</h1>
+      <div>
+        <p>
+          <label for="i1-input">Diameter of the large pulley </label>
+          <input
+            type="number"
+            min="0"
+            autocomplete="off"
+            data-id="i1"
+            step="any"
+            id="i1-input"
+            class="inputs"
+            data-name="Distance"
+          />
+          <select
+            class="selects"
+            id="i1-select"
+            data-type="distance"
+            data-prev="m"
+            data-id="i1"
+          >
+            <option value="mm">millimeters (mm)</option>
+            <option value="cm">centimeters (cm)</option>
+            <option value="m" selected>meters (m)</option>
+            <option value="in">inches (in)</option>
+            <option value="ft">feet (ft)</option>
+          </select>
+        </p>
+
+        <p>
+          <label for="i2-input">Diameter of the small pulley </label>
+          <input
+            type="number"
+            min="0"
+            autocomplete="off"
+            data-id="i2"
+            step="any"
+            id="i2-input"
+            class="inputs"
+            data-name="Distance"
+          />
+
+          <select
+            class="selects"
+            id="i2-select"
+            data-type="distance"
+            data-prev="m"
+            data-id="i2"
+          >
+            <option value="mm">millimeters (mm)</option>
+            <option value="cm">centimeters (cm)</option>
+            <option value="m" selected>meters (m)</option>
+            <option value="in">inches (in)</option>
+            <option value="ft">feet (ft)</option>
+          </select>
+        </p>
+
+        <p>
+          <label for="i3-input">Pulley center distance</label>
+          <input
+            type="number"
+            min="0"
+            autocomplete="off"
+            data-id="i3"
+            step="any"
+            class="inputs"
+            id="i3-input"
+            data-name="Distance"
+          />
+          <select
+            class="selects"
+            id="i3-select"
+            data-type="distance"
+            data-prev="m"
+            data-id="i3"
+          >
+            <option value="mm">millimeters (mm)</option>
+            <option value="cm">centimeters (cm)</option>
+            <option value="m" selected>meters (m)</option>
+            <option value="in">inches (in)</option>
+            <option value="ft">feet (ft)</option>
+          </select>
+        </p>
+      </div>
+
+      <button id="calcBtn">Calculate</button>
+      <button id="resetBtn">Reset</button>
+      <hr>
+      <div>
+        <h3>Result:</h3>
+        <h3 id="calcResults">Result will appear here...</h3>
+      </div>
+    <script>
+      /*************** ELEMENTS ***************/
+      const selects = document.querySelectorAll(".selects");
+      const inputs = document.querySelectorAll(".inputs");
+
+      let i4Select = 'm';
+      let i5Select = 'm'
+
+      let beltLength1 = 0;
+      let beltLength2 = 0;
+
+      const calcBtnEl = document.getElementById('calcBtn');
+      const resetBtnEl = document.getElementById('resetBtn');
+      const calcResultsEl = document.getElementById('calcResults')
+
+      /*************** GLOBAL VARIBLES ***************/
+      const UNITS = {
+        distance: {
+          mm: 1e3,
+          cm: 1e2,
+          m: 1,
+          in: 39.370078740157474,
+          ft: 3.2808398950131235,
+        },
+      };
+
+      /*************** FUNCTIONS ***************/
+      function toSIUnit(type, unit, value) {
+        if (type === "exp") {
+          unit = parseFloat("1e" + unit);
+          return value * unit;
+        }
+        return value / UNITS[type][unit];
+      }
+
+      function fromSIUnit(type, unit, value) {
+        if (type === "exp") {
+          unit = parseFloat("1e" + unit);
+          return value / unit;
+        }
+        return value * UNITS[type][unit];
+      }
+
+      function customPercision(ans, to = 8) {
+        return parseFloat(parseFloat(ans).toPrecision(to));
+      }
+
+      function validateInput(id) {
+        const [val1, val2, val3] = prepareUnit("i1", "i2", "i3");
+        if (isEmpty("i1", "i2", "i3")) {
+          alert(`Please Enter All Details.`)
+          return;
+        }
+
+        if (!isEmpty("i1", "i2")) {
+          if (val2 > val1) {
+            alert(`The diameter of the large pulley cannot be smaller than the diameter of the small pulley.`)
+            return;
+          }
+        }
+
+        if (id === "i3") {
+          if (val3 <= 0.5 * (val1 + val2)) {
+            alert(`The pulley center distance should be greater than half the sum of the pulleys' diameters.`)
+            return false;
+          }
+        }
+
+        return true;
+      }
+
+      
+      function isEmpty(...args) {
+        for (id of args) {
+          const input = document.getElementById(`${id}-input`);
+          if (input.value == "") return true;
+        }
+
+        return false;
+      }
+      
+      // related to caculation
+      function prepareUnit(...args) {
+        const resultArr = [];
+        for (id of args) {
+          const input = document.getElementById(`${id}-input`);
+          const select = document.getElementById(`${id}-select`);
+          const type = select.getAttribute("data-type");
+          let val = parseFloat(input.value);
+          val = isNaN(val) ? 0 : val;
+          let inUnit = select.value;
+          val = toSIUnit(type, inUnit, val);
+          resultArr.push(val);
+        }
+
+        return resultArr;
+      }
+
+      function setResult(resultObj) {
+        const allResults = []
+        for (key of Object.keys(resultObj)) {
+          let val = resultObj[key].result;
+          let id = resultObj[key].type;
+
+          let type = ''
+          let outUnit = ''
+          if (id == 'i4') {
+            type = 'distance'
+            outUnit = i4Select
+          } else if (id == 'i5') {
+            type = 'distance'
+            outUnit = i5Select
+          }
+
+          val = fromSIUnit(type, outUnit, val);
+          allResults.push(customPercision(val, 16))
+        }
+        return allResults
+      }
+
+      function calculateResult() {
+        let [val1, val2, val3] = prepareUnit("i1", "i2", "i3");
+
+        let result2 =
+          (val1 + val2) * (Math.PI / 2) +
+          2 * val3 +
+          Math.pow(val1 - val2, 2) / (4 * val3);
+
+        let result =
+          (val1 + val2) * (Math.PI / 2) +
+          (val1 - val2) * Math.asin((val1 - val2) / (2 * val3)) +
+          2 * Math.sqrt(val3 * val3 - 0.25 * Math.pow(val1 - val2, 2));
+        return {
+          1: { result: result, type: "i4" },
+          2: { result: result2, type: "i5" },
+        };
+      }
+
+      function handleResults1Change(e) {
+        let select = e.target;
+        let id = select.getAttribute("data-id");
+
+        let prevUnit = i4Select;
+        let currentUnit = select.value;
+        i4Select = currentUnit
+
+        let si = toSIUnit("distance", prevUnit, beltLength1);
+        let result = fromSIUnit("distance", currentUnit, si);
+        beltLength1 = customPercision(result, 13);
+
+        console.log(result, beltLength1, si)
+        const beltLength1Para = document.getElementById('beltLength1')
+        beltLength1Para.textContent = `
+          Belt length: ${beltLength1}
+        `
+      }
+
+      function handleResults2Change(e) {
+        let select = e.target;
+        let id = select.getAttribute("data-id");
+
+        let prevUnit = i4Select;
+        let currentUnit = select.value;
+        i4Select = currentUnit
+
+
+        let si = toSIUnit("distance", prevUnit, beltLength2);
+        let result = fromSIUnit("distance", currentUnit, si);
+        beltLength2 = customPercision(result, 13);
+
+        const beltLength2Para = document.getElementById('beltLength2')
+        beltLength2Para.textContent = `
+          Belt length: ${beltLength2}
+        `
+      }
+
+      function calculateResults() {
+        for (el of ["i1", "i2", "i3"]) {
+          if (!validateInput(el)) return;
+        }
+
+        const result = calculateResult();
+
+        const results = setResult(result);
+
+        beltLength1 = results[0]
+        beltLength2 = results[1]
+
+        const results1Select = document.createElement('select')
+        results1Select.id = "i4-select";
+        results1Select.setAttribute("data-id", "i4");
+        const results2Select = document.createElement('select')
+        results2Select.id = "i5-select";
+        results2Select.setAttribute("data-id", "i5");
+
+        results1Select.innerHTML = `
+            <option value="mm">millimeters (mm)</option>
+            <option value="cm">centimeters (cm)</option>
+            <option value="m" selected>meters (m)</option>
+            <option value="in">inches (in)</option>
+            <option value="ft">feet (ft)</option>
+        `
+        results2Select.innerHTML = `
+            <option value="mm">millimeters (mm)</option>
+            <option value="cm">centimeters (cm)</option>
+            <option value="m" selected>meters (m)</option>
+            <option value="in">inches (in)</option>
+            <option value="ft">feet (ft)</option>
+        `
+        results1Select.addEventListener("change", handleResults1Change)
+        results2Select.addEventListener("change", handleResults2Change)
+
+        calcResultsEl.innerHTML = `
+          <p>
+            <span id="beltLength1">Belt length: ${results[0]} &nbsp; &nbsp;</span>
+            <span id="resultSelect1"></span>
+          </p>
+          <p id="text">Engineering approximation:</p>
+          <p>
+            <span id="beltLength2">Belt length: ${results[1]} &nbsp; &nbsp;</span>
+            <span id="resultSelect2"></span>
+          </p>
+        `
+        const resultSelect1Span = document.getElementById('resultSelect1')
+        resultSelect1Span.append(results1Select)
+
+        const resultSelect2Span = document.getElementById('resultSelect2')
+        resultSelect2Span.append(results2Select)
+      }
+
+      function resetForm() {
+        inputs.forEach((input) => {
+          input.value = ""
+        });
+
+        selects.forEach((select) => {
+          select.selectedIndex = '3'
+        });
+      }
+
+      function resetResult() {
+        calcResultsEl.innerHTML = "<p>Result will appear here...</p>";
+      } 
+
+      function resethandler() {
+        resetForm();
+        resetResult();
+      }
+
+      /*************** EVENT LISTINERS ***************/
+      selects.forEach((select) => {
+        select.addEventListener("change", resetResult);
+      });
+
+      inputs.forEach((input) => {
+        input.addEventListener("input", resetResult);
+      });
+
+      resetBtnEl.addEventListener("click", resethandler);
+      calcBtnEl.addEventListener("click", calculateResults);
+
+    </script>
+  </body>
+</html>

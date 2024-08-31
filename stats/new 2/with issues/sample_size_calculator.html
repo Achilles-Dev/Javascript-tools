@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Sample Size Calculator</title>
+</head>
+<body>
+    <h1>Sample Size Calculator</h1>
+    <p>Use this advanced sample size calculator to calculate the sample size required for a one-sample statistic, or for <br />
+      differences between two proportions or means (two independent samples). More than two groups supported for binomial data.<br />
+      Calculate power given sample size, alpha, and the minimum detectable effect (MDE, minimum effect of interest).</p>
+    <p>
+      Calculate:
+      <select id="calcSelect">
+        <option value="sample" selected>Sample Size</option>
+        <option value="power">Power</option>
+      </select>
+    </p>
+    <h4>Experimental design</h4>
+    <div>
+      <p>
+        Experiment for:
+        <select id="experimentSelect">
+          <option value="single" selected>a single sample</option>
+          <option value="difference">difference between samples</option>
+        </select>
+      </p>
+      <p>
+        <span id="dataName">The data is:</span>
+        <select id="dataSelect">
+          <option value="means" selected>continuous (mean)</option>
+          <option value="binomial">binomial (proportion)</option>
+        </select>
+      </p>
+      <p>
+        Alternative H<sub>1</sub> is for:
+        <select id="altH1Select">
+          <option value="super" selected>Superiority</option>
+          <option value="nonInf">Non-inferiority</option>
+          <option value="equiv">Equivalence</option>
+        </select>
+      </p>
+      <p>
+        Inference about:
+        <select id="infereSelect">
+          <option value="absDiff" selected>absolute difference</option>
+          <option value="relDiff">relative difference</option>
+        </select>
+      </p>
+      <p>
+        Type I error rate (α):
+        <select id="type1ErrorSelect">
+          <option value="fifty">50% (0.5)</option>
+          <option value="twenty">20% (0.2)</option>
+          <option value="ten">10% (0.1)</option>
+          <option value="five" selected>5% (0.05)</option>
+          <option value="twoP5">2.5% (0.025)</option>
+          <option value="two">2% (0.02)</option>
+          <option value="one">1% (0.01)</option>
+          <option value="zeroP5">0.5% (0.005)</option>
+          <option value="zeroP1">0.1% (0.001)</option>
+        </select>
+      </p>
+      <p id="powerInput">
+        Power (1 - β):
+        <select id="powerSelect">
+          <option value="fifty">50% (0.50)</option>
+          <option value="eighty" selected>80% (0.80)</option>
+          <option value="eighty5">85% (0.85)</option>
+          <option value="ninety">90% (0.90)</option>
+          <option value="ninety5">95% (0.95)</option>
+          <option value="ninety7P5">97.5% (0.975)</option>
+          <option value="ninety8">1% (0.98)</option>
+          <option value="ninety9">99% (0.99)</option>
+          <option value="zeroP1">0.1% (0.001)</option>
+        </select>
+      </p>
+      <p id="treatmentInput" style="display: none;">
+        Treatment groups:
+        <select id="treatmentSelect">
+          <option value="one" selected>1</option>
+          <option value="two">2</option>
+          <option value="three">3</option>
+          <option value="four">4</option>
+          <option value="five">5</option>
+          <option value="six">6</option>
+          <option value="seven">7</option>
+          <option value="eight">8</option>
+          <option value="nine">9</option>
+          <option value="ten">10</option>
+          <option value="eleven">11</option>
+          <option value="twelve">12</option>
+        </select>
+      </p>
+      <p id="samplingInput" style="display: none;">
+        Sampling ratio (nA/nB):
+        <input type="number" id="sampRatio" value="1">
+      </p>
+    </div>
+    <h4>Data parameters</h4>
+    <div>
+      <p>
+        Sample size:
+        <input type="number" id="sampSize">
+      </p>
+      <p>
+        <span id="probMeanName">Mean under H0:</span>
+        <input type="number" id="meanHo">
+      </p>
+      <p id="variableInput" style="display: none;">
+        Input variables as:
+        <select id="variableSelect">
+          <option value="proportion" selected>Proportions</option>
+          <option value="percentage">Percentages</option>
+        </select>
+      </p>
+      <p id="sdInput">
+        Standard deviation:
+        <input type="number" id="sdVal">
+      </p>
+      <p id="mdeMarginInput" style="display: none;">
+        MDE & Margin as:
+        <select id="mdeMarginSelect">
+          <option value="proportion" selected>Proportions</option>
+          <option value="percentage">Percentages</option>
+        </select>
+      </p>
+      <p>
+        MDE:
+        <input type="number" id="mdeVal">
+      </p>
+      <p>
+        <span id="marginName">Superiority margin</span> 
+        <input type="number" id="marginVal" value="0">
+      </p>
+    </div>
+    <button id="calcBtn">Calculate</button>
+    <button id="resetBtn">Reset</button>
+    <hr>
+    <div>
+      <h3>Result:</h3>
+      <h3 id="calcResults">Result will appear here...</h3>
+    </div>
+
+    <script>
+      // Get required elements from the HTML
+      const calcSelectEL = document.getElementById("calcSelect");
+      const experimentSelectEl = document.getElementById("experimentSelect");
+      const dataNameEl = document.getElementById("dataName");
+      const altH1SelectEl = document.getElementById("altH1Select");
+      const infereSelectEl = document.getElementById("infereSelect");
+      const type1ErrorSelectEL = document.getElementById("type1ErrorSelect");
+      const powerInputEl = document.getElementById("powerInput");
+      const powerSelectEl = document.getElementById("powerSelect");
+      const treatmentInputEl = document.getElementById("treatmentInput");
+      const treatmentSelectEl = document.getElementById("treatmentSelect");
+      const samplingInputEl = document.getElementById("samplingInput");
+      const sampRatioEL = document.getElementById("sampRatio");
+      const sampSizeEl = document.getElementById("sampSize");
+      const probMeanNameEl = document.getElementById("probMeanName");
+      const meanHoEl = document.getElementById("meanHo");
+      const variableInputEl = document.getElementById("variableInput");
+      const variableSelectEl = document.getElementById("variableSelect");
+      const sdValEl = document.getElementById("sdVal");
+      const mdeMarginInputEl = document.getElementById("mdeMarginInput");
+      const mdeMarginSelectEl = document.getElementById("mdeMarginSelect");
+      const mdeValEl = document.getElementById("mdeVal");
+      const marginNameEl = document.getElementById("marginName");
+      const marginValEl = document.getElementById("marginVal");
+
+      const calcBtnEl = document.getElementById('calcBtn');
+      const resetBtnEl = document.getElementById('resetBtn');
+      const calcResultsEl = document.getElementById('calcResults') 
+
+      function calculateResults() {
+          // Retrieve input values
+          const sampRatio = parseFloat(sampRatioEL.value);
+          const sampSize = parseFloat(sampSizeEl.value);
+          const meanHo = parseFloat(meanHoEl.value);
+          const sdVal = parseFloat(sdValEl.value);
+          const mdeVal = parseFloat(mdeValEl.value);
+          const marginVal = parseFloat(marginValEl.value);
+
+          if (isNaN(meanHo) || isNaN(mdeVal) || isNaN(marginVal)) {
+            alert("Please Enter All Details.");
+            return;
+          }
+
+          try {
+            const results = 0
+            
+            calcResultsEl.innerHTML = `<p> Percent error: ${results.toFixed(2) * 1}%</p>`
+          } catch (error) {
+            alert("Something Went Wrong!!!");
+            resethandler()
+          }
+      }
+
+      function resetForm() {
+        calcSelectEL.selectedIndex = "1"
+        experimentSelectEl.selectedIndex = "1"
+        altH1SelectEl.selectedIndex = "1"
+        infereSelectEl.selectedIndex = "1"
+        type1ErrorSelectEL.selectedIndex = "1"
+        powerSelectEl.selectedIndex = "1"
+        treatmentSelectEl.selectedIndex = "1"
+        variableSelectEl.selectedIndex = "1"
+        mdeMarginSelectEl.selectedIndex = "1"
+
+        sampRatioEL.value = "1"
+        sampSizeEl.value = ""
+        meanHoEl.value = ""
+        sdValEl.value = ""
+        mdeValEl.value = ""
+        marginValEl.value = "0"
+      }
+
+      function resetResult() {
+        calcResultsEl.innerHTML = "<p>Result will appear here...</p>";
+      } 
+
+      function resethandler() {
+        resetForm();
+        resetResult();
+      }
+
+      resetBtnEl.addEventListener("click", resethandler);
+      calcBtnEl.addEventListener("click", calculateResults);
+
+      [sampRatioEL, sampSizeEl, meanHoEl, sdValEl, mdeValEl, marginValEl].forEach((el) => {
+        el.addEventListener("input", resetResult);
+      });
+    </script>
+</body>
+</html>

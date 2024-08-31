@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Drake Equation Calculator</title>
+  </head>
+  <body>
+    <h1>Drake Equation Calculator</h1>
+      <div>
+        <div>
+          <p>
+            R* — Rate at which stars suitable for the development of intelligent
+            life are formed:
+          </p>
+          <input
+            type="number"
+            min="0"
+            autocomplete="off"
+            data-id="i1"
+            step="any"
+            id="i1-input"
+            class="inputs"
+            data-name="R*"
+          />
+          <select
+            class="selects"
+            id="i1-select"
+            data-type="unit"
+            data-prev="unit"
+            data-id="i1"
+            style="display: none"
+          >
+            <option value="unit" selected disabled>unit</option>
+          </select>
+          <span> stars per year</span>
+        </div>
+
+        <div>
+          <p>fp — Fraction of those stars with planetary systems:</p>
+          <input
+            type="number"
+            min="0"
+            autocomplete="off"
+            data-id="i2"
+            step="any"
+            id="i2-input"
+            class="inputs"
+            data-name="fp"
+          />
+
+          <select
+            class="selects"
+            id="i2-select"
+            data-type="percent"
+            data-prev="percent"
+            data-id="i2"
+            style="display: none"
+          >
+            <option value="percent" selected disabled>unit</option>
+          </select>
+          <span> %</span>
+        </div>
+
+        <div>
+          <p>
+            ne — Number of planets, per solar system, with an environment
+            suitable for life:
+          </p>
+          <input
+            type="number"
+            min="0"
+            autocomplete="off"
+            data-id="i3"
+            step="any"
+            class="inputs"
+            id="i3-input"
+            data-name="ne"
+          />
+          <select
+            class="selects"
+            id="i3-select"
+            data-type="unit"
+            data-prev="unit"
+            data-id="i3"
+            style="display: none"
+          >
+            <option value="unit" selected disabled>unit</option>
+          </select>
+          <span> planets per system</span>
+        </div>
+
+        <div>
+          <p>
+            fl — Fraction of suitable planets on which life actually appears:
+          </p>
+          <input
+            type="number"
+            min="0"
+            autocomplete="off"
+            data-id="i4"
+            step="any"
+            class="inputs"
+            id="i4-input"
+            data-name="fl"
+          />
+          <select
+            class="selects"
+            id="i4-select"
+            data-type="percent"
+            data-prev="percent"
+            data-id="i4"
+            style="display: none"
+          >
+            <option value="percent" selected disabled>unit</option>
+          </select>
+          <span> %</span>
+        </div>
+
+        <div>
+          <p>
+            fi — Fraction of life bearing planets on which intelligent life
+            emerges:
+          </p>
+          <input
+            type="number"
+            min="0"
+            autocomplete="off"
+            data-id="i5"
+            step="any"
+            class="inputs"
+            id="i5-input"
+            data-name="fi"
+          />
+          <select
+            class="selects"
+            id="i5-select"
+            data-type="percent"
+            data-prev="percent"
+            data-id="i5"
+            style="display: none"
+          >
+            <option value="percent" selected disabled>unit</option>
+          </select>
+          <span> %</span>
+        </div>
+
+        <div>
+          <p>
+            fc — Fraction of civilizations that develop a technology that
+            produces detectable signs of their existence:
+          </p>
+          <input
+            type="number"
+            min="0"
+            autocomplete="off"
+            data-id="i6"
+            step="any"
+            id="i6-input"
+            class="inputs"
+            data-name="L"
+          />
+          <select
+            class="selects"
+            id="i6-select"
+            data-type="percent"
+            data-prev="percent"
+            data-id="i6"
+            style="display: none"
+          >
+            <option value="percent" selected disabled>unit</option>
+          </select>
+          <span> %</span>
+        </div>
+
+        <p>
+          <p>
+            L — Average length of time such civilizations produce such signs:
+          </p>
+          <input
+            type="number"
+            min="0"
+            autocomplete="off"
+            data-id="i7"
+            step="any"
+            id="i7-input"
+            class="inputs"
+            data-name=" L"
+          />
+          <select
+            class="selects"
+            id="i7-select"
+            data-type="time"
+            data-prev="yrs"
+            data-id="i7"
+          >
+            <option value="yrs" selected>years (yrs)</option>
+            <option value="myrs">million years (myrs)</option>
+            <option value="byrs">billion years (byrs)</option>
+            <option value="Univ">ages of the Universe (Univ.)</option>
+          </select>
+        </p>
+      </div>
+      
+      <button id="calcBtn">Calculate</button>
+      <button id="resetBtn">Reset</button>
+      <hr>
+      <div>
+        <h3>Result:</h3>
+        <h3 id="calcResults">Result will appear here...</h3>
+      </div>
+    <script>
+      /*************** ELEMENTS ***************/
+      const selects = document.querySelectorAll(".selects");
+      const inputs = document.querySelectorAll(".inputs");
+
+      const calcBtnEl = document.getElementById('calcBtn');
+      const resetBtnEl = document.getElementById('resetBtn');
+      const calcResultsEl = document.getElementById('calcResults')
+
+      /*************** GLOBAL VARIBLES ***************/
+      const UNITS = {
+        time: {
+          yrs: 1,
+          myrs: 1e-6,
+          byrs: 1e-9,
+          Univ: 0.00000000007246901949416624393071961736357707080223204580042032031306616421,
+        },
+        unit: {
+          unit: 1,
+        },
+        percent: {
+          percent: 100,
+        },
+      };
+      let queue = ["i1", "i2", "i3", "i4", "i5", "i6", "i7", "i8"];
+      /*************** FUNCTIONS ***************/
+      function toSIUnit(type, unit, value) {
+        if (type === "exp") {
+          unit = parseFloat("1e" + unit);
+          return value * unit;
+        }
+        return value / UNITS[type][unit];
+      }
+
+      function fromSIUnit(type, unit, value) {
+        if (type === "exp") {
+          unit = parseFloat("1e" + unit);
+          return value / unit;
+        }
+        return value * UNITS[type][unit];
+      }
+
+      function customPercision(ans, to = 8) {
+        return parseFloat(parseFloat(ans).toPrecision(to));
+      }
+
+      function selectChangeHandler(e) {
+        let select = e.target;
+        let id = select.getAttribute("data-id");
+        let input = document.getElementById(`${id}-input`);
+
+        let prevUnit = select.getAttribute("data-prev");
+        let currentUnit = select.value;
+
+        select.setAttribute("data-prev", currentUnit);
+
+        if (input.value === "") {
+          return;
+        }
+
+        let type = select.getAttribute("data-type");
+
+        let value = input.value;
+        value = parseFloat(value);
+        if (isNaN(value)) value = 0.0;
+
+        let si = toSIUnit(type, prevUnit, value);
+        let result = fromSIUnit(type, currentUnit, si);
+        input.value = customPercision(result, 13);
+      }
+
+      function inputHandler(e, inp = null) {
+        try {
+          let input;
+          if (e) input = e.target;
+          else if (inp) input = inp;
+          const id = input.getAttribute("data-id");
+
+          let out = queue[7];
+
+          if (input.value == "") {
+            if (inputCounter() < 7) {
+              return;
+            }
+
+            if (id !== out) {
+              deleteHandler(out);
+            }
+            return;
+          }
+
+          prioritizeID(id);
+
+          out = queue[7];
+
+          if (!validateInput(id)) return;
+          errorP.textContent = "";
+
+          if (inputCounter() < 7) {
+            return;
+          }
+
+          for (el of ["i1", "i2", "i3", "i4", "i5", "i6", "i7", "i8"]) {
+            if (!validateInput(el)) return;
+          }
+          errorP.textContent = "";
+
+          validateQueue();
+          out = queue[7];
+
+          const result = calculateResults(out);
+          console.log(out);
+          setResult(result);
+
+          for (el of ["i1", "i2", "i3", "i4", "i5", "i6", "i7", "i8"]) {
+            if (!validateInput(el)) return;
+          }
+        } catch (error) {
+          alert(
+            "An error occurred. Try again with valid input, or try contacting us."
+          );
+          console.log(error);
+        }
+      }
+
+      function validateQueue() {
+        if (inputCounter() !== 7) return;
+
+        for (let input of inputs) {
+          if (input.value === "") {
+            const id = input.getAttribute("data-id");
+            const index = queue.indexOf(id);
+            queue.splice(index, 1);
+            queue.push(id);
+          }
+        }
+      }
+
+      function isEmpty(...args) {
+        for (id of args) {
+          const input = document.getElementById(`${id}-input`);
+          if (input.value == "") return true;
+        }
+
+        return false;
+      }
+
+      function validateInput(id) {
+        const input = document.getElementById(`${id}-input`);
+        const label = input.getAttribute("data-name").trim();
+        let value = parseFloat(input.value);
+
+        if (isEmpty("i1", "i2", "i3", "i4", "i5", "i6", "i7")) {
+            alert(`Please Enter All Details.`)
+            return;
+          }
+
+        if (["i2", "i4", "i5", "i6"].includes(id)) {
+          if (value > 100) {
+            alert(`Percentages must be between 0% and 100%.`);
+            return false;
+          }
+        }
+
+        if (value <= 0) {
+         alert(`${label} must be greater than zero!`);
+          return false;
+        }
+
+        return true;
+      }
+      function prioritizeID(id) {
+        const index = queue.indexOf(id);
+        queue.splice(index, 1);
+        queue.unshift(id);
+      }
+
+      function inputCounter() {
+        let count = 0;
+
+        inputs.forEach((input) => {
+          if (input.value !== "") {
+            count++;
+          }
+        });
+
+        return count;
+      }
+
+      function deleteHandler(...args) {
+        for (let id of args) {
+          document.getElementById(`${id}-input`).value = "";
+        }
+      }
+
+      // related to caculation
+      function prepareUnit(...args) {
+        const resultArr = [];
+        for (id of args) {
+          const input = document.getElementById(`${id}-input`);
+          const select = document.getElementById(`${id}-select`);
+          const type = select.getAttribute("data-type");
+          let val = parseFloat(input.value);
+          val = isNaN(val) ? 0 : val;
+          let inUnit = select.value;
+          val = toSIUnit(type, inUnit, val);
+          resultArr.push(val);
+        }
+
+        return resultArr;
+      }
+
+      function setResult(resultObj) {
+        for (key of Object.keys(resultObj)) {
+          let val = resultObj[key].result;
+          let id = resultObj[key].type;
+          if (isNaN(val)) {
+            alert("Your input resulted in NAN.\n 0/0 \n Try again with valid input.");
+            return;
+          }
+          if (Math.abs(val) === Infinity) {
+            alert(
+              "Your input resulted in Infinity. \nDivision by zero. \nTry again with valid input."
+            );
+            return;
+          }
+          if (id == 'i8') {
+            type = 'unit'
+            outUnit = 'unit'
+            val = fromSIUnit(type, outUnit, val);
+            return customPercision(val, 16);
+          } else {
+            const input = document.getElementById(`${id}-input`);
+            const select = document.getElementById(`${id}-select`);
+            const type = select.getAttribute("data-type");
+            let outUnit = select.value;
+            val = fromSIUnit(type, outUnit, val);
+
+            input.value = customPercision(val, 16);
+          }
+        }
+      }
+
+      function calculateResult() {
+        const C = 4 * Math.PI * 10e-6;
+        function calculateI8() {
+          let [val1, val2, val3, val4, val5, val6, val7] = prepareUnit(
+            "i1",
+            "i2",
+            "i3",
+            "i4",
+            "i5",
+            "i6",
+            "i7"
+          );
+
+          let result = val1 * val2 * val3 * val4 * val5 * val6 * val7;
+
+          return {
+            1: { result, type: "i8" },
+          };
+        }
+        return calculateI8()
+      }
+
+      function calculateResults() {
+        for (el of ["i1", "i2", "i3", "i4", "i5", "i6", "i7"]) {
+          if (!validateInput(el)) return;
+        }
+
+        try {
+          const result = calculateResult();
+          results = setResult(result)
+
+          calcResultsEl.innerHTML = `
+            <p>
+              N — Number of civilizations in the Milky Way galaxy whose electromagnetic emissions are detectable:
+            </p>
+            <p>
+              ${results} civilizations
+            </p>
+          `
+
+        } catch(error) {
+          alert("An error ocurred. Try again with valid input.");
+          resetResult()
+          return;
+        }
+      }
+
+      function resetForm() {
+        selects.forEach((select, index) => {
+          select.selectedIndex = '0'
+        });
+
+        inputs.forEach((input) => {
+          input.value = ""
+        });
+      }
+
+      function resetResult() {
+        calcResultsEl.innerHTML = "<p>Result will appear here...</p>";
+      } 
+
+      function resethandler() {
+        resetForm();
+        resetResult();
+      }
+
+      /*************** EVENT LISTINERS ***************/
+      selects.forEach((select, index) => {
+        select.addEventListener("change", resetResult);
+      });
+
+      inputs.forEach((input) => {
+        input.addEventListener("input", resetResult);
+      });
+      
+      resetBtnEl.addEventListener("click", resethandler);
+      calcBtnEl.addEventListener("click", calculateResults);
+
+    </script>
+  </body>
+</html>

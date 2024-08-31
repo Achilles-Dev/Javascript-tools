@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Z-score to P-value Calculator</title>
+</head>
+<body>
+    <h1>Z-score to P-value Calculator</h1>
+    <p>Use this Z to P calculator to easily convert Z-scores to P-values (one or two-tailed) <br />
+      and see if a result is statistically significant. Z-score to percentile calculator (p-value from Z score) <br />
+      for both one-sided and two-sided p-values.</p>
+    <p>
+      Z-score:
+      <input type="number" id="zScore">
+    </p>
+    <p>
+      Type of P-value:
+      <select id="typeSelect">
+        <option value="one" selected>One-tailed</option>
+        <option value="two">Two-tailed</option>
+      </select>
+    </p>
+
+    <button id="calcBtn">Calculate</button>
+    <button id="resetBtn">Reset</button>
+    <hr>
+    <div>
+      <h3>Result:</h3>
+      <h3 id="calcResults">Result will appear here...</h3>
+    </div>
+
+    <script>
+      // Get required elements from the HTML
+      const zScoreEl = document.getElementById("zScore");
+      const typeSelectEl = document.getElementById("typeSelect");
+
+      const calcBtnEl = document.getElementById('calcBtn');
+      const resetBtnEl = document.getElementById('resetBtn');
+      const calcResultsEl = document.getElementById('calcResults') 
+
+      function erfc(x) {
+        const z = Math.abs(x);
+        const t = 1 / (1 + z / 2);
+        const r = t * Math.exp(-z * z - 1.26551223 + t * (1.00002368 +
+                t * (0.37409196 + t * (0.09678418 + t * (-0.18628806 +
+                t * (0.27886807 + t * (-1.13520398 + t * (1.48851587 +
+                t * (-0.82215223 + t * 0.17087277)))))))))
+        return x >= 0 ? r : 2 - r;
+      };
+
+      function calculateResults() {
+          // Retrieve input values
+          const zScore = parseFloat(zScoreEl.value);
+          const typeSelect = typeSelectEl.value;
+
+          if (isNaN(zScore)) {
+            alert("Please Enter All Details.");
+            return;
+          } 
+
+          try {
+            const xVal = zScore / Math.sqrt(2)
+            const erfVal =  1 - erfc(xVal)
+            let results = (1 / 2) * (1 + erfVal)
+            if (typeSelect == "one") {
+              results = 1 - results
+            } else {
+              results = 2 * (1 - results)
+            }
+            
+            calcResultsEl.innerHTML = `<p> P-value: ${results.toFixed(10) * 1}</p>`
+          } catch (error) {
+            alert("Something Went Wrong!!!");
+            resethandler()
+          }
+      }
+
+      function resetForm() {
+        zScoreEl.value = ""
+        typeSelectEl.selectedIndex = "0"
+      }
+
+      function resetResult() {
+        calcResultsEl.innerHTML = "<p>Result will appear here...</p>";
+      } 
+
+      function resethandler() {
+        resetForm();
+        resetResult();
+      }
+
+      resetBtnEl.addEventListener("click", resethandler);
+      calcBtnEl.addEventListener("click", calculateResults);
+      typeSelectEl.addEventListener("change", resetResult)
+
+      zScoreEl.addEventListener("input", resetResult);
+    </script>
+</body>
+</html>

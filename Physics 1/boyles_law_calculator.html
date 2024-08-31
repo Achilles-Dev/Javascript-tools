@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Boyle's Law Calculator</title>
+  </head>
+  <body>
+    <h1>Boyle's Law Calculator</h1>
+
+      <p>
+        Calculate:
+        <select id="calculateUnit">
+          <option value="p1">Initial pressure (p₁)</option>
+          <option value="v1">Initial volume (V₁)</option>
+          <option value="p2">Final pressure (p₂)</option>
+          <option value="v2" selected>Final volume (V₂)</option>
+        </select>
+      </p>
+      <div>
+        <p>Initial parameters</p>
+        <p id="p1-contianer" class="containers">
+          <label for="p1-input">Initial pressure (p₁) </label>
+          <input type="number" step="any" id="p1-input" class="inputs" />
+          <select id="p1-select">
+            <option value="Pa" selected>pascals (Pa)</option>
+            <option value="bar">bars (bar)</option>
+            <option value="psi">pounds per square inch (psi)</option>
+            <option value="at">technical atmospheres (at)</option>
+            <option value="atm">standard atmospheres (atm)</option>
+            <option value="Torr">torr (Torr)</option>
+            <option value="hPa">hectopascals (hPa)</option>
+            <option value="kPa">kilopascals (kPa)</option>
+            <option value="MPa">megapascals (MPa)</option>
+            <option value="GPa">gigapascals (GPa)</option>
+            <option value="inHg">inches of mercury (inHg)</option>
+            <option value="mmHg">millimeters of mercury (mmHg)</option>
+          </select>
+        </p>
+        <p id="v1-contianer" class="containers">
+          <label for="v1-input">Initial volume (V₁) </label>
+          <input type="number" step="any" id="v1-input" class="inputs" />
+          <select id="v1-select">
+            <option value="mm3">cubic millimeters (mm3)</option>
+            <option value="cm3">cubic centimeters (cm3)</option>
+            <option value="dm3">cubic decimeters (dm3)</option>
+            <option value="m3" selected>cubic meters (m3)</option>
+            <option value="cu in">cubic inches (cu in)</option>
+            <option value="cu ft">cubic feet (cu ft)</option>
+            <option value="cu yd">cubic yards (cu yd)</option>
+            <option value="ml">milliliters (ml)</option>
+            <option value="l">liters (l)</option>
+          </select>
+        </p>
+        <p>Final parameters</p>
+        <p id="p2-contianer" class="containers">
+          <label for="p2-input">Final pressure (p₂) </label>
+          <input type="number" id="p2-input" step="any" class="inputs" />
+          <select id="p2-select">
+            <option value="Pa" selected>pascals (Pa)</option>
+            <option value="bar">bars (bar)</option>
+            <option value="psi">pounds per square inch (psi)</option>
+            <option value="at">technical atmospheres (at)</option>
+            <option value="atm">standard atmospheres (atm)</option>
+            <option value="Torr">torr (Torr)</option>
+            <option value="hPa">hectopascals (hPa)</option>
+            <option value="kPa">kilopascals (kPa)</option>
+            <option value="MPa">megapascals (MPa)</option>
+            <option value="GPa">gigapascals (GPa)</option>
+            <option value="inHg">inches of mercury (inHg)</option>
+            <option value="mmHg">millimeters of mercury (mmHg)</option>
+          </select>
+        </p>
+        <p id="v2-contianer" class="containers" style="display: none;">
+          <label for="v2-input">Final volume (V₂) </label>
+          <input type="number" step="any" id="v2-input" class="inputs" />
+          <select id="v2-select">
+            <option value="mm3">cubic millimeters (mm3)</option>
+            <option value="cm3">cubic centimeters (cm3)</option>
+            <option value="dm3">cubic decimeters (dm3)</option>
+            <option value="m3" selected>cubic meters (m3)</option>
+            <option value="cu in">cubic inches (cu in)</option>
+            <option value="cu ft">cubic feet (cu ft)</option>
+            <option value="cu yd">cubic yards (cu yd)</option>
+            <option value="ml">milliliters (ml)</option>
+            <option value="l">liters (l)</option>
+          </select>
+        </p>
+      </div>
+      <br />
+      <button id="calcBtn">Calculate</button>
+      <button id="resetBtn">Reset</button>
+      <hr>
+      <div>
+        <h3>Result:</h3>
+        <h3 id="calcResults">Result will appear here...</h3>
+      </div>
+    <script>
+      /*************** ELEMENTS ***************/
+      const calculateUnitEl = document.getElementById("calculateUnit");
+
+      const p1Input = document.getElementById("p1-input");
+      const v1Input = document.getElementById("v1-input");
+      const p2Input = document.getElementById("p2-input");
+      const v2Input = document.getElementById("v2-input");
+
+      const p1InputContainerEl = document.getElementById("p1-contianer");
+      const v1InputContainerEl = document.getElementById("v1-contianer");
+      const p2InputContainerEl = document.getElementById("p2-contianer");
+      const v2InputContainerEl = document.getElementById("v2-contianer");
+
+      const p1Select = document.getElementById("p1-select");
+      const v1Select = document.getElementById("v1-select");
+      const p2Select = document.getElementById("p2-select");
+      const v2Select = document.getElementById("v2-select");
+
+      const calcBtnEl = document.getElementById('calcBtn');
+      const resetBtnEl = document.getElementById('resetBtn');
+      const calcResultsEl = document.getElementById('calcResults')
+
+      /*************** GLOBAL VARIBLES ***************/
+      const UNITS = {
+        pressure: {
+          Pa: 1,
+          bar: 0.00001,
+          psi: 0.0001450377,
+          at: 0.0000101972,
+          atm: 0.0000098692,
+          Torr: 0.0075006168,
+          hPa: 0.01,
+          kPa: 0.001,
+          MPa: 0.000001,
+          GPa: 1e-9,
+          inHg: 0.0002953006,
+          mmHg: 0.0075006376,
+        },
+        volume: {
+          m3: 1,
+          mm3: 1000000000,
+          cm3: 1000000,
+          dm3: 1000,
+          "cu in": 61023.744095,
+          "cu ft": 35.314666721,
+          "cu yd": 1.3079506193,
+          ml: 1000000,
+          l: 1000,
+        },
+      };
+      /*************** FUNCTIONS ***************/
+      function toSIUnit(type, unit, value) {
+        return value / UNITS[type][unit];
+      }
+
+      function fromSIUnit(type, unit, value) {
+        return value * UNITS[type][unit];
+      }
+
+      function handleCalculateUnitChange(e) {
+        const value = e.target.value
+        console.log(value)
+        p1InputContainerEl.style.display = value === "p1" ? 'none' : 'block'
+        v1InputContainerEl.style.display = value === "v1" ? 'none' : 'block'
+        p2InputContainerEl.style.display = value === "p2" ? 'none' : 'block'
+        v2InputContainerEl.style.display = value === "v2" ? 'none' : 'block'    
+        
+        resetResult()
+      }  
+
+      function createElements(resultObj) {
+        const elementNodes = Object.keys(resultObj).map((key) => {
+          //create elements to put the results in
+          const div = document.createElement("div");
+          const span = document.createElement("span");
+          const span2 = document.createElement("span");
+
+          // give the elements id
+          div.setAttribute("class", `result-container`);
+          span.setAttribute("class", `result-title`);
+          span2.setAttribute("class", `result-value`);
+
+          // put the values in the elements
+
+          span.textContent = resultObj[key]["title"];
+          span2.textContent = resultObj[key]["value"];
+
+          // appened them to an element that contians them
+          div.append(span, span2);
+
+          // return that element
+          return div;
+        });
+
+        return elementNodes;
+      }
+
+      function calculateResult(input) {
+        const calculateP1 = () => {
+          const { v1, v2, p2 } = prepareUnits();
+          let result = (p2 * v2) / v1;
+          return {
+            result,
+            type: "pressure",
+            name: `Initial pressure (p₁)
+            `,
+          };
+        };
+        const calculateV1 = () => {
+          const { v2, p2, p1 } = prepareUnits();
+          let result = (p2 * v2) / p1;
+          return {
+            result,
+            type: "volume",
+            name: "Initial volume (V₁)",
+          };
+        };
+        const calculateP2 = () => {
+          const { v1, v2, p1 } = prepareUnits();
+          let result = (p1 * v1) / v2;
+          return {
+            result,
+            type: "pressure",
+            name: "Final pressure (p₂)",
+          };
+        };
+        const calculateV2 = () => {
+          const { v1, p2, p1 } = prepareUnits();
+          let result = (p1 * v1) / p2;
+          return {
+            result,
+            type: "volume",
+            name: "Final volume (V₂)",
+          };
+        };
+
+        switch (input) {
+          case "p1":
+            return calculateP1();
+          case "v1":
+            return calculateV1();
+          case "p2":
+            return calculateP2();
+          case "v2":
+            return calculateV2();
+          default:
+            console.log("error in calculate result switch");
+        }
+      }
+
+      function prepareUnits() {
+        let p1 = parseFloat(p1Input.value) ?? 0;
+        let v1 = parseFloat(v1Input.value) ?? 0;
+        let p2 = parseFloat(p2Input.value) ?? 0;
+        let v2 = parseFloat(v2Input.value) ?? 0;
+
+        let p1Unit = p1Select.value;
+        let v1Unit = v1Select.value;
+        let p2Unit = p2Select.value;
+        let v2Unit = v2Select.value;
+
+        p1 = toSIUnit("pressure", p1Unit, p1);
+        v1 = toSIUnit("volume", v1Unit, v1);
+        p2 = toSIUnit("pressure", p2Unit, p2);
+        v2 = toSIUnit("volume", v2Unit, v2);
+
+        return { p1, v1, p2, v2 };
+      }
+
+      function prepareResults(result, type, name) {
+        let resultObj = {};
+        Object.keys(UNITS[type]).forEach((key) => {
+          let ans = fromSIUnit(type, key, result);
+          // ans =
+          //   ans > 1 || ans < -1
+          //     ? parseFloat(parseFloat(ans.toExponential(10)).toFixed(4))
+          //     : ans.toExponential(10);
+
+          resultObj[key] = {
+            title: `${name}: `,
+            value: ` ${ans} ${key}`,
+          };
+        });
+        return resultObj;
+      }
+
+      function calculateResults() {
+        const calculateUnit = calculateUnitEl.value
+
+        try {
+          let { result, type, name } = calculateResult(calculateUnit);
+          if (isNaN(result)) {
+            alert("Your input resulted in NAN. Try again with valid input.");
+            resetResult();
+            return;
+          }
+          if (Math.abs(result) === Infinity) {
+            alert("Your input resulted in Infinity. Try again with valid input.");
+            resetResult();
+            return;
+          }
+
+          const resultObj = prepareResults(result, type, name);
+          const elementNodes = createElements(resultObj); // getting elements array from createElements funtion
+
+          // appending all the elements in node array to the result container div that is in html file
+          calcResultsEl.innerHTML = ''
+          elementNodes.forEach((element) => {
+            calcResultsEl.append(element);
+          });
+        } catch {
+          alert("An error ocurred. Try again with valid input.");
+          resethandler()
+          return;
+        }
+      }
+
+      function resetForm() {
+        p1Input.value = ""
+        v1Input.value = ""
+        p2Input.value = ""
+        v2Input.value = ""
+
+        p1Select.selectedIndex = '0'
+        v1Select.selectedIndex = '3'
+        p2Select.selectedIndex = '0'
+        v2Select.selectedIndex = '3'
+      }
+
+      function resetResult() {
+        calcResultsEl.innerHTML = "<p>Result will appear here...</p>";
+      } 
+
+      function resethandler() {
+        resetForm();
+        resetResult();
+      }
+
+      /*************** EVENTLISTINERS ***************/
+      [p1Input, v1Input, p2Input, v2Input].forEach((el) => {
+        el.addEventListener("input", resetResult);
+      });
+
+      [p1Select, v1Select, p2Select, v2Select].forEach((el) => {
+        el.addEventListener("change", resetResult);
+      });
+
+      calculateUnitEl.addEventListener("change", handleCalculateUnitChange)
+      resetBtnEl.addEventListener("click", resethandler);
+      calcBtnEl.addEventListener("click", calculateResults);
+
+    </script>
+  </body>
+</html>

@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Density Calculator</title>
+  </head>
+  <body>
+    <h1>Density Calculator</h1>
+      <p>
+        Calculate:
+        <select id="calculateUnit">
+          <option value="ma">Mass </option>
+          <option value="vo">Volume</option>
+          <option value="de" selected>Density</option>
+        </select>
+      </p>
+      <div>
+        <p id="ma-contianer" class="containers">
+          <label for="m-input">Mass </label>
+          <input type="number" step="any" id="m-input" class="inputs" />
+          <select id="m-select">
+            <option value="mg">mg</option>
+            <option value="g">g</option>
+            <option value="kg" selected>kg</option>
+            <option value="tonne">tonne</option>
+            <option value="oz">oz</option>
+            <option value="lbs">lbs</option>
+            <option value="ton">ton</option>
+          </select>
+        </p>
+        <p id="vo-contianer" class="containers">
+          <label for="v-input">Volume </label>
+          <input type="number" step="any" id="v-input" class="inputs" />
+          <select id="v-select">
+            <option value="mm&sup3;">mm&sup3;</option>
+            <option value="cm&sup3;">cm&sup3;</option>
+            <option value="m&sup3;" selected>m&sup3;</option>
+            <option value="ml">ml</option>
+            <option value="L">L</option>
+            <option value="Gallons">Gallons</option>
+            <option value="fl oz">fl oz</option>
+            <option value="in&sup3;">in&sup3;</option>
+            <option value="ft&sup3; ">ft&sup3;</option>
+            <option value="yd&sup3;">yd&sup3;</option>
+          </select>
+        </p>
+        <p id="de-contianer" class="containers" style="display: none;">
+          <label for="de-input">Density </label>
+          <input type="number" id="de-input" step="any" class="inputs" />
+          <select id="de-select">
+            <option value="g/m&sup3;">g/m&sup3;</option>
+            <option value="g/cm&sup3;">g/cm&sup3;</option>
+            <option value="kg/m&sup3;" selected>kg/m&sup3;</option>
+            <option value="kg/cm&sup3;">kg/cm&sup3;</option>
+            <option value="oz/in&sup3;">oz/in&sup3;</option>
+            <option value="lb/ft&sup3;">lb/ft&sup3;</option>
+            <option value="lb/yd&sup3;">lb/yd&sup3;</option>
+            <option value="g/litre">g/litre</option>
+          </select>
+        </p>
+      </div>
+      <button id="calcBtn">Calculate</button>
+      <button id="resetBtn">Reset</button>
+      <hr>
+      <div>
+        <h3>Result:</h3>
+        <h3 id="calcResults">Result will appear here...</h3>
+      </div>
+    <script>
+      /*************** ELEMENTS ***************/
+
+      const calculateUnitEl = document.getElementById("calculateUnit");
+      const containers = document.querySelectorAll(".containers");
+      const inputs = document.querySelectorAll(".inputs");
+
+      const vInput = document.getElementById("v-input");
+      const mInput = document.getElementById("m-input");
+      const deInput = document.getElementById("de-input");
+
+      const vSelect = document.getElementById("v-select");
+      const mSelect = document.getElementById("m-select");
+      const deSelect = document.getElementById("de-select");
+
+      const calcBtnEl = document.getElementById('calcBtn');
+      const resetBtnEl = document.getElementById('resetBtn');
+      const calcResultsEl = document.getElementById('calcResults')
+
+      /*************** GLOBAL VARIBLES ***************/
+      const UNITS = {
+        mass: {
+          mg: 1000000.0,
+          g: 1000,
+          kg: 1,
+          tonne: 0.001,
+          oz: 35.273962,
+          lbs: 2.2046,
+          ton: 0.00110231,
+        },
+        volume: {
+          "mm³": 1000000000,
+          "cm³": 1000000,
+          "m³": 1,
+          ml: 1000000,
+          L: 1000,
+          Gallons: 264.17217686,
+          "fl oz": 35195.079728,
+          "in³": 61023.744095,
+          "ft³ ": 35.314666721,
+          "yd³": 1.3079506193,
+        },
+        density: {
+          "g/m³": 1000,
+          "g/cm³": 0.001,
+          "kg/m³": 1,
+          "kg/cm³": 1e-6,
+          "oz/in³": 0.000578037,
+          "lb/ft³": 0.062428,
+          "lb/yd³": 1.68555,
+          "g/litre": 1,
+        },
+      };
+      /*************** FUNCTIONS ***************/
+      function toSIUnit(type, unit, value) {
+        return value / UNITS[type][unit];
+      }
+
+      function fromSIUnit(type, unit, value) {
+        return value * UNITS[type][unit];
+      }
+
+      function handleCalculateUnitChange(e) {
+        const value = e.target.value
+
+        containers.forEach((container) => {
+          let idVal = container.id.slice(0, 2)
+          if (idVal == value) {
+            container.style.display = 'none'
+          } else {
+            container.style.display = 'block'
+          }
+        })
+
+        resetResult()
+      }
+
+      function createElements(resultObj) {
+        const elementNodes = Object.keys(resultObj).map((key) => {
+          //create elements to put the results in
+          const div = document.createElement("div");
+          const span = document.createElement("span");
+          const span2 = document.createElement("span");
+
+          // give the elements id
+          div.setAttribute("class", `result-container`);
+          span.setAttribute("class", `result-title`);
+          span2.setAttribute("class", `result-value`);
+
+          // put the values in the elements
+
+          span.textContent = resultObj[key]["title"];
+          span2.textContent = resultObj[key]["value"];
+
+          // appened them to an element that contians them
+          div.append(span, span2);
+
+          // return that element
+          return div;
+        });
+
+        return elementNodes;
+      }
+
+      function calculateResult(input) {
+        const calculateV = () => {
+          const { m, de } = prepareUnits();
+
+          let result = m / de;
+          return {
+            result,
+            type: "volume",
+            name: `Volume`,
+          };
+        };
+        const calculateDe = () => {
+          const { m, v } = prepareUnits();
+          let result = m / v;
+          return {
+            result,
+            type: "density",
+            name: "Density",
+          };
+        };
+        const calculateM = () => {
+          const { de, v } = prepareUnits();
+          let result = de * v;
+          return {
+            result,
+            type: "mass",
+            name: "Mass",
+          };
+        };
+
+        switch (input) {
+          case "vo":
+            return calculateV();
+          case "ma":
+            return calculateM();
+          case "de":
+            return calculateDe();
+          default:
+            console.log("error in calculate result switch");
+        }
+      }
+
+      function prepareUnits() {
+        let de = parseFloat(deInput.value) ?? 0;
+        let m = parseFloat(mInput.value) ?? 0;
+        let v = parseFloat(vInput.value) ?? 0;
+
+        let uUnit = deSelect.value;
+        let deUnit = mSelect.value;
+        let xUnit = vSelect.value;
+
+        de = toSIUnit("density", uUnit, de);
+        m = toSIUnit("mass", deUnit, m);
+        v = toSIUnit("volume", xUnit, v);
+
+        return { de, m, v };
+      }
+
+      function prepareResults(result, type, name) {
+        let resultObj = {};
+        Object.keys(UNITS[type]).forEach((key) => {
+          let ans = fromSIUnit(type, key, result);
+          
+
+          resultObj[key] = {
+            title: `${name} (${key}): `,
+            value: ` ${ans} ${key}`,
+          };
+        });
+        return resultObj;
+      }
+
+      function calculateResults() {
+        const calculateUnit = calculateUnitEl.value
+
+        try {
+          const { result, type, name } = calculateResult(calculateUnit);
+
+          if (isNaN(result)) {
+            alert("Your input resulted in NAN.\n 0/0 \n Try again with valid input.");
+            resetResult()
+            return;
+          }
+          if (Math.abs(result) === Infinity) {
+            alert(
+              "Your input resulted in Infinity. \nDivision by zero. \nTry again with valid input."
+            );
+            resetResult()
+            return;
+          }
+
+          const resultObj = prepareResults(result, type, name);
+          const elementNodes = createElements(resultObj);
+          calcResultsEl.innerHTML = "";
+
+          elementNodes.forEach((element) => {
+            calcResultsEl.append(element);
+          });
+        } catch (error) {
+          console.log(error);
+          alert("An error ocurred. Try again with valid input.");
+          resetResult()
+          return;
+        }
+      }
+
+      function resetForm() {
+        [vSelect, mSelect, deSelect].forEach((select, index) => {
+            select.selectedIndex = '2'
+        });
+
+        [vInput, mInput, deInput].forEach((input) => {
+          input.value = ""
+        });
+        calculateUnitEl.selectedIndex = '2';
+        containers.forEach((container) => {
+          let idVal = container.id.slice(0, 2)
+          if (idVal == 'de') {
+            container.style.display = 'none'
+          } else {
+            container.style.display = 'block'
+          }
+        })
+      }
+
+      function resetResult() {
+        calcResultsEl.innerHTML = "<p>Result will appear here...</p>";
+      } 
+
+      function resethandler() {
+        resetForm();
+        resetResult();
+      }
+
+      /*************** EVENT LISTINERS ***************/
+      [vSelect, mSelect, deSelect].forEach((select) => {
+        select.addEventListener("change", resetResult);
+      });
+      [vInput, mInput, deInput].forEach((input) => {
+        input.addEventListener("input", resetResult);
+      });
+      calculateUnitEl.addEventListener("change", handleCalculateUnitChange);
+
+      resetBtnEl.addEventListener("click", resethandler);
+      calcBtnEl.addEventListener("click", calculateResults);
+
+    </script>
+  </body>
+</html>
