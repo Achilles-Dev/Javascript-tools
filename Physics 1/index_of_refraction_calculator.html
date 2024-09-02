@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Index of Refraction Calculator</title>
+  </head>
+  <body>
+    <h1>Index of Refraction Calculator</h1>
+      <!-- mode select -->
+      <div>
+        <label for="mode-select">Mode</label>
+        <select id="mode-select">
+          <option value="ab" selected>Absolute index of refraction</option>
+          <option value="re">Relative index of refraction</option>
+        </select>
+      </div>
+      <!-- container 1 -->
+      <div id="container-1">
+        <p>
+          <label for="m-select"> Medium </label>
+          <select id="m-select" data-flag="false">
+            <option value="299792458">Vacuum</option>
+            <option value="299704645" selected>Air</option>
+            <option value="224900569">Water at 20°C 🌊</option>
+            <option value="220435631">Ethanol</option>
+            <option value="228849205">Ice 🧊</option>
+            <option value="201202992">Acrylic</option>
+            <option value="197231880">Window glass</option>
+            <option value="123932393">Diamond 💎</option>
+            <option value="custom" disabled>Custom</option>
+          </select>
+        </p>
+
+        <p>
+          <label for="i1-input">Speed in medium (v)</label>
+          <input
+            type="number"
+            autocomplete="off"
+            data-id="i1"
+            data-name="Speed"
+            step="any"
+            id="i1-input"
+            class="inputs"
+          />
+          <select
+            class="selects"
+            id="i1-select"
+            data-type="speed"
+            data-prev="km/s"
+            data-id="i1"
+          >
+            <option value="m/s">meters per second (m/s)</option>
+            <option value="km/s" selected>kilometers per second (km/s)</option>
+            <option value="mi/s">miles per second (mi/s)</option>
+            <option value="c">light speed (c)</option>
+          </select>
+        </p>
+      </div>
+
+      <!-- contianer 2 -->
+      <div id="container-2" style="display: none;">
+        <p>
+          <label for="m1-select"> Medium 1 </label>
+          <select id="m1-select" data-flag="false">
+            <option value="299792458" selected>Vacuum</option>
+            <option value="299704645">Air</option>
+            <option value="224900569">Water at 20°C 🌊</option>
+            <option value="220435631">Ethanol</option>
+            <option value="228849205">Ice 🧊</option>
+            <option value="201202992">Acrylic</option>
+            <option value="197231880">Window glass</option>
+            <option value="123932393">Diamond 💎</option>
+            <option value="custom" disabled>Custom</option>
+          </select>
+        </p>
+
+        <!-- i3 medium velocity -->
+        <p>
+          <label for="i3-input">Speed in medium (v)</label>
+          <input
+            type="number"
+            autocomplete="off"
+            data-id="i3"
+            data-name="Speed"
+            step="any"
+            id="i3-input"
+            class="inputs2"
+            value="299792458"
+          />
+          <select
+            class="selects"
+            id="i3-select"
+            data-type="speed"
+            data-prev="km/s"
+            data-id="i3"
+          >
+            <option value="m/s">meters per second (m/s)</option>
+            <option value="km/s" selected>kilometers per second (km/s)</option>
+            <option value="mi/s">miles per second (mi/s)</option>
+            <option value="c">light speed (c)</option>
+          </select>
+        </p>
+
+        <p>
+          <label for="m2-select"> Medium 2 </label>
+          <select id="m2-select" data-flag="false">
+            <option value="299792458">Vacuum</option>
+            <option value="299704645" selected>Air</option>
+            <option value="224900569">Water at 20°C 🌊</option>
+            <option value="220435631">Ethanol</option>
+            <option value="228849205">Ice 🧊</option>
+            <option value="201202992">Acrylic</option>
+            <option value="197231880">Window glass</option>
+            <option value="123932393">Diamond 💎</option>
+            <option value="custom" disabled>Custom</option>
+          </select>
+        </p>
+
+        <!-- i4 medium velocity -->
+        <p>
+          <label for="i4-input">Speed in medium (v)</label>
+          <input
+            type="number"
+            autocomplete="off"
+            data-id="i4"
+            data-name="Speed"
+            step="any"
+            id="i4-input"
+            class="inputs2"
+            value="299704645"
+          />
+          <select
+            class="selects"
+            id="i4-select"
+            data-type="speed"
+            data-prev="km/s"
+            data-id="i4"
+          >
+            <option value="m/s">meters per second (m/s)</option>
+            <option value="km/s" selected>kilometers per second (km/s)</option>
+            <option value="mi/s">miles per second (mi/s)</option>
+            <option value="c">light speed (c)</option>
+          </select>
+        </p>
+      </div>
+
+      <button id="calcBtn">Calculate</button>
+      <button id="resetBtn">Reset</button>
+      <hr>
+      <div>
+        <h3>Result:</h3>
+        <h3 id="calcResults">Result will appear here...</h3>
+      </div>
+    <script>
+      /*************** ELEMENTS ***************/
+      const selects = document.querySelectorAll(".selects");
+      const inputs = document.querySelectorAll(".inputs");
+      const inputs2 = document.querySelectorAll(".inputs2");
+      
+      const modeSelect = document.getElementById("mode-select");
+      const mediumSelect = document.getElementById("m-select");
+      const medium1Select = document.getElementById("m1-select");
+      const medium2Select = document.getElementById("m2-select");
+
+      const calcBtnEl = document.getElementById('calcBtn');
+      const resetBtnEl = document.getElementById('resetBtn');
+      const calcResultsEl = document.getElementById('calcResults')
+
+      /*************** GLOBAL VARIBLES ***************/
+
+      const UNITS = {
+        refIndex: {
+          refIndex: 1,
+        },
+        speed: {
+          "m/s": 1,
+          "km/s": 0.001,
+          "mi/s": 0.000621371192237334,
+          c: 3.335640951981521e-9,
+        },
+      };
+
+      const queue1 = ["i1", "i2"];
+      const queue2 = ["i3", "i4", "i5"];
+      /*************** FUNCTIONS ***************/
+
+      function toSIUnit(type, unit, value) {
+        if (type === "exp") {
+          unit = parseFloat("1e" + unit);
+          return value * unit;
+        }
+        return value / UNITS[type][unit];
+      }
+
+      function fromSIUnit(type, unit, value) {
+        if (type === "exp") {
+          unit = parseFloat("1e" + unit);
+          return value / unit;
+        }
+        return value * UNITS[type][unit];
+      }
+
+      function createElement() {
+        const newDiv1 = `
+          <div>
+            <p>
+              <label for="i2-span">Index of refraction: &nbsp; </label>
+              <span
+                id="i2-span"
+                class="spans"
+                data-name="Index of refraction"
+              ></span>
+
+              <select
+                class="selects"
+                id="i2-select"
+                data-type="refIndex"
+                data-prev="refIndex"
+                data-id="i2"
+                style="display: none"
+              >
+                <option value="refIndex">unit</option>
+              </select>
+            </p>
+          </div>
+        `
+
+        const newDiv2 = `
+          <div>
+            <p>
+              <label for="i5-span">Relative refractive index (nᵣ): &nbsp; </label>
+              <span
+                id="i5-span"
+                class="spans2"
+                data-name="Relative refractive index"
+              ></span>
+
+              <select
+                class="selects"
+                id="i5-select"
+                data-type="refIndex"
+                data-prev="refIndex"
+                data-id="i5"
+                style="display: none"
+              >
+                <option value="refIndex">unit</option>
+              </select>
+            </p>
+          </div>
+        `
+        if (modeSelect.value == "ab") {
+          return newDiv1
+        } else {
+          return newDiv2
+        }
+        
+      }
+
+
+      function customPercision(ans, to = 8) {
+        return parseFloat(parseFloat(ans).toPrecision(to));
+      }
+
+      function modeHanlder() {
+        const value = modeSelect.value;
+        if (value === "ab") {
+          document.getElementById("container-1").style.display = "";
+          document.getElementById("container-2").style.display = "none";
+        } else if (value === "re") {
+          document.getElementById("container-1").style.display = "none";
+          document.getElementById("container-2").style.display = "";
+        }
+        resetResult()
+      }
+
+      function validateInput(id) {
+        const input = document.getElementById(`${id}-input`);
+        const select = document.getElementById(`${id}-select`);
+        const label = input.getAttribute("data-name").trim();
+        let value = parseFloat(input.value);
+
+        const type = select.getAttribute("data-type");
+        let inUnit = select.value;
+        let val = toSIUnit(type, inUnit, value);
+
+        if (value <= 0 || isNaN(value)) {
+          alert(`${label} must be greater than zero!`);
+          return false;
+        }
+
+        return true;
+      }
+
+      function prepareUnit(...args) {
+        const resultArr = [];
+        for (id of args) {
+          const input = document.getElementById(`${id}-input`);
+          const select = document.getElementById(`${id}-select`);
+          const type = select.getAttribute("data-type");
+          let val = parseFloat(input.value);
+          val = isNaN(val) ? 0 : val;
+          let inUnit = select.value;
+          val = toSIUnit(type, inUnit, val);
+          resultArr.push(val);
+        }
+
+        return resultArr;
+      }
+
+      function setResult(resultObj) {
+        for (key of Object.keys(resultObj)) {
+          let val = resultObj[key].result;
+          let id = resultObj[key].type;
+          if (isNaN(val)) {
+            alert("Your input resulted in NAN.\n 0/0 \n Try again with valid input.");
+            return;
+          }
+          if (Math.abs(val) === Infinity) {
+            alert(
+              "Your input resulted in Infinity. \nDivision by zero. \nTry again with valid input."
+            );
+            return;
+          }
+
+          const span = document.getElementById(`${id}-span`);
+          const select = document.getElementById(`${id}-select`);
+          const type = select.getAttribute("data-type");
+          let outUnit = select.value;
+          val = fromSIUnit(type, outUnit, val);
+
+          span.textContent = customPercision(val, 16);
+        }
+      }
+
+      function calculateResultOne() {
+        const C = 299792458;
+
+        function calculateI2() {
+          let speed = prepareUnit("i1");
+          let result = C / speed;
+          return { 1: { result, type: "i2" } };
+        }
+
+        return calculateI2()
+      }
+
+      function calculateResultTwo() {
+        function calculateI5() {
+          let [val3, val4] = prepareUnit("i3", "i4");
+
+          let result = val3 / val4;
+          return {
+            1: { result, type: "i5" },
+          };
+        }
+        return calculateI5()
+      }
+
+      function mediumSelectHandler(id) {
+        let mSelect;
+
+        if (id === "i1") {
+          mSelect = mediumSelect;
+          mediumSelect.setAttribute("data-flag", "false");
+        } else if (id === "i3") {
+          mSelect = medium1Select;
+          medium1Select.setAttribute("data-flag", "false");
+        } else if (id === "i4") {
+          mSelect = medium2Select;
+          medium2Select.setAttribute("data-flag", "false");
+        }
+
+        let value = mSelect.value;
+
+        if (value === "custom") return;
+        value = parseFloat(value);
+
+        const outUnit = document.getElementById(`${id}-select`).value;
+
+        outValue = fromSIUnit("speed", outUnit, value);
+
+        const input = document.getElementById(`${id}-input`);
+
+        input.value = customPercision(outValue, 13);
+
+        resetResult()
+      }
+
+      function calculateResults() {
+        const mode = modeSelect.value
+        if (mode == "ab") {
+          for (el of ["i1"]) {
+            if (!validateInput(el)) return;
+          }
+        } else {
+          for (el of ["i3", "i4"]) {
+            if (!validateInput(el)) return;
+          }
+        }
+
+        try {
+          const resultElement = createElement()
+          calcResultsEl.innerHTML = resultElement
+          
+          if (mode == 'ab') {
+            const result = calculateResultOne()
+            setResult(result)
+          } else {
+            const result = calculateResultTwo();
+            setResult(result)
+          }
+          
+        } catch(error) {
+          alert("An error ocurred. Try again with valid input.");
+          resetResult()
+          return;
+        }
+      }
+
+      function windowLoadHandler() {
+        modeHanlder();
+        mediumSelectHandler("i1");
+        mediumSelectHandler("i3");
+        mediumSelectHandler("i4");
+      }
+
+      function handleCustomMedium(e) {
+        if (e.target.getAttribute("data-name") == 'Speed') {
+          if (e.target.value == '') {
+            if (e.target.getAttribute("data-id") == 'i1') {
+              mediumSelect.selectedIndex = "8"
+            } else if (e.target.getAttribute("data-id") == 'i3') {
+              medium1Select.selectedIndex = "8"
+            } else {
+              medium2Select.selectedIndex = "8"
+            }
+            
+          }
+        }
+      }
+
+      function resetForm() {
+        selects.forEach((select, index) => {
+          select.selectedIndex = '1'
+        });
+
+        inputs.forEach((input, index) => {
+          input.value = "299704.645"
+        });
+        mediumSelect.selectedIndex = "1"
+        modeSelect.selectedIndex = "0"
+        document.getElementById("container-1").style.display = "block";
+        document.getElementById("container-2").style.display = "none";
+      }
+
+      function resetResult() {
+        calcResultsEl.innerHTML = "<p>Result will appear here...</p>";
+      } 
+
+      function resethandler() {
+        resetForm();
+        resetResult();
+      }
+
+      /*************** EVENT LISTINERS ***************/
+      mediumSelect.addEventListener("change", mediumSelectHandler.bind(this, "i1"));
+
+      modeSelect.addEventListener("change", modeHanlder);
+      window.addEventListener("load", windowLoadHandler);
+      selects.forEach((select) => {
+        select.addEventListener("change", resetResult);
+      });
+
+      inputs.forEach((input) => {
+        input.addEventListener("input", resetResult);
+      });
+
+      inputs2.forEach((input) => {
+        input.addEventListener("input", resetResult);
+      });
+
+      inputs.forEach((input) => {
+        input.addEventListener("input", handleCustomMedium);
+      });
+
+      inputs2.forEach((input) => {
+        input.addEventListener("input", handleCustomMedium);
+      });
+
+      medium1Select.addEventListener("change", mediumSelectHandler.bind(this, "i3"));
+      medium2Select.addEventListener("change", mediumSelectHandler.bind(this, "i4"));
+
+      resetBtnEl.addEventListener("click", resethandler);
+      calcBtnEl.addEventListener("click", calculateResults);
+
+    </script>
+  </body>
+</html>
