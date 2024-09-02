@@ -3,13 +3,14 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Engine Displacement Calculator</title>
+    <title>Free Space Path Loss Calculator</title>
   </head>
   <body>
-    <h1>Engine Displacement Calculator</h1>
+    <h1>Free Space Path Loss Calculator</h1>
+
       <div>
         <p>
-          <label for="i1-input">Number of cylinders </label>
+          <label for="i1-input">Distance (d)</label>
           <input
             type="number"
             min="0"
@@ -18,23 +19,29 @@
             step="any"
             id="i1-input"
             class="inputs"
-            data-name="Number of cylinders"
+            data-name="Distance"
           />
-
           <select
             class="selects"
             id="i1-select"
-            data-type="unit"
-            data-prev="unit"
+            data-type="distance"
+            data-prev="km"
             data-id="i1"
-            style="display: none"
           >
-            <option value="unit">unit</option>
+            <option value="mm">millimeters (mm)</option>
+            <option value="cm">centimeters (cm)</option>
+            <option value="m">meters (m)</option>
+            <option value="km" selected>kilometers (km)</option>
+            <option value="in">inches (in)</option>
+            <option value="ft">feet (ft)</option>
+            <option value="yd">yards (yd)</option>
+            <option value="mi">miles (mi)</option>
+            <option value="nmi">nautical miles (nmi)</option>
           </select>
         </p>
 
         <p>
-          <label for="i2-input">Bore diameter </label>
+          <label for="i2-input">Frequency (f)</label>
           <input
             type="number"
             min="0"
@@ -43,50 +50,76 @@
             step="any"
             id="i2-input"
             class="inputs"
-            data-name="Bore diameter"
+            data-name="Frequency"
           />
+
           <select
             class="selects"
             id="i2-select"
-            data-type="distance"
-            data-prev="cm"
+            data-type="frequency"
+            data-prev="GHz"
             data-id="i2"
           >
-            <option value="mm">millimeters (mm)</option>
-            <option value="cm" selected>centimeters (cm)</option>
-            <option value="m">meters (m)</option>
-            <option value="in">inches (in)</option>
-            <option value="ft">feet (ft)</option>
+            <option value="Hz">hertz (Hz)</option>
+            <option value="kHz">kilohertz (kHz)</option>
+            <option value="MHz">megahertz (MHz)</option>
+            <option value="GHz" selected>gigahertz (GHz)</option>
+            <option value="THz">terahertz (THz)</option>
           </select>
         </p>
 
         <p>
-          <label for="i3-input">Stroke length </label>
+          <label for="i3-input">Transmitter gain (Gᴛ)</label>
           <input
             type="number"
             min="0"
             autocomplete="off"
             data-id="i3"
             step="any"
-            class="inputs"
             id="i3-input"
-            data-name="Stroke length"
+            class="inputs"
+            data-name="Transmitter gain"
+            value="0"
           />
           <select
+            style="display: none"
             class="selects"
             id="i3-select"
-            data-type="distance"
-            data-prev="cm"
+            data-type="amplitude"
+            data-prev="db"
             data-id="i3"
           >
-            <option value="mm">millimeters (mm)</option>
-            <option value="cm" selected>centimeters (cm)</option>
-            <option value="m">meters (m)</option>
-            <option value="in">inches (in)</option>
-            <option value="ft">feet (ft)</option>
+            <option value="db" disabled selected>db</option>
           </select>
+          <span>db</span>
         </p>
 
+        <p>
+          <label for="i4-input">Receiver gain (Gʀ)</label>
+          <input
+            type="number"
+            min="0"
+            autocomplete="off"
+            data-id="i4"
+            step="any"
+            id="i4-input"
+            class="inputs"
+            data-name="Receiver gain"
+            value="0"
+          />
+          <select
+            style="display: none"
+            class="selects"
+            id="i4-select"
+            data-type="amplitude"
+            data-prev="db"
+            data-id="i4"
+          >
+            <option value="db" disabled selected>db</option>
+          </select>
+          <span>db</span>
+        </p>
+        
       </div>
 
       <button id="calcBtn">Calculate</button>
@@ -100,34 +133,36 @@
       /*************** ELEMENTS ***************/
       const selects = document.querySelectorAll(".selects");
       const inputs = document.querySelectorAll(".inputs");
-
+      
       const calcBtnEl = document.getElementById('calcBtn');
       const resetBtnEl = document.getElementById('resetBtn');
       const calcResultsEl = document.getElementById('calcResults')
 
       /*************** GLOBAL VARIBLES ***************/
       const UNITS = {
+        frequency: {
+          Hz: 1,
+          kHz: 1e-3,
+          MHz: 1e-6,
+          GHz: 1e-9,
+          THz: 1e-12,
+        },
+        amplitude: {
+          db: 1,
+        },
         distance: {
-          mm: 1e3,
-          cm: 1e2,
-          m: 1,
-          in: 39.370078740157474,
-          ft: 3.2808398950131235,
-        },
-        volume: {
-          "mm³": 1e9,
-          "cm³": 1e6,
-          "m³": 1,
-          "in³": 61023.7440947322916,
-          l: 1e3,
-          "US gal": 264.1720523581484,
-        },
-
-        unit: {
-          unit: 1,
+          mm: 1e6,
+          cm: 1e5,
+          m: 1000,
+          km: 1,
+          in: 39370.078740157474,
+          ft: 3280.8398950131235,
+          yd: 1093.6132983377078,
+          mi: 0.621371192237334,
+          nmi: 0.5399568034557235,
         },
       };
-      let queue = ["i1", "i2", "i3", "i4"];
+      let queue = ["i1", "i2", "i4", "i3", "i5"];
       /*************** FUNCTIONS ***************/
       function toSIUnit(type, unit, value) {
         if (type === "exp") {
@@ -145,40 +180,27 @@
         return value * UNITS[type][unit];
       }
 
-      function customPercision(ans, to = 8) {
-        return parseFloat(parseFloat(ans).toPrecision(to));
-      }
-
       function createElement() {
         const newDiv = `
           <div>
             <p>
-              <label for="i4-span"> Engine displacement: &nbsp; </label>
+              <label for="i5-input">Free space path loss (FSPL): &nbsp; </label>
               <span
-                type="number"
-                min="0"
-                autocomplete="off"
-                data-id="i4"
-                step="any"
                 class="spans"
-                id="i4-span"
-                data-name="Engine displacement"
+                id="i5-span"
+                data-name="Free space path loss"
               ></span>
               <select
-                class="selectsResult"
-                id="i4-select"
-                data-type="volume"
-                data-prev="cm³"
-                data-id="i4"
+                style="display: none"
+                class="selects"
+                id="i5-select"
+                data-type="amplitude"
+                data-prev="db"
+                data-id="i5"
               >
-                <option value="mm³">cubic millimeters (mm³)</option>
-                <option value="cm³">cubic centimeters (cm³)</option>
-                <option value="m³">cubic meters (m³)</option>
-                <option value="in³">cubic inches (in³)</option>
-                <option value="l">liters (l)</option>
-                <option value="US gal">gallons (US) (US gal)</option>
-                <option value="cm³" selected>cubic centimeters (cc)</option>
+                <option value="db" disabled selected>db</option>
               </select>
+              <span>db</span>
             </p>
           </div>
         `
@@ -186,28 +208,8 @@
       }
 
 
-      function handleResultsChange(e) {
-        let select = e.target;
-        let id = select.getAttribute("data-id");
-        let span = document.getElementById(`${id}-span`);
-
-        let prevUnit = select.getAttribute("data-prev");
-        let currentUnit = select.value;
-        select.setAttribute("data-prev", currentUnit);
-
-        if (span.textContent === "") {
-          return;
-        }
-
-        let type = select.getAttribute("data-type");
-
-        let value = parseFloat(span.textContent);
-        value = parseFloat(value);
-        if (isNaN(value)) value = 0.0;
-
-        let si = toSIUnit(type, prevUnit, value);
-        let result = fromSIUnit(type, currentUnit, si);
-        span.textContent = customPercision(result, 13);
+      function customPercision(ans) {
+        return parseFloat(parseFloat(ans).toPrecision(8));
       }
 
       function validateInput(id) {
@@ -215,6 +217,7 @@
         const label = input.getAttribute("data-name").trim();
         let value = parseFloat(input.value);
 
+        if (id == "i3" || id == "i4") return true
         if (value <= 0 || isNaN(value)) {
           alert(`${label} must be greater than zero!`);
           return false;
@@ -222,7 +225,7 @@
 
         return true;
       }
-      
+
       // related to caculation
       function prepareUnit(...args) {
         const resultArr = [];
@@ -244,6 +247,7 @@
         for (key of Object.keys(resultObj)) {
           let val = resultObj[key].result;
           let id = resultObj[key].type;
+
           if (isNaN(val)) {
             alert("Your input resulted in NAN.\n 0/0 \n Try again with valid input.");
             return;
@@ -261,39 +265,34 @@
           let outUnit = select.value;
           val = fromSIUnit(type, outUnit, val);
 
-          span.textContent = customPercision(val, 16);
+          span.textContent = customPercision(val);
         }
       }
 
-      function calculateResult(out) {
-        const C = 4 * Math.PI * 10e-6;
-
-        function calculateI4() {
-          let [val1, val2, val3] = prepareUnit("i1", "i2", "i3");
-
-          let result = (val1 * val3 * Math.PI * val2 * val2 * 1) / 4;
+      function calculateResult() {
+        const C = -87.554132;
+        
+        function calculateI5() {
+          let [val2, val3, val4, val1] = prepareUnit("i2", "i3", "i4", "i1");
+          let result =
+            20 * Math.log10(val1) + 20 * Math.log10(val2) + C - val3 - val4;
 
           return {
-            1: { result, type: "i4" },
+            1: { result, type: "i5" },
           };
         }
-        return calculateI4()
+
+        return calculateI5()
       }
 
       function calculateResults() {
-        for (el of ["i1", "i2", "i3"]) {
+        for (el of ["i1", "i2", "i3", "i4"]) {
           if (!validateInput(el)) return;
         }
 
         try {
           const resultElement = createElement()
           calcResultsEl.innerHTML = resultElement
-
-          const newSelects = document.querySelectorAll(".selectsResult");
-
-          newSelects.forEach((select) => {
-            select.addEventListener("change", handleResultsChange);
-          });
           
           const result = calculateResult();
           setResult(result)
@@ -307,15 +306,20 @@
 
       function resetForm() {
         selects.forEach((select, index) => {
-          if (index > 0) {
-            select.selectedIndex = '1'
+          if (index < 2) {
+            select.selectedIndex = '3'
           } else {
             select.selectedIndex = '0'
           }
+          
         });
 
-        inputs.forEach((input) => {
-          input.value = ""
+        inputs.forEach((input, index) => {
+          if (index > 1) {
+            input.value = "0"
+          } else {
+            input.value = ""
+          }        
         });
       }
 
@@ -329,10 +333,10 @@
       }
 
       /*************** EVENT LISTINERS ***************/
+
       selects.forEach((select) => {
         select.addEventListener("change", resetResult);
       });
-
       inputs.forEach((input) => {
         input.addEventListener("input", resetResult);
       });
