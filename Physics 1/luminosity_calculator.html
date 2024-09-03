@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Luminosity Calculator</title>
+  </head>
+  <body>
+    <h1>Luminosity Calculator</h1>
+      <div>
+        <p>
+          <label for="i1-input">Star radius</label>
+          <input
+            type="number"
+            min="0"
+            autocomplete="off"
+            data-id="i1"
+            step="any"
+            id="i1-input"
+            class="inputs"
+            data-name="Distance"
+          />
+          <select
+            class="selects"
+            id="i1-select"
+            data-type="distance"
+            data-prev="R☉"
+            data-id="i1"
+          >
+            <option value="m">meters (m)</option>
+            <option value="km">kilometers (km)</option>
+            <option value="mi">miles (mi)</option>
+            <option value="R☉" selected>Sun radii (R☉)</option>
+          </select>
+        </p>
+
+        <p>
+          <label for="i2-input">Star temperature </label>
+          <input
+            type="number"
+            min="0"
+            autocomplete="off"
+            data-id="i2"
+            step="any"
+            id="i2-input"
+            class="inputs"
+            data-name="Temperature"
+          />
+
+          <select
+            class="selects"
+            id="i2-select"
+            data-type="temperature"
+            data-prev="K"
+            data-id="i2"
+          >
+            <option value="°C">Celsius (°C)</option>
+            <option value="°F">Fahrenheit (°F)</option>
+            <option value="K" selected>kelvin (K)</option>
+          </select>
+        </p>
+      </div>
+      <div>
+        <p>
+          <label for="i5-input">Distance</label>
+          <input
+            type="number"
+            min="0"
+            autocomplete="off"
+            data-id="i5"
+            step="any"
+            id="i5-input"
+            data-name="Distance"
+          />
+          <select
+            class="selects"
+            id="i5-select"
+            data-type="distance2"
+            data-prev="pcs"
+            data-id="i5"
+          >
+            <option value="m">meters (m)</option>
+            <option value="km">kilometers (km)</option>
+            <option value="mi">miles (mi)</option>
+            <option value="ly">light years (ly)</option>
+            <option value="pcs" selected>parsecs (pcs)</option>
+          </select>
+        </p>
+      </div>
+
+      <button id="calcBtn">Calculate</button>
+      <button id="resetBtn">Reset</button>
+      <hr>
+      <div>
+        <h3>Result:</h3>
+        <h3 id="calcResults">Result will appear here...</h3>
+      </div>
+    <script>
+      /*************** ELEMENTS ***************/
+      const selects = document.querySelectorAll(".selects");
+      const inputs = document.querySelectorAll(".inputs");
+      const input3 = document.getElementById("i3-input");
+      const input4 = document.getElementById("i4-input");
+      const input5 = document.getElementById("i5-input");
+
+      const calcBtnEl = document.getElementById('calcBtn');
+      const resetBtnEl = document.getElementById('resetBtn');
+      const calcResultsEl = document.getElementById('calcResults')
+
+      /*************** GLOBAL VARIBLES ***************/
+      const UNITS = {
+        temperature: {
+          "°C": (value, op) => (op === "+" ? value + 273.15 : value - 273.15),
+          "°F": (value, op) =>
+            op === "+"
+              ? (value - 32) * (5 / 9) + 273.15
+              : (value - 273.15) * (9 / 5) + 32,
+          K: (value, op) => value,
+        },
+
+        power: {
+          GW: 3.828e17,
+          TW: 3.828e14,
+          PW: 3.828e11,
+          "L☉": 1,
+        },
+        unit: { unit: 1 },
+        distance: {
+          m: 695700000,
+          km: 695700,
+          mi: 432288,
+          "R☉": 1,
+          ly: 7.353578487849736e-8,
+          pcs: 2.2545937712674595e-8,
+        },
+        distance2: {
+          m: 3.0857e16,
+          km: 3.0857e13,
+          mi: 19173650878867,
+          ly: 3.2616,
+          pcs: 1,
+        },
+      };
+      const queue = ["i1", "i2", "i3"];
+      /*************** FUNCTIONS ***************/
+      function toSIUnit(type, unit, value) {
+        if (type === "exp") {
+          unit = parseFloat("1e" + unit);
+          return value * unit;
+        }
+        if (type === "temperature") {
+          return UNITS[type][unit](value, "+");
+        }
+        return value / UNITS[type][unit];
+      }
+
+      function fromSIUnit(type, unit, value) {
+        if (type === "exp") {
+          unit = parseFloat("1e" + unit);
+          return value / unit;
+        }
+        if (type === "temperature") {
+          return UNITS[type][unit](value, "-");
+        }
+        return value * UNITS[type][unit];
+      }
+
+      function createElement() {
+        const newDiv = `
+          <div>
+            <p>
+              <label for="i3-span">Luminosity</label>
+              <span
+                class="spans"
+                id="i3-span"
+                data-name="Luminosity"
+              ></span>
+              <select
+                class="selectsResult"
+                id="i3-select"
+                data-type="power"
+                data-prev="L☉"
+                data-id="i3"
+              >
+                <option value="GW">gigawatts (GW)</option>
+                <option value="TW">terawatts (TW)</option>
+                <option value="PW">petawatts (PW)</option>
+                <option value="L☉" selected>solar luminosities (L☉)</option>
+              </select>
+            </p>
+
+            <p>
+              <label for="i4-span"> Absolute magnitude </label>
+              <span
+                data-id="i4"
+                id="i4-span"
+                data-name="Absolute magnitude"
+              ></span>
+              <select
+                class="selectsResult"
+                id="i4-select"
+                data-type="unit"
+                data-prev="unit"
+                data-id="i4"
+                style="display: none"
+              >
+                <option value="unit" selected>unit</option>
+              </select>
+            </p>
+            <p>
+              <label for="i6-span"> Apparent magnitude </label>
+              <span
+                id="i6-span"
+                data-name="Apparent magnitude"
+                disabled
+              ></span>
+              <select
+                class="selectsResult"
+                id="i6-select"
+                data-type="unit"
+                data-prev="unit"
+                data-id="i6"
+                style="display: none"
+              >
+                <option value="unit" selected>unit</option>
+              </select>
+            </p>
+          </div>
+        `
+        return newDiv
+      }
+
+
+      function customPercision(ans, to = 22) {
+        return parseFloat(ans.toPrecision(to));
+      }
+
+      function input5Handler() {
+        if (!validateInput("i5")) return;
+        
+        if (isEmpty("i5")) {
+          alert("Distance value cannot be empty")
+          return;
+        }
+
+        let [D, M] = prepareUnit("i5", "i4");
+
+        let m = M - 5 + 5 * Math.log10(D);
+        
+        result = {
+          1: {
+            result: m,
+            type: "i6",
+          },
+        };
+        setResult(result);
+      }
+      
+      function validateInput(id) {
+        const input = document.getElementById(`${id}-input`);
+        const label = input.getAttribute("data-name").trim();
+        let value = parseFloat(input.value);
+
+        if (id === "i4" || id === "i2") {
+          return true;
+        }
+        if (value <= 0) {
+          alert(`${label} must be greater than zero!`);
+          return false;
+        }
+
+        return true;
+      }
+
+      function isEmpty(...args) {
+        for (let id of args) {
+          let val = document.getElementById(`${id}-input`).value;
+          if (val === "") return true;
+        }
+        return false;
+      }
+
+      // related to caculation
+      function prepareUnit(...args) {
+        const resultArr = [];
+        for (id of args) {
+          if (id == 'i3' || id == 'i4') {
+            const span = document.getElementById(`${id}-span`);
+            const select = document.getElementById(`${id}-select`);
+            const type = select.getAttribute("data-type");
+            let val = parseFloat(span.textContent);
+            val = isNaN(val) ? 0 : val;
+            let inUnit = select.value;
+            val = toSIUnit(type, inUnit, val);
+            resultArr.push(val);
+          } else {          
+            const input = document.getElementById(`${id}-input`);
+            const select = document.getElementById(`${id}-select`);
+            const type = select.getAttribute("data-type");
+            let val = parseFloat(input.value);
+            val = isNaN(val) ? 0 : val;
+            let inUnit = select.value;
+            val = toSIUnit(type, inUnit, val);
+            resultArr.push(val);
+          }
+        }
+
+        return resultArr;
+      }
+
+      function setResult(resultObj) {
+        for (key of Object.keys(resultObj)) {
+          let val = resultObj[key].result;
+          let id = resultObj[key].type;
+          if (isNaN(val)) {
+            alert("Your input resulted in NAN.\n 0/0 \n Try again with valid input.");
+            return;
+          }
+          if (Math.abs(val) === Infinity) {
+            alert(
+              "Your input resulted in Infinity. \nDivision by zero. \nTry again with valid input."
+            );
+            return;
+          }
+
+          const span = document.getElementById(`${id}-span`);
+          const select = document.getElementById(`${id}-select`);
+          const type = select.getAttribute("data-type");
+          let outUnit = select.value;
+          val = fromSIUnit(type, outUnit, val);
+
+          span.textContent = customPercision(val);
+        }
+      }
+
+      function calculateResult() {
+        const To = 5778;
+        
+        function calculateI3() {
+          let [val1, val2] = prepareUnit("i1", "i2");
+          let result = Math.pow(val1 / 1, 2) * Math.pow(val2 / To, 4) * 1;
+
+          result = {
+            1: { result, type: "i3" },
+          };
+          
+          setResult(result)
+          
+          let result2 = calculateI34("i3")
+
+          setResult(result2)        
+        }
+    
+        return calculateI3()
+      }
+
+      function calculateI34(id) {
+        const Lo = 78.704284; //78.70457896950985
+
+        if (id === "i3") {
+          const [inp] = prepareUnit("i3");
+          let result = -2.5 * Math.log10(inp / Lo);
+          return {
+            1: {
+              result,
+              type: "i4",
+            },
+          };
+        }
+      }
+
+      function handleResultsChange(e) {
+        let select = e.target;
+        let id = select.getAttribute("data-id");
+        let span = document.getElementById(`${id}-span`);
+
+        let prevUnit = select.getAttribute("data-prev");
+        let currentUnit = select.value;
+        select.setAttribute("data-prev", currentUnit);
+
+        if (span.textContent === "") {
+          return;
+        }
+
+        let type = select.getAttribute("data-type");
+
+        let value = parseFloat(span.textContent);
+        value = parseFloat(value);
+        if (isNaN(value)) value = 0.0;
+
+        let si = toSIUnit(type, prevUnit, value);
+        let result = fromSIUnit(type, currentUnit, si);
+        span.textContent = customPercision(result);
+      }
+
+      function calculateResults() {
+        for (el of ["i1", "i2"]) {
+          if (!validateInput(el)) return;
+        }
+
+        try {
+          const resultElement = createElement()
+          calcResultsEl.innerHTML = resultElement
+
+          const newSelects = document.querySelectorAll(".selectsResult");
+
+          newSelects.forEach((select) => {
+            select.addEventListener("change", handleResultsChange);
+          });
+          calculateResult();
+          
+          input5Handler()
+
+        } catch(error) {
+          alert("An error ocurred. Try again with valid input.");
+          resetResult()
+          return;
+        }
+      }
+
+
+      function resetForm() {
+        selects.forEach((select, index) => {
+          if (index == 0) {
+            select.selectedIndex = '3'
+          } else if (index == 1) {
+            select.selectedIndex = '2'
+          } else if (index == 2) {
+            select.selectedIndex = '4'
+          } else {
+            select.selectedIndex = '0'
+          }
+        });
+
+        inputs.forEach((input) => {
+          input.value = ""
+        });
+      }
+
+      function resetResult() {
+        calcResultsEl.innerHTML = "<p>Result will appear here...</p>";
+      } 
+
+      function resethandler() {
+        resetForm();
+        resetResult();
+      }
+
+      /*************** EVENT LISTINERS ***************/
+      input5.addEventListener("input", resetResult);
+
+      selects.forEach((select) => {
+        select.addEventListener("change", resetResult);
+      });
+      inputs.forEach((input) => {
+        input.addEventListener("input", resetResult);
+      });
+
+      resetBtnEl.addEventListener("click", resethandler);
+      calcBtnEl.addEventListener("click", calculateResults);
+
+    </script>
+  </body>
+</html>
