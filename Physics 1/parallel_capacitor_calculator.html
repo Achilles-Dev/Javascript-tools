@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Parallel Capacitor Calculator</title>
+  </head>
+  <body>
+    <h1>Parallel Capacitor Calculator</h1>
+    <p>You can arrange up to 10 capacitors</p>
+    <div id="element-container">
+      <p id="c1-container" class="container">
+        <label for="c1-input">Capacitor 1 (C<sub>1</sub>)</label>
+        <input
+          type="number"
+          class="c-input c1-input"
+          step="any"
+          id="c1-input"
+          data-pos="prev"
+          data-place="1"
+        />
+        <select id="c1-select" class="c-select">
+          <option value="F" selected>farads (F)</option>
+          <option value="mF">millifarads (mF)</option>
+          <option value="μF">microfarads (μF)</option>
+          <option value="nF">nanofarads (nF)</option>
+          <option value="pF">picofarads (pF)</option>
+        </select>
+      </p>
+
+      <p id="c2-container" class="container">
+        <label for="c2-input">Capacitor 2 (C<sub>2</sub>)</label>
+        <input
+          type="number"
+          class="c-input c2-input"
+          step="any"
+          id="c2-input"
+          data-pos="last"
+          data-place="2"
+        />
+        <select id="c2-select" class="c-select">
+          <option value="F" selected>farads (F)</option>
+          <option value="mF">millifarads (mF)</option>
+          <option value="μF">microfarads (μF)</option>
+          <option value="nF">nanofarads (nF)</option>
+          <option value="pF">picofarads (pF)</option>
+        </select>
+      </p>
+    </div>
+
+    <button id="calcBtn">Calculate</button>
+      <button id="resetBtn">Reset</button>
+      <hr>
+      <div>
+        <h3>Result:</h3>
+        <h3 id="calcResults">Result will appear here...</h3>
+      </div>
+    <script>
+      /*************** ELEMENTS ***************/
+      const elContainer = document.getElementById("element-container");
+      let inputList = document.querySelectorAll(".c-input");
+      let selectList = document.querySelectorAll(".c-select");
+
+      const calcBtnEl = document.getElementById('calcBtn');
+      const resetBtnEl = document.getElementById('resetBtn');
+      const calcResultsEl = document.getElementById('calcResults')
+
+      /*************** GLOBAL VARIABLES ***************/
+      const UNITS = {
+        capacitance: {
+          F: 1,
+          mF: 1e3,
+          μF: 1e6,
+          nF: 1e9,
+          pF: 1e12,
+          fF: 1e15,
+        },
+      };
+      /*************** FUNCTIONS ***************/
+      function toSIUnit(type, unit, value) {
+        return value / UNITS[type][unit];
+      }
+      function fromSIUnit(type, unit, value) {
+        return value * UNITS[type][unit];
+      }
+
+      function changeHandler(e) {
+        el = e.target;
+        el.pos = el.getAttribute("data-pos");
+        el.place = parseInt(el.getAttribute("data-place"));
+
+        let scenario_one = el.place != 10 && el.pos == "last" && el.value != "";
+        let scenario_two = el.place != 1 && el.pos == "prev" && el.value == "";
+        let scenario_three = el.place == 10 && el.value == "";
+        if (scenario_one) {
+          scenarioOne(el);
+        } else if (scenario_two) {
+          scenarioTwo(el);
+        } else if (scenario_three) {
+          scenarioThree(el);
+        }
+        resetResult();
+      }
+
+      function scenarioOne(el) {
+        let prevEl = document.querySelector('[data-pos="prev"]');
+        prevEl.setAttribute("data-pos", "null");
+        el.setAttribute("data-pos", "prev");
+        let nextEl = createElement(el.place + 1);
+        elContainer.append(nextEl);
+        updateNodeList();
+      }
+
+      function scenarioTwo(el) {
+        const nextEl = document.querySelector('[data-pos = "last"]');
+        if (
+          el.place != 1 &&
+          el.pos == "prev" &&
+          el.value == "" &&
+          nextEl.value == ""
+        ) {
+          document
+            .getElementById(`c${nextEl.getAttribute("data-place")}-container`)
+            .remove();
+
+          el.setAttribute("data-pos", "last");
+          const newPrev = document.querySelector(`[data-place ="${el.place - 1}"]`);
+          newPrev.setAttribute("data-pos", "prev");
+          newPrev.place = newPrev.getAttribute("data-place");
+          newPrev.pos = newPrev.getAttribute("data-pos");
+          updateNodeList();
+          el.focus();
+          scenarioTwo(newPrev);
+        }
+      }
+
+      function scenarioThree(el) {
+        const newPrev = document.querySelector(`[data-place ="${el.place - 1}"]`);
+        newPrev.setAttribute("data-pos", "prev");
+        newPrev.place = newPrev.getAttribute("data-place");
+        newPrev.pos = newPrev.getAttribute("data-pos");
+        if (el.place == 10 && el.value == "" && newPrev.value == "") {
+          scenarioTwo(newPrev);
+        }
+      }
+
+      function createElement(place) {
+        let templateStr = `<p id="c${place}-container" class="container">
+          <label for="c${place}-input">Capacitor ${place} (C<sub>${place}</sub>)</label>
+          <input
+            type="number"
+            class="c-input c${place}-input"
+            step="any"
+            id="c${place}-input"
+            data-pos="last"
+            data-place="${place}"
+          />
+          <select id="c${place}-select" class="c-select">
+            <option value="F" selected>farads (F)</option>
+            <option value="mF">millifarads (mF)</option>
+            <option value="μF">microfarads (μF)</option>
+            <option value="nF">nanofarads (nF)</option>
+            <option value="pF">picofarads (pF)</option>
+          </select>
+        </p>`;
+
+        let nextEl = document.createElement("div");
+        nextEl.innerHTML = templateStr;
+        return nextEl.firstChild;
+      }
+
+      function updateNodeList() {
+        inputList = document.querySelectorAll(".c-input");
+        inputList.forEach((input) => input.addEventListener("input", changeHandler));
+
+        let selectList = document.querySelectorAll(".c-select");
+        selectList.forEach((select) =>
+          select.addEventListener("change", resetResult)
+        );
+      }
+
+      function calculateResults() {
+        let sum = 0;
+        let unit = "F";
+        //calculate sum
+        inputList.forEach((capacitor) => {
+          let cPlace = capacitor.getAttribute("data-place");
+          let cValue = parseFloat(capacitor.value);
+          if (isNaN(cValue)) cValue = 0;
+          let cUnit = document.getElementById(`c${cPlace}-select`).value;
+          let c = toSIUnit("capacitance", cUnit, cValue);
+          sum += c;
+        });
+
+        if (sum < 1) {
+          sum = fromSIUnit("capacitance", "mF", sum);
+          unit = "mF";
+        }
+        if (sum < 1) {
+          sum = toSIUnit("capacitance", "mF", sum);
+          sum = fromSIUnit("capacitance", "μF", sum);
+          unit = "μF";
+        }
+        if (sum < 1) {
+          sum = toSIUnit("capacitance", "μF", sum);
+          sum = fromSIUnit("capacitance", "nF", sum);
+          unit = "nF";
+        }
+        if (sum < 1) {
+          sum = toSIUnit("capacitance", "nF", sum);
+          sum = fromSIUnit("capacitance", "pF", sum);
+          unit = "pF";
+        }
+        if (sum < 1) {
+          sum = toSIUnit("capacitance", "pF", sum);
+          sum = fromSIUnit("capacitance", "fF", sum);
+          unit = "fF";
+        }
+        calcResultsEl.textContent = `The resulting capacitance equals ${sum} ${unit}.`;
+      }
+
+      function clearHandler() {
+        elContainer.innerHTML = `<p id="c1-container" class="container">
+        <label for="c1-input">Capacitor 1 (C<sub>1</sub>)</label>
+        <input
+          type="number"
+          class="c-input c1-input"
+          step="any"
+          id="c1-input"
+          data-pos="prev"
+          data-place="1"
+        />
+        <select id="c1-select" class="c-select">
+          <option value="F" selected>farads (F)</option>
+          <option value="mF">millifarads (mF)</option>
+          <option value="μF">microfarads (μF)</option>
+          <option value="nF">nanofarads (nF)</option>
+          <option value="pF">picofarads (pF)</option>
+        </select>
+      </p>
+
+      <p id="c2-container" class="container">
+        <label for="c2-input">Capacitor 2 (C<sub>2</sub>)</label>
+        <input
+          type="number"
+          class="c-input c2-input"
+          step="any"
+          id="c2-input"
+          data-pos="last"
+          data-place="2"
+        />
+        <select id="c2-select" class="c-select">
+          <option value="F" selected>farads (F)</option>
+          <option value="mF">millifarads (mF)</option>
+          <option value="μF">microfarads (μF)</option>
+          <option value="nF">nanofarads (nF)</option>
+          <option value="pF">picofarads (pF)</option>
+        </select>
+      </p>`;
+        updateNodeList();
+      }
+
+      function resetForm() {
+       clearHandler()
+      }
+
+      function resetResult() {
+        calcResultsEl.innerHTML = "<p>Result will appear here...</p>";
+      } 
+
+      function resethandler() {
+        resetForm();
+        resetResult();
+      }
+
+      /*************** EVENT LISTENERS ***************/
+      inputList.forEach((input) => input.addEventListener("input", changeHandler));
+      selectList.forEach((select) =>
+        select.addEventListener("change", resetResult)
+      );
+
+      resetBtnEl.addEventListener("click", resethandler);
+      calcBtnEl.addEventListener("click", calculateResults);
+
+    </script>
+  </body>
+</html>

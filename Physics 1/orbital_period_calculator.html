@@ -1,0 +1,639 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Orbital Period Calculator</title>
+  </head>
+  <body>
+    <h1>Orbital Period Calculator</h1>
+      <p>Satellite around central sphere</p>
+      <div>
+        <p>
+          <label for="i5-input">Central body density </label>
+          <input
+            type="number"
+            min="0"
+            autocomplete="off"
+            data-id="i5"
+            step="any"
+            class="inputs2"
+            id="i5-input"
+            data-name="Density"
+          />
+          <select
+            class="selects"
+            id="i5-select"
+            data-type="density"
+            data-prev="g/cm³"
+            data-id="i5"
+          >
+            <option value="kg/m³">kilograms per cubic meter (kg/m³)</option>
+            <option value="lb/ft³">pounds per cubic feet (lb/ft³)</option>
+            <option value="lb/yd³">pounds per cubic yard (lb/yd³)</option>
+            <option value="g/cm³" selected>
+              grams per cubic centimeter (g/cm³)
+            </option>
+            <option value="kg/cm³">
+              kilograms per cubic centimeter (kg/cm³)
+            </option>
+            <option value="mg/cm³">
+              milligrams per cubic centimeter (mg/cm³)
+            </option>
+            <option value="g/m³">grams per cubic meter (g/m³)</option>
+          </select>
+        </p>
+      </div>
+      <p>Binary system</p>
+      <div>
+        <p>
+          <label for="i1-input">Semi-major axis </label>
+          <input
+            type="number"
+            min="0"
+            autocomplete="off"
+            data-id="i1"
+            step="any"
+            id="i1-input"
+            class="inputs"
+            data-name="Semi-major axis"
+          />
+          <select
+            class="selects"
+            id="i1-select"
+            data-type="distance"
+            data-prev="au"
+            data-id="i1"
+          >
+            <option value="m">meters (m)</option>
+            <option value="km">kilometers (km)</option>
+            <option value="yd">yards (yd)</option>
+            <option value="mi">miles (mi)</option>
+            <option value="nmi">nautical miles (nmi)</option>
+            <option value="R☉">Sun radii (R☉)</option>
+            <option value="ly">light years (ly)</option>
+            <option value="au" selected>astronomical units (au)</option>
+            <option value="pcs">parsecs (pcs)</option>
+          </select>
+        </p>
+
+        <p>
+          <label for="i2-input">First body mass </label>
+          <input
+            type="number"
+            min="0"
+            autocomplete="off"
+            data-id="i2"
+            step="any"
+            id="i2-input"
+            class="inputs"
+            data-name="First body mass"
+          />
+
+          <select
+            class="selects"
+            id="i2-select"
+            data-type="mass"
+            data-prev="Suns"
+            data-id="i2"
+          >
+            <option value="kg">kilograms (kg)</option>
+            <option value="t">metric tons (t)</option>
+            <option value="lb">pounds (lb)</option>
+            <option value="st">stones (st)</option>
+            <option value="US ton">US short tons (US ton)</option>
+            <option value="long ton">imperial tons (long ton)</option>
+            <option value="Earths">masses of the Earth (Earths)</option>
+            <option value="Suns" selected>masses of the Sun (Suns)</option>
+          </select>
+        </p>
+
+        <p>
+          <label for="i3-input">Second body mass </label>
+          <input
+            type="number"
+            min="0"
+            autocomplete="off"
+            data-id="i3"
+            step="any"
+            class="inputs"
+            id="i3-input"
+            data-name="Second body mass"
+          />
+          <select
+            class="selects"
+            id="i3-select"
+            data-type="mass"
+            data-prev="Earths"
+            data-id="i3"
+          >
+            <option value="kg">kilograms (kg)</option>
+            <option value="t">metric tons (t)</option>
+            <option value="lb">pounds (lb)</option>
+            <option value="st">stones (st)</option>
+            <option value="US ton">US short tons (US ton)</option>
+            <option value="long ton">imperial tons (long ton)</option>
+            <option value="Earths" selected>
+              masses of the Earth (Earths)
+            </option>
+            <option value="Suns">masses of the Sun (Suns)</option>
+          </select>
+        </p>
+      </div>
+
+      <button id="calcBtn">Calculate</button>
+      <button id="resetBtn">Reset</button>
+      <hr>
+      <div>
+        <h3>Result:</h3>
+        <h3 id="calcResults">Result will appear here...</h3>
+      </div>
+    <script>
+      /*************** ELEMENTS ***************/
+      const selects = document.querySelectorAll(".selects");
+      const inputs = document.querySelectorAll(".inputs");
+      const inputs2 = document.querySelectorAll(".inputs2");
+
+      const calcBtnEl = document.getElementById('calcBtn');
+      const resetBtnEl = document.getElementById('resetBtn');
+      const calcResultsEl = document.getElementById('calcResults')
+
+      /*************** GLOBAL VARIBLES ***************/
+      const UNITS = {
+        density: {
+          "kg/m³": 1,
+          "lb/ft³": 0.06242796059999999,
+          "lb/yd³": 1.6855549399999998,
+          "g/cm³": 0.001,
+          "kg/cm³": 0.000001,
+          "mg/cm³": 1,
+          "g/m³": 1e3,
+        },
+        distance: {
+          m: 1,
+          km: 0.001,
+          yd: 0.10936132983377078,
+          mi: 0.000621371192237334,
+          nmi: 0.0005399568034557236,
+          "R☉": 1.4374011786689666e-9,
+          ly: 1.0570042385869968e-16,
+          au: 6.684587122268446e-12,
+          pcs: 3.2407557442395566e-17,
+        },
+        mass: {
+          kg: 1,
+          t: 0.0010000000000000002,
+          lb: 2.204622621848776,
+          st: 0.15747304441776971,
+          "US ton": 0.001102311310924388,
+          "long ton": 0.0009842065276110606,
+          Earths: 1.6744248350691536e-25,
+          Suns: 5.027652086475616e-31,
+        },
+        time: {
+          sec: 1,
+          min: 0.016666666666666666,
+          hrs: 0.0002777777777777778,
+          days: 0.000011574074074074075,
+          wks: 0.0000016534391534391535,
+          mos: 3.8025705376834745e-7,
+          yrs: 3.1688087814028954e-8,
+        },
+      };
+      let queue = ["i2", "i1", "i3", "i4"];
+      /*************** FUNCTIONS ***************/
+      function toSIUnit(type, unit, value) {
+        if (type === "exp") {
+          unit = parseFloat("1e" + unit);
+          return value * unit;
+        }
+        return value / UNITS[type][unit];
+      }
+
+      function fromSIUnit(type, unit, value) {
+        if (type === "exp") {
+          unit = parseFloat("1e" + unit);
+          return value / unit;
+        }
+        return value * UNITS[type][unit];
+      }
+
+      function createElement(value) {
+        const newDiv1 = `
+          <p>
+            <label for="i6-span">Orbital period: &nbsp; </label>
+            <span
+              data-id="i6"
+              step="any"
+              class="spans2"
+              id="i6-span"
+              data-name="Orbital period"
+            ></span>
+            <select
+              class="selectsResult"
+              id="i6-select"
+              data-type="time"
+              data-prev="hrs"
+              data-id="i6"
+            >
+              <option value="sec">seconds (sec)</option>
+              <option value="min">minutes (min)</option>
+              <option value="hrs" selected>hour (hrs)</option>
+              <option value="days">days (days)</option>
+              <option value="wks">weeks (wks)</option>
+              <option value="mos">months (mos)</option>
+              <option value="yrs">years (yrs)</option>
+            </select>
+          </p>
+        `
+        const newDiv2 = `
+          <p>
+            <label for="i4-span">Period: &nbsp; </label>
+            <span
+              data-id="i4"
+              step="any"
+              class="spans"
+              id="i4-span"
+              data-name="Period"
+            ></span>
+            <select
+              class="selectsResult"
+              id="i4-select"
+              data-type="time"
+              data-prev="days"
+              data-id="i4"
+            >
+              <option value="sec">seconds (sec)</option>
+              <option value="min">minutes (min)</option>
+              <option value="hrs">hour (hrs)</option>
+              <option value="days" selected>days (days)</option>
+              <option value="wks">weeks (wks)</option>
+              <option value="mos">months (mos)</option>
+              <option value="yrs">years (yrs)</option>
+            </select>
+          </p>
+        `
+        if (value == 'one') {
+          return newDiv1
+        } else if (value == 'two') {
+          return newDiv2
+        } else if (value == 'none') {
+          return ''
+        }
+        return newDiv1 + newDiv2
+      }
+
+      function customPercision(ans, to = 8) {
+        return parseFloat(parseFloat(ans).toPrecision(to));
+      }
+
+      function selectChangeHandler(e) {
+        let select = e.target;
+        let id = select.getAttribute("data-id");
+        let input = document.getElementById(`${id}-input`);
+
+        let prevUnit = select.getAttribute("data-prev");
+        let currentUnit = select.value;
+
+        select.setAttribute("data-prev", currentUnit);
+
+        if (input.value === "") {
+          return;
+        }
+
+        let type = select.getAttribute("data-type");
+
+        let value = input.value;
+        value = parseFloat(value);
+        if (isNaN(value)) value = 0.0;
+
+        let si = toSIUnit(type, prevUnit, value);
+        let result = fromSIUnit(type, currentUnit, si);
+        input.value = customPercision(result, 13);
+      }
+
+      function inputHandler(e, inp = null) {
+        try {
+          let input;
+          if (e) input = e.target;
+          else if (inp) input = inp;
+          const id = input.getAttribute("data-id");
+
+          let out = queue[3];
+          for (el of ["i1", "i2", "i3", "i4"]) {
+            if (!validateInput(el)) return;
+          }
+          if (input.value == "") {
+            errorP.textContent = "";
+
+            if (inputCounter() < 3) {
+              return;
+            }
+
+            if (id !== out) {
+              deleteHandler(out);
+            }
+            return;
+          }
+
+          prioritizeID(id);
+
+          out = queue[3];
+
+          if (!validateInput(id)) return;
+          errorP.textContent = "";
+
+          if (inputCounter() < 3) {
+            return;
+          }
+
+          for (el of ["i1", "i2", "i3", "i4"]) {
+            if (!validateInput(el)) return;
+          }
+          errorP.textContent = "";
+
+          validateQueue();
+          out = queue[3];
+
+          const result = calculateResults(out);
+
+          setResult(result);
+          for (el of ["i1", "i2", "i3", "i4"]) {
+            if (!validateInput(el)) return;
+          }
+          errorP.textContent = "";
+        } catch (error) {
+          alert(
+            "An error occurred. Try again with valid input, or try contacting us."
+          );
+          console.log(error);
+        }
+      }
+
+      function inputHandler2(e) {
+        let input = e.target;
+        let id = input.getAttribute("data-id");
+        if (!validateInput(id)) return;
+
+        if (input.value === "") {
+          if (id === "i5") {
+            deleteHandler("i6");
+          } else {
+            deleteHandler("i5");
+          }
+
+          for (el of ["i6", "i5"]) {
+            if (!validateInput(el)) return;
+          }
+
+          errorP.textContent = "";
+          return;
+        }
+
+        let result = calculate2(id);
+        setResult(result);
+        for (el of ["i6", "i5"]) {
+          if (!validateInput(el)) return;
+        }
+        errorP.textContent = "";
+      }
+
+      function calculate2(id = 'i5') {
+        let [val] = prepareUnit(id);
+
+        const G = 6.6743e-11;
+
+        if (id === "i5") {
+          let result = Math.sqrt((3 * Math.PI) / (val * G));
+          return {
+            1: {
+              result,
+              type: "i6",
+            },
+          };
+        }
+      }
+
+      function validateQueue() {
+        if (inputCounter() !== 3) return;
+
+        for (let input of inputs) {
+          if (input.value === "") {
+            const id = input.getAttribute("data-id");
+            const index = queue.indexOf(id);
+            queue.splice(index, 1);
+            queue.push(id);
+          }
+        }
+      }
+      
+      function validateInput(id) {
+        const input = document.getElementById(`${id}-input`);
+        const label = input.getAttribute("data-name").trim();
+        let value = parseFloat(input.value);
+
+        if ((id == 'i1' || id == 'i2' || id == 'i3') && isNaN(value)) return false
+        if ((id == 'i5') && isNaN(value)) return false
+        if (value <= 0 || isNaN(value)) {
+          alert(`${label} must be greater than zero!`);
+          return false;
+        }
+
+        return true;
+      }
+      
+      // related to caculation
+      function prepareUnit(...args) {
+        const resultArr = [];
+        for (id of args) {
+          const input = document.getElementById(`${id}-input`);
+          const select = document.getElementById(`${id}-select`);
+          const type = select.getAttribute("data-type");
+          let val = parseFloat(input.value);
+          val = isNaN(val) ? 0 : val;
+          let inUnit = select.value;
+          val = toSIUnit(type, inUnit, val);
+          resultArr.push(val);
+        }
+
+        return resultArr;
+      }
+
+      function setResult(resultObj) {
+        for (key of Object.keys(resultObj)) {
+          let val = resultObj[key].result;
+          let id = resultObj[key].type;
+          if (isNaN(val)) {
+            alert("Your input resulted in NAN.\n 0/0 \n Try again with valid input.");
+            return;
+          }
+          if (Math.abs(val) === Infinity) {
+            alert(
+              "Your input resulted in Infinity. \nDivision by zero. \nTry again with valid input."
+            );
+            return;
+          }
+
+          const span = document.getElementById(`${id}-span`);
+          const select = document.getElementById(`${id}-select`);
+          const type = select.getAttribute("data-type");
+          let outUnit = select.value;
+          val = fromSIUnit(type, outUnit, val);
+
+          span.textContent = customPercision(val, 12);
+        }
+      }
+
+      function calculateResult() {
+        const G = 6.6743e-11;
+
+        function calculateI4() {
+          let [val1, val2, val3] = prepareUnit("i1", "i2", "i3");
+
+          let result =
+            2 * Math.PI * Math.sqrt((val1 * val1 * val1) / (G * (val2 + val3)));
+
+          return {
+            1: { result, type: "i4" },
+          };
+        }
+        return calculateI4()
+      }
+
+      function handleResultsChange(e) {
+        let select = e.target;
+        let id = select.getAttribute("data-id");
+        let span = document.getElementById(`${id}-span`);
+
+        let prevUnit = select.getAttribute("data-prev");
+        let currentUnit = select.value;
+        select.setAttribute("data-prev", currentUnit);
+
+        if (span.textContent === "") {
+          return;
+        }
+
+        let type = select.getAttribute("data-type");
+
+        let value = parseFloat(span.textContent);
+        value = parseFloat(value);
+        if (isNaN(value)) value = 0.0;
+
+        let si = toSIUnit(type, prevUnit, value);
+        let result = fromSIUnit(type, currentUnit, si);
+        span.textContent = customPercision(result, 13);
+      }
+
+      function calculateResults() {
+        let first = false
+        let second = false
+        for (el of ["i5"]) {
+          if (!validateInput(el)) {
+            first = false
+          } else {
+            first = true
+          }
+        }
+
+        for (el of ["i1", "i2", "i3"]) {
+          if (!validateInput(el)) {
+            second = false
+          } else {
+            second = true
+          }
+        }
+
+        try {
+          if (first && !second) {
+            const resultElement = createElement('one')
+            calcResultsEl.innerHTML = resultElement
+
+            const newSelects = document.querySelectorAll(".selectsResult");
+
+            newSelects.forEach((select) => {
+              select.addEventListener("change", handleResultsChange);
+            });
+            console.log(1)
+            const result = calculate2()
+            setResult(result)
+          } else if (!first && second) {
+            const resultElement = createElement('two')
+            calcResultsEl.innerHTML = resultElement
+
+            const newSelects = document.querySelectorAll(".selectsResult");
+
+            newSelects.forEach((select) => {
+              select.addEventListener("change", handleResultsChange);
+            });
+
+            const result = calculateResult();
+            console.log(result)
+            setResult(result)           
+          } else  if (first && second){
+            const resultElement = createElement('all')
+            calcResultsEl.innerHTML = resultElement
+
+            const newSelects = document.querySelectorAll(".selectsResult");
+
+            newSelects.forEach((select) => {
+              select.addEventListener("change", handleResultsChange);
+            });
+
+            const result1 = calculateResult();
+            setResult(result1)   
+            const result2 = calculate2();
+            setResult(result2)   
+          }
+
+        } catch(error) {
+          alert("An error ocurred. Try again with valid input.");
+          resetResult()
+          return;
+        }
+      }
+
+
+      function resetForm() {
+        selects.forEach((select, index) => {
+          if (index == 0) {
+            select.selectedIndex = "3"
+          } else if (index == 1 || index == 2) {
+            select.selectedIndex = "7"
+          } else if (index == 3) {
+            select.selectedIndex = "6"
+          } else {
+            select.selectedIndex = "0"
+          }
+        });
+
+        inputs.forEach((input) => {
+          input.value = ""
+        });
+      }
+
+      function resetResult() {
+        calcResultsEl.innerHTML = "<p>Result will appear here...</p>";
+      } 
+
+      function resethandler() {
+        resetForm();
+        resetResult();
+      }
+
+      /*************** EVENT LISTINERS ***************/
+      selects.forEach((select) => {
+        select.addEventListener("change", resetResult);
+      });
+      inputs.forEach((input) => {
+        input.addEventListener("input", resetResult);
+      });
+      inputs2.forEach((input) => {
+        input.addEventListener("input", resetResult);
+      });
+
+      resetBtnEl.addEventListener("click", resethandler);
+      calcBtnEl.addEventListener("click", calculateResults);
+
+    </script>
+  </body>
+</html>
