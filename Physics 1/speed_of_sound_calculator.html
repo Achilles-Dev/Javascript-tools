@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Speed of Sound Calculator</title>
+  </head>
+  <body>
+    <h1>Speed of Sound Calculator</h1>
+      <p>Speed of sound in dry air</p>
+      <div>
+        <p>
+          <label for="i1-input">Temperature</label>
+          <input
+            type="number"
+            min="0"
+            autocomplete="off"
+            data-id="i1"
+            step="any"
+            id="i1-input"
+            class="inputs"
+            data-name="Temperature"
+          />
+          <select
+            class="selects"
+            id="i1-select"
+            data-type="temperature"
+            data-prev="°C"
+            data-id="i1"
+          >
+            <option value="°C" selected>Celsius (°C)</option>
+            <option value="°F">Fahrenheit (°F)</option>
+            <option value="K">kelvin (K)</option>
+          </select>
+        </p>
+      </div>
+
+      <p>Speed of sound in water</p>
+      <div>
+        <p>
+          <p>
+            <label for="i1II-select"
+              >I want to choose temperature in ...
+            </label>
+            <select id="i1II-select">
+              <option value="°C">Celsius (°C)</option>
+              <option value="°F" selected>Fahrenheit (°F)</option>
+            </select>
+          </p>
+
+          <label>Temperature </label>
+          <select id="°C-select" class="selectsII">
+            <option value="1403">0°C</option>
+            <option value="1427">5°C</option>
+            <option value="1447">10°C</option>
+            <option value="1481" selected>20°C</option>
+            <option value="1507">30°C</option>
+            <option value="1526">40°C</option>
+            <option value="1541">50°C</option>
+            <option value="1552">60°C</option>
+            <option value="1555">70°C</option>
+            <option value="1555">80°C</option>
+            <option value="1550">90°C</option>
+            <option value="1543">100°C</option>
+          </select>
+          <select id="°F-select" class="selectsII">
+            <option value="1403">32°F</option>
+            <option value="1424">40°F</option>
+            <option value="1447.2">50°F</option>
+            <option value="1467.3">60°F</option>
+            <option value="1484.7" selected>70°F</option>
+            <option value="1499.3">80°F</option>
+            <option value="1511.8">90°F</option>
+            <option value="1522.5">100°F</option>
+            <option value="1539">120°F</option>
+            <option value="1551.7">140°F</option>
+            <option value="1554.8">160°F</option>
+            <option value="1553">180°F</option>
+            <option value="1551">200°F</option>
+            <option value="1543">212°F</option>
+          </select>
+        </p>
+
+        <p>
+          <label for="i2II-input">Speed</label>
+          <input
+            type="number"
+            min="0"
+            autocomplete="off"
+            data-id="i2II"
+            step="any"
+            id="i2II-input"
+            class="inputs"
+            data-name="Speed"
+            disabled
+          />
+
+          <select
+            class="selects"
+            id="i2II-select"
+            data-type="speed"
+            data-prev="m/s"
+            data-id="i2II"
+          >
+            <option value="m/s" selected>meters per second (m/s)</option>
+            <option value="km/h">kilometers per hour (km/h)</option>
+            <option value="ft/s">feet per second (ft/s)</option>
+            <option value="mph">miles per hour (mph)</option>
+            <option value="kn">knots (kn)</option>
+            <option value="ft/min">feet per minute (ft/min)</option>
+          </select>
+        </p>
+
+      <button id="calcBtn">Calculate</button>
+      <button id="resetBtn">Reset</button>
+      <hr>
+      <div>
+        <h3>Result:</h3>
+        <h3 id="calcResults">Result will appear here...</h3>
+      </div>
+
+    <script>
+      /*************** ELEMENTS ***************/
+      const selects = document.querySelectorAll(".selects");
+      const inputs = document.querySelectorAll(".inputs");
+      const tempSelect = document.getElementById("i1II-select");
+
+      const formElII = document.getElementById("form-2");
+      const selectsII = document.querySelectorAll(".selectsII");
+
+      const calcBtnEl = document.getElementById('calcBtn');
+      const resetBtnEl = document.getElementById('resetBtn');
+      const calcResultsEl = document.getElementById('calcResults')
+
+      /*************** GLOBAL VARIBLES ***************/
+      const UNITS = {
+        temperature: {
+          "°C": (value, op) => (op === "+" ? value + 273.15 : value - 273.15),
+          "°F": (value, op) =>
+            op === "+"
+              ? (value - 32) * (5 / 9) + 273.15
+              : (value - 273.15) * (9 / 5) + 32,
+          K: (value, op) => value,
+        },
+        speed: {
+          "m/s": 1,
+          "km/h": 3.6,
+          "ft/s": 3.280839895013123,
+          mph: 2.236936292054402,
+          kn: 1.9438444924406046,
+          "ft/min": 196.85039370078738,
+        },
+      };
+
+      /*************** FUNCTIONS ***************/
+      function toSIUnit(type, unit, value) {
+        if (type === "temperature") {
+          return UNITS[type][unit](value, "+");
+        }
+        return value / UNITS[type][unit];
+      }
+
+      function fromSIUnit(type, unit, value) {
+        if (type === "temperature") {
+          return UNITS[type][unit](value, "-");
+        }
+        return value * UNITS[type][unit];
+      }
+
+      function createElement() {
+        const newDiv = `
+          <div>
+            <p>
+              <label for="i2-span">Speed: &nbsp; </label>
+              <span
+                data-id="i2"
+                step="any"
+                id="i2-span"
+                class="spans"
+                data-name="Speed"
+              ></span>
+
+              <select
+                class="selectsResult"
+                id="i2-select"
+                data-type="speed"
+                data-prev="m/s"
+                data-id="i2"
+              >
+                <option value="m/s" selected>meters per second (m/s)</option>
+                <option value="km/h">kilometers per hour (km/h)</option>
+                <option value="ft/s">feet per second (ft/s)</option>
+                <option value="mph">miles per hour (mph)</option>
+                <option value="kn">knots (kn)</option>
+                <option value="ft/min">feet per minute (ft/min)</option>
+              </select>
+            </p>
+          </div>
+        `
+        return newDiv
+      }
+
+      // related to caculation
+      function prepareUnit(...args) {
+        const resultArr = [];
+        for (id of args) {
+          const input = document.getElementById(`${id}-input`);
+          const select = document.getElementById(`${id}-select`);
+          const type = select.getAttribute("data-type");
+          let val = parseFloat(input.value);
+
+          val = isNaN(val) ? 0 : val;
+          let inUnit = select.value;
+
+          val = toSIUnit(type, inUnit, val);
+
+          resultArr.push(val);
+        }
+
+        return resultArr;
+      }
+
+      function setResult(resultObj) {
+        for (key of Object.keys(resultObj)) {
+          let val = resultObj[key].result;
+          let id = resultObj[key].type;
+
+          if (isNaN(val)) {
+           alert("Your input resulted in NAN.\n 0/0 \n Try again with valid input.");
+            return;
+          }
+          if (Math.abs(val) === Infinity) {
+            alert("Your input resulted in Infinity. \nDivision by zero. \nTry again with valid input.");
+            return;
+          }
+          if (id != 'i2') {
+            const input = document.getElementById(`${id}-input`);
+            const select = document.getElementById(`${id}-select`);
+            const type = select.getAttribute("data-type");
+            let outUnit = select.value;
+
+            val = fromSIUnit(type, outUnit, val);
+            input.value = parseFloat(val);
+
+            !validateInput(id);
+          } else {
+            const span = document.getElementById(`${id}-span`);
+            const select = document.getElementById(`${id}-select`);
+            const type = select.getAttribute("data-type");
+            let outUnit = select.value;
+            val = fromSIUnit(type, outUnit, val);
+
+            span.textContent = parseFloat(val);
+          }
+        }
+      }
+
+      function calculateResult() {
+        const R = 8.31446261815324;
+        const M = 0.0289647;
+        const ro = 1.4;
+
+        const k = (ro * R) / M;
+        
+        function calculateI2() {
+          let [val1] = prepareUnit("i1");
+          let result = Math.sqrt(val1 * k);
+          return {
+            1: { result, type: "i2" },
+          };
+        }
+        return calculateI2()
+      }
+
+      function selectsIIChangeHandler(e, inp = false) {
+        let select;
+        if (e) {
+          select = e.target;
+        } else select = inp;
+        let val = parseFloat(select.value);
+        let resultObj = {
+          1: { result: val, type: "i2II" },
+        };
+        setResult(resultObj, "II");
+      }
+
+      function selectChangeHandler(e) {
+        let select = e.target;
+        let id = select.getAttribute("data-id");
+        let input = document.getElementById(`${id}-input`);
+
+        let prevUnit = select.getAttribute("data-prev");
+        let currentUnit = select.value;
+
+        select.setAttribute("data-prev", currentUnit);
+
+        let type = select.getAttribute("data-type");
+
+        let value = input.value;
+
+        if (value == "") return;
+        value = parseFloat(value);
+        if (isNaN(value)) value = 0.0;
+
+        let si = toSIUnit(type, prevUnit, value);
+        let result = fromSIUnit(type, currentUnit, si);
+        input.value = parseFloat(result);
+      }
+
+      function validateInput(id) {
+        const input = document.getElementById(`${id}-input`);
+        const label = input.getAttribute("data-name").trim();
+        let value = parseFloat(input.value);
+
+        if (label === "Temperature") {
+          let unit = document.getElementById(`${id}-select`).value;
+          let siValue = toSIUnit("temperature", unit, value);
+          if (siValue <= 0 || isNaN(value)) {
+            alert(`Temperature must be greater than zero kelvin (273.15 °C, -459.7 °F).`);
+            return false;
+          }
+          return true;
+        }
+
+        if (value < 0) {
+          alert(`Speed of sound in dry air cannot be negative.`);
+          return false;
+        }
+
+        return true;
+      }
+
+      function tempSelectHandler() {
+        const id = tempSelect.value;
+        if (id === "°C") {
+          document.getElementById("°F-select").style.display = "none";
+          document.getElementById("°C-select").style.display = "";
+        } else if (id === "°F") {
+          document.getElementById("°F-select").style.display = "";
+          document.getElementById("°C-select").style.display = "none";
+        }
+        const select = document.getElementById(`${id}-select`);
+        selectsIIChangeHandler(false, select);
+      }
+
+      function handleResultsChange(e) {
+        let select = e.target;
+        let id = select.getAttribute("data-id");
+        let span = document.getElementById(`${id}-span`);
+
+        let prevUnit = select.getAttribute("data-prev");
+        let currentUnit = select.value;
+        select.setAttribute("data-prev", currentUnit);
+
+        if (span.textContent === "") {
+          return;
+        }
+
+        let type = select.getAttribute("data-type");
+
+        let value = parseFloat(span.textContent);
+        value = parseFloat(value);
+        if (isNaN(value)) value = 0.0;
+
+        let si = toSIUnit(type, prevUnit, value);
+        let result = fromSIUnit(type, currentUnit, si);
+        span.textContent = parseFloat(result);
+      }
+
+      function calculateResults() {
+        if (!validateInput("i1")) return;
+        
+        try {
+          const resultElement = createElement()
+          calcResultsEl.innerHTML = resultElement
+
+          const newSelects = document.querySelectorAll(".selectsResult");
+
+          newSelects.forEach((select) => {
+            select.addEventListener("change", handleResultsChange);
+          });
+        
+          const result = calculateResult();
+          setResult(result)
+
+        } catch(error) {
+          alert("An error ocurred. Try again with valid input.");
+          resetResult()
+          return;
+        }
+      }
+
+      function resetForm() {
+        tempSelect.selectedIndex = '1'
+        selects.forEach((select, index) => {
+          select.selectedIndex = '0'
+        });
+
+        inputs.forEach((input) => {
+          input.value = ""
+        });
+        tempSelectHandler()
+      }
+
+      function resetResult() {
+        calcResultsEl.innerHTML = "<p>Result will appear here...</p>";
+      } 
+
+      function resethandler() {
+        resetForm();
+        resetResult();
+      }
+
+
+      function windowLoadHandler() {
+        // set select data-prev
+        selects.forEach((select) => {
+          let value = select.value;
+          select.setAttribute("data-prev", value);
+        });
+        tempSelectHandler();
+        let selectID = document.getElementById("i1II-select").value;
+        let select = document.getElementById(`${selectID}-select`);
+        selectsIIChangeHandler(false, select);
+      }
+
+      /*************** EVENT LISTINERS ***************/
+      window.addEventListener("load", windowLoadHandler);
+      tempSelect.addEventListener("change", tempSelectHandler);
+
+      selects.forEach((select, index) => {
+        if (index == 0) {
+          select.addEventListener("change", resetResult);
+        } else {
+          select.addEventListener("change", selectChangeHandler)
+        }
+      });
+
+      inputs.forEach((input) => {
+        input.addEventListener("input", resetResult);
+      });
+
+      selectsII.forEach((select) => {
+        select.addEventListener("change", selectsIIChangeHandler);
+      });
+
+      resetBtnEl.addEventListener("click", resethandler);
+      calcBtnEl.addEventListener("click", calculateResults);
+
+    </script>
+  </body>
+</html>

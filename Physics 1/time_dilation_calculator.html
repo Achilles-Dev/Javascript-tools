@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Time Dilation Calculator</title>
+  </head>
+  <body>
+    <h1>Time Dilation Calculator</h1>
+      <div>
+        <p>
+          <label for="i1-input">Time interval (Δt)</label>
+          <input
+            type="number"
+            min="0"
+            autocomplete="off"
+            data-id="i1"
+            step="any"
+            id="i1-input"
+            class="inputs"
+            data-name="Time interval"
+          />
+          <select
+            class="selects"
+            id="i1-select"
+            data-type="time"
+            data-prev="sec"
+            data-id="i1"
+          >
+            <option value="sec" selected>seconds (sec)</option>
+            <option value="min">minutes (min)</option>
+            <option value="hrs">hour (hrs)</option>
+            <option value="days">days (days)</option>
+            <option value="wks">weeks (wks)</option>
+            <option value="mos">months (mos)</option>
+            <option value="yrs">years (yrs)</option>
+          </select>
+        </p>
+
+        <p>
+          <label for="i2-input">Observer velocity (v)</label>
+          <input
+            type="number"
+            min="0"
+            autocomplete="off"
+            data-id="i2"
+            step="any"
+            id="i2-input"
+            class="inputs"
+            data-name="Observer velocity"
+            value="200000"
+          />
+
+          <select
+            class="selects"
+            id="i2-select"
+            data-type="speed"
+            data-prev="km/s"
+            data-id="i2"
+          >
+            <option value="m/s">meters per second (m/s)</option>
+            <option value="km/s" selected>kilometers per second (km/s)</option>
+            <option value="mi/s">miles per second (mi/s)</option>
+            <option value="c">light speed (c)</option>
+          </select>
+        </p>      
+      </div>
+
+      <button id="calcBtn">Calculate</button>
+      <button id="resetBtn">Reset</button>
+      <hr>
+      <div>
+        <h3>Result:</h3>
+        <h3 id="calcResults">Result will appear here...</h3>
+      </div>
+    <script>
+      /*************** ELEMENTS ***************/
+      const selects = document.querySelectorAll(".selects");
+      const inputs = document.querySelectorAll(".inputs");
+
+      const calcBtnEl = document.getElementById('calcBtn');
+      const resetBtnEl = document.getElementById('resetBtn');
+      const calcResultsEl = document.getElementById('calcResults')
+
+      /*************** GLOBAL VARIBLES ***************/
+      const UNITS = {
+        time: {
+          sec: 1,
+          min: 0.016666666666666666,
+          hrs: 0.0002777777777777778,
+          days: 0.000011574074074074073,
+          wks: 0.0000016534391534391533,
+          mos: 3.802570537683474e-7,
+          yrs: 3.168808781402895e-8,
+        },
+        speed: {
+          "m/s": 1,
+          "km/s": 0.0010000000000000002,
+          "mi/s": 0.000621371192237334,
+          c: 3.3356409519815204e-9,
+        },
+      };
+      const queue = ["i1", "i2", "i3"];
+      /*************** FUNCTIONS ***************/
+      function toSIUnit(type, unit, value) {
+        if (type === "exp") {
+          unit = parseFloat("1e" + unit);
+          return value * unit;
+        }
+        return value / UNITS[type][unit];
+      }
+
+      function fromSIUnit(type, unit, value) {
+        if (type === "exp") {
+          unit = parseFloat("1e" + unit);
+          return value / unit;
+        }
+        return value * UNITS[type][unit];
+      }
+
+      function createElement() {
+        const newDiv = `
+          <div>
+            <p>
+              <label for="i3-span">Relative time (Δt'): &nbsp;</label>
+              <span
+                data-id="i3"
+                step="any"
+                class="spans"
+                id="i3-span"
+                data-name="Relative time"
+              ></span>
+              <select
+                class="selectsResult"
+                id="i3-select"
+                data-type="time"
+                data-prev="sec"
+                data-id="i3"
+              >
+                <option value="sec" selected>seconds (sec)</option>
+                <option value="min">minutes (min)</option>
+                <option value="hrs">hour (hrs)</option>
+                <option value="days">days (days)</option>
+                <option value="wks">weeks (wks)</option>
+                <option value="mos">months (mos)</option>
+                <option value="yrs">years (yrs)</option>
+              </select>
+            </p>
+          </div>
+        `
+        return newDiv
+      }
+
+
+      function customPercision(ans, to = 13) {
+        return parseFloat(ans.toPrecision(to));
+      }
+
+      function validateInput(id) {
+        const input = document.getElementById(`${id}-input`);
+        const label = input.getAttribute("data-name").trim();
+        let value = parseFloat(input.value);
+
+        if (id === "i2") {
+          const select = document.getElementById(`${id}-select`);
+          let val = parseFloat(input.value);
+          let inUnit = select.value;
+          val = toSIUnit("speed", inUnit, val);
+
+          if (val > 299792458) {
+            alert(`You can't exceed the speed of light`);
+            return false;
+          }
+        }
+
+        return true;
+      }
+
+      // related to caculation
+      function prepareUnit(...args) {
+        const resultArr = [];
+        for (id of args) {
+          const input = document.getElementById(`${id}-input`);
+          const select = document.getElementById(`${id}-select`);
+          const type = select.getAttribute("data-type");
+          let val = parseFloat(input.value);
+          val = isNaN(val) ? 0 : val;
+          let inUnit = select.value;
+          val = toSIUnit(type, inUnit, val);
+          resultArr.push(val);
+        }
+
+        return resultArr;
+      }
+
+      function setResult(resultObj) {
+        for (key of Object.keys(resultObj)) {
+          let val = resultObj[key].result;
+          let id = resultObj[key].type;
+
+          const input = document.getElementById(`${id}-input`);
+
+          if (isNaN(val)) {
+            alert("Your input resulted in NAN.\n 0/0 \n Try again with valid input.");
+            input.value = "";
+            return;
+          }
+          if (Math.abs(val) === Infinity) {
+            alert(
+              "Your input resulted in Infinity. \nDivision by zero. \nTry again with valid input."
+            );
+            return;
+          }
+
+          const span = document.getElementById(`${id}-span`);
+          const select = document.getElementById(`${id}-select`);
+          const type = select.getAttribute("data-type");
+          let outUnit = select.value;
+          val = fromSIUnit(type, outUnit, val);
+
+          span.textContent = customPercision(val);
+        }
+      }
+
+      function calculateResult() {
+        const C = 299792458;
+
+        function calculateI3() {
+          let [val1, val2] = prepareUnit("i1", "i2");
+
+          let result = val1 / Math.sqrt(1 - (val2 * val2) / (C * C));
+          return {
+            1: { result, type: "i3" },
+          };
+        }
+        return calculateI3()
+      }
+
+      function handleResultsChange(e) {
+        let select = e.target;
+        let id = select.getAttribute("data-id");
+        let span = document.getElementById(`${id}-span`);
+
+        let prevUnit = select.getAttribute("data-prev");
+        let currentUnit = select.value;
+        select.setAttribute("data-prev", currentUnit);
+
+        if (span.textContent === "") {
+          return;
+        }
+
+        let type = select.getAttribute("data-type");
+
+        let value = parseFloat(span.textContent);
+        value = parseFloat(value);
+        if (isNaN(value)) value = 0.0;
+
+        let si = toSIUnit(type, prevUnit, value);
+        let result = fromSIUnit(type, currentUnit, si);
+        span.textContent = customPercision(result);
+      }
+
+      function calculateResults() {
+        for (el of ["i1", "i2"]) {
+          if (!validateInput(el)) return;
+        }
+
+        try {
+          const resultElement = createElement()
+          calcResultsEl.innerHTML = resultElement
+
+          const newSelects = document.querySelectorAll(".selectsResult");
+
+          newSelects.forEach((select) => {
+            select.addEventListener("change", handleResultsChange);
+          });
+          
+          const result = calculateResult();
+          setResult(result)
+
+        } catch(error) {
+          alert("An error ocurred. Try again with valid input.");
+          resetResult()
+          return;
+        }
+      }
+
+      function resetForm() {
+        selects.forEach((select, index) => {
+          if (index == 1) {
+            select.selectedIndex = '1'
+          } else {
+            select.selectedIndex = '0'
+          }
+          
+        });
+
+        inputs.forEach((input, index) => {
+          if (index == 1) {
+            input.value = "200000"
+          } else {
+            input.value = ""
+          }
+        });
+      }
+
+      function resetResult() {
+        calcResultsEl.innerHTML = "<p>Result will appear here...</p>";
+      } 
+
+      function resethandler() {
+        resetForm();
+        resetResult();
+      }
+
+      /*************** EVENT LISTINERS ***************/
+      selects.forEach((select) => {
+        select.addEventListener("change", resetResult);
+      });
+      inputs.forEach((input) => {
+        input.addEventListener("input", resetResult);
+      });
+
+      resetBtnEl.addEventListener("click", resethandler);
+      calcBtnEl.addEventListener("click", calculateResults);
+
+    </script>
+  </body>
+</html>
