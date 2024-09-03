@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Specific Gravity Calculator</title>
+  </head>
+  <body>
+    <h1>Specific Gravity Calculator</h1>
+      <div>
+        <p>
+          <label for="i1-input">Density</label>
+          <input
+            type="number"
+            min="0"
+            autocomplete="off"
+            data-id="i1"
+            step="any"
+            id="i1-input"
+            class="inputs"
+            data-name="Density"
+          />
+
+          <select
+            class="selects"
+            id="i1-select"
+            data-type="distance"
+            data-prev="kg/m³"
+            data-id="i1"
+          >
+            <option value="kg/m³" selected>
+              kilograms per cubic meter (kg/m³)
+            </option>
+            <option value="lb/ft³">pounds per cubic feet (lb/ft³)</option>
+            <option value="lb/yd³">pounds per cubic yard (lb/yd³)</option>
+            <option value="g/cm³">grams per cubic centimeter (g/cm³)</option>
+            <option value="kg/cm³">
+              kilograms per cubic centimeter (kg/cm³)
+            </option>
+            <option value="mg/cm³">
+              milligrams per cubic centimeter (mg/cm³)
+            </option>
+            <option value="g/m³">grams per cubic meter (g/m³)</option>
+            <option value="g/dm³">grams cubic per decimeter (g/dm³)</option>
+          </select>
+        </p>
+      </div>
+      <!-- section two -->
+      <p>Example specific gravities</p>
+      <div>
+        <p>
+          <label for="P-select"> Substance</label>
+          <select id="P-select">
+            <option value="0.2">Balsa wood</option>
+            <option value="0.75">Oak wood</option>
+            <option value="0.78">Ethanol</option>
+            <option value="0.91">Olive oil</option>
+            <option value="0.91">Ice</option>
+            <option value="0.9498">Vodka</option>
+            <option value="1" selected>Water</option>
+            <option value="1.06">Blood</option>
+            <option value="2.17">Table salt</option>
+            <option value="2.7">Aluminium</option>
+            <option value="3.15">Cement</option>
+            <option value="7.87">Iron</option>
+            <option value="8.96">Copper</option>
+            <option value="11.35">Lead</option>
+            <option value="13.56">Mecury</option>
+            <option value="19.1">Depleted uranium</option>
+            <option value="19.3">Gold</option>
+            <option value="22.59">Osmium</option>
+          </select>
+        </p>
+        <p>
+          <label for="iv-input">Specific gravity</label>
+          <input
+            type="number"
+            min="0"
+            autocomplete="off"
+            data-id="iv"
+            step="any"
+            id="iv-input"
+            data-name="Wave velocity"
+            value="1"
+            disabled
+          />
+        </p>
+
+        <button id="calcBtn">Calculate</button>
+        <button id="resetBtn">Reset</button>
+        <hr>
+        <div>
+          <h3>Result:</h3>
+          <h3 id="calcResults">Result will appear here...</h3>
+        </div>
+    </form>
+
+    <script>
+      /*************** ELEMENTS ***************/
+      const selects = document.querySelectorAll(".selects");
+      const inputs = document.querySelectorAll(".inputs");
+
+      const presetSelect = document.getElementById("P-select");
+
+      const calcBtnEl = document.getElementById('calcBtn');
+      const resetBtnEl = document.getElementById('resetBtn');
+      const calcResultsEl = document.getElementById('calcResults')
+
+      /*************** GLOBAL VARIBLES ***************/
+      const UNITS = {
+        distance: {
+          "kg/m³": 1,
+          "lb/ft³": 0.0624279606,
+          "lb/yd³": 1.68555494,
+          "g/cm³": 0.001,
+          "kg/cm³": 0.000001,
+          "mg/cm³": 1,
+          "g/m³": 1000,
+          "g/dm³": 1,
+        },
+        unit: {
+          unit: 1,
+        },
+      };
+      const queue = ["i1", "i2", "i3"];
+      /*************** FUNCTIONS ***************/
+      function toSIUnit(type, unit, value) {
+        if (type === "exp") {
+          unit = parseFloat("1e" + unit);
+          return value * unit;
+        }
+        return value / UNITS[type][unit];
+      }
+
+      function fromSIUnit(type, unit, value) {
+        if (type === "exp") {
+          unit = parseFloat("1e" + unit);
+          return value / unit;
+        }
+        return value * UNITS[type][unit];
+      }
+
+      function createElement() {
+        const newDiv = `
+          <div>
+            <p>
+              <label for="i2-span">Specific gravity: &nbsp;</label>
+              <span
+                data-id="i2"
+                step="any"
+                class="spans"
+                id="i2-span"
+                data-name="Specific gravity"
+              ></span>
+              <select
+                class="selectsResult"
+                id="i2-select"
+                data-type="unit"
+                data-prev="unit"
+                data-id="i2"
+                style="display: none"
+              >
+                <option value="unit" selected>unit</option>
+              </select>
+            </p>
+          </div>
+        `
+        return newDiv
+      }
+
+
+      function customPercision(ans, to = 8) {
+        return parseFloat(parseFloat(ans).toPrecision(to));
+      }
+
+      function validateInput(id) {
+        const input = document.getElementById(`${id}-input`);
+        const label = input.getAttribute("data-name").trim();
+        let value = parseFloat(input.value);
+
+        if (value <= 0 || isNaN(value)) {
+          alert(`${label} must be greater than zero!`);
+          return false;
+        }
+
+        return true;
+      }
+
+      // related to caculation
+      function prepareUnit(...args) {
+        const resultArr = [];
+        for (id of args) {
+          const input = document.getElementById(`${id}-input`);
+          const select = document.getElementById(`${id}-select`);
+          const type = select.getAttribute("data-type");
+          let val = parseFloat(input.value);
+          val = isNaN(val) ? 0 : val;
+          let inUnit = select.value;
+          val = toSIUnit(type, inUnit, val);
+          resultArr.push(val);
+        }
+
+        return resultArr;
+      }
+
+      function setResult(resultObj) {
+        for (key of Object.keys(resultObj)) {
+          let val = resultObj[key].result;
+          let id = resultObj[key].type;
+          if (isNaN(val)) {
+            alert("Your input resulted in NAN.\n 0/0 \n Try again with valid input.");
+            return;
+          }
+          if (Math.abs(val) === Infinity) {
+            alert(
+              "Your input resulted in Infinity. \nDivision by zero. \nTry again with valid input."
+            );
+            return;
+          }
+
+          const span = document.getElementById(`${id}-span`);
+          const select = document.getElementById(`${id}-select`);
+          const type = select.getAttribute("data-type");
+          let outUnit = select.value;
+          val = fromSIUnit(type, outUnit, val);
+
+          span.textContent = customPercision(val);
+        }
+      }
+
+      function calculateResult() {
+        function calculateI2() {
+          let [val1] = prepareUnit("i1");
+
+          let result = val1 / 1000;
+          return {
+            1: { result, type: "i2" },
+          };
+        }
+        return calculateI2()
+      }
+
+      function calculateResults() {
+        if (!validateInput("i1")) return;
+
+        try {
+          const resultElement = createElement()
+          calcResultsEl.innerHTML = resultElement
+          
+          const result = calculateResult();
+          setResult(result)
+
+        } catch(error) {
+          alert("An error ocurred. Try again with valid input.");
+          resetResult()
+          return;
+        }
+      }
+
+      function presetHandler() {
+        const value = presetSelect.value;
+        const input = document.getElementById("iv-input");
+        input.value = value;
+      }
+
+      function resetForm() {
+        presetSelect.selectedIndex = '6'
+        selects.forEach((select, index) => {
+          select.selectedIndex = '0'
+        });
+
+        inputs.forEach((input) => {
+          input.value = ""
+        });
+        presetHandler()  
+      }
+
+      function resetResult() {
+        calcResultsEl.innerHTML = "<p>Result will appear here...</p>";
+      } 
+
+      function resethandler() {
+        resetForm();
+        resetResult();
+      }
+
+
+      function windowLoadHandler() {
+        presetHandler();
+        selects.forEach((select) => {
+          let value = select.value;
+          select.setAttribute("data-prev", value);
+        });
+      }
+
+      /*************** EVENT LISTINERS ***************/
+      window.addEventListener("load", windowLoadHandler);
+      presetSelect.addEventListener("change", presetHandler);
+      selects.forEach((select) => {
+        select.addEventListener("change", resetResult);
+      });
+      inputs.forEach((input) => {
+        input.addEventListener("input", resetResult);
+      });
+
+      resetBtnEl.addEventListener("click", resethandler);
+      calcBtnEl.addEventListener("click", calculateResults);
+
+    </script>
+  </body>
+</html>

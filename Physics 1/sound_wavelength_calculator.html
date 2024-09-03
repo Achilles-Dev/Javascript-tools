@@ -3,39 +3,31 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Skin Depth Calculator</title>
+    <title>Sound Wavelength Calculator</title>
   </head>
   <body>
-    <h1>Skin Depth Calculator</h1>
+    <h1>Sound Wavelength Calculator</h1>
       <p>
-        <label for="P-select"> Material </label>
+        <label for="P-select"> Wave velocity of</label>
         <select id="P-select" data-flag="false">
-          <option
-            value=""
-            data-res="0.00000001678"
-            data-perm="0.999991"
-            selected
-          >
-            Copper
-          </option>
-          <option value="" data-res="0.000000026548" data-perm="1.00002">
-            Aluminum
-          </option>
-          <option value="" data-res="0.0000000214" data-perm="1">Gold</option>
-          <option value="" data-res="0.00000001587" data-perm="0.9998">
-            Silver
-          </option>
-          <option value="" data-res="0.0000000684" data-perm="600">
-            Nickel
-          </option>
-
+          <option value="343">Air (20 oc/68 OF)</option>
+          <option value="1007">Helium (20 oc/68 OF)</option>
+          <option value="1270">Hydrogen (20 oc/68 OF)</option>
+          <option value="1403">Water (0 oc/32 'F)</option>
+          <option value="1481">Water (20 oc/68 OF)</option>
+          <option value="1543">Water (100 oc/212 OF)</option>
+          <option value="4540">Glass</option>
+          <option value="4150">Wood (average)</option>
+          <option value="60">Rubber</option>
+          <option value="6420">Aluminum</option>
+          <option value="1960">Lead</option>
+          <option value="5940">Steel</option>
           <option value="custom" disabled>Custom</option>
         </select>
       </p>
-
       <div>
         <p>
-          <label for="i1-input">Resistivity (ρ) </label>
+          <label for="i1-input">Speed of sound (v)</label>
           <input
             type="number"
             min="0"
@@ -44,23 +36,27 @@
             step="any"
             id="i1-input"
             class="inputs"
-            data-name="Resistivity"
+            data-name="Speed of sound"
+            value="343"
           />
           <select
             class="selects"
             id="i1-select"
-            data-type="resistivity"
+            data-type="speed"
             data-prev="m/s"
             data-id="i1"
           >
-            <option value="Ω•m">ohm meters (Ω•m)</option>
-            <option value="μΩ•cm">micro-ohm centimeters (μΩ•cm)</option>
-            <option value="Ω•cm">ohm centimeters (Ω•cm)</option>
+            <option value="m/s" selected>meters per second (m/s)</option>
+            <option value="km/h">kilometers per hour (km/h)</option>
+            <option value="ft/s">feet per second (ft/s)</option>
+            <option value="mph">miles per hour (mph)</option>
+            <option value="kn">knots (kn)</option>
+            <option value="ft/min">feet per minute (ft/min)</option>
           </select>
         </p>
 
         <p>
-          <label for="i2-input">Relative permeability (μᵣ) </label>
+          <label for="i2-input">Frequency (𝑓)</label>
           <input
             type="number"
             min="0"
@@ -69,44 +65,20 @@
             step="any"
             id="i2-input"
             class="inputs"
-            data-name="Relative permeability (μᵣ)"
+            data-name="Frequency"
           />
 
           <select
             class="selects"
             id="i2-select"
-            data-type="rp"
-            data-prev="rp"
-            data-id="i2"
-            style="display: none"
-          >
-            <option value="rp">unit</option>
-          </select>
-        </p>
-
-        <p>
-          <label for="i3-input">Frequency (f) </label>
-          <input
-            type="number"
-            min="0"
-            autocomplete="off"
-            data-id="i3"
-            step="any"
-            class="inputs"
-            id="i3-input"
-            data-name="Frequency"
-          />
-          <select
-            class="selects"
-            id="i3-select"
             data-type="frequency"
-            data-prev="GHz"
-            data-id="i3"
+            data-prev="Hz"
+            data-id="i2"
           >
-            <option value="Hz">hertz (Hz)</option>
+            <option value="Hz" selected>hertz (Hz)</option>
             <option value="kHz">kilohertz (kHz)</option>
             <option value="MHz">megahertz (MHz)</option>
-            <option value="GHz" selected>gigahertz (GHz)</option>
+            <option value="GHz">gigahertz (GHz)</option>
           </select>
         </p>
       </div>
@@ -122,7 +94,7 @@
       /*************** ELEMENTS ***************/
       const selects = document.querySelectorAll(".selects");
       const inputs = document.querySelectorAll(".inputs");
-
+    
       const presetSelect = document.getElementById("P-select");
 
       const calcBtnEl = document.getElementById('calcBtn');
@@ -131,13 +103,23 @@
 
       /*************** GLOBAL VARIBLES ***************/
       const UNITS = {
+        speed: {
+          "m/s": 1,
+          "km/h": 3.5999999999999996,
+          "ft/s": 3.280839895013123,
+          mph: 2.236936292054402,
+          kn: 1.9438444924406046,
+          "ft/min": 196.85039370078738,
+        },
         distance: {
-          nm: 1e9,
-          μm: 1e6,
           mm: 1e3,
           cm: 1e2,
           m: 1,
+          km: 1e-3,
           in: 39.370078740157474,
+          ft: 3.2808398950131235,
+          yd: 1.0936132983377078,
+          mi: 0.000621371192237334,
         },
 
         frequency: {
@@ -146,16 +128,8 @@
           MHz: 1e-6,
           GHz: 1e-9,
         },
-        rp: {
-          rp: 100,
-        },
-        resistivity: {
-          "Ω•m": 1,
-          "μΩ•cm": 100000000,
-          "Ω•cm": 100,
-        },
       };
-      let queue = ["i2", "i1", "i3", "i4"];
+      const queue = ["i1", "i2", "i3"];
       /*************** FUNCTIONS ***************/
       function toSIUnit(type, unit, value) {
         if (type === "exp") {
@@ -177,37 +151,34 @@
         const newDiv = `
           <div>
             <p>
-              <label for="i4-span"> Skin depth (δ): &nbsp; </label>
+              <label for="i3-span">Wavelength (λ): &nbsp; </label>
               <span
-                data-id="i4"
+                data-id="i3"
                 step="any"
                 class="spans"
-                id="i4-span"
-                data-name="Skin depth"
+                id="i3-span"
+                data-name="Wavelength"
               ></span>
               <select
                 class="selectsResult"
-                id="i4-select"
+                id="i3-select"
                 data-type="distance"
-                data-prev="μm"
-                data-id="i4"
+                data-prev="m"
+                data-id="i3"
               >
-                <option value="nm">nanometers (nm)</option>
-                <option value="μm" selected>micrometers (μm)</option>
                 <option value="mm">millimeters (mm)</option>
                 <option value="cm">centimeters (cm)</option>
-                <option value="m">meters (m)</option>
+                <option value="m" selected>meters (m)</option>
+                <option value="km">kilometers (km)</option>
                 <option value="in">inches (in)</option>
+                <option value="ft">feet (ft)</option>
+                <option value="yd">yard (yd)</option>
+                <option value="mi">mile (mi)</option>
               </select>
             </p>
           </div>
         `
         return newDiv
-      }
-
-
-      function customPercision(ans, to = 8) {
-        return parseFloat(parseFloat(ans).toPrecision(to));
       }
 
       function validateInput(id) {
@@ -244,7 +215,6 @@
         for (key of Object.keys(resultObj)) {
           let val = resultObj[key].result;
           let id = resultObj[key].type;
-         
           if (isNaN(val)) {
             alert("Your input resulted in NAN.\n 0/0 \n Try again with valid input.");
             return;
@@ -255,53 +225,28 @@
             );
             return;
           }
-          
+
           const span = document.getElementById(`${id}-span`);
           const select = document.getElementById(`${id}-select`);
           const type = select.getAttribute("data-type");
           let outUnit = select.value;
           val = fromSIUnit(type, outUnit, val);
 
-          span.textContent = customPercision(val, 16);
+          span.textContent = parseFloat(val);
         }
       }
 
       function calculateResult() {
-        const C = 4 * Math.PI * 10e-6;
 
-        function calculateI4() {
-          let [val1, val2, val3] = prepareUnit("i1", "i2", "i3");
+        function calculateI3() {
+          let [val1, val2] = prepareUnit("i1", "i2");
 
-          let result = Math.sqrt(val1 / (Math.PI * val3 * C * val2));
-
+          let result = val1 / val2;
           return {
-            1: { result, type: "i4" },
+            1: { result, type: "i3" },
           };
         }
-        return calculateI4()
-      }
-
-      function presetHandler() {
-        const perm =
-          presetSelect.options[presetSelect.selectedIndex].getAttribute("data-perm");
-
-        let res =
-          presetSelect.options[presetSelect.selectedIndex].getAttribute("data-res");
-
-        const input = document.getElementById("i1-input");
-        const input2 = document.getElementById("i2-input");
-
-        const select = document.getElementById(`i1-select`);
-        const type = select.getAttribute("data-type");
-
-        let outUnit = select.value;
-        res = fromSIUnit(type, outUnit, parseFloat(res));
-        input.value = customPercision(res, 11);
-
-        input2.value = parseFloat(perm);
-        presetSelect.setAttribute("data-flag", "false");
-
-        resetResult()
+        return calculateI3()
       }
 
       function handleResultsChange(e) {
@@ -325,16 +270,15 @@
 
         let si = toSIUnit(type, prevUnit, value);
         let result = fromSIUnit(type, currentUnit, si);
-        span.textContent = customPercision(result, 16);
+        span.textContent = parseFloat(result);
       }
 
       function calculateResults() {
-        for (el of ["i1", "i2", "i3"]) {
+        for (el of ["i1", "i2"]) {
           if (!validateInput(el)) return;
         }
 
         try {
-          
           const resultElement = createElement()
           calcResultsEl.innerHTML = resultElement
 
@@ -354,21 +298,30 @@
         }
       }
 
+      function presetHandler() {
+        const value = presetSelect.value;
+        const input = document.getElementById("i1-input");
+        const select = document.getElementById("i1-select");
+        let unit = select.value;
+
+        let val = fromSIUnit("speed", unit, parseFloat(value));
+
+        input.value = val;
+
+        presetSelect.setAttribute("data-flag", "false");
+        resetResult()
+      }
+
       function resetForm() {
-        presetSelect.selectedIndex = "0"
+        presetSelect.selectedIndex = '0'
         selects.forEach((select, index) => {
-          if (index == 2) {
-            select.selectedIndex = '3'
-          } else {
-            select.selectedIndex = '0'
-          }
-          
+          select.selectedIndex = '0'
         });
 
         inputs.forEach((input) => {
           input.value = ""
         });
-        presetHandler()
+        presetHandler()  
       }
 
       function resetResult() {
@@ -387,7 +340,6 @@
           let value = select.value;
           select.setAttribute("data-prev", value);
         });
-        // queue = ["i2", "i1", "i3", "i4"];
       }
 
 
