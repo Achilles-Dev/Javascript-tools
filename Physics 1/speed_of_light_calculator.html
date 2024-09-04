@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Speed of Light Calculator</title>
+  </head>
+  <body>
+    <h1>Speed of Light Calculator</h1>
+      <p>
+        Calculate:
+        <select id="calculateUnit">
+          <option value="sl">Speed of light </option>
+          <option value="tm">Time</option>
+          <option value="ds" selected>Distance </option>
+        </select>
+      </p>
+     
+      <div>
+        <p id="sl-contianer" class="containers">
+          <label for="sl-input">Speed of light </label>
+          <input
+            type="number"
+            step="any"
+            id="sl-input"
+            class="inputs"
+            min="1e-19"
+            value="299792458"
+            max="299792458"
+          />
+          <select id="sl-select">
+            <option value="m/s" selected>meters per second (m/s)</option>
+            <option value="km/h">kilometers per hour (km/h)</option>
+            <option value="ft/s">feet per second (ft/s)</option>
+            <option value="mph">miles per hour (mph)</option>
+            <option value="km/s">kilometers per second (km/s)</option>
+            <option value="mi/s">miles per second (mi/s)</option>
+            <option value="ft/min">feet per minute (ft/min)</option>
+          </select>
+        </p>
+        <p id="tm-contianer" class="containers">
+          <label for="tm-input">Time </label>
+          <input
+            type="number"
+            step="any"
+            id="tm-input"
+            class="inputs"
+            min="0"
+          />
+          <select id="tm-select">
+            <option value="sec" selected>seconds (sec)</option>
+            <option value="min">minutes (min)</option>
+            <option value="hrs">hour (hrs)</option>
+            <option value="days">days (days)</option>
+            <option value="wks">weeks (wks)</option>
+            <option value="mos">months (mos)</option>
+            <option value="yrs">years (yrs)</option>
+            <option value="myrs">million years (myrs)</option>
+            <option value="byrs">billion years (byrs)</option>
+            <option value="Univ.">ages of the Universe (Univ.)</option>
+          </select>
+        </p>
+        <p id="ds-contianer" class="containers" style="display: none;">
+          <label for="ds-input">Distance </label>
+          <input
+            type="number"
+            id="ds-input"
+            step="any"
+            class="inputs"
+            min="0"
+          />
+          <select id="ds-select">
+            <option value="mm">millimeters (mm)</option>
+            <option value="cm">centimeters (cm)</option>
+            <option value="m" selected>meters (m)</option>
+            <option value="km">kilometers (km)</option>
+            <option value="in">inches (in)</option>
+            <option value="ft">feet (ft)</option>
+            <option value="yd">yards (yd)</option>
+            <option value="mi">miles (mi)</option>
+            <option value="nmi">nautical miles (nmi)</option>
+            <option value="R⊕">Earth radii (R⊕)</option>
+            <option value="R☉">Sun radii (R☉)</option>
+            <option value="ly">light years (ly)</option>
+            <option value="au">astronomical unit (au)</option>
+            <option value="pcs">parsecs (pcs)</option>
+            <option value="Mly">mega light years (Mly)</option>
+            <option value="Mpcs">mega parsecs (Mpcs)</option>
+          </select>
+        </p>
+      </div>
+
+      <button id="calcBtn">Calculate</button>
+      <button id="resetBtn">Reset</button>
+      <hr>
+      <div>
+        <h3>Result:</h3>
+        <h3 id="calcResults">Result will appear here...</h3>
+      </div>
+    <script>
+      /*************** ELEMENTS ***************/
+      const calculateUnitEl = document.getElementById("calculateUnit");
+      const containers = document.querySelectorAll(".containers");
+      const inputs = document.querySelectorAll(".inputs");
+
+      const slInput = document.getElementById("sl-input");
+      const tmInput = document.getElementById("tm-input");
+      const dsInput = document.getElementById("ds-input");
+
+      const slSelect = document.getElementById("sl-select");
+      const tmSelect = document.getElementById("tm-select");
+      const dsSelect = document.getElementById("ds-select");
+
+      const calcBtnEl = document.getElementById('calcBtn');
+      const resetBtnEl = document.getElementById('resetBtn');
+      const calcResultsEl = document.getElementById('calcResults')
+
+      /*************** GLOBAL VARIBLES ***************/
+      const UNITS = {
+        distance: {
+          mm: 1e3,
+          cm: 1e2,
+          m: 1,
+          km: 1e-3,
+          in: 39.37,
+          ft: 3.281,
+          yd: 1.0936,
+          mi: 0.0006214,
+          nmi: 0.000539957,
+          "R⊕": 0.00000015696,
+          "R☉": 0.0000000014374,
+          ly: 1.057e-16,
+          au: 6.68459e-12,
+          pcs: 3.24078e-17,
+          Mly: 1.057e-22,
+          Mpcs: 3.24078e-23,
+        },
+        speed: {
+          "m/s": 1,
+          "km/h": 3.6,
+          "ft/s": 3.281,
+          mph: 2.237,
+          "km/s": 0.001,
+          "mi/s": 0.0006214,
+          "ft/min": 196.85,
+        },
+        time: {
+          sec: 1,
+          min: 0.016667,
+          hrs: 0.0002778,
+          days: 0.000011574,
+          wks: 0.0000016534,
+          mos: 0.00000038026,
+          yrs: 0.000000031688087814028950237026896848936547772961188430045378,
+          myrs: 0.00000003169e-6,
+          byrs: 0.00000003169e-9,
+          "Univ.": 2.2964046535277158e-18,
+        },
+      };
+      /*************** FUNCTIONS ***************/
+      function toSIUnit(type, unit, value) {
+        return value / UNITS[type][unit];
+      }
+
+      function fromSIUnit(type, unit, value) {
+        return value * UNITS[type][unit];
+      }
+
+      function handleCalculateUnitChange(e) {
+        const value = e.target.value
+        containers.forEach((container) => {
+          let idVal = container.id.slice(0, 2)
+          if (idVal == value) {
+            container.style.display = 'none'           
+          } else {
+            container.style.display = 'block'
+          }
+        })
+
+        resetResult()
+      }
+
+      function createElements(resultObj) {
+        const elementNodes = Object.keys(resultObj).map((key) => {
+          //create elements to put the results in
+          const div = document.createElement("div");
+          const span = document.createElement("span");
+          const span2 = document.createElement("span");
+
+          // give the elements id
+          div.setAttribute("class", `result-container`);
+          span.setAttribute("class", `result-title`);
+          span2.setAttribute("class", `result-value`);
+
+          // put the values in the elements
+
+          span.textContent = resultObj[key]["title"];
+          span2.textContent = resultObj[key]["value"];
+
+          // appened them to an element that contians them
+          div.append(span, span2);
+
+          // return that element
+          return div;
+        });
+
+        return elementNodes;
+      }
+
+      function calculateResult(input) {
+        const calculateTm = () => {
+          const { sl, ds } = prepareUnits();
+
+          let result = ds / sl;
+          return {
+            result,
+            type: "time",
+            name: `Time`,
+          };
+        };
+        const calculateDs = () => {
+          const { sl, tm } = prepareUnits();
+          let result = sl * tm;
+          return {
+            result,
+            type: "distance",
+            name: "Distance",
+          };
+        };
+        const calculateSl = () => {
+          const { ds, tm } = prepareUnits();
+          let result = ds / tm;
+          return {
+            result,
+            type: "speed",
+            name: "Speed of light",
+          };
+        };
+
+        switch (input) {
+          case "tm":
+            return calculateTm();
+          case "sl":
+            return calculateSl();
+          case "ds":
+            return calculateDs();
+          default:
+            console.log("error in calculate result switch");
+        }
+      }
+
+      function prepareUnits() {
+        let ds = parseFloat(dsInput.value) ?? 0;
+        let sl = parseFloat(slInput.value) ?? 0;
+        let tm = parseFloat(tmInput.value) ?? 0;
+
+        let slUnit = slSelect.value;
+        let tmUnit = tmSelect.value;
+        let dsUnit = dsSelect.value;
+
+        sl = toSIUnit("speed", slUnit, sl);
+        tm = toSIUnit("time", tmUnit, tm);
+        ds = toSIUnit("distance", dsUnit, ds);
+
+        return { ds, sl, tm };
+      }
+
+      function prepareResults(result, type, name) {
+        let resultObj = {};
+        Object.keys(UNITS[type]).forEach((key) => {
+          let ans = fromSIUnit(type, key, result);
+          ans = parseFloat(ans.toFixed(22));
+          if (!(ans > 0 && ans < 1) && !(ans < 0 && ans > -1)) {
+            ans = ans.toLocaleString();
+          }
+
+          resultObj[key] = {
+            title: `${name} (${key}): `,
+            value: ` ${ans} ${key}`,
+          };
+        });
+        return resultObj;
+      }
+      
+      function calculateResults() {
+        const calculateUnit = calculateUnitEl.value
+
+        try {
+          if (slInput.value > slInput.getAttribute('max') ) {
+            alert('Speed of light value must be less than or equal to 299792458')
+            return
+          }
+          const { result, type, name } = calculateResult(calculateUnit);
+          if (isNaN(result)) {
+            alert("Your input resulted in NAN.\n 0/0 \n Try again with valid input.");
+            resetResult()
+            return;
+          }
+          if (Math.abs(result) === Infinity) {
+            alert(
+              "Your input resulted in Infinity. \nDivision by zero. \nTry again with valid input."
+            );
+            resetResult()
+            return;
+          }
+          if (type === "speed" && result > 299792458) {
+            alert(
+              `299,792,458 m/s is the maximum light speed in vacuum!\n${name}: ${result} \nTry again with valid input.`
+            );
+            resetResult()
+            return;
+          }
+
+          const resultObj = prepareResults(result, type, name);
+          const elementNodes = createElements(resultObj);
+          calcResultsEl.innerHTML = "";
+
+          elementNodes.forEach((element) => {
+            calcResultsEl.append(element);
+          });
+        } catch (error) {
+          console.log(error);
+          alert("An error ocurred. Try again with valid input.");
+          resetResult()
+          return;
+        }
+      }
+
+      function resetForm() {
+        [slSelect, tmSelect, dsSelect].forEach((select) => {
+          select.selectedIndex = '0'
+        });
+
+        [slInput,tmInput, dsInput].forEach((input, index) => {
+          if (index == 0) {
+            input.value = "299792458"
+          } else {
+            input.value = ""
+          }       
+        });
+
+        calculateUnitEl.selectedIndex = '2';
+        containers.forEach((container) => {
+          let idVal = container.id.slice(0, 2)
+          if (idVal == 'ds') {
+            container.style.display = 'none'
+          } else {
+            container.style.display = 'block'
+          }
+        })
+      }
+
+      function resetResult() {
+        calcResultsEl.innerHTML = "<p>Result will appear here...</p>";
+      } 
+
+      function resethandler() {
+        resetForm();
+        resetResult();
+      }
+
+      /*************** EVENT LISTINERS ***************/
+      [slSelect, tmSelect, dsSelect].forEach((select) => {
+        select.addEventListener("change", resetResult);
+      });
+      [slInput, tmInput, dsInput].forEach((input) => {
+        input.addEventListener("input", resetResult);
+      });
+      calculateUnitEl.addEventListener("change", handleCalculateUnitChange);
+      resetBtnEl.addEventListener("click", resethandler);
+      calcBtnEl.addEventListener("click", calculateResults);
+
+    </script>
+  </body>
+</html>

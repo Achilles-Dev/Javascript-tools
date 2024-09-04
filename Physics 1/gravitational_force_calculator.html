@@ -468,7 +468,7 @@
       }
 
       function resetForm() {
-        [i1Select, i2Select, i3Select, i4Select, peSelect].forEach((select, index) => {
+        [i1Select, i2Select, i3Select, i4Select].forEach((select, index) => {
           if (index < 2) {
             select.selectedIndex = '1'
           } else {
@@ -476,10 +476,11 @@
           }
         });
 
-        [i1Input, i2Input, i3Input, i4Input, peInput].forEach((input) => {
+        [i1Input, i2Input, i3Input, i4Input].forEach((input) => {
           input.value = ""
         });
-
+        peSelect.selectedIndex = '24'
+        peInput.value = "0.66743"
         calculateUnitEl.selectedIndex = '3';
         modeUnitEl.selectedIndex = '1'
         containers.forEach((container) => {
