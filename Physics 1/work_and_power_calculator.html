@@ -1,0 +1,599 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Work and Power Calculator</title>
+  </head>
+  <body>
+    <h1>Work and Power Calculator</h1>
+      <div>
+        <p id="fieldInput">
+          Calculate:
+          <select id="fieldSelect">
+            <option value="wk" selected>Work</option>
+            <option value="pr">Power</option>
+          </select>
+        </p>
+        <p id="i5-contianer" style="display: none;">
+          <label for="i5-input"> Force </label>
+          <input
+            type="number"
+            min="0"
+            autocomplete="off"
+            data-id="i5"
+            step="any"
+            id="i5-input"
+            data-name="Force"
+          />
+          <select
+            class="selects"
+            id="i5-select"
+            data-type="force"
+            data-prev="m"
+            data-id="i5"
+            style="display: none"
+          >
+            <option value="N" selected>Newton (N)</option>
+          </select>
+          <span>N</span>
+        </p>
+
+        <p id="i4-contianer" style="display: none;">
+          <label for="i4-input"> Displacement </label>
+          <input
+            type="number"
+            min="0"
+            autocomplete="off"
+            data-id="i4"
+            step="any"
+            id="i4-input"
+            data-name="Displacement"
+          />
+          <select
+            class="selects"
+            id="i4-select"
+            data-type="distance"
+            data-prev="m"
+            data-id="i4"
+          >
+            <option value="mm">millimeters (mm)</option>
+            <option value="cm">centimeters (cm)</option>
+            <option value="m" selected>meters (m)</option>
+            <option value="km">kilometers (km)</option>
+            <option value="in">inches (in)</option>
+            <option value="ft">feet (ft)</option>
+            <option value="yd">yards (yd)</option>
+            <option value="mi">miles (mi)</option>
+            <option value="nmi">nautical miles (nmi)</option>
+          </select>
+        </p>
+        <p id="workInput" style="display: none;">
+          <label for="i1-input">Work</label>
+          <input
+            type="number"
+            min="0"
+            autocomplete="off"
+            data-id="i1"
+            step="any"
+            id="i1-input"
+            class="inputs"
+            data-name="Work"
+          />
+          <select
+            class="selects"
+            id="i1-select"
+            data-type="work"
+            data-prev="J"
+            data-id="i1"
+          >
+            <option value="J" selected>joules (J)</option>
+            <option value="kJ">kilojoules (kJ)</option>
+            <option value="MJ">megajoules (MJ)</option>
+            <option value="Wh">watt hours (Wh)</option>
+            <option value="kWh">kilowatt hours (kWh)</option>
+            <option value="ft-lb">foot-pounds (ft-lb)</option>
+            <option value="kcal">kilocalories (kcal)</option>
+            <option value="eV">electronvolts (eV)</option>
+          </select>
+        </p>
+
+        <p>
+          <label for="i2-input">Time</label>
+          <input
+            type="number"
+            min="0"
+            autocomplete="off"
+            data-id="i2"
+            step="any"
+            id="i2-input"
+            class="inputs"
+            data-name="Time"
+          />
+
+          <select
+            class="selects"
+            id="i2-select"
+            data-type="time"
+            data-prev="sec"
+            data-id="i2"
+          >
+            <option value="sec" selected>seconds (sec)</option>
+            <option value="min">minutes (min)</option>
+            <option value="hrs">hour (hrs)</option>
+            <option value="days">days (days)</option>
+            <option value="wks">weeks (wks)</option>
+            <option value="mos">months (mos)</option>
+            <option value="yrs">years (yrs)</option>
+          </select>
+        </p>
+
+        <p id="powerInput">
+          <label for="i3-input">Power</label>
+          <input
+            type="number"
+            min="0"
+            autocomplete="off"
+            data-id="i3"
+            step="any"
+            class="inputs"
+            id="i3-input"
+            data-name="Power"
+          />
+          <select
+            class="selects"
+            id="i3-select"
+            data-type="power"
+            data-prev="W"
+            data-id="i3"
+          >
+            <option value="mW">milliwatts (mW)</option>
+            <option value="W" selected>watts (W)</option>
+            <option value="kW">kilowatts (kW)</option>
+            <option value="MW">megawatts (MW)</option>
+            <option value="GW">gigawatts (GW)</option>
+            <option value="BTU/h">
+              British thermal units per hour (BTU/h)
+            </option>
+            <option value="hp(l)">mechanical horsepowers (hp(l))</option>
+          </select>
+        </p>
+      </div>
+
+      <p>
+        Mode:
+        <select id="modeUnit">
+          <option value="am">Advanced mode  </option>
+          <option value="sm" selected>Simple mode</option>
+        </select>
+      </p>
+
+      <button id="calcBtn">Calculate</button>
+      <button id="resetBtn">Reset</button>
+      <hr>
+      <div>
+        <h3>Result:</h3>
+        <h3 id="calcResults">Result will appear here...</h3>
+      </div>
+    <script>
+      /*************** ELEMENTS ***************/
+      const fieldSelectEl = document.getElementById("fieldSelect");
+      const fieldInputEl = document.getElementById("fieldInput");
+      const selects = document.querySelectorAll(".selects");
+      const inputs = document.querySelectorAll(".inputs");
+      const input1 = document.getElementById("i1-input");
+      const input4 = document.getElementById("i4-input");
+      const input5 = document.getElementById("i5-input");
+
+      
+      const workInputEl = document.getElementById("workInput");
+      const modeUnitEl = document.getElementById('modeUnit');
+      const powerInputEl = document.getElementById('powerInput');
+      const i5ContianerEl = document.getElementById('i5-contianer');
+      const i4ContianerEl = document.getElementById('i4-contianer');
+
+
+      const calcBtnEl = document.getElementById('calcBtn');
+      const resetBtnEl = document.getElementById('resetBtn');
+      const calcResultsEl = document.getElementById('calcResults')
+
+      /*************** GLOBAL VARIBLES ***************/
+      const UNITS = {
+        work: {
+          J: 1,
+          kJ: 1e-3,
+          MJ: 1e-6,
+          Wh: 0.0002777777777777777777777777777777777777777777777778,
+          kWh: 2.777777777777777777777777777777777777777777777777778e-7,
+          "ft-lb": 0.7375621492772654,
+          kcal: 0.00023900573613766732,
+          eV: 6241509074460762607.7762409809304459,
+        },
+
+        power: {
+          mW: 1e3,
+          W: 1,
+          kW: 1e-3,
+          MW: 1e-6,
+          GW: 1e-9,
+          "BTU/h": 3.4121399999999995,
+          "hp(l)": 0.0013410220895949741,
+        },
+
+        time: {
+          sec: 1,
+          min: 0.016666666666666666666666666666666666666666667,
+          hrs: 0.0002777777777777777777777777777777777777778,
+          days: 0.000011574074074074074074074074074074074073,
+          wks: 0.0000016534391534391535,
+          mos: 3.8025705376834734e-7,
+          yrs: 3.1688087814028954e-8,
+        },
+
+        force: {
+          N: 1,
+        },
+
+        distance: {
+          mm: 1e3,
+          cm: 1e2,
+          m: 1,
+          km: 1e-3,
+          in: 39.370078740157474,
+          ft: 3.2808398950131235,
+          yd: 1.0936132983377078,
+          mi: 0.0006213711922373339,
+          nmi: 0.0005399568034557235,
+        },
+      };
+      const queue = ["i1", "i2", "i3"];
+      const queue2 = ["i4", "i5"];
+      /*************** FUNCTIONS ***************/
+      function toSIUnit(type, unit, value) {
+        if (type === "exp") {
+          unit = parseFloat("1e" + unit);
+          return value * unit;
+        }
+        return value / UNITS[type][unit];
+      }
+
+      function fromSIUnit(type, unit, value) {
+        if (type === "exp") {
+          unit = parseFloat("1e" + unit);
+          return value / unit;
+        }
+        return value * UNITS[type][unit];
+      }
+
+      function customPercision(ans) {
+        return parseFloat(ans);
+      }
+
+      function handleFieldSelectChange(e) {
+        const value = e.target.value
+        const mode = modeUnitEl.value
+        workInputEl.style.display = value == 'wk' || mode == 'am' ? 'none' : 'block'
+        powerInputEl.style.display = value == 'pr' || mode == 'am' ? 'none' : 'block'
+
+        resetResult()
+      }
+
+      function handleModeUnitChange(e) {
+        const value = e.target.value;
+        const field = fieldSelectEl.value
+        i5ContianerEl.style.display = value == 'am' ? 'block' : 'none'
+        i4ContianerEl.style.display = value == 'am' ? 'block' : 'none'
+        workInputEl.style.display = value == 'am' || field == 'wk' ? 'none' : 'block'
+        powerInputEl.style.display = value == 'am' || field == 'pr' ? 'none' : 'block'
+        fieldInputEl.style.display = value == 'am' ? 'none' : 'block'
+
+        resetResult()
+      }
+
+      function createElement() {
+        const newDiv1 = `
+          <div>
+            <p>
+              <label for="i1-span">Work: &nbsp;</label>
+              <span
+                data-id="i1"
+                step="any"
+                id="i1-span"
+                class="spans"
+                data-name="Work"
+              ></span>
+              <select
+                class="selectsResult"
+                id="i1-select"
+                data-type="work"
+                data-prev="J"
+                data-id="i1"
+              >
+                <option value="J" selected>joules (J)</option>
+                <option value="kJ">kilojoules (kJ)</option>
+                <option value="MJ">megajoules (MJ)</option>
+                <option value="Wh">watt hours (Wh)</option>
+                <option value="kWh">kilowatt hours (kWh)</option>
+                <option value="ft-lb">foot-pounds (ft-lb)</option>
+                <option value="kcal">kilocalories (kcal)</option>
+                <option value="eV">electronvolts (eV)</option>
+              </select>
+            </p>
+          </div>
+        `
+        const newDiv2 = `
+          <div>
+            <p>
+              <label for="i3-span">Power: &nbsp;</label>
+              <span
+                data-id="i3"
+                step="any"
+                class="spans"
+                id="i3-span"
+                data-name="Power"
+              ></span>
+              <select
+                class="selectsResult"
+                id="i3-select"
+                data-type="power"
+                data-prev="W"
+                data-id="i3"
+              >
+                <option value="mW">milliwatts (mW)</option>
+                <option value="W" selected>watts (W)</option>
+                <option value="kW">kilowatts (kW)</option>
+                <option value="MW">megawatts (MW)</option>
+                <option value="GW">gigawatts (GW)</option>
+                <option value="BTU/h">
+                  British thermal units per hour (BTU/h)
+                </option>
+                <option value="hp(l)">mechanical horsepowers (hp(l))</option>
+              </select>
+            </p>
+          </div>
+        `
+        const mode = modeUnitEl.value
+        const field = fieldSelectEl.value
+
+        if (mode == 'sm') {
+          if (field == "wk") {
+            return newDiv1
+          } else {
+            return newDiv2
+          }
+        } else {
+          return newDiv1 + newDiv2
+        }
+      }
+      
+      function validateInput(id) {
+        const input = document.getElementById(`${id}-input`);
+        const label = input.getAttribute("data-name").trim();
+        let value = parseFloat(input.value);
+        if (value <= 0 && label == "Time") {
+          alert(`${label} should have a positive value.`);
+          return false;
+        }
+
+        if (value < 0) {
+          alert(`${label} cannot have a negative value.`);
+          return false;
+        }
+
+        return true;
+      }
+
+      // related to caculation
+      function prepareUnit(...args) {
+        const resultArr = [];
+        
+        for (id of args) {
+          const input = document.getElementById(`${id}-input`);
+          const select = document.getElementById(`${id}-select`);
+          const type = select.getAttribute("data-type");
+          let val = parseFloat(input.value);
+          val = isNaN(val) ? 0 : val;
+          let inUnit = select.value;
+          val = toSIUnit(type, inUnit, val);
+          resultArr.push(val);
+        }
+
+        return resultArr;
+      }
+
+      function setResult(resultObj) {
+        for (key of Object.keys(resultObj)) {
+          let val = resultObj[key].result;
+          let id = resultObj[key].type;
+          if (isNaN(val)) {
+            alert("Your input resulted in NAN.\n 0/0 \n Try again with valid input.");
+            return;
+          }
+          if (Math.abs(val) === Infinity) {
+            alert(
+              "Your input resulted in Infinity. \nDivision by zero. \nTry again with valid input."
+            );
+            return;
+          }
+
+          const span = document.getElementById(`${id}-span`);
+          const select = document.getElementById(`${id}-select`);
+          const type = select.getAttribute("data-type");
+          let outUnit = select.value;
+          val = fromSIUnit(type, outUnit, val);
+
+          span.textContent = customPercision(val);
+        }
+      }
+
+      function calculateResult(out) {
+        switch (out) {
+          case "i1":
+            return calculateI1();
+          case "i3":
+            return calculateI3();
+          default:
+            console.log("error in switch");
+        }
+
+        function calculateI1() {
+          let [val1, val2] = prepareUnit("i2", "i3");
+          let result = val1 * val2;
+
+          return {
+            1: {
+              result,
+              type: "i1",
+            },
+          };
+        }
+
+        function calculateI3() {
+          let [val1, val2] = prepareUnit("i1", "i2");
+
+          let result = val1 / val2;
+
+          return {
+            1: { result, type: "i3" },
+          };
+        }
+      }
+
+      function calculate45() {
+        let [val3] = prepareUnit("i2")
+        
+        let [val1] = prepareUnit("i4");
+        let [val2] = prepareUnit("i5")
+        let result = val1 * val2;
+        let result2 = result / val3;
+
+        return {
+          1: {
+            result,
+            type: "i1",
+          },
+          2: {
+            result: result2,
+            type: "i3",
+          },
+        };     
+      }
+      
+      function handleResultsChange(e) {
+        let select = e.target;
+        let id = select.getAttribute("data-id");
+        let span = document.getElementById(`${id}-span`);
+
+        let prevUnit = select.getAttribute("data-prev");
+        let currentUnit = select.value;
+        select.setAttribute("data-prev", currentUnit);
+
+        if (span.textContent === "") {
+          return;
+        }
+
+        let type = select.getAttribute("data-type");
+
+        let value = parseFloat(span.textContent);
+        value = parseFloat(value);
+        if (isNaN(value)) value = 0.0;
+
+        let si = toSIUnit(type, prevUnit, value);
+        let result = fromSIUnit(type, currentUnit, si);
+        span.textContent = customPercision(result);
+      }
+
+      function calculateResults() {
+        const mode = modeUnitEl.value
+        const field = fieldSelectEl.value
+        if (mode == 'sm') {
+          if (field == 'wk') {
+            for (el of ["i2", "i3"]) {
+              if (!validateInput(el)) return;
+            }
+          } else {
+            for (el of ["i1", "i2"]) {
+              if (!validateInput(el)) return;
+            }
+          }      
+        } else {
+          for (el of ["i2", "i4", "i5"]) {
+            if (!validateInput(el)) return;
+          }
+        }
+       
+        try {
+          const resultElement = createElement()
+          calcResultsEl.innerHTML = resultElement
+
+          const newSelects = document.querySelectorAll(".selectsResult");
+
+          newSelects.forEach((select) => {
+            select.addEventListener("change", handleResultsChange);
+          });
+          let result;
+          if (mode == 'sm') {
+            if (field == 'wk') {
+              result = calculateResult('i1')
+            } else {
+              result = calculateResult('i3')
+            }      
+          } else if (mode == 'am') {
+            result = calculate45()
+          }
+          setResult(result)
+
+        } catch(error) {
+          alert("An error ocurred. Try again with valid input.");
+          resetResult()
+          return;
+        }
+      }
+
+      function resetForm() {
+        selects.forEach((select, index) => {
+          if (index == 4) {
+            select.selectedIndex = '1'
+          } else {
+            select.selectedIndex = '0'
+          }
+        });
+
+        inputs.forEach((input) => {
+          input.value = ""
+        });
+        modeUnitEl.selectedIndex = '1'
+        fieldInputEl.style.display = "block"
+        fieldSelectEl.selectedIndex = "0"
+        i5ContianerEl.style.display = 'none'
+        i4ContianerEl.style.display = 'none'
+        powerInputEl.style.display = "block"
+      }
+
+      function resetResult() {
+        calcResultsEl.innerHTML = "<p>Result will appear here...</p>";
+      } 
+
+      function resethandler() {
+        resetForm();
+        resetResult();
+      }
+
+      /*************** EVENT LISTINERS ***************/
+      modeUnitEl.addEventListener("change", handleModeUnitChange);
+      fieldSelectEl.addEventListener("change", handleFieldSelectChange)
+      // input4.addEventListener("input", input45Handler);
+      // input5.addEventListener("input", input45Handler);
+      selects.forEach((select) => {
+        select.addEventListener("change", resetResult);
+      });
+      inputs.forEach((input) => {
+        input.addEventListener("input", resetResult);
+      });
+
+      resetBtnEl.addEventListener("click", resethandler);
+      calcBtnEl.addEventListener("click", calculateResults);
+
+    </script>
+  </body>
+</html>

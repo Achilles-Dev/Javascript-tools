@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Wye to Delta Conversion</title>
+  </head>
+  <body>
+    <h1>Wye to Delta Conversion</h1>
+      <div>
+        <p>
+          <label for="i1-input">R1 </label>
+          <input
+            type="number"
+            min="0"
+            autocomplete="off"
+            data-id="i1"
+            step="any"
+            id="i1-input"
+            class="inputs"
+            data-name="Resistivity"
+          />
+          <select
+            class="selects"
+            id="i1-select"
+            data-type="resistivity"
+            data-prev="Ω"
+            data-id="i1"
+          >
+            <option value="mΩ">milliohms (mΩ)</option>
+            <option value="Ω" selected>ohms (Ω)</option>
+            <option value="kΩ">kiloohms (kΩ)</option>
+            <option value="MΩ">megaohms (MΩ)</option>
+          </select>
+        </p>
+
+        <p>
+          <label for="i2-input">R2 </label>
+          <input
+            type="number"
+            min="0"
+            autocomplete="off"
+            data-id="i2"
+            step="any"
+            id="i2-input"
+            class="inputs"
+            data-name="Resistivity"
+          />
+
+          <select
+            class="selects"
+            id="i2-select"
+            data-type="resistivity"
+            data-prev="Ω"
+            data-id="i2"
+          >
+            <option value="mΩ">milliohms (mΩ)</option>
+            <option value="Ω" selected>ohms (Ω)</option>
+            <option value="kΩ">kiloohms (kΩ)</option>
+            <option value="MΩ">megaohms (MΩ)</option>
+          </select>
+        </p>
+
+        <p>
+          <label for="i3-input">R3 </label>
+          <input
+            type="number"
+            min="0"
+            autocomplete="off"
+            data-id="i3"
+            step="any"
+            class="inputs"
+            id="i3-input"
+            data-name="Resistivity"
+          />
+          <select
+            class="selects"
+            id="i3-select"
+            data-type="resistivity"
+            data-prev="Ω"
+            data-id="i3"
+          >
+            <option value="mΩ">milliohms (mΩ)</option>
+            <option value="Ω" selected>ohms (Ω)</option>
+            <option value="kΩ">kiloohms (kΩ)</option>
+            <option value="MΩ">megaohms (MΩ)</option>
+          </select>
+        </p>
+      </div>
+
+      <button id="calcBtn">Calculate</button>
+      <button id="resetBtn">Reset</button>
+      <hr>
+      <div>
+        <h3>Result:</h3>
+        <h3 id="calcResults">Result will appear here...</h3>
+      </div>
+    <script>
+      /*************** ELEMENTS ***************/
+      const selects = document.querySelectorAll(".selects");
+      const inputs = document.querySelectorAll(".inputs");
+
+      const calcBtnEl = document.getElementById('calcBtn');
+      const resetBtnEl = document.getElementById('resetBtn');
+      const calcResultsEl = document.getElementById('calcResults')
+
+      /*************** GLOBAL VARIBLES ***************/
+      const UNITS = {
+        resistivity: {
+          mΩ: 1e3,
+          Ω: 1,
+          kΩ: 1e-3,
+          MΩ: 1e-6,
+        },
+      };
+
+      /*************** FUNCTIONS ***************/
+      function toSIUnit(type, unit, value) {
+        if (type === "exp") {
+          unit = parseFloat("1e" + unit);
+          return value * unit;
+        }
+        return value / UNITS[type][unit];
+      }
+
+      function fromSIUnit(type, unit, value) {
+        if (type === "exp") {
+          unit = parseFloat("1e" + unit);
+          return value / unit;
+        }
+        return value * UNITS[type][unit];
+      }
+
+      function customPercision(ans, to = 8) {
+        return parseFloat(parseFloat(ans).toPrecision(to));
+      }
+
+      function createElement() {
+        const newDiv = `
+          <div>
+            <p>Resulting resistance values</p>
+            <p>
+              <label for="ia1-span"> Ra: &nbsp; </label>
+              <span
+                data-id="ia1"
+                step="any"
+                id="ia1-span"
+                data-name="Resistivity"
+              ></span>
+              <select
+                class="selectsResult"
+                id="ia1-select"
+                data-type="resistivity"
+                data-prev="Ω"
+                data-id="ia1"
+              >
+                <option value="mΩ">milliohms (mΩ)</option>
+                <option value="Ω" selected>ohms (Ω)</option>
+                <option value="kΩ">kiloohms (kΩ)</option>
+                <option value="MΩ">megaohms (MΩ)</option>
+              </select>
+            </p>
+
+            <p>
+              <label for="ia2-span"> Rb: &nbsp; </label>
+              <span
+                data-id="ia2"
+                step="any"
+                id="ia2-span"
+                data-name="Resistivity"
+              ></span>
+              <select
+                class="selectsResult"
+                id="ia2-select"
+                data-type="resistivity"
+                data-prev="Ω"
+                data-id="ia2"
+              >
+                <option value="mΩ">milliohms (mΩ)</option>
+                <option value="Ω" selected>ohms (Ω)</option>
+                <option value="kΩ">kiloohms (kΩ)</option>
+                <option value="MΩ">megaohms (MΩ)</option>
+              </select>
+            </p>
+
+            <p>
+              <label for="ia3-span">Rc: &nbsp; </label>
+              <span
+                data-id="ia3"
+                step="any"
+                id="ia3-span"
+                data-name="Resistivity"
+              ></span>
+              <select
+                class="selectsResult"
+                id="ia3-select"
+                data-type="resistivity"
+                data-prev="Ω"
+                data-id="ia3"
+              >
+                <option value="mΩ">milliohms (mΩ)</option>
+                <option value="Ω" selected>ohms (Ω)</option>
+                <option value="kΩ">kiloohms (kΩ)</option>
+                <option value="MΩ">megaohms (MΩ)</option>
+              </select>
+            </p>
+          </div>
+        `
+        return newDiv
+      }
+
+      function validateInput(id) {
+        const input = document.getElementById(`${id}-input`);
+        const label = input.getAttribute("data-name").trim();
+        let value = parseFloat(input.value);
+
+        if (value <= 0 || isNaN(value)) {
+         alert(`${label} must be greater than zero!`);
+          return false;
+        }
+
+        return true;
+      }
+
+      // related to caculation
+      function prepareUnit(...args) {
+        const resultArr = [];
+        for (id of args) {
+          const input = document.getElementById(`${id}-input`);
+          const select = document.getElementById(`${id}-select`);
+          const type = select.getAttribute("data-type");
+          let val = parseFloat(input.value);
+          val = isNaN(val) ? 0 : val;
+          let inUnit = select.value;
+          val = toSIUnit(type, inUnit, val);
+          resultArr.push(val);
+        }
+
+        return resultArr;
+      }
+
+      function setResult(resultObj) {
+        for (key of Object.keys(resultObj)) {
+          let val = resultObj[key].result;
+          let id = resultObj[key].type;
+          if (isNaN(val)) {
+            alert("Your input resulted in NAN.\n 0/0 \n Try again with valid input.");
+            return;
+          }
+          if (Math.abs(val) === Infinity) {
+            alert(
+              "Your input resulted in Infinity. \nDivision by zero. \nTry again with valid input."
+            );
+            return;
+          }
+
+          const span = document.getElementById(`${id}-span`);
+          const select = document.getElementById(`${id}-select`);
+          const type = select.getAttribute("data-type");
+          let outUnit = select.value;
+          val = fromSIUnit(type, outUnit, val);
+
+          span.textContent = customPercision(val, 16);
+        }
+      }
+
+      function calculateResult() {
+        let ra, rb, rc;
+        let [r1, r2, r3] = prepareUnit("i1", "i2", "i3");
+
+        ra = r2 + r3 + (r2 * r3) / r1;
+        rb = r3 + r1 + (r3 * r1) / r2;
+        rc = r1 + r2 + (r1 * r2) / r3;
+
+        return {
+          1: { result: ra, type: "ia1" },
+          2: { result: rb, type: "ia2" },
+          3: { result: rc, type: "ia3" },
+        };
+      }
+
+      function handleResultsChange(e) {
+        let select = e.target;
+        let id = select.getAttribute("data-id");
+        let span = document.getElementById(`${id}-span`);
+
+        let prevUnit = select.getAttribute("data-prev");
+        let currentUnit = select.value;
+        select.setAttribute("data-prev", currentUnit);
+
+        if (span.textContent === "") {
+          return;
+        }
+
+        let type = select.getAttribute("data-type");
+
+        let value = parseFloat(span.textContent);
+        value = parseFloat(value);
+        if (isNaN(value)) value = 0.0;
+
+        let si = toSIUnit(type, prevUnit, value);
+        let result = fromSIUnit(type, currentUnit, si);
+        span.textContent = customPercision(result, 13);
+      }
+
+      function calculateResults() {
+        for (el of ["i1", "i2", "i3"]) {
+          if (!validateInput(el)) return;
+        }
+
+        try {
+          const resultElement = createElement()
+          calcResultsEl.innerHTML = resultElement
+
+          const newSelects = document.querySelectorAll(".selectsResult");
+
+          newSelects.forEach((select) => {
+            select.addEventListener("change", handleResultsChange);
+          });
+          
+          const result = calculateResult();
+          setResult(result)
+
+        } catch(error) {
+          alert("An error ocurred. Try again with valid input.");
+          resetResult()
+          return;
+        }
+      }
+
+      function resetForm() {
+        selects.forEach((select, index) => {
+            select.selectedIndex = '1'
+        });
+
+        inputs.forEach((input) => {
+          input.value = ""
+        });
+      }
+
+      function resetResult() {
+        calcResultsEl.innerHTML = "<p>Result will appear here...</p>";
+      } 
+
+      function resethandler() {
+        resetForm();
+        resetResult();
+      }
+
+
+      /*************** EVENT LISTINERS ***************/
+      selects.forEach((select) => {
+        select.addEventListener("change", resetResult);
+      });
+      inputs.forEach((input) => {
+        input.addEventListener("input", resetResult);
+      });
+
+      resetBtnEl.addEventListener("click", resethandler);
+      calcBtnEl.addEventListener("click", calculateResults);
+
+    </script>
+  </body>
+</html>
