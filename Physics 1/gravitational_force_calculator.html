@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Gravitational Force Calculator</title>
+  </head>
+  <body>
+    <h1>Gravitational Force Calculator</h1>
+      <p>
+        Calculate:
+        <select id="calculateUnit">
+          <option value="i1">Mass 1 (M)</option>
+          <option value="i2">Mass 2 (m)</option>
+          <option value="i3">Distance (R)</option>
+          <option value="i4" selected>Gravitational force (F)</option>
+        </select>
+      </p>
+      
+      <div>
+        <p id="i1-contianer" class="containers">
+          <label for="i1-input">Mass 1 (M) </label>
+          <input
+            type="number"
+            step="any"
+            id="i1-input"
+            class="inputs"
+            min="0"
+          />
+          <select id="i1-select">
+            <option value="g">grams (g)</option>
+            <option value="kg" selected>kilograms (kg)</option>
+            <option value="t">metric tons (t)</option>
+            <option value="oz">ounces (oz)</option>
+            <option value="lb">pounds (lb)</option>
+            <option value="st">stones (st)</option>
+            <option value="US ton">US short tons (US ton)</option>
+            <option value="long ton">imperial tons (long ton)</option>
+            <option value="Earths">weights of the Earth (Earths)</option>
+            <option value="Suns">weights of the Sun (Suns)</option>
+            <option value="me">electron rest masses (me)</option>
+            <option value="mp">proton rest masses (mp)</option>
+            <option value="mn">neutron rest masses (mn)</option>
+          </select>
+        </p>
+
+        <p id="i2-contianer" class="containers">
+          <label for="i2-input">Mass 2 (m) </label>
+          <input
+            type="number"
+            step="any"
+            id="i2-input"
+            class="inputs"
+            min="0"
+          />
+          <select id="i2-select">
+            <option value="g">grams (g)</option>
+            <option value="kg" selected>kilograms (kg)</option>
+            <option value="t">metric tons (t)</option>
+            <option value="oz">ounces (oz)</option>
+            <option value="lb">pounds (lb)</option>
+            <option value="st">stones (st)</option>
+            <option value="US ton">US short tons (US ton)</option>
+            <option value="long ton">imperial tons (long ton)</option>
+            <option value="Earths">weights of the Earth (Earths)</option>
+            <option value="Suns">weights of the Sun (Suns)</option>
+            <option value="me">electron rest masses (me)</option>
+            <option value="mp">proton rest masses (mp)</option>
+            <option value="mn">neutron rest masses (mn)</option>
+          </select>
+        </p>
+
+        <p id="pe-contianer" class="containers" style="display: none;">
+          <label for="pe-input">Gravitational constant (G) </label>
+          <input
+            type="number"
+            step="any"
+            id="pe-input"
+            class="inputs"
+            value="0.66743"
+            min="0"
+            required
+          />
+
+          <select id="pe-select">
+            <option value="e-34">&times;10^-34</option>
+            <option value="e-33">&times;10^-33</option>
+            <option value="e-32">&times;10^-32</option>
+            <option value="e-31">&times;10^-31</option>
+            <option value="e-30">&times;10^-30</option>
+            <option value="e-29">&times;10^-29</option>
+            <option value="e-28">&times;10^-28</option>
+            <option value="e-27">&times;10^-27</option>
+            <option value="e-26">&times;10^-26</option>
+            <option value="e-25">&times;10^-25</option>
+            <option value="e-24">&times;10^-24</option>
+            <option value="e-23">&times;10^-23</option>
+            <option value="e-22">&times;10^-22</option>
+            <option value="e-21">&times;10^-21</option>
+            <option value="e-20">&times;10^-20</option>
+            <option value="e-19">&times;10^-19</option>
+            <option value="e-18">&times;10^-18</option>
+            <option value="e-17">&times;10^-17</option>
+            <option value="e-16">&times;10^-16</option>
+            <option value="e-15">&times;10^-15</option>
+            <option value="e-14">&times;10^-14</option>
+            <option value="e-13">&times;10^-13</option>
+            <option value="e-12">&times;10^-12</option>
+            <option value="e-11">&times;10^-11</option>
+            <option value="e-10" selected>&times;10^-10</option>
+            <option value="e-9">&times;10^-9</option>
+            <option value="e-8">&times;10^-8</option>
+            <option value="e-7">&times;10^-7</option>
+            <option value="e-6">&times;10^-6</option>
+            <option value="e-5">&times;10^-5</option>
+            <option value="e-4">&times;10^-4</option>
+            <option value="e-3">&times;10^-3</option>
+            <option value="e-2">&times;10^-2</option>
+            <option value="e-1">&times;10^-1</option>
+            <option value="e0">&times;10^0</option>
+            <option value="e1">&times;10^1</option>
+            <option value="e2">&times;10^2</option>
+            <option value="e3">&times;10^3</option>
+            <option value="e4">&times;10^4</option>
+            <option value="e5">&times;10^5</option>
+            <option value="e6">&times;10^6</option>
+            <option value="e7">&times;10^7</option>
+            <option value="e8">&times;10^8</option>
+            <option value="e9">&times;10^9</option>
+            <option value="e10">&times;10^10</option>
+            <option value="e11">&times;10^11</option>
+            <option value="e12">&times;10^12</option>
+            <option value="e13">&times;10^13</option>
+            <option value="e14">&times;10^14</option>
+            <option value="e15">&times;10^15</option>
+            <option value="e16">&times;10^16</option>
+            <option value="e17">&times;10^17</option>
+            <option value="e18">&times;10^18</option>
+            <option value="e19">&times;10^19</option>
+            <option value="e20">&times;10^20</option>
+            <option value="e21">&times;10^21</option>
+            <option value="e22">&times;10^22</option>
+            <option value="e23">&times;10^23</option>
+            <option value="e24">&times;10^24</option>
+            <option value="e25">&times;10^25</option>
+            <option value="e26">&times;10^26</option>
+            <option value="e27">&times;10^27</option>
+            <option value="e28">&times;10^28</option>
+            <option value="e29">&times;10^29</option>
+            <option value="e30">&times;10^30</option>
+          </select>
+          <span>m³/kg⋅s²</span>
+        </p>
+
+        <p id="i3-contianer" class="containers">
+          <label for="i3-input">Distance (R) </label>
+          <input
+            type="number"
+            id="i3-input"
+            step="any"
+            class="inputs"
+            min="0"
+          />
+          <select id="i3-select">
+            <option value="nm">nanometers (nm)</option>
+            <option value="μm">micrometers ( μm)</option>
+            <option value="mm">millimeters (mm)</option>
+            <option value="cm">centimeters (cm)</option>
+            <option value="m">meters (m)</option>
+            <option value="km">kilometers (km)</option>
+            <option value="in">inches (in)</option>
+            <option value="ft">feet (ft)</option>
+            <option value="yd">yards (yd)</option>
+            <option value="mi">miles (mi)</option>
+            <option value="R⊕">Earth radii (R⊕)</option>
+            <option value="R☉">Sun radii (R☉)</option>
+            <option value="au">astronomical unit (au)</option>
+          </select>
+        </p>
+
+        <p id="i4-contianer" class="containers" style="display: none;">
+          <label for="i4-input">Gravitational force (F) </label>
+          <input
+            type="number"
+            step="any"
+            id="i4-input"
+            class="inputs"
+            min="0"
+          />
+          <select id="i4-select">
+            <option value="N" selected>newtons (N)</option>
+            <option value="kN" selected>kilonewtons (kN)</option>
+            <option value="MN" selected>meganewtons (MN)</option>
+            <option value="GN" selected>giganewtons (GN)</option>
+            <option value="TN" selected>teranewtons (TN)</option>
+            <option value="lbf" selected>pounds-force (lbf)</option>
+          </select>
+        </p>
+      </div>
+
+      <p>
+        Mode:
+        <select id="modeUnit">
+          <option value="am">Advanced mode</option>
+          <option value="sm" selected>Simple mode</option>
+        </select>
+      </p>
+
+      <button id="calcBtn">Calculate</button>
+      <button id="resetBtn">Reset</button>
+      <hr>
+      <div>
+        <h3>Result:</h3>
+        <h3 id="calcResults">Result will appear here...</h3>
+      </div>
+    <script>
+      /*************** ELEMENTS ***************/
+      const modeUnitEl = document.getElementById("modeUnit");
+      const calculateUnitEl = document.getElementById("calculateUnit");
+      const containers = document.querySelectorAll(".containers");
+      const inputs = document.querySelectorAll(".inputs");
+
+      const i1Input = document.getElementById("i1-input");
+      const i2Input = document.getElementById("i2-input");
+      const i3Input = document.getElementById("i3-input");
+      const i4Input = document.getElementById("i4-input");
+      const peInput = document.getElementById("pe-input");
+      const peInputContainerEl = document.getElementById("pe-contianer");
+
+      const i1Select = document.getElementById("i1-select");
+      const i2Select = document.getElementById("i2-select");
+      const i3Select = document.getElementById("i3-select");
+      const i4Select = document.getElementById("i4-select");
+      const peSelect = document.getElementById("pe-select");
+
+      const calcBtnEl = document.getElementById('calcBtn');
+      const resetBtnEl = document.getElementById('resetBtn');
+      const calcResultsEl = document.getElementById('calcResults')
+
+      /*************** GLOBAL VARIBLES ***************/
+      const UNITS = {
+        mass: {
+          g: 1e3,
+          kg: 1,
+          t: 1e-3,
+          oz: 35.273961949580412915675808215204325416673,
+          lb: 2.204622621848776,
+          st: 0.15747304441776971,
+          "US ton": 0.001102311310924388,
+          "long ton": 0.0009842065276110608,
+          Earths: 1.6744248350691502e-25,
+          Suns: 5.02765209e-31,
+          me: 1.0977691228098864e30,
+          mp: 5.978633201944897e26,
+          mn: 5.970403753330142e26,
+        },
+        distance: {
+          nm: 1e9,
+          μm: 1e6,
+          mm: 1e3,
+          cm: 1e2,
+          m: 1,
+          km: 1e-3,
+          in: 39.370078740157474,
+          ft: 3.280839895013123,
+          yd: 1.0936132983377078,
+          mi: 0.000621371192237334,
+          "R⊕": 1.569612305760477e-7,
+          "R☉": 1.4374011786689664e-9,
+          au: 6.684587122268446e-12,
+        },
+        force: {
+          N: 1,
+          kN: 1e-3,
+          MN: 1e-6,
+          GN: 1e-9,
+          TN: 1e-12,
+          lbf: 0.2248089438709618,
+        },
+      };
+      /*************** FUNCTIONS ***************/
+      function toSIUnit(type, unit, value) {
+        return value / UNITS[type][unit];
+      }
+
+      function fromSIUnit(type, unit, value) {
+        return value * UNITS[type][unit];
+      }
+
+      function handleModeUnitChange(e) {
+        const value = e.target.value;
+        peInputContainerEl.style.display = value == 'am' ? 'block' : 'none'
+
+        resetResult()
+      }
+
+      function handleCalculateUnitChange(e) {
+        const value = e.target.value
+        const mode = modeUnitEl.value
+        containers.forEach((container) => {
+          let idVal = container.id.slice(0, 2)     
+          if (idVal == value ) {
+            container.style.display = 'none'
+          } else {
+            container.style.display = 'block'
+          }
+          if (idVal == 'pe' && mode == 'sm') {
+            container.style.display = 'none'
+          }
+        })
+
+        resetResult()
+      }
+
+
+      function createElements(resultObj) {
+        const elementNodes = Object.keys(resultObj).map((key) => {
+          //create elements to put the results in
+          const div = document.createElement("div");
+          const span = document.createElement("span");
+          const span2 = document.createElement("span");
+
+          // give the elements id
+          div.setAttribute("class", `result-container`);
+          span.setAttribute("class", `result-title`);
+          span2.setAttribute("class", `result-value`);
+
+          // put the values in the elements
+
+          span.textContent = resultObj[key]["title"];
+          span2.textContent = resultObj[key]["value"];
+
+          // appened them to an element that contians them
+          div.append(span, span2);
+
+          // return that element
+          return div;
+        });
+
+        return elementNodes;
+      }
+
+      function calculateResult(input) {
+        const calculateI1 = () => {
+          const { i3, i2, i4, pe } = prepareUnits();
+          let result = (i4 * i3 * i3) / (i2 * pe);
+          return {
+            result,
+            type: "mass",
+            name: "Mass",
+          };
+        };
+        const calculateI2 = () => {
+          const { i1, i3, i4, pe } = prepareUnits();
+
+          let result = (i4 * i3 * i3) / (i1 * pe);
+          return {
+            result,
+            type: "mass",
+            name: `Mass`,
+          };
+        };
+        const calculateI3 = () => {
+          const { i1, i2, i4, pe } = prepareUnits();
+          let result = Math.sqrt((pe * i1 * i2) / i4);
+          return {
+            result,
+            type: "distance",
+            name: "Distance",
+          };
+        };
+
+        const calculateI4 = () => {
+          const { i3, i2, i1, pe } = prepareUnits();
+          let result = (pe * i1 * i2) / (i3 * i3);
+          return {
+            result,
+            type: "force",
+            name: "Gravitational force",
+          };
+        };
+
+        switch (input) {
+          case "i1":
+            return calculateI1();
+          case "i2":
+            return calculateI2();
+          case "i3":
+            return calculateI3();
+          case "i4":
+            return calculateI4();
+          default:
+            console.log("error in calculate result switch");
+        }
+      }
+
+      function prepareUnits() {
+        let i1 = parseFloat(i1Input.value);
+        let i2 = parseFloat(i2Input.value);
+        let i3 = parseFloat(i3Input.value);
+        let i4 = parseFloat(i4Input.value);
+        let pe = peInput.value;
+        pe = parseFloat(pe + peSelect.value);
+
+        let i1Unit = i1Select.value;
+        let i2Unit = i2Select.value;
+        let i3Unit = i3Select.value;
+        let i4wUnit = i4Select.value;
+
+        i1 = toSIUnit("mass", i1Unit, i1);
+        i2 = toSIUnit("mass", i2Unit, i2);
+        i3 = toSIUnit("distance", i3Unit, i3);
+        i4 = toSIUnit("force", i4wUnit, i4);
+
+        return { i3, i1, i2, i4, pe };
+      }
+
+      function prepareResults(result, type, name) {
+        let resultObj = {};
+        Object.keys(UNITS[type]).forEach((key) => {
+          let ans = fromSIUnit(type, key, result);
+          ans = parseFloat(ans.toFixed(17));
+          if (!(ans > 0 && ans < 1) && !(ans < 0 && ans > -1)) {
+            ans = ans.toLocaleString();
+          }
+
+          resultObj[key] = {
+            title: `${name} (${key}): `,
+            value: ` ${ans} ${key}`,
+          };
+        });
+        return resultObj;
+      }
+
+      function calculateResults() {
+        const calculateUnit = calculateUnitEl.value
+
+        try {
+          const { result, type, name } = calculateResult(calculateUnit);
+
+          if (isNaN(result)) {
+            alert("Your input resulted in NAN.\n 0/0 \n Try again with valid input.");
+            resetResult()
+            return;
+          }
+          if (Math.abs(result) === Infinity) {
+            alert(
+              "Your input resulted in Infinity. \nDivision by zero. \nTry again with valid input."
+            );
+
+            resetResult()
+            return;
+          }
+
+          const resultObj = prepareResults(result, type, name);
+          const elementNodes = createElements(resultObj);
+          calcResultsEl.innerHTML = ``;
+
+          elementNodes.forEach((element) => {
+            calcResultsEl.append(element);
+          });
+        } catch (error) {
+          console.log(error);
+          alert("An error ocurred. Try again with valid input.");
+          resetResult()
+          return;
+        }
+      }
+
+      function resetForm() {
+        [i1Select, i2Select, i3Select, i4Select, peSelect].forEach((select, index) => {
+          if (index < 2) {
+            select.selectedIndex = '1'
+          } else {
+            select.selectedIndex = '0'
+          }
+        });
+
+        [i1Input, i2Input, i3Input, i4Input, peInput].forEach((input) => {
+          input.value = ""
+        });
+
+        calculateUnitEl.selectedIndex = '3';
+        modeUnitEl.selectedIndex = '1'
+        containers.forEach((container) => {
+          let idVal = container.id.slice(0, 2)
+          if (idVal == 'i4' || idVal == "pe") {
+            container.style.display = 'none'
+          } else {
+            container.style.display = 'block'
+          }
+        })
+      }
+
+      function resetResult() {
+        calcResultsEl.innerHTML = "<p>Result will appear here...</p>";
+      } 
+
+      function resethandler() {
+        resetForm();
+        resetResult();
+      }
+
+
+      /*************** EVENT LISTINERS ***************/
+      [i1Select, i2Select, i3Select, i4Select, peSelect].forEach((select) => {
+        select.addEventListener("change", resetResult);
+      });
+      [i1Input, i2Input, i3Input, i4Input, peInput].forEach((input) => {
+        input.addEventListener("input", resetResult);
+      });
+      calculateUnitEl.addEventListener("change", handleCalculateUnitChange);
+      modeUnitEl.addEventListener("change", handleModeUnitChange);
+      
+      resetBtnEl.addEventListener("click", resethandler);
+      calcBtnEl.addEventListener("click", calculateResults);
+
+    </script>
+  </body>
+</html>

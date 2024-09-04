@@ -3,61 +3,55 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Factor of Safety Calculator</title>
+    <title>Friction Calculator</title>
   </head>
   <body>
-    <h1>Factor of Safety Calculator</h1>
+    <h1>Friction Calculator</h1>
       <p>
         Calculate:
         <select id="calculateUnit">
-          <option value="ms">Maximum strength</option>
-          <option value="dl">Design load </option>
-          <option value="fs" selected>Factor of Safety</option>
+          <option value="i1">Friction coefficient (μ)</option>
+          <option value="i2">Normal force (N)</option>
+          <option value="i3" selected>Friction (F)</option>
         </select>
       </p>
-      
+  
       <div>
-        <p id="ms-contianer" class="containers">
-          <label for="ms-input">Maximum strength</label>
-          <input
-            type="number"
-            step="any"
-            id="ms-input"
-            class="inputs"
-            min="0"
-          />
-          <select id="ms-select">
-            <option value="N" selected>newtons (N)</option>
-            <option value="kN">kilonewtons (kN)</option>
-            <option value="MN">meganewtons (MN)</option>
-            <option value="lbf">pounds-force (lbf)</option>
-            <option value="kip">kips (kip)</option>
+        <p id="i1-contianer" class="containers">
+          <label for="i1-input">Friction coefficient (μ) </label>
+          <input type="number" step="any" id="i1-input" class="inputs" />
+          <select id="i1-select" style="display: none">
+            <option value="units" selected disabled>UNIT</option>
           </select>
         </p>
-        <p id="dl-contianer" class="containers">
-          <label for="dl-input">Design load </label>
-          <input
-            type="number"
-            step="any"
-            id="dl-input"
-            class="inputs"
-            min="0"
-          />
-          <select id="dl-select">
-            <option value="N" selected>newtons (N)</option>
+        
+        <p id="i2-contianer" class="containers">
+          <label for="i2-input">Normal force (N) </label>
+          <input type="number" step="any" id="i2-input" class="inputs" />
+          <select id="i2-select">
+            <option value="N">newtons (N)</option>
             <option value="kN">kilonewtons (kN)</option>
             <option value="MN">meganewtons (MN)</option>
+            <option value="GN">giganewtons (GN)</option>
+            <option value="TN">teranewtons (TN)</option>
             <option value="lbf">pounds-force (lbf)</option>
-            <option value="kip">kips (kip)</option>
           </select>
         </p>
-        <p id="fs-contianer" class="containers" style="display: none;">
-          <label for="fs-input">Factor of Safety </label>
-          <input type="number" id="fs-input" step="any" class="inputs" />
-          <input id="fs-select" type="button" value="Units" />
+        
+        <p id="i3-contianer" class="containers" style="display: none;">
+          <label for="i3-input">Friction (F) </label>
+          <input type="number" id="i3-input" step="any" class="inputs" />
+          <select id="i3-select">
+            <option value="N">newtons (N)</option>
+            <option value="kN">kilonewtons (kN)</option>
+            <option value="MN">meganewtons (MN)</option>
+            <option value="GN">giganewtons (GN)</option>
+            <option value="TN">teranewtons (TN)</option>
+            <option value="lbf">pounds-force (lbf)</option>
+          </select>
         </p>
       </div>
-      
+
       <button id="calcBtn">Calculate</button>
       <button id="resetBtn">Reset</button>
       <hr>
@@ -71,13 +65,13 @@
       const containers = document.querySelectorAll(".containers");
       const inputs = document.querySelectorAll(".inputs");
 
-      const msInput = document.getElementById("ms-input");
-      const dlInput = document.getElementById("dl-input");
-      const fsInput = document.getElementById("fs-input");
+      const i1Input = document.getElementById("i1-input");
+      const i2Input = document.getElementById("i2-input");
+      const i3Input = document.getElementById("i3-input");
 
-      const msSelect = document.getElementById("ms-select");
-      const dlSelect = document.getElementById("dl-select");
-      const fsSelect = document.getElementById("fs-select");
+      const i1Select = document.getElementById("i1-select");
+      const i2Select = document.getElementById("i2-select");
+      const i3Select = document.getElementById("i3-select");
 
       const calcBtnEl = document.getElementById('calcBtn');
       const resetBtnEl = document.getElementById('resetBtn');
@@ -85,25 +79,40 @@
 
       /*************** GLOBAL VARIBLES ***************/
       const UNITS = {
+        coefficient: {
+          units: 1,
+        },
         force: {
           N: 1,
-          kN: 0.001,
-          MN: 0.000001,
-          lbf: 0.224809,
-          kip: 0.000225,
-        },
-        ratio: {
-          Units: 1,
+          kN: 1e-3,
+          MN: 1e-6,
+          GN: 1e-9,
+          TN: 1e-12,
+          lbf: 0.2248,
         },
       };
-
       /*************** FUNCTIONS ***************/
       function toSIUnit(type, unit, value) {
         return value / UNITS[type][unit];
       }
 
       function fromSIUnit(type, unit, value) {
-        return UNITS[type][unit] * value;
+        return value * UNITS[type][unit];
+      }
+
+      function handleCalculateUnitChange(e) {
+        const value = e.target.value
+
+        containers.forEach((container) => {
+          let idVal = container.id.slice(0, 2)
+          if (idVal == value) {
+            container.style.display = 'none'
+          } else {
+            container.style.display = 'block'
+          }
+        })
+
+        resetResult()
       }
 
       function createElements(resultObj) {
@@ -133,117 +142,87 @@
         return elementNodes;
       }
 
-      function handleCalculateUnitChange(e) {
-        const value = e.target.value
-
-        containers.forEach((container) => {
-          let idVal = container.id.slice(0, 2)
-          if (idVal == value) {
-            container.style.display = 'none'
-          } else {
-            container.style.display = 'block'
-          }
-        })
-
-        resetResult()
-      }
-
       function calculateResult(input) {
-        const calculateMS = () => {
-          const { dl, fs } = prepareUnits();
-          if (fs <= 1) {
-            alert(
-              "Your structure or its material would fail. Redesign its maximum strength to withstand the design load."
-            );
-          }
-          let result = dl * fs;
+        const calculateI1 = () => {
+          const { i3, i2 } = prepareUnits();
+          let result = i3 / i2;
           return {
             result,
-            type: "force",
-            name: `Maximum strength`,
+            type: "coefficient",
+            name: "Friction coefficients",
           };
         };
-        const calculateDL = () => {
-          const { fs, ms } = prepareUnits();
+        const calculateI2 = () => {
+          const { i1, i3 } = prepareUnits();
 
-          if (fs <= 1) {
-            alert(
-              "Your structure or its material would fail. Redesign its maximum strength to withstand the design load."
-            );
-          }
-          let result = ms / fs;
+          let result = i3 / i1;
           return {
             result,
             type: "force",
-            name: "Design load",
+            name: `Normal force`,
           };
         };
-        const calculateFS = () => {
-          const { dl, ms } = prepareUnits();
-          let result = ms / dl;
+        const calculateI3 = () => {
+          const { i1, i2 } = prepareUnits();
+
+          let result = i1 * i2;
           return {
             result,
-            type: "ratio",
-            name: "Factor of Safety",
+            type: "force",
+            name: "Friction (F)",
           };
         };
 
         switch (input) {
-          case "ms":
-            return calculateMS();
-          case "dl":
-            return calculateDL();
-          case "fs":
-            return calculateFS();
-
+          case "i1":
+            return calculateI1();
+          case "i2":
+            return calculateI2();
+          case "i3":
+            return calculateI3();
           default:
             console.log("error in calculate result switch");
         }
       }
 
       function prepareUnits() {
-        let ms = parseFloat(msInput.value) ?? 0;
-        let dl = parseFloat(dlInput.value) ?? 0;
-        let fs = parseFloat(fsInput.value) ?? 0;
+        let i1 = parseFloat(i1Input.value) ?? 0;
+        let i2 = parseFloat(i2Input.value) ?? 0;
+        let i3 = parseFloat(i3Input.value) ?? 0;
 
-        let teUnit = msSelect.value;
-        let dpUnit = dlSelect.value;
-        let rhUnit = fsSelect.value;
+        let i1Unit = i1Select.value;
+        let i2Unit = i2Select.value;
+        let i3Unit = i3Select.value;
 
-        ms = toSIUnit("force", teUnit, ms);
-        dl = toSIUnit("force", dpUnit, dl);
-        fs = toSIUnit("ratio", rhUnit, fs);
+        i1 = toSIUnit("coefficient", i1Unit, i1);
+        i2 = toSIUnit("force", i2Unit, i2);
+        i3 = toSIUnit("force", i3Unit, i3);
 
-        return { ms, dl, fs };
+        return { i3, i1, i2 };
       }
 
       function prepareResults(result, type, name) {
         let resultObj = {};
         Object.keys(UNITS[type]).forEach((key) => {
           let ans = fromSIUnit(type, key, result);
-          // ans =
-          //   ans > 1 || ans < -1
-          //     ? parseFloat(parseFloat(ans.toExponential(10)).toFixed(4))
-          //     : ans.toExponential(10);
+          ans = parseFloat(ans.toFixed(10));
+          if (!(ans > 0 && ans < 1) && !(ans < 0 && ans > -1)) {
+            ans = ans.toLocaleString();
+          }
 
           resultObj[key] = {
-            title: `${name}: `,
+            title: `${name} (${key}): `,
             value: ` ${ans} ${key}`,
           };
         });
         return resultObj;
       }
-
       function calculateResults() {
         const calculateUnit = calculateUnitEl.value
+
         try {
           const { result, type, name } = calculateResult(calculateUnit);
 
-          if (result <= 1 && type === "ratio") {
-            alert(
-              "Your structure or its material would fail. Redesign its maximum strength to withstand the design load."
-            );
-          }
           if (isNaN(result)) {
             alert("Your input resulted in NAN.\n 0/0 \n Try again with valid input.");
             resetResult()
@@ -259,7 +238,7 @@
 
           const resultObj = prepareResults(result, type, name);
           const elementNodes = createElements(resultObj);
-          calcResultsEl.innerHTML = "";
+          calcResultsEl.innerHTML = ``;
 
           elementNodes.forEach((element) => {
             calcResultsEl.append(element);
@@ -273,16 +252,17 @@
       }
 
       function resetForm() {
-        [msSelect, dlSelect, fsSelect].forEach((select) => {
+        [i1Select, i2Select, i3Select].forEach((select) => {
           select.selectedIndex = '0'
         });
-        [msInput, dlInput, fsInput].forEach((input) => {
+
+        [i1Input, i2Input, i3Input].forEach((input) => {
           input.value = ""
         });
         calculateUnitEl.selectedIndex = '2';
         containers.forEach((container) => {
           let idVal = container.id.slice(0, 2)
-          if (idVal == 'fs') {
+          if (idVal == 'i3') {
             container.style.display = 'none'
           } else {
             container.style.display = 'block'
@@ -301,10 +281,10 @@
       }
 
       /*************** EVENT LISTINERS ***************/
-      [msSelect, dlSelect, fsSelect].forEach((select) => {
+      [i1Select, i2Select, i3Select].forEach((select) => {
         select.addEventListener("change", resetResult);
       });
-      [msInput, dlInput, fsInput].forEach((input) => {
+      [i1Input, i2Input, i3Input].forEach((input) => {
         input.addEventListener("input", resetResult);
       });
       calculateUnitEl.addEventListener("change", handleCalculateUnitChange);
