@@ -3,55 +3,59 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Friction Calculator</title>
+    <title>Power-to-Weight Ratio Calculator</title>
   </head>
   <body>
-    <h1>Friction Calculator</h1>
+    <h1>Power-to-Weight Ratio Calculator</h1>
       <p>
         Calculate:
         <select id="calculateUnit">
-          <option value="i1">Friction coefficient (μ)</option>
-          <option value="i2">Normal force (N)</option>
-          <option value="i3" selected>Friction (F)</option>
+          <option value="p">Power </option>
+          <option value="w">Weight</option>
+          <option value="r" selected>Power-to-weight ratio </option>
         </select>
       </p>
-  
+      
       <div>
-        <p id="i1-contianer" class="containers">
-          <label for="i1-input">Friction coefficient (μ) </label>
-          <input type="number" step="any" id="i1-input" class="inputs" />
-          <select id="i1-select" style="display: none">
-            <option value="units" selected disabled>UNIT</option>
+        <p id="p-contianer" class="containers">
+          <label for="p-input">Power </label>
+          <input type="number" step="any" id="p-input" class="inputs" />
+          <select id="p-select">
+            <option value="W" selected>watts (W)</option>
+            <option value="kW">kilowatts (kW)</option>
+            <option value="hp(l)">mechanical horsepowers (hp(l))</option>
+            <option value="hp(M)">metric horsepowers (hp(M))</option>
           </select>
         </p>
-        
-        <p id="i2-contianer" class="containers">
-          <label for="i2-input">Normal force (N) </label>
-          <input type="number" step="any" id="i2-input" class="inputs" />
-          <select id="i2-select">
-            <option value="N">newtons (N)</option>
-            <option value="kN">kilonewtons (kN)</option>
-            <option value="MN">meganewtons (MN)</option>
-            <option value="GN">giganewtons (GN)</option>
-            <option value="TN">teranewtons (TN)</option>
-            <option value="lbf">pounds-force (lbf)</option>
+        <p id="w-contianer" class="containers">
+          <label for="w-input">Weight </label>
+          <input type="number" step="any" id="w-input" class="inputs" />
+          <select id="w-select">
+            <option value="g">grams (g)</option>
+            <option value="kg" selected>kilograms (kg)</option>
+            <option value="t">metric tons (t)</option>
+            <option value="oz">ounces (oz)</option>
+            <option value="lb">pounds (lb)</option>
+            <option value="US ton">US short tons (US ton)</option>
+            <option value="Long ton">imperial tons (Long ton)</option>
           </select>
         </p>
-        
-        <p id="i3-contianer" class="containers" style="display: none;">
-          <label for="i3-input">Friction (F) </label>
-          <input type="number" id="i3-input" step="any" class="inputs" />
-          <select id="i3-select">
-            <option value="N">newtons (N)</option>
-            <option value="kN">kilonewtons (kN)</option>
-            <option value="MN">meganewtons (MN)</option>
-            <option value="GN">giganewtons (GN)</option>
-            <option value="TN">teranewtons (TN)</option>
-            <option value="lbf">pounds-force (lbf)</option>
+        <p id="r-contianer" class="containers" style="display: none;">
+          <label for="r-input">Power-to-weight ratio </label>
+          <input type="number" id="r-input" step="any" class="inputs" />
+          <select id="r-select">
+            <option value="W/kg" selected>watts per kilogram (W/kg)</option>
+            <option value="kW/kg">kilowatts per kilogram (kW/kg)</option>
+            <option value="hp(l)/lb">
+              mechanical horsepower per pound (hp(l)/lb)
+            </option>
+            <option value="hp(M)/kg">
+              mechanical horsepower per kilogram (hp(M)/kg)
+            </option>
           </select>
         </p>
       </div>
-
+      
       <button id="calcBtn">Calculate</button>
       <button id="resetBtn">Reset</button>
       <hr>
@@ -65,13 +69,13 @@
       const containers = document.querySelectorAll(".containers");
       const inputs = document.querySelectorAll(".inputs");
 
-      const i1Input = document.getElementById("i1-input");
-      const i2Input = document.getElementById("i2-input");
-      const i3Input = document.getElementById("i3-input");
+      const pInput = document.getElementById("p-input");
+      const wInput = document.getElementById("w-input");
+      const rInput = document.getElementById("r-input");
 
-      const i1Select = document.getElementById("i1-select");
-      const i2Select = document.getElementById("i2-select");
-      const i3Select = document.getElementById("i3-select");
+      const pSelect = document.getElementById("p-select");
+      const wSelect = document.getElementById("w-select");
+      const rSelect = document.getElementById("r-select");
 
       const calcBtnEl = document.getElementById('calcBtn');
       const resetBtnEl = document.getElementById('resetBtn');
@@ -79,16 +83,26 @@
 
       /*************** GLOBAL VARIBLES ***************/
       const UNITS = {
-        coefficient: {
-          units: 1,
+        weight: {
+          g: 1000,
+          kg: 1,
+          t: 0.001,
+          oz: 35.274,
+          lb: 2.2046226218,
+          "US ton": 0.00110231,
+          "Long ton": 0.000984207,
         },
-        force: {
-          N: 1,
-          kN: 1e-3,
-          MN: 1e-6,
-          GN: 1e-9,
-          TN: 1e-12,
-          lbf: 0.2248,
+        ratio: {
+          "W/kg": 1,
+          "kW/kg": 0.001,
+          "hp(l)/lb": 0.000608277,
+          "hp(M)/kg": 0.00135962,
+        },
+        power: {
+          W: 1,
+          kW: 0.001,
+          "hp(l)": 0.00134102,
+          "hp(M)": 0.00135962,
         },
       };
       /*************** FUNCTIONS ***************/
@@ -104,7 +118,7 @@
         const value = e.target.value
 
         containers.forEach((container) => {
-          let idVal = container.id.slice(0, 2)
+          let idVal = container.id.slice(0, 1)
           if (idVal == value) {
             container.style.display = 'none'
           } else {
@@ -143,72 +157,68 @@
       }
 
       function calculateResult(input) {
-        const calculateI1 = () => {
-          const { i3, i2 } = prepareUnits();
-          let result = i3 / i2;
+        const calculateP = () => {
+          const { w, r } = prepareUnits();
+
           return {
-            result,
-            type: "coefficient",
-            name: "Friction coefficients",
+            result: w * r,
+            type: "power",
+            name: `Power`,
           };
         };
-        const calculateI2 = () => {
-          const { i1, i3 } = prepareUnits();
-
-          let result = i3 / i1;
+        const calculateR = () => {
+          const { w, p } = prepareUnits();
           return {
-            result,
-            type: "force",
-            name: `Normal force`,
+            result: p / w,
+            type: "ratio",
+            name: "Ratio",
           };
         };
-        const calculateI3 = () => {
-          const { i1, i2 } = prepareUnits();
-
-          let result = i1 * i2;
+        const calculateW = () => {
+          const { r, p } = prepareUnits();
           return {
-            result,
-            type: "force",
-            name: "Friction (F)",
+            result: p / r,
+            type: "weight",
+            name: "Weight",
           };
         };
 
         switch (input) {
-          case "i1":
-            return calculateI1();
-          case "i2":
-            return calculateI2();
-          case "i3":
-            return calculateI3();
+          case "p":
+            return calculateP();
+          case "w":
+            return calculateW();
+          case "r":
+            return calculateR();
           default:
             console.log("error in calculate result switch");
         }
       }
 
       function prepareUnits() {
-        let i1 = parseFloat(i1Input.value) ?? 0;
-        let i2 = parseFloat(i2Input.value) ?? 0;
-        let i3 = parseFloat(i3Input.value) ?? 0;
+        let r = parseFloat(rInput.value) ?? 0;
+        let w = parseFloat(wInput.value) ?? 0;
+        let p = parseFloat(pInput.value) ?? 0;
 
-        let i1Unit = i1Select.value;
-        let i2Unit = i2Select.value;
-        let i3Unit = i3Select.value;
+        let rUnit = rSelect.value;
+        let wUnit = wSelect.value;
+        let pUnit = pSelect.value;
 
-        i1 = toSIUnit("coefficient", i1Unit, i1);
-        i2 = toSIUnit("force", i2Unit, i2);
-        i3 = toSIUnit("force", i3Unit, i3);
+        r = toSIUnit("ratio", rUnit, r);
+        w = toSIUnit("weight", wUnit, w);
+        p = toSIUnit("power", pUnit, p);
 
-        return { i3, i1, i2 };
+        return { r, w, p };
       }
 
       function prepareResults(result, type, name) {
         let resultObj = {};
         Object.keys(UNITS[type]).forEach((key) => {
           let ans = fromSIUnit(type, key, result);
-          ans = parseFloat(ans.toFixed(10));
-          if (!(ans > 0 && ans < 1) && !(ans < 0 && ans > -1)) {
-            ans = ans.toLocaleString();
-          }
+          // ans =
+          //   ans > 1 || ans < -1
+          //     ? parseFloat(parseFloat(ans.toExponential(10)).toFixed(4))
+          //     : ans.toExponential(10);
 
           resultObj[key] = {
             title: `${name} (${key}): `,
@@ -239,7 +249,7 @@
 
           const resultObj = prepareResults(result, type, name);
           const elementNodes = createElements(resultObj);
-          calcResultsEl.innerHTML = ``;
+          calcResultsEl.innerHTML = "";
 
           elementNodes.forEach((element) => {
             calcResultsEl.append(element);
@@ -253,23 +263,26 @@
       }
 
       function resetForm() {
-        [i1Select, i2Select, i3Select].forEach((select) => {
-          select.selectedIndex = '0'
+        [pSelect, wSelect, rSelect].forEach((select, index) => {
+          if (index == 1) {
+            select.selectedIndex = "1"
+          } else {
+            select.selectedIndex = '0'
+          }
         });
 
-        [i1Input, i2Input, i3Input].forEach((input) => {
+        [pInput, wInput, rInput].forEach((input) => {
           input.value = ""
         });
         calculateUnitEl.selectedIndex = '2';
         containers.forEach((container) => {
-          let idVal = container.id.slice(0, 2)
-          if (idVal == 'i3') {
+          let idVal = container.id.slice(0, 1)
+          if (idVal == 'r') {
             container.style.display = 'none'
           } else {
             container.style.display = 'block'
           }
         })
-
       }
 
       function resetResult() {
@@ -281,14 +294,16 @@
         resetResult();
       }
 
+
       /*************** EVENT LISTINERS ***************/
-      [i1Select, i2Select, i3Select].forEach((select) => {
+      [pSelect, wSelect, rSelect].forEach((select) => {
         select.addEventListener("change", resetResult);
       });
-      [i1Input, i2Input, i3Input].forEach((input) => {
+      [pInput, wInput, rInput].forEach((input) => {
         input.addEventListener("input", resetResult);
       });
       calculateUnitEl.addEventListener("change", handleCalculateUnitChange);
+
       resetBtnEl.addEventListener("click", resethandler);
       calcBtnEl.addEventListener("click", calculateResults);
 

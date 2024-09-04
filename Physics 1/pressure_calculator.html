@@ -3,51 +3,84 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Friction Calculator</title>
+    <title>Pressure Calculator</title>
   </head>
   <body>
-    <h1>Friction Calculator</h1>
+    <h1>Pressure Calculator</h1>
       <p>
         Calculate:
         <select id="calculateUnit">
-          <option value="i1">Friction coefficient (μ)</option>
-          <option value="i2">Normal force (N)</option>
-          <option value="i3" selected>Friction (F)</option>
+          <option value="fr">Force </option>
+          <option value="ar">Area</option>
+          <option value="pr" selected>Pressure </option>
         </select>
       </p>
-  
+
       <div>
-        <p id="i1-contianer" class="containers">
-          <label for="i1-input">Friction coefficient (μ) </label>
-          <input type="number" step="any" id="i1-input" class="inputs" />
-          <select id="i1-select" style="display: none">
-            <option value="units" selected disabled>UNIT</option>
-          </select>
-        </p>
-        
-        <p id="i2-contianer" class="containers">
-          <label for="i2-input">Normal force (N) </label>
-          <input type="number" step="any" id="i2-input" class="inputs" />
-          <select id="i2-select">
-            <option value="N">newtons (N)</option>
+        <p id="fr-contianer" class="containers">
+          <label for="fr-input">Force </label>
+          <input
+            type="number"
+            step="any"
+            id="fr-input"
+            class="inputs"
+            min="0"
+          />
+          <select id="fr-select">
+            <option value="N" selected>newtons (N)</option>
             <option value="kN">kilonewtons (kN)</option>
             <option value="MN">meganewtons (MN)</option>
             <option value="GN">giganewtons (GN)</option>
             <option value="TN">teranewtons (TN)</option>
+            <option value="pdl">poundals (pdl)</option>
             <option value="lbf">pounds-force (lbf)</option>
           </select>
         </p>
-        
-        <p id="i3-contianer" class="containers" style="display: none;">
-          <label for="i3-input">Friction (F) </label>
-          <input type="number" id="i3-input" step="any" class="inputs" />
-          <select id="i3-select">
-            <option value="N">newtons (N)</option>
-            <option value="kN">kilonewtons (kN)</option>
-            <option value="MN">meganewtons (MN)</option>
-            <option value="GN">giganewtons (GN)</option>
-            <option value="TN">teranewtons (TN)</option>
-            <option value="lbf">pounds-force (lbf)</option>
+        <p id="ar-contianer" class="containers">
+          <label for="ar-input">Area </label>
+          <input
+            type="number"
+            step="any"
+            id="ar-input"
+            class="inputs"
+            min="0"
+          />
+          <select id="ar-select">
+            <option value="mm²">square millimeters (mm²)</option>
+            <option value="cm²">square centimeters (cm²)</option>
+            <option value="dm²">square decimeters (dm²)</option>
+            <option value="m²" selected>square meters (m²)</option>
+            <option value="km²">square kilometers (km²)</option>
+            <option value="in²">square inches (in²)</option>
+            <option value="ft²">square feet (ft²)</option>
+            <option value="yd²">square yards (yd²)</option>
+            <option value="mi²">square miles (mi²)</option>
+            <option value="a">ares (a)</option>
+            <option value="ha">hectares (ha)</option>
+          </select>
+        </p>
+        <p id="pr-contianer" class="containers" style="display: none;">
+          <label for="pr-input">Pressure </label>
+          <input
+            type="number"
+            id="pr-input"
+            step="any"
+            class="inputs"
+            min="0"
+          />
+          <select id="pr-select">
+            <option value="Pa" selected>pascals (Pa)</option>
+            <option value="bar">bars (bar)</option>
+            <option value="psi">pounds per square inch (psi)</option>
+            <option value="at">technical atmospheres (at)</option>
+            <option value="atm">standard atmospheres (atm)</option>
+            <option value="Torr">torr (Torr)</option>
+            <option value="hPa">hectopascals (hPa)</option>
+            <option value="kPa">kilopascals (kPa)</option>
+            <option value="MPa">megapascals (MPa)</option>
+            <option value="GPa">gigapascals (GPa)</option>
+            <option value="inHg">inches of mercury (inHg)</option>
+            <option value="mmHg">millimeters of mercury (mmHg)</option>
           </select>
         </p>
       </div>
@@ -65,13 +98,13 @@
       const containers = document.querySelectorAll(".containers");
       const inputs = document.querySelectorAll(".inputs");
 
-      const i1Input = document.getElementById("i1-input");
-      const i2Input = document.getElementById("i2-input");
-      const i3Input = document.getElementById("i3-input");
+      const arInput = document.getElementById("ar-input");
+      const frInput = document.getElementById("fr-input");
+      const prInput = document.getElementById("pr-input");
 
-      const i1Select = document.getElementById("i1-select");
-      const i2Select = document.getElementById("i2-select");
-      const i3Select = document.getElementById("i3-select");
+      const arSelect = document.getElementById("ar-select");
+      const frSelect = document.getElementById("fr-select");
+      const prSelect = document.getElementById("pr-select");
 
       const calcBtnEl = document.getElementById('calcBtn');
       const resetBtnEl = document.getElementById('resetBtn');
@@ -79,16 +112,41 @@
 
       /*************** GLOBAL VARIBLES ***************/
       const UNITS = {
-        coefficient: {
-          units: 1,
-        },
         force: {
           N: 1,
           kN: 1e-3,
           MN: 1e-6,
           GN: 1e-9,
           TN: 1e-12,
+          pdl: 7.233,
           lbf: 0.2248,
+        },
+        area: {
+          "mm²": 1000000,
+          "cm²": 10000,
+          "dm²": 100,
+          "m²": 1,
+          "km²": 0.000001,
+          "in²": 1550,
+          "ft²": 10.764,
+          "yd²": 1.196,
+          "mi²": 0.0000003861,
+          a: 0.01,
+          ha: 0.0001,
+        },
+        pressure: {
+          Pa: 1,
+          bar: 0.00001,
+          psi: 0.00014504,
+          at: 0.000010197,
+          atm: 0.00000987,
+          Torr: 0.0075,
+          hPa: 0.01,
+          kPa: 0.001,
+          MPa: 0.000001,
+          GPa: 0.000000001,
+          inHg: 0.0002953,
+          mmHg: 0.0075,
         },
       };
       /*************** FUNCTIONS ***************/
@@ -114,6 +172,7 @@
 
         resetResult()
       }
+
 
       function createElements(resultObj) {
         const elementNodes = Object.keys(resultObj).map((key) => {
@@ -143,69 +202,68 @@
       }
 
       function calculateResult(input) {
-        const calculateI1 = () => {
-          const { i3, i2 } = prepareUnits();
-          let result = i3 / i2;
+        const calculateAr = () => {
+          const { fr, pr } = prepareUnits();
+
+          let result = fr / pr;
           return {
             result,
-            type: "coefficient",
-            name: "Friction coefficients",
+            type: "area",
+            name: `Area`,
           };
         };
-        const calculateI2 = () => {
-          const { i1, i3 } = prepareUnits();
-
-          let result = i3 / i1;
+        const calculatePr = () => {
+          const { fr, ar } = prepareUnits();
+          let result = fr / ar;
+          return {
+            result,
+            type: "pressure",
+            name: "Pressure",
+          };
+        };
+        const calculateFr = () => {
+          const { pr, ar } = prepareUnits();
+          let result = pr * ar;
           return {
             result,
             type: "force",
-            name: `Normal force`,
-          };
-        };
-        const calculateI3 = () => {
-          const { i1, i2 } = prepareUnits();
-
-          let result = i1 * i2;
-          return {
-            result,
-            type: "force",
-            name: "Friction (F)",
+            name: "Force",
           };
         };
 
         switch (input) {
-          case "i1":
-            return calculateI1();
-          case "i2":
-            return calculateI2();
-          case "i3":
-            return calculateI3();
+          case "ar":
+            return calculateAr();
+          case "fr":
+            return calculateFr();
+          case "pr":
+            return calculatePr();
           default:
             console.log("error in calculate result switch");
         }
       }
 
       function prepareUnits() {
-        let i1 = parseFloat(i1Input.value) ?? 0;
-        let i2 = parseFloat(i2Input.value) ?? 0;
-        let i3 = parseFloat(i3Input.value) ?? 0;
+        let pr = parseFloat(prInput.value) ?? 0;
+        let fr = parseFloat(frInput.value) ?? 0;
+        let ar = parseFloat(arInput.value) ?? 0;
 
-        let i1Unit = i1Select.value;
-        let i2Unit = i2Select.value;
-        let i3Unit = i3Select.value;
+        let prUnit = prSelect.value;
+        let frUnit = frSelect.value;
+        let arUnit = arSelect.value;
 
-        i1 = toSIUnit("coefficient", i1Unit, i1);
-        i2 = toSIUnit("force", i2Unit, i2);
-        i3 = toSIUnit("force", i3Unit, i3);
+        pr = toSIUnit("pressure", prUnit, pr);
+        fr = toSIUnit("force", frUnit, fr);
+        ar = toSIUnit("area", arUnit, ar);
 
-        return { i3, i1, i2 };
+        return { pr, fr, ar };
       }
 
       function prepareResults(result, type, name) {
         let resultObj = {};
         Object.keys(UNITS[type]).forEach((key) => {
           let ans = fromSIUnit(type, key, result);
-          ans = parseFloat(ans.toFixed(10));
+          ans = parseFloat(ans.toFixed(22));
           if (!(ans > 0 && ans < 1) && !(ans < 0 && ans > -1)) {
             ans = ans.toLocaleString();
           }
@@ -217,7 +275,7 @@
         });
         return resultObj;
       }
-      
+
       function calculateResults() {
         const calculateUnit = calculateUnitEl.value
 
@@ -239,7 +297,7 @@
 
           const resultObj = prepareResults(result, type, name);
           const elementNodes = createElements(resultObj);
-          calcResultsEl.innerHTML = ``;
+          calcResultsEl.innerHTML = "";
 
           elementNodes.forEach((element) => {
             calcResultsEl.append(element);
@@ -253,23 +311,26 @@
       }
 
       function resetForm() {
-        [i1Select, i2Select, i3Select].forEach((select) => {
-          select.selectedIndex = '0'
+        [frSelect, arSelect , prSelect].forEach((select, index) => {
+          if (index == 1) {
+            select.selectedIndex = '3'
+          } else {
+            select.selectedIndex = '0'
+          }
         });
 
-        [i1Input, i2Input, i3Input].forEach((input) => {
+        [arInput, frInput, prInput].forEach((input) => {
           input.value = ""
         });
         calculateUnitEl.selectedIndex = '2';
         containers.forEach((container) => {
           let idVal = container.id.slice(0, 2)
-          if (idVal == 'i3') {
+          if (idVal == 'pr') {
             container.style.display = 'none'
           } else {
             container.style.display = 'block'
           }
         })
-
       }
 
       function resetResult() {
@@ -281,11 +342,12 @@
         resetResult();
       }
 
+
       /*************** EVENT LISTINERS ***************/
-      [i1Select, i2Select, i3Select].forEach((select) => {
+      [arSelect, frSelect, prSelect].forEach((select) => {
         select.addEventListener("change", resetResult);
       });
-      [i1Input, i2Input, i3Input].forEach((input) => {
+      [arInput, frInput, prInput].forEach((input) => {
         input.addEventListener("input", resetResult);
       });
       calculateUnitEl.addEventListener("change", handleCalculateUnitChange);

@@ -3,51 +3,88 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Friction Calculator</title>
+    <title>Potential Energy Calculator</title>
   </head>
   <body>
-    <h1>Friction Calculator</h1>
+    <h1>Potential Energy Calculator</h1>
       <p>
         Calculate:
         <select id="calculateUnit">
-          <option value="i1">Friction coefficient (μ)</option>
-          <option value="i2">Normal force (N)</option>
-          <option value="i3" selected>Friction (F)</option>
+          <option value="i1">Mass </option>
+          <option value="i2">Grav. acceleration</option>
+          <option value="i3">Height </option>
+          <option value="i4" selected>Potential energy </option>
         </select>
       </p>
-  
+     
       <div>
         <p id="i1-contianer" class="containers">
-          <label for="i1-input">Friction coefficient (μ) </label>
+          <label for="i1-input">Mass </label>
           <input type="number" step="any" id="i1-input" class="inputs" />
-          <select id="i1-select" style="display: none">
-            <option value="units" selected disabled>UNIT</option>
+          <select id="i1-select">
+            <option value="µg">micrograms (µg)</option>
+            <option value="mg">milligrams (mg)</option>
+            <option value="g">grams (g)</option>
+            <option value="dag">decagrams (dag)</option>
+            <option value="kg" selected>kilograms (kg)</option>
+            <option value="t">metric tons (t)</option>
+            <option value="gr">grains (gr)</option>
+            <option value="dr">drachms (dr)</option>
+            <option value="oz">ounces (oz)</option>
+            <option value="lb">pounds (lb)</option>
+            <option value="st">stones (st)</option>
+            <option value="US ton">US short tons (US ton)</option>
+            <option value="long ton">imperial tons (long ton)</option>
+            <option value="Earths">weights of the Earth (Earths)</option>
+            <option value="me">electron rest masses (me)</option>
+            <option value="u">atomic mass units (u)</option>
+            <option value="oz t">troy ounces (oz t)</option>
           </select>
         </p>
-        
+
         <p id="i2-contianer" class="containers">
-          <label for="i2-input">Normal force (N) </label>
-          <input type="number" step="any" id="i2-input" class="inputs" />
+          <label for="i2-input">Grav. acceleration </label>
+          <input
+            type="number"
+            step="any"
+            id="i2-input"
+            class="inputs"
+            value="1"
+          />
           <select id="i2-select">
-            <option value="N">newtons (N)</option>
-            <option value="kN">kilonewtons (kN)</option>
-            <option value="MN">meganewtons (MN)</option>
-            <option value="GN">giganewtons (GN)</option>
-            <option value="TN">teranewtons (TN)</option>
-            <option value="lbf">pounds-force (lbf)</option>
+            <option value="m/s²">meters per second squared (m/s²)</option>
+            <option value="g" selected>gravitational acc. on Earth (g)</option>
           </select>
         </p>
-        
-        <p id="i3-contianer" class="containers" style="display: none;">
-          <label for="i3-input">Friction (F) </label>
+
+        <p id="i3-contianer" class="containers">
+          <label for="i3-input">Height </label>
           <input type="number" id="i3-input" step="any" class="inputs" />
           <select id="i3-select">
-            <option value="N">newtons (N)</option>
-            <option value="kN">kilonewtons (kN)</option>
-            <option value="MN">meganewtons (MN)</option>
-            <option value="GN">giganewtons (GN)</option>
-            <option value="TN">teranewtons (TN)</option>
-            <option value="lbf">pounds-force (lbf)</option>
+            <option value="mm">millimeters (mm)</option>
+            <option value="cm">centimeters (cm)</option>
+            <option value="m" selected>meters (m)</option>
+            <option value="km">kilometers (km)</option>
+            <option value="in">inches (in)</option>
+            <option value="ft">feet (ft)</option>
+            <option value="yd">yards (yd)</option>
+            <option value="mi">miles (mi)</option>
+            <option value="nmi">nautical miles (nmi)</option>
+          </select>
+        </p>
+
+        <p id="i4-contianer" class="containers" style="display: none;">
+          <label for="i4-input">Potential energy </label>
+          <input type="number" step="any" id="i4-input" class="inputs" />
+          <select id="i4-select">
+            <option value="J" selected>joules (J)</option>
+            <option value="kJ">kilojoules (kJ)</option>
+            <option value="MJ">megajoules (MJ)</option>
+            <option value="Wh">watt hours (Wh)</option>
+            <option value="kWh">kilowatt hours (kWh)</option>
+            <option value="ft-lb">foot-pounds (ft-lb)</option>
+            <option value="kcal">kilocalories (kcal)</option>
+            <option value="eV">electronvolts (eV)</option>
           </select>
         </p>
       </div>
@@ -68,10 +105,12 @@
       const i1Input = document.getElementById("i1-input");
       const i2Input = document.getElementById("i2-input");
       const i3Input = document.getElementById("i3-input");
+      const i4Input = document.getElementById("i4-input");
 
       const i1Select = document.getElementById("i1-select");
       const i2Select = document.getElementById("i2-select");
       const i3Select = document.getElementById("i3-select");
+      const i4Select = document.getElementById("i4-select");
 
       const calcBtnEl = document.getElementById('calcBtn');
       const resetBtnEl = document.getElementById('resetBtn');
@@ -79,16 +118,49 @@
 
       /*************** GLOBAL VARIBLES ***************/
       const UNITS = {
-        coefficient: {
-          units: 1,
+        acceleration: {
+          "m/s²": 1,
+          g: 0.10197162129779282,
         },
-        force: {
-          N: 1,
-          kN: 1e-3,
-          MN: 1e-6,
-          GN: 1e-9,
-          TN: 1e-12,
-          lbf: 0.2248,
+        mass: {
+          µg: 1e9,
+          mg: 1e6,
+          g: 1e3,
+          dag: 1e2,
+          kg: 1,
+          t: 1e-3,
+          gr: 15432.35835294143,
+          dr: 564.3833911932867,
+          oz: 35.27396194958042,
+          lb: 2.204622621848776,
+          st: 0.15747304441776971,
+          "US ton": 0.001102311310924388,
+          "long ton": 0.0009842065276110606,
+          Earths: 1.6744248350691538e-25,
+          me: 1.0977691228098864e30,
+          u: 6.022139999999999e26,
+          "oz t": 32.15074656862798,
+        },
+        distance: {
+          mm: 1e3,
+          cm: 1e2,
+          m: 1,
+          km: 1e-3,
+          in: 39.370078740157474,
+          ft: 3.280839895013123,
+          yd: 1.0936132983377078,
+          mi: 0.000621371192237334,
+          nmi: 0.0005399568034557236,
+        },
+        energy: {
+          J: 1,
+          kJ: 1e-3,
+          MJ: 1e-6,
+          Wh: 0.00027777777777777783,
+          kWh: 2.777777777777778e-7,
+          "ft-lb": 0.7375621492772654,
+          kcal: 0.00023900573613766732,
+          eV: 6.241509074460763e18,
         },
       };
       /*************** FUNCTIONS ***************/
@@ -114,6 +186,7 @@
 
         resetResult()
       }
+
 
       function createElements(resultObj) {
         const elementNodes = Object.keys(resultObj).map((key) => {
@@ -144,32 +217,41 @@
 
       function calculateResult(input) {
         const calculateI1 = () => {
-          const { i3, i2 } = prepareUnits();
-          let result = i3 / i2;
+          const { i3, i2, i4 } = prepareUnits();
+          let result = i4 / (i3 * i2);
           return {
             result,
-            type: "coefficient",
-            name: "Friction coefficients",
+            type: "mass",
+            name: "Mass",
           };
         };
         const calculateI2 = () => {
-          const { i1, i3 } = prepareUnits();
+          const { i1, i3, i4 } = prepareUnits();
 
-          let result = i3 / i1;
+          let result = i4 / (i1 * i3);
           return {
             result,
-            type: "force",
-            name: `Normal force`,
+            type: "acceleration",
+            name: `Grav. acceleration`,
           };
         };
         const calculateI3 = () => {
-          const { i1, i2 } = prepareUnits();
-
-          let result = i1 * i2;
+          const { i1, i2, i4 } = prepareUnits();
+          let result = i4 / (i1 * i2);
           return {
             result,
-            type: "force",
-            name: "Friction (F)",
+            type: "distance",
+            name: "Height",
+          };
+        };
+
+        const calculateI4 = () => {
+          const { i3, i2, i1 } = prepareUnits();
+          let result = i3 * i2 * i1;
+          return {
+            result,
+            type: "energy",
+            name: "Potential energy",
           };
         };
 
@@ -180,6 +262,8 @@
             return calculateI2();
           case "i3":
             return calculateI3();
+          case "i4":
+            return calculateI4();
           default:
             console.log("error in calculate result switch");
         }
@@ -189,23 +273,26 @@
         let i1 = parseFloat(i1Input.value) ?? 0;
         let i2 = parseFloat(i2Input.value) ?? 0;
         let i3 = parseFloat(i3Input.value) ?? 0;
+        let i4 = parseFloat(i4Input.value) ?? 0;
 
         let i1Unit = i1Select.value;
         let i2Unit = i2Select.value;
         let i3Unit = i3Select.value;
+        let i4wUnit = i4Select.value;
 
-        i1 = toSIUnit("coefficient", i1Unit, i1);
-        i2 = toSIUnit("force", i2Unit, i2);
-        i3 = toSIUnit("force", i3Unit, i3);
+        i1 = toSIUnit("mass", i1Unit, i1);
+        i2 = toSIUnit("acceleration", i2Unit, i2);
+        i3 = toSIUnit("distance", i3Unit, i3);
+        i4 = toSIUnit("energy", i4wUnit, i4);
 
-        return { i3, i1, i2 };
+        return { i3, i1, i2, i4 };
       }
 
       function prepareResults(result, type, name) {
         let resultObj = {};
         Object.keys(UNITS[type]).forEach((key) => {
           let ans = fromSIUnit(type, key, result);
-          ans = parseFloat(ans.toFixed(10));
+          ans = parseFloat(ans.toFixed(8));
           if (!(ans > 0 && ans < 1) && !(ans < 0 && ans > -1)) {
             ans = ans.toLocaleString();
           }
@@ -217,7 +304,6 @@
         });
         return resultObj;
       }
-      
       function calculateResults() {
         const calculateUnit = calculateUnitEl.value
 
@@ -233,6 +319,7 @@
             alert(
               "Your input resulted in Infinity. \nDivision by zero. \nTry again with valid input."
             );
+
             resetResult()
             return;
           }
@@ -253,23 +340,31 @@
       }
 
       function resetForm() {
-        [i1Select, i2Select, i3Select].forEach((select) => {
-          select.selectedIndex = '0'
+        [i1Select, i2Select, i3Select, i4Select].forEach((select, index) => {
+          console.log(index, select)
+          if (index == 0) {
+            select.selectedIndex = '4'
+          } else if (index == 1) {
+            select.selectedIndex = '1'
+          } else if (index == 2) {
+            select.selectedIndex = '2'
+          } else {
+            select.selectedIndex = '0'
+          }
         });
 
-        [i1Input, i2Input, i3Input].forEach((input) => {
+        [i1Input, i2Input, i3Input, i4Input].forEach((input) => {
           input.value = ""
         });
-        calculateUnitEl.selectedIndex = '2';
+        calculateUnitEl.selectedIndex = '3';
         containers.forEach((container) => {
           let idVal = container.id.slice(0, 2)
-          if (idVal == 'i3') {
+          if (idVal == 'i4') {
             container.style.display = 'none'
           } else {
             container.style.display = 'block'
           }
         })
-
       }
 
       function resetResult() {
@@ -281,11 +376,12 @@
         resetResult();
       }
 
+
       /*************** EVENT LISTINERS ***************/
-      [i1Select, i2Select, i3Select].forEach((select) => {
+      [i1Select, i2Select, i3Select, i4Select].forEach((select) => {
         select.addEventListener("change", resetResult);
       });
-      [i1Input, i2Input, i3Input].forEach((input) => {
+      [i1Input, i2Input, i3Input, i4Input].forEach((input) => {
         input.addEventListener("input", resetResult);
       });
       calculateUnitEl.addEventListener("change", handleCalculateUnitChange);

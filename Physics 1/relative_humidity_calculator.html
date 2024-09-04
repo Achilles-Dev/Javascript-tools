@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Relative Humidity Calculator</title>
+  </head>
+  <body>
+    <h1>Relative Humidity Calculator</h1>
+      <p>
+        Calculate:
+        <select id="calculateUnit">
+          <option value="te">Temperature </option>
+          <option value="dp">Dew point</option>
+          <option value="rh" selected>Relative humidity </option>
+        </select>
+      </p>
+      
+      <div>
+        <p id="te-contianer" class="containers">
+          <label for="te-input">Temperature</label>
+          <input type="number" step="any" id="te-input" class="inputs" />
+          <select id="te-select">
+            <option value="°C" selected>Celsius (°C)</option>
+            <option value="°F">Fahrenheit (°F)</option>
+            <option value="K">kelvin (K)</option>
+          </select>
+        </p>
+        <p id="dp-contianer" class="containers">
+          <label for="dp-input">Dew point </label>
+          <input type="number" step="any" id="dp-input" class="inputs" />
+          <select id="dp-select">
+            <option value="°C" selected>Celsius (°C)</option>
+            <option value="°F">Fahrenheit (°F)</option>
+            <option value="K">kelvin (K)</option>
+          </select>
+        </p>
+        <p id="rh-contianer" class="containers" style="display: none;">
+          <label for="rh-input">Relative humidity </label>
+          <input
+            type="number"
+            id="rh-input"
+            step="any"
+            max="100"
+            min="0.000001"
+            class="inputs"
+          />
+          <input id="rh-select" type="button" value="%" />
+        </p>
+      </div>
+
+      <button id="calcBtn">Calculate</button>
+      <button id="resetBtn">Reset</button>
+      <hr>
+      <div>
+        <h3>Result:</h3>
+        <h3 id="calcResults">Result will appear here...</h3>
+      </div>
+    <script>
+      /*************** ELEMENTS ***************/
+      const calculateUnitEl = document.getElementById("calculateUnit");
+      const containers = document.querySelectorAll(".containers");
+      const inputs = document.querySelectorAll(".inputs");
+
+      const teInput = document.getElementById("te-input");
+      const dpInput = document.getElementById("dp-input");
+      const rhInput = document.getElementById("rh-input");
+
+      const teSelect = document.getElementById("te-select");
+      const dpSelect = document.getElementById("dp-select");
+      const rhSelect = document.getElementById("rh-select");
+
+      const calcBtnEl = document.getElementById('calcBtn');
+      const resetBtnEl = document.getElementById('resetBtn');
+      const calcResultsEl = document.getElementById('calcResults')
+
+      /*************** GLOBAL VARIBLES ***************/
+      const UNITS = {
+        temperature: {
+          "°C": (value, op) => value,
+          "°F": (value, op) =>
+            op === "+" ? (value - 32) * (5 / 9) : value * (9 / 5) + 32,
+          K: (value, op) => (op === "+" ? value - 273.15 : value + 273.15),
+        },
+        ratio: {
+          "%": (val, op) => val,
+        },
+      };
+
+      const lamda = 243.04;
+      const beta = 17.625;
+
+      /*************** FUNCTIONS ***************/
+      function toSIUnit(type, unit, value) {
+        return UNITS[type][unit](value, "+");
+      }
+
+      function fromSIUnit(type, unit, value) {
+        return UNITS[type][unit](value, "-");
+      }
+
+      function handleCalculateUnitChange(e) {
+        const value = e.target.value
+
+        containers.forEach((container) => {
+          let idVal = container.id.slice(0, 2)
+          if (idVal == value) {
+            container.style.display = 'none'
+          } else {
+            container.style.display = 'block'
+          }
+        })
+
+        resetResult()
+      }
+
+      function createElements(resultObj) {
+        const elementNodes = Object.keys(resultObj).map((key) => {
+          //create elements to put the results in
+          const div = document.createElement("div");
+          const span = document.createElement("span");
+          const span2 = document.createElement("span");
+
+          // give the elements id
+          div.setAttribute("class", `result-container`);
+          span.setAttribute("class", `result-title`);
+          span2.setAttribute("class", `result-value`);
+
+          // put the values in the elements
+
+          span.textContent = resultObj[key]["title"];
+          span2.textContent = resultObj[key]["value"];
+
+          // appened them to an element that contians them
+          div.append(span, span2);
+
+          // return that element
+          return div;
+        });
+
+        return elementNodes;
+      }
+
+      function calculateResult(input) {
+        let err = false;
+        const calculateTE = () => {
+          const { dp, rh } = prepareUnits();
+
+          let result =
+            (dp * beta * lamda -
+              Math.log(rh / 100) * lamda -
+              lamda * lamda * Math.log(rh / 100)) /
+            (beta +
+              lamda * beta -
+              (dp + Math.log(rh / 100)) +
+              lamda * Math.log(rh / 100));
+
+          if (result > 60) {
+            result = "Temperature should be 60 °C (140 °F) or lower.";
+            err = true;
+          }
+          if (result < -45) {
+            result = "Temperature should be -45 °C (-49 °F) or higher.";
+            err = true;
+          }
+
+          return {
+            result,
+            type: "temperature",
+            name: `Temperature`,
+            err,
+          };
+        };
+        const calculateDP = () => {
+          const { rh, te } = prepareUnits();
+          let result =
+            (lamda * (Math.log(rh / 100) + (beta * te) / (lamda + te))) /
+            (beta - (Math.log(rh / 100) + (beta * te) / (lamda + te)));
+          if (result > 60) {
+            result = "Temperature should be 60 °C (140 °F) or lower.";
+            err = true;
+          }
+          if (result < -45) {
+            result = "Temperature should be -45 °C (-49 °F) or higher.";
+            err = true;
+          }
+
+          return {
+            result,
+            type: "temperature",
+            name: "Dew point",
+            err,
+          };
+        };
+        const calculateRH = () => {
+          const { dp, te } = prepareUnits();
+          let temp1 = (beta * dp) / (lamda + dp);
+          let temp2 = (beta * te) / (lamda + te);
+          let result = 100 * (Math.pow(Math.E, temp1) / Math.pow(Math.E, temp2));
+          if (result > 100) {
+            result = "Relative humidity cannot exceed 100%.";
+            err = true;
+          }
+          return {
+            result,
+            type: "ratio",
+            name: "Relative humidity",
+            err,
+          };
+        };
+
+        switch (input) {
+          case "te":
+            return calculateTE();
+          case "dp":
+            return calculateDP();
+          case "rh":
+            return calculateRH();
+
+          default:
+            console.log("error in calculate result switch");
+        }
+      }
+
+      function prepareUnits() {
+        let te = parseFloat(teInput.value) ?? 0;
+        let dp = parseFloat(dpInput.value) ?? 0;
+        let rh = parseFloat(rhInput.value) ?? 0;
+
+        let teUnit = teSelect.value;
+        let dpUnit = dpSelect.value;
+        let rhUnit = rhSelect.value;
+
+        te = toSIUnit("temperature", teUnit, te);
+        dp = toSIUnit("temperature", dpUnit, dp);
+        rh = toSIUnit("ratio", rhUnit, rh);
+
+        return { te, dp, rh };
+      }
+
+      function prepareResults(result, type, name) {
+        let resultObj = {};
+        Object.keys(UNITS[type]).forEach((key) => {
+          let ans = fromSIUnit(type, key, result);
+          // ans =
+          //   ans > 1 || ans < -1
+          //     ? parseFloat(parseFloat(ans.toExponential(10)).toFixed(4))
+          //     : ans.toExponential(10);
+
+          resultObj[key] = {
+            title: `${name}: `,
+            value: ` ${ans.toFixed(2)} ${key}`,
+          };
+        });
+        return resultObj;
+      }
+      function calculateResults() {
+      
+        let teUnit = teSelect.value;
+        let dpUnit = dpSelect.value;
+        let te = parseFloat(teInput.value) ?? 0;
+        let dp = parseFloat(dpInput.value) ?? 0;
+        te = toSIUnit("temperature", teUnit, te);
+        dp = toSIUnit("temperature", dpUnit, dp);
+        if (te > 60 || dp > 60) {
+          alert("Temperature should be 60 °C (140 °F) or lower.");
+          return;
+        }
+        if (te < -45 || dp < -45) {
+          alert("Temperature should be -45 °C (-49 °F) or higher.");
+          return;
+        }
+        const calculateUnit = calculateUnitEl.value
+
+        try {
+          const { result, type, name, err } = calculateResult(calculateUnit);
+
+          if (err) {
+            alert(result);
+            resetResult()
+            return;
+          }
+
+          if (isNaN(result)) {
+            alert("Your input resulted in NAN.\n 0/0 \n Try again with valid input.");
+            resetResult()
+            return;
+          }
+          if (Math.abs(result) === Infinity) {
+            alert(
+              "Your input resulted in Infinity. \nDivision by zero. \nTry again with valid input."
+            );
+            resetResult()
+            return;
+          }
+
+          const resultObj = prepareResults(result, type, name);
+          const elementNodes = createElements(resultObj);
+          calcResultsEl.innerHTML = ``;
+
+          elementNodes.forEach((element) => {
+            calcResultsEl.append(element);
+          });
+        } catch (error) {
+          console.log(error);
+          alert("An error ocurred. Try again with valid input.");
+          resetResult()
+          return;
+        }
+      }
+
+      function resetForm() {
+        [teSelect, dpSelect, rhSelect].forEach((select) => {
+          select.selectedIndex = '0'
+        });
+
+        [teInput, dpInput, rhInput].forEach((input) => {
+          input.value = ""
+        });
+        calculateUnitEl.selectedIndex = '2';
+        containers.forEach((container) => {
+          let idVal = container.id.slice(0, 2)
+          if (idVal == 'rh') {
+            container.style.display = 'none'
+          } else {
+            container.style.display = 'block'
+          }
+        })
+      }
+
+      function resetResult() {
+        calcResultsEl.innerHTML = "<p>Result will appear here...</p>";
+      } 
+
+      function resethandler() {
+        resetForm();
+        resetResult();
+      }
+
+
+      /*************** EVENT LISTINERS ***************/
+      [teSelect, dpSelect, rhSelect].forEach((select) => {
+        select.addEventListener("change", resetResult);
+      });
+      [teInput, dpInput, rhInput].forEach((input) => {
+        input.addEventListener("input", resetResult);
+      });
+      calculateUnitEl.addEventListener("change", handleCalculateUnitChange);
+      resetBtnEl.addEventListener("click", resethandler);
+      calcBtnEl.addEventListener("click", calculateResults);
+
+    </script>
+  </body>
+</html>
