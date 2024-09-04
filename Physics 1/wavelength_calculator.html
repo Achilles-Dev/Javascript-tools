@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Wavelength Calculator</title>
+  </head>
+  <body>
+    <h1>Wavelength Calculator</h1>
+      <p>
+        <label for="P-select"> Preset (optional)</label>
+        <select id="P-select" data-flag="false">
+          <option value="299792458" selected>light in vacuum</option>
+          <option value="299702547">light in air</option>
+          <option value="225238511">light in water</option>
+          <option value="199861639">light in glass</option>
+          <option value="343">sound in air at 20 °C</option>
+          <option value="355">sound in air at 40 °C</option>
+          <option value="1481">sound in water at 20 °C</option>
+          <option value="1526">sound in water at 40 °C</option>
+          <option value="1522">sound in seawater at 20 °C</option>
+          <option value="1563">sound in seawater at 40 °C</option>
+          <option value="60">sound in rubber</option>
+          <option value="1210">sound in lead</option>
+          <option value="3240">sound in gold</option>
+          <option value="4540">sound in glass</option>
+          <option value="4600">sound in copper</option>
+          <option value="6320">sound in aluminum</option>
+          <option value="custom" disabled>Custom</option>
+        </select>
+      </p>
+      <div>
+        <p>
+          <label for="i1-input">Wave velocity</label>
+          <input
+            type="number"
+            min="0"
+            autocomplete="off"
+            data-id="i1"
+            step="any"
+            id="i1-input"
+            class="inputs"
+            data-name="Wave velocity"
+            value="299792458"
+          />
+          <select
+            class="selects"
+            id="i1-select"
+            data-type="speed"
+            data-prev="m/s"
+            data-id="i1"
+          >
+            <option value="m/s" selected>meters per second (m/s)</option>
+            <option value="km/h">kilometers per hour (km/h)</option>
+            <option value="ft/s">feet per second (ft/s)</option>
+            <option value="mph">miles per hour (mph)</option>
+            <option value="kn">knots (kn)</option>
+            <option value="c">light speed (c)</option>
+            <option value="cm/s">centimeters per second (cm/s)</option>
+          </select>
+        </p>
+
+        <p>
+          <label for="i2-input">Wave frequency </label>
+          <input
+            type="number"
+            min="0"
+            autocomplete="off"
+            data-id="i2"
+            step="any"
+            id="i2-input"
+            class="inputs"
+            data-name="Wave frequency"
+          />
+          <select
+            class="selects"
+            id="i2-select"
+            data-type="frequency"
+            data-prev="m/s"
+            data-id="i2"
+          >
+            <option value="Hz">hertz (Hz)</option>
+            <option value="kHz">kilohertz (kHz)</option>
+            <option value="MHz" selected>megahertz (MHz)</option>
+            <option value="GHz">gigahertz (GHz)</option>
+            <option value="THz">terahertz (THz)</option>
+          </select>
+        </p>
+      </div>
+
+      <button id="calcBtn">Calculate</button>
+      <button id="resetBtn">Reset</button>
+      <hr>
+      <div>
+        <h3>Result:</h3>
+        <h3 id="calcResults">Result will appear here...</h3>
+      </div>
+    <script>
+      /*************** ELEMENTS ***************/
+      const selects = document.querySelectorAll(".selects");
+      const inputs = document.querySelectorAll(".inputs");
+      const input3 = document.getElementById("i3-input");
+      const input4 = document.getElementById("i4-input");
+     
+      const presetSelect = document.getElementById("P-select");
+
+      const calcBtnEl = document.getElementById('calcBtn');
+      const resetBtnEl = document.getElementById('resetBtn');
+      const calcResultsEl = document.getElementById('calcResults')
+
+      /*************** GLOBAL VARIBLES ***************/
+      const UNITS = {
+        speed: {
+          "m/s": 1,
+          "km/h": 3.6,
+          "ft/s": 3.280839895013123,
+          mph: 2.2369362920544025,
+          kn: 1.9438444924406046,
+          c: 3.3356409519815204e-9,
+          "cm/s": 100,
+        },
+        distance: {
+          nm: 1e9,
+          μm: 1e6,
+          mm: 1e3,
+          cm: 1e2,
+          m: 1,
+          km: 1e-3,
+          in: 39.370078740157474,
+          ft: 3.2808398950131235,
+          yd: 1.0936132983377078,
+          mi: 0.000621371192237334,
+        },
+        distanceInv: {
+          nm: 1 / 1e9,
+          μm: 1 / 1e6,
+          mm: 1 / 1e3,
+          cm: 1 / 1e2,
+          m: 1 / 1,
+          km: 1 / 1e-3,
+          in: 1 / 39.370078740157474,
+          ft: 1 / 3.2808398950131235,
+          yd: 1 / 1.0936132983377078,
+          mi: 1 / 0.000621371192237334,
+        },
+        frequency: {
+          Hz: 1,
+          kHz: 1e-3,
+          MHz: 1e-6,
+          GHz: 1e-9,
+          THz: 1e-12,
+        },
+      };
+      const queue = ["i1", "i2", "i3"];
+      /*************** FUNCTIONS ***************/
+      function toSIUnit(type, unit, value) {
+        if (type === "exp") {
+          unit = parseFloat("1e" + unit);
+          return value * unit;
+        }
+        return value / UNITS[type][unit];
+      }
+
+      function fromSIUnit(type, unit, value) {
+        if (type === "exp") {
+          unit = parseFloat("1e" + unit);
+          return value / unit;
+        }
+        return value * UNITS[type][unit];
+      }
+
+      function createElement() {
+        const newDiv = `
+          <div>
+            <p>
+              <label for="i3-span">Wavelength (λ): &nbsp;</label>
+              <span
+                data-id="i3"
+                step="any"
+                id="i3-span"
+                class="spans"
+                data-name="Wavelength (λ)"
+              ></span>
+
+              <select
+                class="selectsResult"
+                id="i3-select"
+                data-type="distance"
+                data-prev="m"
+                data-id="i3"
+              >
+                <option value="nm">nanometers (nm)</option>
+                <option value="μm">micrometers (μm)</option>
+                <option value="mm">millimeters (mm)</option>
+                <option value="cm">centimeters (cm)</option>
+                <option value="m" selected>meters (m)</option>
+                <option value="km">kilometers (km)</option>
+                <option value="in">inches (in)</option>
+                <option value="ft">feet (ft)</option>
+                <option value="yd">yard (yd)</option>
+                <option value="mi">mile (mi)</option>
+              </select>
+            </p>
+
+            <p>
+              <label for="i4-span">Wave number: &nbsp;</label>
+              <span
+                autocomplete="off"
+                data-id="i4"
+                step="any"
+                id="i4-span"
+                data-name="Wavenumber"
+              ></span>
+              &nbsp;&nbsp;<span>1/</span>
+              <select
+                class="selectsResult"
+                id="i4-select"
+                data-type="distanceInv"
+                data-prev="μm"
+                data-id="i4"
+              >
+                <option value="nm">nanometers (nm)</option>
+                <option value="μm" selected>micrometers (μm)</option>
+                <option value="mm">millimeters (mm)</option>
+                <option value="cm">centimeters (cm)</option>
+                <option value="m">meters (m)</option>
+                <option value="km">kilometers (km)</option>
+                <option value="in">inches (in)</option>
+                <option value="ft">feet (ft)</option>
+                <option value="yd">yard (yd)</option>
+                <option value="mi">mile (mi)</option>
+              </select>
+            </p>
+          </div>
+        `
+        return newDiv
+      }
+
+      function validateInput(id) {
+        const input = document.getElementById(`${id}-input`);
+        const label = input.getAttribute("data-name").trim();
+        let value = parseFloat(input.value);
+
+        if (value <= 0 || isNaN(value)) {
+          alert(`${label} must be greater than zero!`);
+          return false;
+        }
+
+        return true;
+      }
+
+      // related to caculation
+      function prepareUnit(...args) {
+        const resultArr = [];
+        for (id of args) {
+          if (id != 'i3') {
+            const input = document.getElementById(`${id}-input`);
+            const select = document.getElementById(`${id}-select`);
+            const type = select.getAttribute("data-type");
+            let val = parseFloat(input.value);
+            val = isNaN(val) ? 0 : val;
+            let inUnit = select.value;
+            val = toSIUnit(type, inUnit, val);
+            resultArr.push(val);
+          } else {
+            const span = document.getElementById(`${id}-span`);
+            const select = document.getElementById(`${id}-select`);
+            const type = select.getAttribute("data-type");
+            let val = parseFloat(span.textContent);
+            val = isNaN(val) ? 0 : val;
+            let inUnit = select.value;
+            val = toSIUnit(type, inUnit, val);
+            resultArr.push(val);
+          }
+        }
+
+        return resultArr;
+      }
+      
+      function setResult(resultObj) {
+        for (key of Object.keys(resultObj)) {
+          let val = resultObj[key].result;
+          let id = resultObj[key].type;
+          if (isNaN(val)) {
+            alert("Your input resulted in NAN.\n 0/0 \n Try again with valid input.");
+            return;
+          }
+          if (Math.abs(val) === Infinity) {
+            alert(
+              "Your input resulted in Infinity. \nDivision by zero. \nTry again with valid input."
+            );
+            return;
+          }
+
+          const span = document.getElementById(`${id}-span`);
+          const select = document.getElementById(`${id}-select`);
+          const type = select.getAttribute("data-type");
+          let outUnit = select.value;
+          val = fromSIUnit(type, outUnit, val);
+
+          span.textContent = parseFloat(val.toPrecision(6));
+        }
+      }
+
+      function calculateResult() {     
+        function calculateI3() {
+          let [val1, val2] = prepareUnit("i1", "i2");
+
+          let result = val1 / val2;
+          return {
+            1: { result, type: "i3" },
+          };
+        }
+        return calculateI3()
+      }
+
+      function calculateI34(id = "i3") {
+        if (id === "i3") {
+          let [inp] = prepareUnit("i3");
+          let result = 1 / inp;
+          return {
+            1: {
+              result,
+              type: "i4",
+            },
+          };
+        }
+      }
+
+      function handleResultsChange(e) {
+        let select = e.target;
+        let id = select.getAttribute("data-id");
+        let span = document.getElementById(`${id}-span`);
+
+        let prevUnit = select.getAttribute("data-prev");
+        let currentUnit = select.value;
+        select.setAttribute("data-prev", currentUnit);
+
+        if (span.textContent === "") {
+          return;
+        }
+
+        let type = select.getAttribute("data-type");
+
+        let value = parseFloat(span.textContent);
+        value = parseFloat(value);
+        if (isNaN(value)) value = 0.0;
+
+        let si = toSIUnit(type, prevUnit, value);
+        let result = fromSIUnit(type, currentUnit, si);
+        span.textContent = result.toPrecision(6);
+      }
+
+      function calculateResults() {
+        for (el of ["i1", "i2"]) {
+          if (!validateInput(el)) return;
+        }
+
+        try {
+          const resultElement = createElement()
+          calcResultsEl.innerHTML = resultElement
+
+          const newSelects = document.querySelectorAll(".selectsResult");
+
+          newSelects.forEach((select) => {
+            select.addEventListener("change", handleResultsChange);
+          });
+          
+          const result1 = calculateResult();
+          setResult(result1)
+          const result2 = calculateI34();
+          setResult(result2)
+
+        } catch(error) {
+          alert("An error ocurred. Try again with valid input.");
+          resetResult()
+          return;
+        }
+      }
+
+      function presetHandler() {
+        const value = presetSelect.value;
+        const input = document.getElementById("i1-input");
+        input.value = value;
+        presetSelect.setAttribute("data-flag", "false");
+        resetResult()
+      }
+
+      function handleCustomMedium(e) {
+        if (e.target.id == 'i1-input') {
+          presetSelect.selectedIndex = "16"
+        }
+      }
+
+      function resetForm() {
+        presetSelect.selectedIndex = '0'
+        selects.forEach((select, index) => {
+          if (index == 1) {
+            select.selectedIndex = '2'
+          } else {
+            select.selectedIndex = '0'
+          }
+        });
+
+        inputs.forEach((input) => {
+          input.value = ""
+        });
+        presetHandler()
+      }
+
+      function resetResult() {
+        calcResultsEl.innerHTML = "<p>Result will appear here...</p>";
+      } 
+
+      function resethandler() {
+        resetForm();
+        resetResult();
+      }
+
+      /*************** EVENT LISTINERS ***************/
+      
+      presetSelect.addEventListener("change", presetHandler);
+      selects.forEach((select) => {
+        select.addEventListener("change", resetResult);
+      });
+      inputs.forEach((input) => {
+        input.addEventListener("input", resetResult);
+      });
+
+      inputs.forEach((input) => {
+        input.addEventListener("input", handleCustomMedium  );
+      });
+
+      resetBtnEl.addEventListener("click", resethandler);
+      calcBtnEl.addEventListener("click", calculateResults);
+
+    </script>
+  </body>
+</html>

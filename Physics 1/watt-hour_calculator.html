@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Watt-hour Calculator</title>
+  </head>
+  <body>
+    <h1>Watt-hour Calculator</h1>
+      <p>Watt-hours from amp-hours</p>
+      <div>
+        <p>
+          <label for="i1-input">Voltage</label>
+          <input
+            type="number"
+            min="0"
+            autocomplete="off"
+            data-id="i1"
+            step="any"
+            id="i1-input"
+            class="inputs"
+            data-name="Voltage"
+          />
+          <select
+            class="selects"
+            id="i1-select"
+            data-type="voltage"
+            data-prev="V"
+            data-id="i1"
+          >
+            <option value="nV">nanovolts (nV)</option>
+            <option value="μV">microvolts (μV)</option>
+            <option value="mV">millivolts (mV)</option>
+            <option value="V" selected>volts (V)</option>
+            <option value="kV">kilovolts (kV)</option>
+            <option value="MV">megavolts (MV)</option>
+          </select>
+        </p>
+
+        <p>
+          <label for="i2-input">Charge </label>
+          <input
+            type="number"
+            min="0"
+            autocomplete="off"
+            data-id="i2"
+            step="any"
+            id="i2-input"
+            class="inputs"
+            data-name="Charge"
+          />
+
+          <select
+            class="selects"
+            id="i2-select"
+            data-type="charge"
+            data-prev="Ah"
+            data-id="i2"
+          >
+            <option value="C">coulombs (C)</option>
+            <option value="Ah" selected>ampere hours (Ah)</option>
+            <option value="mAh">milliampere hours (mAh)</option>
+          </select>
+        </p>
+      </div>
+
+      <p>Watt-hours from time</p>
+
+      <div>
+        <p>
+          <label for="i21-input">Power </label>
+          <input
+            type="number"
+            min="0"
+            autocomplete="off"
+            data-id="i21"
+            step="any"
+            id="i21-input"
+            class="inputs2"
+            data-name="Power"
+          />
+          <select
+            class="selects"
+            id="i21-select"
+            data-type="power"
+            data-prev="W"
+            data-id="i21"
+          >
+            <option value="mW">milliwatts (mW)</option>
+            <option value="W" selected>watts (W)</option>
+            <option value="kW">kilowatts (kW)</option>
+            <option value="MW">megawatts (MW)</option>
+            <option value="BTU/h">
+              British thermal units per hour (BTU/h)
+            </option>
+            <option value="hp(l)">mechanical horsepowers (hp(l))</option>
+            <option value="hp(E)">electric horsepowers (hp(E))</option>
+          </select>
+        </p>
+
+        <p>
+          <label for="i22-input">Time </label>
+          <input
+            type="number"
+            min="0"
+            autocomplete="off"
+            data-id="i22"
+            step="any"
+            id="i22-input"
+            class="inputs2"
+            data-name="Time"
+          />
+
+          <select
+            class="selects"
+            id="i22-select"
+            data-type="time"
+            data-prev="hrs"
+            data-id="i22"
+          >
+            <option value="ms">milliseconds (ms)</option>
+            <option value="sec">seconds (sec)</option>
+            <option value="min">minutes (min)</option>
+            <option value="hrs" selected>hour (hrs)</option>
+            <option value="days">days (days)</option>
+            <option value="wks">weeks(wks)</option>
+            <option value="mos">months (mos)</option>
+            <option value="yrs">years (yrs)</option>
+          </select>
+        </p>
+        <button id="calcBtn">Calculate</button>
+        <button id="resetBtn">Reset</button>
+        <hr>
+        <div>
+          <h3>Result:</h3>
+          <h3 id="calcResults">Result will appear here...</h3>
+        </div>
+
+    <script>
+      /*************** ELEMENTS ***************/
+      const selects = document.querySelectorAll(".selects");
+      const inputs = document.querySelectorAll(".inputs");
+      const inputs2 = document.querySelectorAll(".inputs2");
+
+      const calcBtnEl = document.getElementById('calcBtn');
+      const resetBtnEl = document.getElementById('resetBtn');
+      const calcResultsEl = document.getElementById('calcResults')
+
+      /*************** GLOBAL VARIBLES ***************/
+      const UNITS = {
+        voltage: {
+          nV: 1e9,
+          μV: 1e6,
+          mV: 1e3,
+          V: 1,
+          kV: 1e-3,
+          MV: 1e-6,
+        },
+        charge: {
+          C: 1,
+          Ah: 0.0002777777777777777777777777777778,
+          mAh: 0.277777777777777777777777777777778,
+        },
+        energy: {
+          J: 1,
+          kJ: 1e-3,
+          Wh: 0.00027777777777777777777777777777777777777777777777777,
+          kWh: 0.000000277777777777777777777777777777777777777777777777777777,
+          MWh: 2.77777777777777777777777777777777777777777777777777777e-10,
+        },
+
+        power: {
+          mW: 1e3,
+          W: 1,
+          kW: 1e-3,
+          MW: 1e-6,
+          "BTU/h": 341214,
+          "hp(l)": 0.0013410220895949743,
+          "hp(E)": 0.0013404825737265416,
+        },
+        time: {
+          ms: 1000,
+          sec: 1,
+          min: 0.016666666666666666666666666666666666666666667,
+          hrs: 0.0002777777777777777777777777777777777777778,
+          days: 0.000011574074074074074074074074074074074073,
+          wks: 0.0000016534391534391535,
+          mos: 3.8025705376834734e-7,
+          yrs: 3.1688087814028954e-8,
+        },
+      };
+      /*************** FUNCTIONS ***************/
+      function toSIUnit(type, unit, value) {
+        if (type === "exp") {
+          unit = parseFloat("1e" + unit);
+          return value * unit;
+        }
+        return value / UNITS[type][unit];
+      }
+
+      function fromSIUnit(type, unit, value) {
+        if (type === "exp") {
+          unit = parseFloat("1e" + unit);
+          return value / unit;
+        }
+        return value * UNITS[type][unit];
+      }
+
+      function createElement() {
+        const newDiv = `
+          <div>
+            <p>
+              <label for="i3-span">Energy: &nbsp;</label>
+              <span
+                data-id="i3"
+                step="any"
+                class="spans"
+                id="i3-span"
+                data-name="Energy"
+              ></span>
+              <select
+                class="selectsResult"
+                id="i3-select"
+                data-type="energy"
+                data-prev="Wh"
+                data-id="i3"
+              >
+                <option value="J">joules (J)</option>
+                <option value="Wh" selected>watt hours (Wh)</option>
+                <option value="kWh">kilowatt hours (kWh)</option>
+                <option value="MWh">megawatt hours (MWh)</option>
+              </select>
+            </p>
+            <p>
+              <label for="i23-span">Watt-hours: &nbsp; </label>
+              <span
+                data-id="i23"
+                step="any"
+                class="spans2"
+                id="i23-span"
+                data-name="Energy"
+              ></span>
+              <select
+                class="selectsResult"
+                id="i23-select"
+                data-type="energy"
+                data-prev="Wh"
+                data-id="i23"
+              >
+                
+                <option value="J">joules (J)</option>
+                <option value="kJ">kilojoules (kJ)</option>
+                <option value="Wh" selected>watt hours (Wh)</option>
+                <option value="kWh">kilowatt hours (kWh)</option>
+                <option value="MWh">megawatt hours (MWh)</option>
+              </select>
+            </p>
+          </div>
+        `
+        return newDiv
+      }
+
+
+      function customPercision(ans, to = 12) {
+        return parseFloat(ans.toPrecision(to));
+      }
+
+      function validateInput(id) {
+        const input = document.getElementById(`${id}-input`);
+        const label = input.getAttribute("data-name").trim();
+        let value = parseFloat(input.value);
+
+        if ((id == 'i1' || id == 'i2') && isNaN(value)) return false
+        if ((id == "i21" || id == "i22") && isNaN(value)) return false
+        if (value <= 0 || isNaN(value)) {
+         alert(`${label} must be greater than zero!`);
+          return false;
+        }
+
+        return true;
+      }
+
+      // related to caculation
+      function prepareUnit(...args) {
+        const resultArr = [];
+        for (id of args) {
+          const input = document.getElementById(`${id}-input`);
+          const select = document.getElementById(`${id}-select`);
+          const type = select.getAttribute("data-type");
+          let val = parseFloat(input.value);
+          val = isNaN(val) ? 0 : val;
+          let inUnit = select.value;
+          val = toSIUnit(type, inUnit, val);
+          resultArr.push(val);
+        }
+
+        return resultArr;
+      }
+
+      function setResult(resultObj) {
+        for (key of Object.keys(resultObj)) {
+          let val = resultObj[key].result;
+          let id = resultObj[key].type;
+          if (isNaN(val)) {
+            alert("Your input resulted in NAN.\n 0/0 \n Try again with valid input.");
+            return;
+          }
+          if (Math.abs(val) === Infinity) {
+            alert(
+              "Your input resulted in Infinity. \nDivision by zero. \nTry again with valid input."
+            );
+            return;
+          }
+
+          const span = document.getElementById(`${id}-span`);
+          const select = document.getElementById(`${id}-select`);
+          const type = select.getAttribute("data-type");
+          let outUnit = select.value;
+          val = fromSIUnit(type, outUnit, val);
+
+          span.textContent = customPercision(val);
+        }
+      }
+
+      function calculateResult() {
+        function calculateI3() {
+          let [val1, val2] = prepareUnit("i1", "i2");
+
+          let result = val2 * val1;
+          return {
+            1: { result, type: "i3" },
+          };
+        }
+        return calculateI3()
+      }
+      function calculateResults2() {
+        function calculateI23() {
+          let [val1, val2] = prepareUnit("i21", "i22");
+          let result = val2 * val1;
+          return {
+            1: { result, type: "i23" },
+          };
+        }
+        return calculateI23()
+      }
+
+      function handleResultsChange(e) {
+        let select = e.target;
+        let id = select.getAttribute("data-id");
+        let span = document.getElementById(`${id}-span`);
+
+        let prevUnit = select.getAttribute("data-prev");
+        let currentUnit = select.value;
+        select.setAttribute("data-prev", currentUnit);
+
+        if (span.textContent === "") {
+          return;
+        }
+
+        let type = select.getAttribute("data-type");
+
+        let value = parseFloat(span.textContent);
+        value = parseFloat(value);
+        if (isNaN(value)) value = 0.0;
+
+        let si = toSIUnit(type, prevUnit, value);
+        let result = fromSIUnit(type, currentUnit, si);
+        span.textContent = customPercision(result);
+      }
+
+      function calculateResults() {
+        let first = false;
+        let second = false;
+        
+        for (el of ["i1", "i2"]) {
+          if (!validateInput(el)) {
+            first = false
+          } else {
+            first = true
+          }
+        }
+
+        for (el of ["i21", "i22"]) {
+          if (!validateInput(el)) {
+            second = false
+          } else {
+            second = true
+          }
+        }
+
+        try {
+          const resultElement = createElement()
+          calcResultsEl.innerHTML = resultElement
+
+          const newSelects = document.querySelectorAll(".selectsResult");
+
+          newSelects.forEach((select) => {
+            select.addEventListener("change", handleResultsChange);
+          });
+
+          if (first) {
+            const result = calculateResult()
+            setResult(result)
+          } 
+          if (second) {
+            const result = calculateResults2()
+            setResult(result)
+          }
+          
+          calculateResult();
+
+        } catch(error) {
+          alert("An error ocurred. Try again with valid input.");
+          resetResult()
+          return;
+        }
+      }
+
+      function resetForm() {
+        selects.forEach((select, index) => {
+          select.selectedIndex = '1'
+        });
+
+        inputs.forEach((input) => {
+          input.value = ""
+        });
+      }
+
+      function resetResult() {
+        calcResultsEl.innerHTML = "<p>Result will appear here...</p>";
+      } 
+
+      function resethandler() {
+        resetForm();
+        resetResult();
+      }
+
+
+      /*************** EVENT LISTINERS ***************/
+
+      selects.forEach((select) => {
+        select.addEventListener("change", resetResult);
+      });
+      inputs.forEach((input) => {
+        input.addEventListener("input", resetResult);
+      });
+
+      inputs2.forEach((input) => {
+        input.addEventListener("input", resetResult);
+      });
+
+      resetBtnEl.addEventListener("click", resethandler);
+      calcBtnEl.addEventListener("click", calculateResults);
+
+    </script>
+  </body>
+</html>

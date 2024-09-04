@@ -3,45 +3,65 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Photon Energy Calculator</title>
+    <title>Wien's Law Calculator</title>
   </head>
   <body>
-    <h1>Photon Energy Calculator</h1>
+    <h1>Wien's Law Calculator</h1>
       <p>Insert only one field to calculate the other two.</p>
       <p>
         Insert:
         <select id="fieldSelect">
-          <option value="wl" selected>Wavelength</option>
-          <option value="fq">Frequency</option>
-          <option value="en">Energy</option>
+          <option value="bbt" selected>Black body temperature</option>
+          <option value="pwl">Peak wavelength</option>
+          <option value="pfq">Peak frequency</option>
         </select>
       </p>
       <div>
-        <p id="wavelengthInput">
-          <label for="i1-input">Wavelength</label>
+        <p id="bbtInput">
+          <label for="i1-input">Black body temperature</label>
           <input
             type="number"
-            autocomplete="off"
             id="i1-input"
             class="inputs"
             step="any"
             data-id="i1"
-            data-name="distance"
           />
           <select
             class="selects"
             id="i1-select"
-            data-type="distance"
-            data-prev="mm"
+            data-type="temprature"
+            data-prev="°C"
             data-id="i1"
+          >
+            <option value="°C">Celsius (°C)</option>
+            <option value="°F">Fahrenheit (°F)</option>
+            <option value="K" selected>kelvin (K)</option>
+          </select>
+        </p>
+
+        <p id="pwlInput" style="display: none;">
+          <label for="i2-input">Peak wavelength</label>
+          <input
+            type="number"
+            id="i2-input"
+            class="inputs"
+            step="any"
+            data-id="i2"
+          />
+          <select
+            class="selects"
+            id="i2-select"
+            data-type="distance"
+            data-prev="m"
+            data-id="i2"
           >
             <option value="Å">ångström (Å)</option>
             <option value="pm">picometers (pm)</option>
             <option value="nm">nanometers (nm)</option>
             <option value="μm">micrometers (μm)</option>
-            <option value="mm" selected>millimeters (mm)</option>
+            <option value="mm">millimeters (mm)</option>
             <option value="cm">centimeters (cm)</option>
-            <option value="m">meters (m)</option>
+            <option value="m" selected>meters (m)</option>
             <option value="km">kilometers (km)</option>
             <option value="in">inches (in)</option>
             <option value="ft">feet (ft)</option>
@@ -49,57 +69,28 @@
           </select>
         </p>
 
-        <p id="frequencyInput" style="display: none;">
-          <label for="i2-input">Frequency</label>
+        <p id="pfqInput" style="display: none;">
+          <label for="i3-input">Peak frequency</label>
           <input
             type="number"
-            autocomplete="off"
-            id="i2-input"
-            class="inputs"
-            step="any"
-            data-id="i2"
-            data-name="frequency"
-          />
-          <select
-            class="selects"
-            id="i2-select"
-            data-type="frequency"
-            data-prev="GHz"
-            data-id="i2"
-          >
-            <option value="Hz">hertz (Hz)</option>
-            <option value="kHz">kilohertz (kHz)</option>
-            <option value="MHz">megahertz (MHz)</option>
-            <option value="GHz" selected>gigahertz (GHz)</option>
-            <option value="THz">terahertz (THz)</option>
-            <option value="RPM">revolutions per minute (RPM)</option>
-          </select>
-        </p>
-
-        <p id="energyInput" style="display: none;">
-          <label for="i3-input">Energy</label>
-          <input
-            type="number"
-            autocomplete="off"
             id="i3-input"
             class="inputs"
             step="any"
             data-id="i3"
-            data-name="energy"
           />
           <select
             class="selects"
             id="i3-select"
-            data-type="energy"
-            data-prev="meV"
+            data-type="frequency"
+            data-prev="Hz"
             data-id="i3"
           >
-            <option value="neV">nanoelectronvolts (neV)</option>
-            <option value="μeV">microelectronvolts (μeV)</option>
-            <option value="meV" selected>millielectronvolts (meV)</option>
-            <option value="eV">electronvolts (eV)</option>
-            <option value="keV">kiloelectronvolts (keV)</option>
-            <option value="MeV">megaelectronvolts (MeV)</option>
+            <option value="Hz" selected>hertz (Hz)</option>
+            <option value="kHz">kilohertz (kHz)</option>
+            <option value="MHz">megahertz (MHz)</option>
+            <option value="GHz">gigahertz (GHz)</option>
+            <option value="THz">terahertz (THz)</option>
+            <option value="RPM">revolutions per minute (RPM)</option>
           </select>
         </p>
       </div>
@@ -114,7 +105,6 @@
     <script>
       /*************** ELEMENTS ***************/
       const fieldSelectEl = document.getElementById("fieldSelect");
-
       const selects = document.querySelectorAll(".selects");
       const inputs = document.querySelectorAll(".inputs");
 
@@ -126,9 +116,9 @@
       const i2Select = document.getElementById("i2-select");
       const i3Select = document.getElementById("i3-select");
 
-      const wavelengthInputEl = document.getElementById("wavelengthInput");
-      const frequencyInputEl = document.getElementById("frequencyInput");
-      const energyInputEl = document.getElementById("energyInput");
+      const bbtInputEl = document.getElementById("bbtInput");
+      const pwlInputEl = document.getElementById("pwlInput");
+      const pfqInputEl = document.getElementById("pfqInput");
 
       const calcBtnEl = document.getElementById('calcBtn');
       const resetBtnEl = document.getElementById('resetBtn');
@@ -136,15 +126,6 @@
 
       /*************** GLOBAL VARIBLES ***************/
       const UNITS = {
-        energy: {
-          neV: 6241509128999772821550722666.268841196796393146718119004882245755,
-          μeV: 6241509128999772821550722.666268841196796393146718119004882245755,
-          meV: 6241509128999772821550.722666268841196796393146718119004882245755,
-          j: 1,
-          eV: 6241509128999772821.550722666268841196796393146718119004882245755,
-          keV: 6241509128999772.821550722666268841196796393146718119004882245755,
-          MeV: 6241509128999.772821550722666268841196796393146718119004882245755,
-        },
         frequency: {
           Hz: 1,
           kHz: 1e-3,
@@ -166,6 +147,14 @@
           ft: 3.280839895013123,
           yd: 1.0936132983377078,
         },
+        temprature: {
+          "°C": (value, op) => (op === "+" ? value + 273.15 : value - 273.15),
+          "°F": (value, op) =>
+            op === "+"
+              ? (value - 32) * (5 / 9) + 273.15
+              : (value - 273.15) * (9 / 5) + 32,
+          K: (value, op) => value,
+        },
       };
 
       /*************** FUNCTIONS ***************/
@@ -177,21 +166,29 @@
         return value * UNITS[type][unit];
       }
 
+      function toSIUnitTemp(type, unit, value) {
+        return UNITS[type][unit](value, "+");
+      }
+
+      function fromSIUnitTemp(type, unit, value) {
+        return UNITS[type][unit](value, "-");
+      }
+
       function handleFieldSelectChange(e) {
         const value = e.target.value
-        wavelengthInputEl.style.display = value == 'wl' ? 'block' : 'none'
-        frequencyInputEl.style.display = value == 'fq' ? 'block' : 'none'
-        energyInputEl.style.display = value == 'en' ? 'block' : 'none'
+        bbtInputEl.style.display = value == 'bbt' ? 'block' : 'none'
+        pwlInputEl.style.display = value == 'pwl' ? 'block' : 'none'
+        pfqInputEl.style.display = value == 'pfq' ? 'block' : 'none'
 
         resetResult()
       }
 
       function createElement() {
         const field = fieldSelectEl.value
-        const wavelength = `
+        const temperature = `
           <div>
             <p>
-              <label for="i1-span">Wavelength: &nbsp;</label>
+              <label for="i1-span">Black body temperature: &nbsp;</label>
               <span
                 id="i1-span"
                 class="spans"
@@ -201,29 +198,21 @@
               <select
                 class="selectsResult"
                 id="i1-select"
-                data-type="distance"
-                data-prev="mm"
+                data-type="temprature"
+                data-prev="°C"
                 data-id="i1"
               >
-                <option value="Å">ångström (Å)</option>
-                <option value="pm">picometers (pm)</option>
-                <option value="nm">nanometers (nm)</option>
-                <option value="μm">micrometers (μm)</option>
-                <option value="mm" selected>millimeters (mm)</option>
-                <option value="cm">centimeters (cm)</option>
-                <option value="m">meters (m)</option>
-                <option value="km">kilometers (km)</option>
-                <option value="in">inches (in)</option>
-                <option value="ft">feet (ft)</option>
-                <option value="yd">yards (yd)</option>
+                <option value="°C">Celsius (°C)</option>
+                <option value="°F">Fahrenheit (°F)</option>
+                <option value="K" selected>kelvin (K)</option>
               </select>
             </p>
           </div>
         `
-        const frequency = `
+        const wavelength = `
           <div>
             <p>
-              <label for="i2-span">Frequency: &nbsp;</label>
+              <label for="i2-span">Peak wavelength: &nbsp;</label>
               <span
                 id="i2-span"
                 class="spans"
@@ -233,25 +222,30 @@
               <select
                 class="selectsResult"
                 id="i2-select"
-                data-type="frequency"
-                data-prev="GHz"
+                data-type="distance"
+                data-prev="m"
                 data-id="i2"
               >
-                <option value="Hz">hertz (Hz)</option>
-                <option value="kHz">kilohertz (kHz)</option>
-                <option value="MHz">megahertz (MHz)</option>
-                <option value="GHz" selected>gigahertz (GHz)</option>
-                <option value="THz">terahertz (THz)</option>
-                <option value="RPM">revolutions per minute (RPM)</option>
+                <option value="Å">ångström (Å)</option>
+                <option value="pm">picometers (pm)</option>
+                <option value="nm">nanometers (nm)</option>
+                <option value="μm">micrometers (μm)</option>
+                <option value="mm">millimeters (mm)</option>
+                <option value="cm">centimeters (cm)</option>
+                <option value="m" selected>meters (m)</option>
+                <option value="km">kilometers (km)</option>
+                <option value="in">inches (in)</option>
+                <option value="ft">feet (ft)</option>
+                <option value="yd">yards (yd)</option>
               </select>
             </p>
           </div>
         `
 
-        const energy = `
+        const frequency = `
           <div>
             <p>
-              <label for="i3-span">Energy: &nbsp;</label>
+              <label for="i3-span">Peak frequency: &nbsp;</label>
               <span
                 id="i3-span"
                 class="spans"
@@ -261,37 +255,60 @@
               <select
                 class="selectsResult"
                 id="i3-select"
-                data-type="energy"
-                data-prev="meV"
+                data-type="frequency"
+                data-prev="Hz"
                 data-id="i3"
               >
-                <option value="neV">nanoelectronvolts (neV)</option>
-                <option value="μeV">microelectronvolts (μeV)</option>
-                <option value="meV" selected>millielectronvolts (meV)</option>
-                <option value="eV">electronvolts (eV)</option>
-                <option value="keV">kiloelectronvolts (keV)</option>
-                <option value="MeV">megaelectronvolts (MeV)</option>
+                <option value="Hz" selected>hertz (Hz)</option>
+                <option value="kHz">kilohertz (kHz)</option>
+                <option value="MHz">megahertz (MHz)</option>
+                <option value="GHz">gigahertz (GHz)</option>
+                <option value="THz">terahertz (THz)</option>
+                <option value="RPM">revolutions per minute (RPM)</option>
               </select>
             </p>
           </div>
         `
-        if (field == 'wl') {
-          return frequency + energy
-        } else if (field == 'fq') {
-          return wavelength + energy
+        if (field == 'bbt') {
+          return wavelength + frequency
+        } else if (field == 'pwl') {
+          return temperature + frequency
         }
-        return wavelength + frequency
+        return temperature + wavelength
       }
 
       function validateInput(id) {
         const input = document.getElementById(`${id}-input`);
-        const label = input.getAttribute("data-name").trim();
         let value = parseFloat(input.value);
-        if (value <= 0 || isNaN(value)) {
-          alert(`${label} must be greater than zero!`);
-          return false;
+        const select = document.getElementById(`${id}-select`);
+        const type = select.getAttribute("data-type");
+        
+        if (isNaN(value)) {
+          alert('Value cannot be empty')
+          return false
         }
 
+        if (type === "distance" && value <= 0) {
+            alert("Peak wavelength must be greater than 0.");
+            input.value = "";
+            return false;
+          }
+          if (type === "frequency" && value <= 0) {
+            alert("Peak frequency must be greater than 0.");
+            input.value = "";
+            return false;
+          }
+          if (type === "temprature") {
+            let currentUnit = select.value;
+            value = parseFloat(value);
+            value = toSIUnitTemp(type, currentUnit, value);
+
+            if (value <= 0 ) {
+              alert("temperature cannot be lower than 0 K (-273.15 °C, -459.7 °F)!");
+              input.value = "";
+              return false;
+            }
+          }
         return true;
       }
 
@@ -300,79 +317,58 @@
           let id = result.id;
           let value = result.value;
           let type = result.type;
-          
+
           let select = document.getElementById(`${id}-select`);
           let span = document.getElementById(`${id}-span`);
-         
+
           let currentUnit = select.value;
-          
-          value = fromSIUnit(type, currentUnit, value);
+
+          if (type === "temprature") {
+            value = fromSIUnitTemp(type, currentUnit, value);
+          } else {
+            value = fromSIUnit(type, currentUnit, value);
+          }
           span.textContent = value;
-          
         });
-        if (fieldSelectEl.value == 'en') {
-          let i3Input = document.getElementById(`i3-input`);
-          let i3 = parseFloat(i3Input.value);
-          if (isNaN(i3)) {
-            calcResultsEl.innerHTML += "";
-            return;
-          }
-          let i3Select = document.getElementById(`i3-select`);
-          let i3Unit = i3Select.value;
-          const joules = toSIUnit("energy", i3Unit, i3);
-          calcResultsEl.innerHTML += `<p>This energy is equivalent to ${joules} joules.</p>`;
-        } else {
-          let i3Span = document.getElementById(`i3-span`);
-          let i3 = parseFloat(i3Span.textContent);
-          if (isNaN(i3)) {
-            calcResultsEl.innerHTML += "";
-            return;
-          }
-          let i3Select = document.getElementById(`i3-select`);
-          let i3Unit = i3Select.value;
-          const joules = toSIUnit("energy", i3Unit, i3);
-          calcResultsEl.innerHTML += `<p>This energy is equivalent to ${joules} joules.</p>`;
-        }
       }
 
       function calculateResult(id) {
-        const h = 6.62607015e-34;
-        const c = 299792456.2;
-        
-        const calculateI1 = (id) => {         
-          let { i2, i3 } = prepareUnits();        
+        const b = 0.0028977719;
+        const k = 5.8789232e10;
+        const calculateI1 = (id) => {
+          let { i2, i3 } = prepareUnits();
           let value = 0;
           if (id === "i2") {
-            value = c / i2;
-          } else value = (h * c) / i3;
+            value = b / i2;
+          } else value = i3 / k;
           return {
             value,
             id: "i1",
-            type: "distance",
+            type: "temprature",
           };
         };
         const calculateI2 = (id) => {
           let { i1, i3 } = prepareUnits();
           let value = 0;
           if (id === "i1") {
-            value = c / i1;
-          } else value = i3 / h;
+            value = b / i1;
+          } else value = (b * k) / i3;
           return {
             value,
             id: "i2",
-            type: "frequency",
+            type: "distance",
           };
         };
         const calculateI3 = (id) => {
           let { i2, i1 } = prepareUnits();
           let value = 0;
           if (id === "i2") {
-            value = h * i2;
-          } else value = (c * h) / i1;
+            value = k * (b / i2);
+          } else value = k * i1;
           return {
             value,
             id: "i3",
-            type: "energy",
+            type: "frequency",
           };
         };
 
@@ -401,10 +397,10 @@
         let i2Unit = i2Select.value;
         let i3Unit = i3Select.value;
 
-        i1 = toSIUnit("distance", i1Unit, i1);
-        i2 = toSIUnit("frequency", i2Unit, i2);
-        i3 = toSIUnit("energy", i3Unit, i3);
-        
+        i1 = toSIUnitTemp("temprature", i1Unit, i1);
+        i2 = toSIUnit("distance", i2Unit, i2);
+        i3 = toSIUnit("frequency", i3Unit, i3);
+
         return { i3, i1, i2 };
       }
 
@@ -429,14 +425,14 @@
 
         let si = toSIUnit(type, prevUnit, value);
         let result = fromSIUnit(type, currentUnit, si);
-        span.textContent = parseFloat(result);
+        span.textContent = result;
       }
 
       function calculateResults() {
         const field = fieldSelectEl.value
-        if (field == 'wl') {
+        if (field == 'bbt') {
           if (!validateInput('i1')) return
-        } else if (field == 'fq') {
+        } else if (field == 'pwl') {
           if (!validateInput('i2')) return
         } else {
           if (!validateInput('i3')) return
@@ -447,9 +443,9 @@
           calcResultsEl.innerHTML = resultElement
 
           let result;
-          if (field == 'wl') {
+          if (field == 'bbt') {
             result = calculateResult('i1')
-          } else if (field == 'fq') {
+          } else if (field == 'pwl') {
             result = calculateResult('i2')
           } else {
             result = calculateResult('i3')
@@ -469,15 +465,15 @@
 
       function resetForm() {
         selects.forEach((select, index) => {
-          select.selectedIndex = '4'
+          select.selectedIndex = '2'
         });
 
         inputs.forEach((input) => {
           input.value = ""
         });
-        wavelengthInputEl.style.display = 'block';
-        frequencyInputEl.style.display = 'none';
-        energyInputEl.style.display = 'none';
+        bbtInputEl.style.display = 'block';
+        pwlInputEl.style.display = 'none';
+        pfqInputEl.style.display = 'none';
         fieldSelectEl.selectedIndex = "0"
       }
 
@@ -490,15 +486,17 @@
         resetResult();
       }
 
+
       /*************** EVENT LISTINERS ***************/
 
       inputs.forEach((input) => {
         input.addEventListener("input", resetResult);
       });
+      
       selects.forEach((select) => {
         select.addEventListener("change", resetResult);
       });
-      
+
       fieldSelectEl.addEventListener("change", handleFieldSelectChange)
 
       resetBtnEl.addEventListener("click", resethandler);
