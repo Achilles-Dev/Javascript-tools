@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Half-Life Calculator</title>
+</head>
+<body>
+    <h1>Half-Life Calculator</h1>
+    <p>Use this decay calculator to easily calculate the time elapsed since the beginning of the decay, <br />
+      or calculate the original quantity, half-life (a.k.a. decay rate) or remaining quantity of a substance <br />
+      subject to radioactive decay, based on any of the three parameters. Convert half-life to mean lifetime <br />
+      or decay constant, and vice versa by entering any of the three values in its respective field.
+    </p>
+    <p>
+      Solve for:
+      <select id="solveForSelect">
+        <option value="te" selected>Time Elapsed</option>
+        <option value="hl">Half-Life</option>
+        <option value="iq">Initial Quantity</option>
+        <option value="rq">Remaining Quantity</option>
+      </select>
+    </p>
+    <p id="iqContainer" class="containers">
+      Initial Quantity:
+      <input type="number" id="iniQtyVal">
+    </p>
+    <p id="rqContainer" class="containers">
+      Remaining Quantity: 
+      <input type="number" id="remQtyVal">
+    </p>
+    <p id="teContainer" class="containers" style="display: none;">
+      Time: 
+      <input type="number" id="timeVal">
+      <select id="timeSelect">
+        <option value="ns">Nanoseconds</option>
+        <option value="ms">Milliseconds</option>
+        <option value="s" selected>Seconds</option>
+        <option value="m">Minutes</option>
+        <option value="h">Hours</option>
+        <option value="d">Days</option>
+        <option value="w">Weeks</option>
+        <option value="mo">Months</option>
+        <option value="y">Years</option>
+      </select>
+    </p>
+
+    <div id="hlContainer" class="containers">
+      <p>
+        Half-Life: 
+        <input type="number" id="halfLifeVal" class="halfLife">
+        <select id="halfLifeSelect" class="halfLifeSelect">
+          <option value="ns">Nanoseconds</option>
+          <option value="ms" selected>Milliseconds</option>
+          <option value="s">Seconds</option>
+          <option value="m">Minutes</option>
+          <option value="h">Hours</option>
+          <option value="d">Days</option>
+          <option value="w">Weeks</option>
+          <option value="mo">Months</option>
+          <option value="y">Years</option>
+        </select>
+      </p>
+      <p>
+        or Decay Constant: 
+        <input type="number" id="decConstVal" class="halfLife">
+        <select id="decConstSelect" class="halfLifeSelect">
+          <option value="ns">Nanoseconds</option>
+          <option value="ms" selected>Milliseconds</option>
+          <option value="s">Seconds</option>
+          <option value="m">Minutes</option>
+          <option value="h">Hours</option>
+          <option value="d">Days</option>
+          <option value="w">Weeks</option>
+          <option value="mo">Months</option>
+          <option value="y">Years</option>
+        </select>
+      </p>
+      <p>
+        or Mean Lifetime: 
+        <input type="number" id="mLifeTVal" class="halfLife">
+        <select id="mLifeSelect" class="halfLifeSelect">
+          <option value="ns">Nanoseconds</option>
+          <option value="ms" selected>Milliseconds</option>
+          <option value="s">Seconds</option>
+          <option value="m">Minutes</option>
+          <option value="h">Hours</option>
+          <option value="d">Days</option>
+          <option value="w">Weeks</option>
+          <option value="mo">Months</option>
+          <option value="y">Years</option>
+        </select>
+      </p>
+    </div>
+
+    <button id="calcBtn">Calculate</button>
+    <button id="resetBtn">Reset</button>
+    <hr>
+    <div>
+      <h3>Result:</h3>
+      <h3 id="calcResults">Result will appear here...</h3>
+    </div>
+
+    <script>
+      // Get required elements from the HTML
+      const solveForSelectEl = document.getElementById("solveForSelect");
+      const iniQtyValEl = document.getElementById("iniQtyVal");
+      const remQtyValEl = document.getElementById("remQtyVal");
+      const timeValEl = document.getElementById("timeVal");
+
+      const timeSelectEl = document.getElementById("timeSelect");
+      const containtersEl = document.querySelectorAll(".containers");
+
+      const halfLifeEl = document.querySelectorAll(".halfLife");
+      const halfLifeSelectEl = document.querySelectorAll(".halfLifeSelect");
+
+      const calcBtnEl = document.getElementById('calcBtn');
+      const resetBtnEl = document.getElementById('resetBtn');
+      const calcResultsEl = document.getElementById('calcResults') 
+
+      const UNITS = {
+        time: {
+          ns: 0,
+          ms: 0,
+          s: 1,
+          m: 0.01666666666,
+          h: 0.0002777777777777778,
+          days: 0.000011574074074074073,
+          wks: 0.0000016534391534391535,
+          mos: 3.8025705376834734e-7,
+          yrs: 3.1688087814028954e-8,
+        },
+      }
+
+      /*************** FUNCTIONS ***************/
+      function toSIUnit(type, unit, value) {
+        return value / UNITS[type][unit];
+      }
+
+      function fromSIUnit(type, unit, value) {
+        return value * UNITS[type][unit];
+      }
+
+      function handleSolveForSelectChange(e) {
+        const value = e.target.value
+
+        containtersEl.forEach((container) => {
+          let idVal = container.id.slice(0, 2)
+          if (value == idVal) {
+            container.style.display = 'none'
+          } else {
+            container.style.display = 'block'
+          }
+        })
+      }
+
+      function handleHLInputChange(e) {
+        const value = parseFloat(e.target.value)
+        const id = e.target.id
+        let val1 = 0
+        let val2 = 0 
+        halfLifeEl.forEach((input) => {
+          if (input.id != id) {
+            if (id == 'halfLifeVal') {
+              val1 =  isNaN(value) ? '' : (Math.log(2) / value);
+              val2 =  isNaN(value) ? '' : (value / Math.log(2));
+              input.value = input.id == 'decConstVal' ? val1 : val2
+            } else if (id == 'decConstVal') {
+              val1 =  isNaN(value) ? '' : (Math.log(2) / value);
+              val2 =  isNaN(value) ? '' : (1 / value);
+              input.value = input.id == 'halfLifeVal' ? val1 : val2
+            } else {
+              val1 =  isNaN(value) ? '' : (Math.log(2) * value);
+              val2 =  isNaN(value) ? '' : (1 / value);
+              input.value = input.id == 'halfLifeVal' ? val1 : val2
+            }
+          }
+        })
+      }
+
+      function handleHLSelectChange(e) {
+        const index = e.target.selectedIndex
+        const id = e.target.id
+        halfLifeSelectEl.forEach((select) => {
+          if (select.id != id) {
+            select.selectedIndex = index
+          }
+        })
+      }
+
+      function prepareUnits() {
+        let iq = parseFloat(iniQtyValEl.value) ?? 0;
+        let rq = parseFloat(remQtyValEl.value) ?? 0;
+        let te = parseFloat(timeValEl.value) ?? 0;
+        let hl = parseFloat(document.getElementById('halfLifeVal').value) ?? 0;
+
+        let teUnit = timeSelectEl.value;
+        let hlUnit = document.getElementById('halfLifeSelect').value;
+
+        te = toSIUnit("time", teUnit, te);
+        hl = toSIUnit("time", hlUnit, hl);
+
+        return { iq, rq, te , hl};
+      }
+
+      function calculateResults() {
+          // Retrieve input values
+          // const observedVal = parseFloat(observedValEl.value);
+          // const trueVal = parseFloat(trueValEl.value);
+
+          if (isNaN(observedVal) || isNaN(trueVal)) {
+            alert("Please Enter All Details.");
+            return;
+          } else if (trueVal < 0  ) {
+            alert("The relative uncertainty cannot be negative.");
+              return;
+          }
+
+          try {
+            const results = ((observedVal -trueVal) / trueVal) * 100
+            
+            calcResultsEl.innerHTML = `<p> Percent error: ${results.toFixed(2) * 1}%</p>`
+          } catch (error) {
+            alert("Something Went Wrong!!!");
+            resethandler()
+          }
+      }
+
+      function resetForm() {
+        observedValEl.value = ""
+        trueValEl.value = ""
+      }
+
+      function resetResult() {
+        calcResultsEl.innerHTML = "<p>Result will appear here...</p>";
+      } 
+
+      function resethandler() {
+        resetForm();
+        resetResult();
+      }
+
+      /*************** EVENTLISTINERS ***************/
+      [iniQtyValEl, remQtyValEl, timeValEl].forEach((el) => {
+        el.addEventListener("input", resetResult);
+      }); 
+      
+      timeSelectEl.addEventListener("change", resetResult);
+      
+      halfLifeSelectEl.forEach((el) => {
+        el.addEventListener("change", handleHLSelectChange);
+      }); 
+
+      halfLifeEl.forEach((el) => {
+        el.addEventListener("input", handleHLInputChange)
+      })
+
+      solveForSelectEl.addEventListener("change", handleSolveForSelectChange)
+
+      resetBtnEl.addEventListener("click", resethandler);
+      calcBtnEl.addEventListener("click", calculateResults);
+
+    </script>
+</body>
+</html>
