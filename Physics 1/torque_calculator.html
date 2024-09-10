@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Torque Calculator</title>
+  </head>
+  <body>
+    <h1>Torque Calculator</h1>
+
+      <p>
+        Calculate:
+        <select id="calculateUnit">
+          <option value="i1">Distance (r) </option>
+          <option value="i2">Force (F)</option>
+          <option value="i3" selected>Torque (τ) </option>
+        </select>
+      </p>
+  
+      <div>
+        <p id="i1-contianer" class="containers">
+          <label for="i1-input">Distance (r) </label>
+          <input
+            type="number"
+            step="any"
+            id="i1-input"
+            class="inputs"
+            min="0"
+          />
+          <select id="i1-select">
+            <option value="mm">millimeters (mm)</option>
+            <option value="cm">centimeters (cm)</option>
+            <option value="m" selected>meters (m)</option>
+            <option value="in">inches (in)</option>
+            <option value="ft">feet (ft)</option>
+            <option value="yd">yards (yd)</option>
+            <option value="mi">miles (mi)</option>
+          </select>
+        </p>
+
+        <p id="i2-contianer" class="containers">
+          <label for="i2-input">Force (F) </label>
+          <input
+            type="number"
+            step="any"
+            id="i2-input"
+            class="inputs"
+            min="0"
+          />
+          <select id="i2-select">
+            <option value="N" selected>newtons (N)</option>
+            <option value="kN">kilonewtons (kN)</option>
+            <option value="MN">meganewtons (MN)</option>
+            <option value="GN">giganewtons (GN)</option>
+            <option value="TN">teranewtons (TN)</option>
+            <option value="Ibf">pounds-force (Ibf)</option>
+          </select>
+        </p>
+
+        <p id="pe-contianer" class="containers" style="display: none;">
+          <label for="pe-input">Angle (θ) </label>
+          <input
+            type="number"
+            step="any"
+            id="pe-input"
+            class="inputs"
+            value="90"
+            min="0"
+            required
+          />
+
+          <select id="pe-select">
+            <option value="deg" selected>degrees (deg)</option>
+            <option value="rad">radians (rad)</option>
+            <option value="gon">gradians (gon)</option>
+            <option value="tr">turns (tr)</option>
+            <option value="arcmin">minutes of arc (arcmin)</option>
+            <option value="arcsec">seconds of arc (arcsec)</option>
+            <option value="mrad">milliradians (mrad)</option>
+            <option value="μrad">microradians (μrad)</option>
+            <option value="πrad">π radians (πrad)</option>
+          </select>
+        </p>
+
+        <p id="i3-contianer" class="containers" style="display: none;">
+          <label for="i3-input">Torque (τ) </label>
+          <input
+            type="number"
+            id="i3-input"
+            step="any"
+            class="inputs"
+            min="0"
+          />
+          <select id="i3-select">
+            <option value="N•m" selected>newton meters (N•m)</option>
+            <option value="kgf•cm">kilogram-force centimeters (kgf•cm)</option>
+            <option value="J/rad">joules per radian (J/rad)</option>
+            <option value="lbf•ft">pound-force feet (lbf•ft)</option>
+            <option value="lbf•in">pound-force inches (lbf•in)</option>
+            <option value="N•cm">newton centimeters (N•cm)</option>
+            <option value="N•mm">newton millimeters (N•mm)</option>
+          </select>
+        </p>
+      </div>
+      <p>
+        Mode:
+        <select id="modeUnit">
+          <option value="am">Advanced mode  </option>
+          <option value="sm" selected>Simple mode</option>
+        </select>
+      </p>
+      
+      <button id="calcBtn">Calculate</button>
+      <button id="resetBtn">Reset</button>
+      <hr>
+      <div>
+        <h3>Result:</h3>
+        <h3 id="calcResults">Result will appear here...</h3>
+      </div>
+    <script>
+      /*************** ELEMENTS ***************/
+      const modeUnitEl = document.getElementById("modeUnit");
+      const calculateUnitEl = document.getElementById("calculateUnit");
+      const containers = document.querySelectorAll(".containers");
+      const inputs = document.querySelectorAll(".inputs");
+
+      const i1Input = document.getElementById("i1-input");
+      const i2Input = document.getElementById("i2-input");
+      const i3Input = document.getElementById("i3-input");
+
+      const peInput = document.getElementById("pe-input");
+      const peInputContainerEl = document.getElementById("pe-contianer");
+
+      const i1Select = document.getElementById("i1-select");
+      const i2Select = document.getElementById("i2-select");
+      const i3Select = document.getElementById("i3-select");
+      const peSelect = document.getElementById("pe-select");
+
+      const calcBtnEl = document.getElementById('calcBtn');
+      const resetBtnEl = document.getElementById('resetBtn');
+      const calcResultsEl = document.getElementById('calcResults')
+
+      /*************** GLOBAL VARIBLES ***************/
+      const UNITS = {
+        torque: {
+          "N•m": 1,
+          "kgf•cm": 10.197162129779299,
+          "J/rad": 1,
+          "lbf•ft": 0.7375621492772666,
+          "lbf•in": 8.8507457913272,
+          "N•cm": 100,
+          "N•mm": 1000,
+        },
+        distance: {
+          mm: 1e3,
+          cm: 1e2,
+          m: 1,
+          in: 39.370078740157474,
+          ft: 3.280839895013123,
+          yd: 1.0936132983377078,
+          mi: 0.000621371192237334,
+        },
+        force: {
+          N: 1,
+          kN: 1e-3,
+          MN: 1e-6,
+          GN: 1e-9,
+          TN: 1e-12,
+          lbf: 0.2248089438709618,
+        },
+        angle: {
+          deg: 1,
+          rad: 0.017453292519943295,
+          gon: 1.1111111111111112,
+          tr: 0.0027777777777777775,
+          arcmin: 60,
+          arcsec: 3600,
+          mrad: 17.453292519943293,
+          μrad: 17453.292519943294,
+          πrad: 0.005555555555555555,
+        },
+      };
+      /*************** FUNCTIONS ***************/
+      function toSIUnit(type, unit, value) {
+        return value / UNITS[type][unit];
+      }
+
+      function fromSIUnit(type, unit, value) {
+        return value * UNITS[type][unit];
+      }
+      function degreesToRadians(degrees) {
+        return degrees * (Math.PI / 180);
+      }
+
+      function handleModeUnitChange(e) {
+        const value = e.target.value;
+        peInputContainerEl.style.display = value == 'am' ? 'block' : 'none'
+
+        resetResult()
+      }
+
+      function handleCalculateUnitChange(e) {
+        const value = e.target.value
+        const mode = modeUnitEl.value
+        containers.forEach((container) => {
+          let idVal = container.id.slice(0, 2)     
+          if (idVal == value ) {
+            container.style.display = 'none'
+          } else {
+            container.style.display = 'block'
+          }
+          if (idVal == 'pe' && mode == 'sm') {
+            container.style.display = 'none'
+          }
+        })
+
+        resetResult()
+      }
+
+      function createElements(resultObj) {
+        const elementNodes = Object.keys(resultObj).map((key) => {
+          //create elements to put the results in
+          const div = document.createElement("div");
+          const span = document.createElement("span");
+          const span2 = document.createElement("span");
+
+          // give the elements id
+          div.setAttribute("class", `result-container`);
+          span.setAttribute("class", `result-title`);
+          span2.setAttribute("class", `result-value`);
+
+          // put the values in the elements
+
+          span.textContent = resultObj[key]["title"];
+          span2.textContent = resultObj[key]["value"];
+
+          // appened them to an element that contians them
+          div.append(span, span2);
+
+          // return that element
+          return div;
+        });
+
+        return elementNodes;
+      }
+
+      function calculateResult(input) {
+        const calculateI1 = () => {
+          const { i3, i2, pe } = prepareUnits();
+          let result = i3 / (i2 * Math.sin(pe));
+          return {
+            result,
+            type: "distance",
+            name: "Distance",
+          };
+        };
+        const calculateI2 = () => {
+          const { i1, i3, pe } = prepareUnits();
+
+          let result = i3 / (i1 * Math.sin(pe));
+          return {
+            result,
+            type: "force",
+            name: `Force`,
+          };
+        };
+        const calculateI3 = () => {
+          const { i1, i2, pe } = prepareUnits();
+
+          let result = i1 * i2 * Math.sin(pe);
+          return {
+            result,
+            type: "torque",
+            name: "Torque",
+          };
+        };
+
+
+        switch (input) {
+          case "i1":
+            return calculateI1();
+          case "i2":
+            return calculateI2();
+          case "i3":
+            return calculateI3();
+
+          default:
+            console.log("error in calculate result switch");
+        }
+      }
+
+      function prepareUnits() {
+        let i1 = parseFloat(i1Input.value);
+        i1 = isNaN(i1) ? 0 : i1;
+        let i2 = parseFloat(i2Input.value);
+        i2 = isNaN(i2) ? 0 : i2;
+        let i3 = parseFloat(i3Input.value);
+        i3 = isNaN(i3) ? 0 : i3;
+        let pe = parseFloat(peInput.value);
+        pe = isNaN(pe) ? 0 : pe;
+
+        let i1Unit = i1Select.value;
+        let i2Unit = i2Select.value;
+        let i3Unit = i3Select.value;
+        let peUnit = peSelect.value;
+
+        i1 = toSIUnit("distance", i1Unit, i1);
+        i2 = toSIUnit("force", i2Unit, i2);
+        i3 = toSIUnit("torque", i3Unit, i3);
+        pe = toSIUnit("angle", peUnit, pe);
+        pe = degreesToRadians(pe);
+
+        return { i3, i1, i2, pe };
+      }
+
+      function prepareResults(result, type, name) {
+        let resultObj = {};
+        Object.keys(UNITS[type]).forEach((key) => {
+          let ans = fromSIUnit(type, key, result);
+          ans = parseFloat(ans.toFixed(17));
+          if (!(ans > 0 && ans < 1) && !(ans < 0 && ans > -1)) {
+            ans = ans.toLocaleString();
+          }
+
+          resultObj[key] = {
+            title: `${name} (${key}): `,
+            value: ` ${ans} ${key}`,
+          };
+        });
+        return resultObj;
+      }
+      
+      function calculateResults() {
+        const calculateUnit = calculateUnitEl.value
+
+        try {
+          const { result, type, name } = calculateResult(calculateUnit);
+          if (isNaN(result)) {
+            alert("Your input resulted in NAN.\n 0/0 \n Try again with valid input.");
+            resetResult()
+            return;
+          }
+          if (Math.abs(result) === Infinity) {
+            alert(
+              "Your input resulted in Infinity. \nDivision by zero. \nTry again with valid input."
+            );
+
+            resetResult()
+            return;
+          }
+
+          const resultObj = prepareResults(result, type, name);
+          const elementNodes = createElements(resultObj);
+          calcResultsEl.innerHTML = ``;
+
+          elementNodes.forEach((element) => {
+            calcResultsEl.append(element);
+          });
+        } catch (error) {
+          console.log(error);
+          alert("An error ocurred. Try again with valid input.");
+          resetResult()
+          return;
+        }
+      }
+
+      function resetForm() {
+        [i1Select, i2Select, i3Select].forEach((select, index) => {
+          if (index == 0) {
+            select.selectedIndex = '2'
+          } else {
+            select.selectedIndex = '0'
+          }
+        });
+
+        [i1Input, i2Input, i3Input].forEach((input) => {
+          input.value = ""
+        });
+        peInput.value = "90"
+        calculateUnitEl.selectedIndex = '2';
+        modeUnitEl.selectedIndex = '1'
+        containers.forEach((container) => {
+          let idVal = container.id.slice(0, 2)
+          if (idVal == 'i3' || idVal == "pe") {
+            container.style.display = 'none'
+          } else {
+            container.style.display = 'block'
+          }
+        })
+      }
+
+      function resetResult() {
+        calcResultsEl.innerHTML = "<p>Result will appear here...</p>";
+      } 
+
+      function resethandler() {
+        resetForm();
+        resetResult();
+      }
+
+      /*************** EVENT LISTINERS ***************/
+      [i1Select, i2Select, i3Select, peSelect].forEach((select) => {
+        select.addEventListener("change", resetResult);
+      });
+      [i1Input, i2Input, i3Input, peInput].forEach((input) => {
+        input.addEventListener("input", resetResult);
+      });
+      calculateUnitEl.addEventListener("change", handleCalculateUnitChange);
+      modeUnitEl.addEventListener("change", handleModeUnitChange);
+
+      resetBtnEl.addEventListener("click", resethandler);
+      calcBtnEl.addEventListener("click", calculateResults);
+
+    </script>
+  </body>
+</html>

@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Power-to-Weight Ratio Calculator</title>
+  </head>
+  <body>
+    <h1>Power-to-Weight Ratio Calculator</h1>
+      <p>
+        Calculate:
+        <select id="calculateUnit">
+          <option value="p">Power </option>
+          <option value="w">Weight</option>
+          <option value="r" selected>Power-to-weight ratio </option>
+        </select>
+      </p>
+      
+      <div>
+        <p id="p-contianer" class="containers">
+          <label for="p-input">Power </label>
+          <input type="number" step="any" id="p-input" class="inputs" />
+          <select id="p-select">
+            <option value="W" selected>watts (W)</option>
+            <option value="kW">kilowatts (kW)</option>
+            <option value="hp(l)">mechanical horsepowers (hp(l))</option>
+            <option value="hp(M)">metric horsepowers (hp(M))</option>
+          </select>
+        </p>
+        <p id="w-contianer" class="containers">
+          <label for="w-input">Weight </label>
+          <input type="number" step="any" id="w-input" class="inputs" />
+          <select id="w-select">
+            <option value="g">grams (g)</option>
+            <option value="kg" selected>kilograms (kg)</option>
+            <option value="t">metric tons (t)</option>
+            <option value="oz">ounces (oz)</option>
+            <option value="lb">pounds (lb)</option>
+            <option value="US ton">US short tons (US ton)</option>
+            <option value="Long ton">imperial tons (Long ton)</option>
+          </select>
+        </p>
+        <p id="r-contianer" class="containers" style="display: none;">
+          <label for="r-input">Power-to-weight ratio </label>
+          <input type="number" id="r-input" step="any" class="inputs" />
+          <select id="r-select">
+            <option value="W/kg" selected>watts per kilogram (W/kg)</option>
+            <option value="kW/kg">kilowatts per kilogram (kW/kg)</option>
+            <option value="hp(l)/lb">
+              mechanical horsepower per pound (hp(l)/lb)
+            </option>
+            <option value="hp(M)/kg">
+              mechanical horsepower per kilogram (hp(M)/kg)
+            </option>
+          </select>
+        </p>
+      </div>
+      
+      <button id="calcBtn">Calculate</button>
+      <button id="resetBtn">Reset</button>
+      <hr>
+      <div>
+        <h3>Result:</h3>
+        <h3 id="calcResults">Result will appear here...</h3>
+      </div>
+    <script>
+      /*************** ELEMENTS ***************/
+      const calculateUnitEl = document.getElementById("calculateUnit");
+      const containers = document.querySelectorAll(".containers");
+      const inputs = document.querySelectorAll(".inputs");
+
+      const pInput = document.getElementById("p-input");
+      const wInput = document.getElementById("w-input");
+      const rInput = document.getElementById("r-input");
+
+      const pSelect = document.getElementById("p-select");
+      const wSelect = document.getElementById("w-select");
+      const rSelect = document.getElementById("r-select");
+
+      const calcBtnEl = document.getElementById('calcBtn');
+      const resetBtnEl = document.getElementById('resetBtn');
+      const calcResultsEl = document.getElementById('calcResults')
+
+      /*************** GLOBAL VARIBLES ***************/
+      const UNITS = {
+        weight: {
+          g: 1000,
+          kg: 1,
+          t: 0.001,
+          oz: 35.274,
+          lb: 2.2046226218,
+          "US ton": 0.00110231,
+          "Long ton": 0.000984207,
+        },
+        ratio: {
+          "W/kg": 1,
+          "kW/kg": 0.001,
+          "hp(l)/lb": 0.000608277,
+          "hp(M)/kg": 0.00135962,
+        },
+        power: {
+          W: 1,
+          kW: 0.001,
+          "hp(l)": 0.00134102,
+          "hp(M)": 0.00135962,
+        },
+      };
+      /*************** FUNCTIONS ***************/
+      function toSIUnit(type, unit, value) {
+        return value / UNITS[type][unit];
+      }
+
+      function fromSIUnit(type, unit, value) {
+        return value * UNITS[type][unit];
+      }
+
+      function handleCalculateUnitChange(e) {
+        const value = e.target.value
+
+        containers.forEach((container) => {
+          let idVal = container.id.slice(0, 1)
+          if (idVal == value) {
+            container.style.display = 'none'
+          } else {
+            container.style.display = 'block'
+          }
+        })
+
+        resetResult()
+      }
+
+      function createElements(resultObj) {
+        const elementNodes = Object.keys(resultObj).map((key) => {
+          //create elements to put the results in
+          const div = document.createElement("div");
+          const span = document.createElement("span");
+          const span2 = document.createElement("span");
+
+          // give the elements id
+          div.setAttribute("class", `result-container`);
+          span.setAttribute("class", `result-title`);
+          span2.setAttribute("class", `result-value`);
+
+          // put the values in the elements
+
+          span.textContent = resultObj[key]["title"];
+          span2.textContent = resultObj[key]["value"];
+
+          // appened them to an element that contians them
+          div.append(span, span2);
+
+          // return that element
+          return div;
+        });
+
+        return elementNodes;
+      }
+
+      function calculateResult(input) {
+        const calculateP = () => {
+          const { w, r } = prepareUnits();
+
+          return {
+            result: w * r,
+            type: "power",
+            name: `Power`,
+          };
+        };
+        const calculateR = () => {
+          const { w, p } = prepareUnits();
+          return {
+            result: p / w,
+            type: "ratio",
+            name: "Ratio",
+          };
+        };
+        const calculateW = () => {
+          const { r, p } = prepareUnits();
+          return {
+            result: p / r,
+            type: "weight",
+            name: "Weight",
+          };
+        };
+
+        switch (input) {
+          case "p":
+            return calculateP();
+          case "w":
+            return calculateW();
+          case "r":
+            return calculateR();
+          default:
+            console.log("error in calculate result switch");
+        }
+      }
+
+      function prepareUnits() {
+        let r = parseFloat(rInput.value) ?? 0;
+        let w = parseFloat(wInput.value) ?? 0;
+        let p = parseFloat(pInput.value) ?? 0;
+
+        let rUnit = rSelect.value;
+        let wUnit = wSelect.value;
+        let pUnit = pSelect.value;
+
+        r = toSIUnit("ratio", rUnit, r);
+        w = toSIUnit("weight", wUnit, w);
+        p = toSIUnit("power", pUnit, p);
+
+        return { r, w, p };
+      }
+
+      function prepareResults(result, type, name) {
+        let resultObj = {};
+        Object.keys(UNITS[type]).forEach((key) => {
+          let ans = fromSIUnit(type, key, result);
+          // ans =
+          //   ans > 1 || ans < -1
+          //     ? parseFloat(parseFloat(ans.toExponential(10)).toFixed(4))
+          //     : ans.toExponential(10);
+
+          resultObj[key] = {
+            title: `${name} (${key}): `,
+            value: ` ${ans} ${key}`,
+          };
+        });
+        return resultObj;
+      }
+      
+      function calculateResults() {
+        const calculateUnit = calculateUnitEl.value
+
+        try {
+          const { result, type, name } = calculateResult(calculateUnit);
+
+          if (isNaN(result)) {
+            alert("Your input resulted in NAN.\n 0/0 \n Try again with valid input.");
+            resetResult()
+            return;
+          }
+          if (Math.abs(result) === Infinity) {
+            alert(
+              "Your input resulted in Infinity. \nDivision by zero. \nTry again with valid input."
+            );
+            resetResult()
+            return;
+          }
+
+          const resultObj = prepareResults(result, type, name);
+          const elementNodes = createElements(resultObj);
+          calcResultsEl.innerHTML = "";
+
+          elementNodes.forEach((element) => {
+            calcResultsEl.append(element);
+          });
+        } catch (error) {
+          console.log(error);
+          alert("An error ocurred. Try again with valid input.");
+          resetResult()
+          return;
+        }
+      }
+
+      function resetForm() {
+        [pSelect, wSelect, rSelect].forEach((select, index) => {
+          if (index == 1) {
+            select.selectedIndex = "1"
+          } else {
+            select.selectedIndex = '0'
+          }
+        });
+
+        [pInput, wInput, rInput].forEach((input) => {
+          input.value = ""
+        });
+        calculateUnitEl.selectedIndex = '2';
+        containers.forEach((container) => {
+          let idVal = container.id.slice(0, 1)
+          if (idVal == 'r') {
+            container.style.display = 'none'
+          } else {
+            container.style.display = 'block'
+          }
+        })
+      }
+
+      function resetResult() {
+        calcResultsEl.innerHTML = "<p>Result will appear here...</p>";
+      } 
+
+      function resethandler() {
+        resetForm();
+        resetResult();
+      }
+
+
+      /*************** EVENT LISTINERS ***************/
+      [pSelect, wSelect, rSelect].forEach((select) => {
+        select.addEventListener("change", resetResult);
+      });
+      [pInput, wInput, rInput].forEach((input) => {
+        input.addEventListener("input", resetResult);
+      });
+      calculateUnitEl.addEventListener("change", handleCalculateUnitChange);
+
+      resetBtnEl.addEventListener("click", resethandler);
+      calcBtnEl.addEventListener("click", calculateResults);
+
+    </script>
+  </body>
+</html>

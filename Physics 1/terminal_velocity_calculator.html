@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Terminal Velocity Calculator</title>
+  </head>
+  <body>
+    <h1>Terminal Velocity Calculator</h1>
+
+      <p>
+        <label for="P-select"> Shape</label>
+        <select id="P-select" data-flag="true">
+          <option value="0.47" selected>Sphere</option>
+          <option value="0.389">Golf ball</option>
+          <option value="0.3275">Baseball</option>
+          <option value="0.42">Hemisphere</option>
+          <option value="1.05">Cube</option>
+          <option value="0.8">Angled cube</option>
+          <option value="0.04">Streamlined body</option>
+          <option value="custom" disabled>Custom</option>
+        </select>
+      </p>
+      
+      <div>
+        <p>
+          <label for="i1-input">Mass (m) </label>
+          <input
+            type="number"
+            min="0"
+            autocomplete="off"
+            data-id="i1"
+            step="any"
+            id="i1-input"
+            class="inputs"
+            data-name="Mass"
+          />
+          <select
+            class="selects"
+            id="i1-select"
+            data-type="mass"
+            data-prev="kg"
+            data-id="i1"
+          >
+            <option value="mg">milligrams (mg)</option>
+            <option value="g">grams (g)</option>
+            <option value="kg" selected>kilograms (kg)</option>
+            <option value="t">metric tons (t)</option>
+            <option value="gr">grains (gr)</option>
+            <option value="oz">ounces (oz)</option>
+            <option value="lb">pounds (lb)</option>
+            <option value="st">stones (st)</option>
+            <option value="US ton">US short tons (US ton)</option>
+          </select>
+        </p>
+
+        <p>
+          <label for="i2-input">Cross-sectional area (A) </label>
+          <input
+            type="number"
+            min="0"
+            autocomplete="off"
+            data-id="i2"
+            step="any"
+            id="i2-input"
+            class="inputs"
+            data-name="area"
+          />
+
+          <select
+            class="selects"
+            id="i2-select"
+            data-type="area"
+            data-prev="m²"
+            data-id="i2"
+          >
+            <option value="mm²">square millimeters (mm²)</option>
+            <option value="cm²">square centimeters (cm²)</option>
+            <option value="m²" selected>square meters (m²)</option>
+            <option value="in²">square inches (in²)</option>
+            <option value="ft²">square feet (ft²)</option>
+          </select>
+        </p>
+
+        <p>
+          <label for="i3-input">Coefficient of drag (Cd) </label>
+          <input
+            type="number"
+            min="0"
+            autocomplete="off"
+            data-id="i3"
+            step="any"
+            class="inputs"
+            id="i3-input"
+            data-name="Coefficient of drag"
+            value="0.47"
+          />
+          <select
+            class="selects"
+            id="i3-select"
+            data-type="unit"
+            data-prev="unit"
+            data-id="i3"
+            style="display: none"
+          >
+            <option value="unit">unit</option>
+          </select>
+        </p>
+
+        <p>
+          <label for="i4-input"> Density of fluid (ρ) </label>
+          <input
+            type="number"
+            min="0"
+            autocomplete="off"
+            data-id="i4"
+            step="any"
+            class="inputs"
+            id="i4-input"
+            data-name="Density"
+            value="1.204"
+          />
+          <select
+            class="selects"
+            id="i4-select"
+            data-type="density"
+            data-prev="kg/m³"
+            data-id="i4"
+          >
+            <option value="kg/m³" selected>
+              kilograms per cubic meter (kg/m³)
+            </option>
+            <option value="lb/ft³">pounds per cubic feet (lb/ft³)</option>
+            <option value="g/cm³">grams per cubic centimeter (g/cm³)</option>
+            <option value="kg/cm³">
+              kilograms per cubic centimeter (kg/cm³)
+            </option>
+          </select>
+        </p>
+
+        <p>
+          <label for="i5-input"> Acceleration due to gravity (g) </label>
+          <input
+            type="number"
+            min="0"
+            autocomplete="off"
+            data-id="i5"
+            step="any"
+            class="inputs"
+            id="i5-input"
+            data-name="Acceleration"
+            value="9.81"
+          />
+          <select
+            class="selects"
+            id="i5-select"
+            data-type="acceleration"
+            data-prev="m/s²"
+            data-id="i5"
+          >
+            <option value="m/s²" selected>
+              meters per second squared (m/s²)
+            </option>
+            <option value="ft/s²">feet per second squared (ft/s²)</option>
+          </select>
+        </p>
+      </div>
+
+      <button id="calcBtn">Calculate</button>
+      <button id="resetBtn">Reset</button>
+      <hr>
+      <div>
+        <h3>Result:</h3>
+        <h3 id="calcResults">Result will appear here...</h3>
+      </div>
+    <script>
+      /*************** ELEMENTS ***************/
+      const selects = document.querySelectorAll(".selects");
+      const inputs = document.querySelectorAll(".inputs");
+      
+      const presetSelect = document.getElementById("P-select");
+
+      const calcBtnEl = document.getElementById('calcBtn');
+      const resetBtnEl = document.getElementById('resetBtn');
+      const calcResultsEl = document.getElementById('calcResults')
+
+      /*************** GLOBAL VARIBLES ***************/
+      const UNITS = {
+        mass: {
+          mg: 1e6,
+          g: 1e3,
+          kg: 1,
+          t: 0.001,
+          gr: 15432.35835294143,
+          oz: 35.27396194958041,
+          lb: 2.2046226218487757,
+          st: 0.1574730444177697,
+          "US ton": 0.001102311310924388,
+        },
+        area: {
+          "mm²": 1000000,
+          "cm²": 10000,
+          "m²": 1,
+          "in²": 1550.0031000062,
+          "ft²": 10.763910416709722,
+        },
+        unit: {
+          unit: 1,
+        },
+        density: {
+          "kg/m³": 1,
+          "lb/ft³": 0.0624279606,
+          "g/cm³": 0.001,
+          "kg/cm³": 0.000001,
+        },
+        acceleration: {
+          "m/s²": 1,
+          "ft/s²": 3.28084,
+        },
+        speed: {
+          "m/s": 1,
+          "km/h": 3.6,
+          "ft/s": 3.2808398950131235,
+          mph: 2.2369362920544025,
+          kn: 1.9438444924406049,
+          "ft/min": 196.8503937007874,
+        },
+      };
+      /*************** FUNCTIONS ***************/
+      function toSIUnit(type, unit, value) {
+        if (type === "exp") {
+          unit = parseFloat("1e" + unit);
+          return value * unit;
+        }
+        return value / UNITS[type][unit];
+      }
+
+      function fromSIUnit(type, unit, value) {
+        if (type === "exp") {
+          unit = parseFloat("1e" + unit);
+          return value / unit;
+        }
+        return value * UNITS[type][unit];
+      }
+
+      function createElement() {
+        const newDiv = `
+          <div>
+            <p>
+              <label for="i6-span"> Terminal velocity (Vₜ): &nbsp; </label>
+              <span
+                data-id="i6"
+                step="any"
+                class="spans"
+                id="i6-span"
+                data-name="Terminal velocity"
+              ></span>
+              <select
+                class="selectsResult"
+                id="i6-select"
+                data-type="speed"
+                data-prev="m/s"
+                data-id="i6"
+              >
+                <option value="m/s" selected>meters per second (m/s)</option>
+                <option value="km/h">kilometers per hour (km/h)</option>
+                <option value="ft/s">feet per second (ft/s)</option>
+                <option value="mph">miles per hour (mph)</option>
+                <option value="kn">knots (kn)</option>
+                <option value="ft/min">feet per minute (ft/min)</option>
+              </select>
+            </p>
+          </div>
+        `
+        return newDiv
+      }
+
+      function customPercision(ans, to = 8) {
+        return parseFloat(parseFloat(ans).toPrecision(to));
+      }
+
+      function validateInput(id) {
+        const input = document.getElementById(`${id}-input`);
+        const label = input.getAttribute("data-name").trim();
+        let value = parseFloat(input.value);
+
+        if (value <= 0 || isNaN(value)) {
+         alert(`${label} must be greater than zero!`);
+          return false;
+        }
+
+        return true;
+      }
+      
+      // related to caculation
+      function prepareUnit(...args) {
+        const resultArr = [];
+        for (id of args) {
+          const input = document.getElementById(`${id}-input`);
+          const select = document.getElementById(`${id}-select`);
+          const type = select.getAttribute("data-type");
+          let val = parseFloat(input.value);
+          val = isNaN(val) ? 0 : val;
+          let inUnit = select.value;
+          val = toSIUnit(type, inUnit, val);
+          resultArr.push(val);
+        }
+
+        return resultArr;
+      }
+
+      function setResult(resultObj) {
+        for (key of Object.keys(resultObj)) {
+          let val = resultObj[key].result;
+          let id = resultObj[key].type;
+          if (isNaN(val)) {
+            alert("Your input resulted in NAN.\n 0/0 \n Try again with valid input.");
+            return;
+          }
+          if (Math.abs(val) === Infinity) {
+            alert(
+              "Your input resulted in Infinity. \nDivision by zero. \nTry again with valid input."
+            );
+            return;
+          }
+          if (id == 'i6') {
+            const span = document.getElementById(`${id}-span`);
+            const select = document.getElementById(`${id}-select`);
+            const type = select.getAttribute("data-type");
+            let outUnit = select.value;
+            val = fromSIUnit(type, outUnit, val);
+
+            span.textContent = customPercision(val, 16);
+          } else {
+            const input = document.getElementById(`${id}-input`);
+            const select = document.getElementById(`${id}-select`);
+            const type = select.getAttribute("data-type");
+            let outUnit = select.value;
+            val = fromSIUnit(type, outUnit, val);
+
+            input.value = customPercision(val, 16);
+          }
+        }
+      }
+
+      function calculateResult() {
+        
+        function calculateI6() {
+          let [val1, val2, val3, val4, val5] = prepareUnit(
+            "i1",
+            "i2",
+            "i3",
+            "i4",
+            "i5"
+          );
+
+          let result = Math.sqrt((2 * val1 * val5) / (val4 * val2 * val3));
+
+          return {
+            1: { result, type: "i6" },
+          };
+        }
+        return calculateI6()
+      }
+
+      function handleResultsChange(e) {
+        let select = e.target;
+        let id = select.getAttribute("data-id");
+        let span = document.getElementById(`${id}-span`);
+
+        let prevUnit = select.getAttribute("data-prev");
+        let currentUnit = select.value;
+        select.setAttribute("data-prev", currentUnit);
+
+        if (span.textContent === "") {
+          return;
+        }
+
+        let type = select.getAttribute("data-type");
+
+        let value = parseFloat(span.textContent);
+        value = parseFloat(value);
+        if (isNaN(value)) value = 0.0;
+
+        let si = toSIUnit(type, prevUnit, value);
+        let result = fromSIUnit(type, currentUnit, si);
+        span.textContent = customPercision(result, 13);
+      }
+
+      function calculateResults() {
+        for (el of ["i1", "i2", "i3", "i4", "i5"]) {
+          if (!validateInput(el)) return;
+        }
+
+        try {
+          const resultElement = createElement()
+          calcResultsEl.innerHTML = resultElement
+
+          const newSelects = document.querySelectorAll(".selectsResult");
+
+          newSelects.forEach((select) => {
+            select.addEventListener("change", handleResultsChange);
+          });
+          
+          const result = calculateResult();
+          setResult(result)
+
+        } catch(error) {
+          alert("An error ocurred. Try again with valid input.");
+          resetResult()
+          return;
+        }
+      }
+
+      function handleCustomMedium(e) {
+        if (e.target.id == 'i3-input') {
+          presetSelect.selectedIndex = "7"
+        }
+      }
+
+      function resetForm() {
+        presetSelect.selectedIndex = '0'
+        selects.forEach((select, index) => {
+          if (index < 2) {
+            select.selectedIndex = '2'
+          } else {
+            select.selectedIndex = '0'
+          }       
+        });
+
+        inputs.forEach((input, index) => {
+          if (index == 3) {
+            input.value = "1.204"
+          } else if (index == 4) {
+            input.value = "9.81"
+          } else {
+            input.value = ""
+          }
+        });
+        presetHandler()
+      }
+
+      function resetResult() {
+        calcResultsEl.innerHTML = "<p>Result will appear here...</p>";
+      } 
+
+      function resethandler() {
+        resetForm();
+        resetResult();
+      }
+
+      function windowLoadHandler() {
+        // set select data-prev
+        selects.forEach((select) => {
+          let value = select.value;
+          select.setAttribute("data-prev", value);
+        });
+      }
+
+      function presetHandler() {
+        const value = presetSelect.value;
+        const input = document.getElementById("i3-input");
+        input.value = value;
+        presetSelect.setAttribute("data-flag", "false");
+
+        resetResult()
+      }
+
+      /*************** EVENT LISTINERS ***************/
+      window.addEventListener("load", windowLoadHandler);
+      selects.forEach((select) => {
+        select.addEventListener("change", resetResult);
+      });
+      inputs.forEach((input) => {
+        input.addEventListener("input", resetResult);
+      });
+
+      inputs.forEach((input) => {
+        input.addEventListener("input", handleCustomMedium);
+      });
+
+      presetSelect.addEventListener("change", presetHandler);
+      resetBtnEl.addEventListener("click", resethandler);
+      calcBtnEl.addEventListener("click", calculateResults);
+
+    </script>
+  </body>
+</html>

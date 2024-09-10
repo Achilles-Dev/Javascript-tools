@@ -3,13 +3,13 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Engine Displacement Calculator</title>
+    <title>Specific Gravity Calculator</title>
   </head>
   <body>
-    <h1>Engine Displacement Calculator</h1>
+    <h1>Specific Gravity Calculator</h1>
       <div>
         <p>
-          <label for="i1-input">Number of cylinders </label>
+          <label for="i1-input">Density</label>
           <input
             type="number"
             min="0"
@@ -18,88 +18,89 @@
             step="any"
             id="i1-input"
             class="inputs"
-            data-name="Number of cylinders"
+            data-name="Density"
           />
 
           <select
             class="selects"
             id="i1-select"
-            data-type="unit"
-            data-prev="unit"
+            data-type="distance"
+            data-prev="kg/m³"
             data-id="i1"
-            style="display: none"
           >
-            <option value="unit">unit</option>
+            <option value="kg/m³" selected>
+              kilograms per cubic meter (kg/m³)
+            </option>
+            <option value="lb/ft³">pounds per cubic feet (lb/ft³)</option>
+            <option value="lb/yd³">pounds per cubic yard (lb/yd³)</option>
+            <option value="g/cm³">grams per cubic centimeter (g/cm³)</option>
+            <option value="kg/cm³">
+              kilograms per cubic centimeter (kg/cm³)
+            </option>
+            <option value="mg/cm³">
+              milligrams per cubic centimeter (mg/cm³)
+            </option>
+            <option value="g/m³">grams per cubic meter (g/m³)</option>
+            <option value="g/dm³">grams cubic per decimeter (g/dm³)</option>
           </select>
         </p>
-
-        <p>
-          <label for="i2-input">Bore diameter </label>
-          <input
-            type="number"
-            min="0"
-            autocomplete="off"
-            data-id="i2"
-            step="any"
-            id="i2-input"
-            class="inputs"
-            data-name="Bore diameter"
-          />
-          <select
-            class="selects"
-            id="i2-select"
-            data-type="distance"
-            data-prev="cm"
-            data-id="i2"
-          >
-            <option value="mm">millimeters (mm)</option>
-            <option value="cm" selected>centimeters (cm)</option>
-            <option value="m">meters (m)</option>
-            <option value="in">inches (in)</option>
-            <option value="ft">feet (ft)</option>
-          </select>
-        </p>
-
-        <p>
-          <label for="i3-input">Stroke length </label>
-          <input
-            type="number"
-            min="0"
-            autocomplete="off"
-            data-id="i3"
-            step="any"
-            class="inputs"
-            id="i3-input"
-            data-name="Stroke length"
-          />
-          <select
-            class="selects"
-            id="i3-select"
-            data-type="distance"
-            data-prev="cm"
-            data-id="i3"
-          >
-            <option value="mm">millimeters (mm)</option>
-            <option value="cm" selected>centimeters (cm)</option>
-            <option value="m">meters (m)</option>
-            <option value="in">inches (in)</option>
-            <option value="ft">feet (ft)</option>
-          </select>
-        </p>
-
       </div>
-
-      <button id="calcBtn">Calculate</button>
-      <button id="resetBtn">Reset</button>
-      <hr>
+      <!-- section two -->
+      <p>Example specific gravities</p>
       <div>
-        <h3>Result:</h3>
-        <h3 id="calcResults">Result will appear here...</h3>
-      </div>
+        <p>
+          <label for="P-select"> Substance</label>
+          <select id="P-select">
+            <option value="0.2">Balsa wood</option>
+            <option value="0.75">Oak wood</option>
+            <option value="0.78">Ethanol</option>
+            <option value="0.91">Olive oil</option>
+            <option value="0.91">Ice</option>
+            <option value="0.9498">Vodka</option>
+            <option value="1" selected>Water</option>
+            <option value="1.06">Blood</option>
+            <option value="2.17">Table salt</option>
+            <option value="2.7">Aluminium</option>
+            <option value="3.15">Cement</option>
+            <option value="7.87">Iron</option>
+            <option value="8.96">Copper</option>
+            <option value="11.35">Lead</option>
+            <option value="13.56">Mecury</option>
+            <option value="19.1">Depleted uranium</option>
+            <option value="19.3">Gold</option>
+            <option value="22.59">Osmium</option>
+          </select>
+        </p>
+        <p>
+          <label for="iv-input">Specific gravity</label>
+          <input
+            type="number"
+            min="0"
+            autocomplete="off"
+            data-id="iv"
+            step="any"
+            id="iv-input"
+            data-name="Wave velocity"
+            value="1"
+            disabled
+          />
+        </p>
+
+        <button id="calcBtn">Calculate</button>
+        <button id="resetBtn">Reset</button>
+        <hr>
+        <div>
+          <h3>Result:</h3>
+          <h3 id="calcResults">Result will appear here...</h3>
+        </div>
+    </form>
+
     <script>
       /*************** ELEMENTS ***************/
       const selects = document.querySelectorAll(".selects");
       const inputs = document.querySelectorAll(".inputs");
+
+      const presetSelect = document.getElementById("P-select");
 
       const calcBtnEl = document.getElementById('calcBtn');
       const resetBtnEl = document.getElementById('resetBtn');
@@ -108,26 +109,20 @@
       /*************** GLOBAL VARIBLES ***************/
       const UNITS = {
         distance: {
-          mm: 1e3,
-          cm: 1e2,
-          m: 1,
-          in: 39.370078740157474,
-          ft: 3.2808398950131235,
+          "kg/m³": 1,
+          "lb/ft³": 0.0624279606,
+          "lb/yd³": 1.68555494,
+          "g/cm³": 0.001,
+          "kg/cm³": 0.000001,
+          "mg/cm³": 1,
+          "g/m³": 1000,
+          "g/dm³": 1,
         },
-        volume: {
-          "mm³": 1e9,
-          "cm³": 1e6,
-          "m³": 1,
-          "in³": 61023.7440947322916,
-          l: 1e3,
-          "US gal": 264.1720523581484,
-        },
-
         unit: {
           unit: 1,
         },
       };
-      let queue = ["i1", "i2", "i3", "i4"];
+      const queue = ["i1", "i2", "i3"];
       /*************** FUNCTIONS ***************/
       function toSIUnit(type, unit, value) {
         if (type === "exp") {
@@ -145,39 +140,27 @@
         return value * UNITS[type][unit];
       }
 
-      function customPercision(ans, to = 8) {
-        return parseFloat(parseFloat(ans).toPrecision(to));
-      }
-
       function createElement() {
         const newDiv = `
           <div>
             <p>
-              <label for="i4-span"> Engine displacement: &nbsp; </label>
+              <label for="i2-span">Specific gravity: &nbsp;</label>
               <span
-                type="number"
-                min="0"
-                autocomplete="off"
-                data-id="i4"
+                data-id="i2"
                 step="any"
                 class="spans"
-                id="i4-span"
-                data-name="Engine displacement"
+                id="i2-span"
+                data-name="Specific gravity"
               ></span>
               <select
                 class="selectsResult"
-                id="i4-select"
-                data-type="volume"
-                data-prev="cm³"
-                data-id="i4"
+                id="i2-select"
+                data-type="unit"
+                data-prev="unit"
+                data-id="i2"
+                style="display: none"
               >
-                <option value="mm³">cubic millimeters (mm³)</option>
-                <option value="cm³">cubic centimeters (cm³)</option>
-                <option value="m³">cubic meters (m³)</option>
-                <option value="in³">cubic inches (in³)</option>
-                <option value="l">liters (l)</option>
-                <option value="US gal">gallons (US) (US gal)</option>
-                <option value="cm³" selected>cubic centimeters (cc)</option>
+                <option value="unit" selected>unit</option>
               </select>
             </p>
           </div>
@@ -186,28 +169,8 @@
       }
 
 
-      function handleResultsChange(e) {
-        let select = e.target;
-        let id = select.getAttribute("data-id");
-        let span = document.getElementById(`${id}-span`);
-
-        let prevUnit = select.getAttribute("data-prev");
-        let currentUnit = select.value;
-        select.setAttribute("data-prev", currentUnit);
-
-        if (span.textContent === "") {
-          return;
-        }
-
-        let type = select.getAttribute("data-type");
-
-        let value = parseFloat(span.textContent);
-        value = parseFloat(value);
-        if (isNaN(value)) value = 0.0;
-
-        let si = toSIUnit(type, prevUnit, value);
-        let result = fromSIUnit(type, currentUnit, si);
-        span.textContent = customPercision(result, 13);
+      function customPercision(ans, to = 8) {
+        return parseFloat(parseFloat(ans).toPrecision(to));
       }
 
       function validateInput(id) {
@@ -222,7 +185,7 @@
 
         return true;
       }
-      
+
       // related to caculation
       function prepareUnit(...args) {
         const resultArr = [];
@@ -261,39 +224,28 @@
           let outUnit = select.value;
           val = fromSIUnit(type, outUnit, val);
 
-          span.textContent = customPercision(val, 16);
+          span.textContent = customPercision(val);
         }
       }
 
-      function calculateResult(out) {
-        const C = 4 * Math.PI * 10e-6;
+      function calculateResult() {
+        function calculateI2() {
+          let [val1] = prepareUnit("i1");
 
-        function calculateI4() {
-          let [val1, val2, val3] = prepareUnit("i1", "i2", "i3");
-
-          let result = (val1 * val3 * Math.PI * val2 * val2 * 1) / 4;
-
+          let result = val1 / 1000;
           return {
-            1: { result, type: "i4" },
+            1: { result, type: "i2" },
           };
         }
-        return calculateI4()
+        return calculateI2()
       }
 
       function calculateResults() {
-        for (el of ["i1", "i2", "i3"]) {
-          if (!validateInput(el)) return;
-        }
+        if (!validateInput("i1")) return;
 
         try {
           const resultElement = createElement()
           calcResultsEl.innerHTML = resultElement
-
-          const newSelects = document.querySelectorAll(".selectsResult");
-
-          newSelects.forEach((select) => {
-            select.addEventListener("change", handleResultsChange);
-          });
           
           const result = calculateResult();
           setResult(result)
@@ -305,18 +257,22 @@
         }
       }
 
+      function presetHandler() {
+        const value = presetSelect.value;
+        const input = document.getElementById("iv-input");
+        input.value = value;
+      }
+
       function resetForm() {
+        presetSelect.selectedIndex = '6'
         selects.forEach((select, index) => {
-          if (index > 0) {
-            select.selectedIndex = '1'
-          } else {
-            select.selectedIndex = '0'
-          }
+          select.selectedIndex = '0'
         });
 
         inputs.forEach((input) => {
           input.value = ""
         });
+        presetHandler()  
       }
 
       function resetResult() {
@@ -328,11 +284,21 @@
         resetResult();
       }
 
+
+      function windowLoadHandler() {
+        presetHandler();
+        selects.forEach((select) => {
+          let value = select.value;
+          select.setAttribute("data-prev", value);
+        });
+      }
+
       /*************** EVENT LISTINERS ***************/
+      window.addEventListener("load", windowLoadHandler);
+      presetSelect.addEventListener("change", presetHandler);
       selects.forEach((select) => {
         select.addEventListener("change", resetResult);
       });
-
       inputs.forEach((input) => {
         input.addEventListener("input", resetResult);
       });

@@ -1,0 +1,766 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Net Force Calculator</title>
+  </head>
+  <body>
+    <h1>Net Force Calculator</h1>
+    <p>
+      You can add up to 10 different forces. Each angle is measured with respect
+      to the positive x-axis.
+    </p>
+      <div id="components-container">
+        <div id="comp-1" data-pos="prev" data-place="1" class="comps">
+          <p>
+            <label for="i1-1-input">Force 1</label>
+            <input
+              type="number"
+              autocomplete="off"
+              data-id="i1-1"
+              data-name="Force"
+              step="any"
+              id="i1-1-input"
+              class="inputs"
+              value="1"
+              data-place="1"
+            />
+            <select
+              class="selects"
+              id="i1-1-select"
+              data-type="force"
+              data-prev="N"
+              data-id="i1-1"
+            >
+              <option value="N" selected>newtons (N)</option>
+              <option value="kN">kilonewtons (kN)</option>
+              <option value="lbf">pounds-force (lbf)</option>
+              <option value="dyn">dynes (dyn)</option>
+            </select>
+          </p>
+
+          <p>
+            <label for="i2-1-input">Angle 1</label>
+            <input
+              type="number"
+              autocomplete="off"
+              data-id="i2-1"
+              data-name="Angle"
+              step="any"
+              id="i2-1-input"
+              class="inputs"
+              value="15"
+              data-place="1"
+            />
+            <select
+              class="selects"
+              id="i2-1-select"
+              data-type="angle"
+              data-prev="deg"
+              data-id="i2-1"
+            >
+              <option value="deg" selected>degrees (deg)</option>
+              <option value="rad">radians (rad)</option>
+            </select>
+          </p>
+        </div>
+
+        <div id="comp-2" data-pos="last" data-place="2" class="comps">
+          <p>
+            <label for="i1-2-input">Force 2</label>
+            <input
+              type="number"
+              autocomplete="off"
+              data-id="i1-2"
+              data-name="Force"
+              step="any"
+              id="i1-2-input"
+              class="inputs"
+              data-place="2"
+            />
+            <select
+              class="selects"
+              id="i1-2-select"
+              data-type="force"
+              data-prev="N"
+              data-id="i1-2"
+            >
+              <option value="N" selected>newtons (N)</option>
+              <option value="kN">kilonewtons (kN)</option>
+              <option value="lbf">pounds-force (lbf)</option>
+              <option value="dyn">dynes (dyn)</option>
+            </select>
+          </p>
+
+          <p>
+            <label for="i2-2-input">Angle 2</label>
+            <input
+              type="number"
+              autocomplete="off"
+              data-id="i2-2"
+              data-name="Angle"
+              step="any"
+              id="i2-2-input"
+              class="inputs"
+              data-place="2"
+            />
+            <select
+              class="selects"
+              id="i2-2-select"
+              data-type="angle"
+              data-prev="deg"
+              data-id="i2-2"
+            >
+              <option value="deg" selected>degrees (deg)</option>
+              <option value="rad">radians (rad)</option>
+            </select>
+          </p>
+        </div>
+      </div>
+      
+      <button id="calcBtn">Calculate</button>
+      <button id="resetBtn">Reset</button>
+      <hr>
+      <div>
+        <h3>Result:</h3>
+        <h3 id="calcResults">Result will appear here...</h3>
+      </div>
+
+    <script>
+      /*************** ELEMENTS ***************/
+      let selects = document.querySelectorAll(".selects");
+      let inputs = document.querySelectorAll(".inputs");
+      let components = document.querySelectorAll(".comps");
+      const container = document.getElementById("components-container");
+
+      const calcBtnEl = document.getElementById('calcBtn');
+      const resetBtnEl = document.getElementById('resetBtn');
+      const calcResultsEl = document.getElementById('calcResults')
+
+      /*************** GLOBAL VARIBLES ***************/
+
+      const UNITS = {
+        angle: {
+          deg: 57.295779513082316,
+          rad: 1,
+        },
+        force: {
+          N: 1,
+          kN: 0.001,
+          lbf: 0.2248089438709618,
+          dyn: 100000,
+        },
+      };
+
+      /*************** FUNCTIONS ***************/
+
+      function toSIUnit(type, unit, value) {
+        if (type === "exp") {
+          unit = parseFloat("1e" + unit);
+          return value * unit;
+        }
+        return value / UNITS[type][unit];
+      }
+
+      function fromSIUnit(type, unit, value) {
+        if (type === "exp") {
+          unit = parseFloat("1e" + unit);
+          return value / unit;
+        }
+        return value * UNITS[type][unit];
+      }
+
+      function customPercision(ans, to = 8) {
+        return parseFloat(parseFloat(ans).toPrecision(to));
+      }
+
+      function selectChangeHandler(e) {
+        let select = e.target;
+        let id = select.getAttribute("data-id");
+        let input = document.getElementById(`${id}-input`);
+
+        let prevUnit = select.getAttribute("data-prev");
+        let currentUnit = select.value;
+
+        select.setAttribute("data-prev", currentUnit);
+
+        if (input.value === "") {
+          return;
+        }
+
+        let type = select.getAttribute("data-type");
+
+        let value = input.value;
+        value = parseFloat(value);
+        if (isNaN(value)) value = 0.0;
+
+        let si = toSIUnit(type, prevUnit, value);
+        let result = fromSIUnit(type, currentUnit, si);
+        input.value = customPercision(result, 13);
+      }
+
+      function inputHandler(e, inp = null) {
+        try {
+          let flag = true;
+          for (let inps of inputs) {
+            let id = inps.getAttribute("data-id");
+            if (!validateInput(id)) flag = false;
+          }
+          
+          const input = e.target;
+
+          const place = input.getAttribute("data-place");
+          const el = document.getElementById(`comp-${place}`);
+
+          el.pos = el.getAttribute("data-pos");
+          el.place = parseInt(el.getAttribute("data-place"));
+
+          const val1 = document.getElementById(`i1-${place}-input`).value;
+          const val2 = document.getElementById(`i2-${place}-input`).value;
+
+          const bool1 = val1 !== "" && val2 !== "";
+          const bool2 = val1 === "" || val2 === "";
+
+          let scenario_one = el.place != 10 && el.pos == "last" && bool1;
+          let scenario_two = el.place != 1 && el.pos == "prev" && bool2;
+          let scenario_three = el.place == 10 && bool2;
+
+          if (scenario_one) {
+            scenarioOne(el);
+          } else if (scenario_two) {
+            scenarioTwo(el, bool2);
+          } else if (scenario_three) {
+            scenarioThree(el);
+          }
+
+          flag = true;
+          for (let inps of inputs) {
+            let id = inps.getAttribute("data-id");
+            if (!validateInput(id)) flag = false;
+          }
+          resetResult()
+          
+        } catch (error) {
+          alert(
+            "An error occurred. Try again with valid input, or try contacting us."
+          );
+          console.log(error);
+        }
+      }
+      /* scenarios */
+      function scenarioOne(el) {
+        let prevEl = document.querySelector('[data-pos="prev"]');
+        prevEl.setAttribute("data-pos", "null");
+        el.setAttribute("data-pos", "prev");
+        let nextEl = createElement(el.place + 1);
+        container.append(nextEl);
+        updateNodeList();
+      }
+
+      function scenarioTwo(el) {
+        const elPlace = el.getAttribute("data-place");
+        const nextEl = document.querySelector('[data-pos = "last"]');
+        const nextPlace = nextEl.getAttribute("data-place");
+
+        const val1 = document.getElementById(`i1-${elPlace}-input`).value;
+        const val2 = document.getElementById(`i2-${elPlace}-input`).value;
+        const bool1 = val1 == "" || val2 == "";
+
+        const val1Next = document.getElementById(`i1-${nextPlace}-input`).value;
+        const val2next = document.getElementById(`i2-${nextPlace}-input`).value;
+        const bool2 = val1Next === "" || val2next === "";
+
+        if (el.place != 1 && el.pos == "prev" && bool1 && bool2) {
+          let tbd = document.getElementById(
+            `comp-${nextEl.getAttribute("data-place")}`
+          );
+
+          tbd.remove();
+
+          el.setAttribute("data-pos", "last");
+          const newPrev = document.querySelector(`[data-place ="${el.place - 1}"]`);
+          newPrev.setAttribute("data-pos", "prev");
+          newPrev.place = newPrev.getAttribute("data-place");
+          newPrev.pos = newPrev.getAttribute("data-pos");
+          updateNodeList();
+          el.focus();
+          scenarioTwo(newPrev);
+        }
+      }
+
+      function scenarioThree(el) {
+        const newPrev = document.getElementById(`comp-${el.place - 1}`);
+        const nextPlace = newPrev.getAttribute("data-place");
+        const elPlace = el.getAttribute("data-place");
+
+        const val1Next = document.getElementById(`i1-${nextPlace}-input`).value;
+        const val2next = document.getElementById(`i2-${nextPlace}-input`).value;
+        const bool2 = val1Next === "" || val2next === "";
+
+        const val1 = document.getElementById(`i1-${elPlace}-input`).value;
+        const val2 = document.getElementById(`i2-${elPlace}-input`).value;
+        const bool1 = val1 !== "" || val2 !== "";
+
+        newPrev.setAttribute("data-pos", "prev");
+        newPrev.place = newPrev.getAttribute("data-place");
+        newPrev.pos = newPrev.getAttribute("data-pos");
+        if (el.place == 10 && bool1 && bool2) {
+          scenarioTwo(newPrev);
+        }
+      }
+
+      function createElement(place) {
+        let templateStr = `<div id="comp-${place}" data-pos="last" data-place="${place}" class="comps">
+        <p>
+          <label for="i1-${place}-input">Force ${place}</label>
+          <input
+            type="number"
+            autocomplete="off"
+            data-id="i1-${place}"
+            data-name="Force"
+            step="any"
+            id="i1-${place}-input"
+            class="inputs"
+            data-place="${place}"
+          />
+          <select
+            class="selects"
+            id="i1-${place}-select"
+            data-type="force"
+            data-prev="N"
+            data-id="i1-${place}"
+          >
+            <option value="N" selected>newtons (N)</option>
+            <option value="kN">kilonewtons (kN)</option>
+            <option value="lbf">pounds-force (lbf)</option>
+            <option value="dyn">dynes (dyn)</option>
+          </select>
+        </p>
+
+        <p>
+          <label for="i2-${place}-input">Angle ${place}</label>
+          <input
+            type="number"
+            autocomplete="off"
+            data-id="i2-${place}"
+            data-name="Angle"
+            step="any"
+            id="i2-${place}-input"
+            class="inputs"
+            data-place="${place}"
+          />
+          <select
+            class="selects"
+            id="i2-${place}-select"
+            data-type="angle"
+            data-prev="deg"
+            data-id="i2-${place}"
+          >
+            <option value="deg" selected>degrees (deg)</option>
+            <option value="rad">radians (rad)</option>
+          </select>
+        </p>
+        </div>`;
+
+        let nextEl = document.createElement("div");
+        nextEl.innerHTML = templateStr;
+        return nextEl.firstChild;
+      }
+
+      function createElement2() {
+        const newDiv = `
+          <div>
+            <p>Resultant Force</p>
+
+            <p>
+              <label for="ia1-span">Horizontal component (Fx): &nbsp; </label>
+              <span
+                data-id="ia1"
+                data-name="Force"
+                id="ia1-span"
+              ></span>
+              <select
+                class="selectsResult"
+                id="ia1-select"
+                data-type="force"
+                data-prev="N"
+                data-id="ia1"
+              >
+                <option value="N" selected>newtons (N)</option>
+                <option value="kN">kilonewtons (kN)</option>
+                <option value="lbf">pounds-force (lbf)</option>
+                <option value="dyn">dynes (dyn)</option>
+              </select>
+            </p>
+
+            <p>
+              <label for="ia2-span">Vertical component (Fy): &nbsp; </label>
+              <span
+                data-id="ia2"
+                data-name="Force"
+                id="ia2-span"
+                
+              ></span>
+              <select
+                class="selectsResult"
+                id="ia2-select"
+                data-type="force"
+                data-prev="N"
+                data-id="ia2"
+              >
+                <option value="N" selected>newtons (N)</option>
+                <option value="kN">kilonewtons (kN)</option>
+                <option value="lbf">pounds-force (lbf)</option>
+                <option value="dyn">dynes (dyn)</option>
+              </select>
+            </p>
+
+            <p>
+              <label for="ia3-span">Magnitude of resultant force (F): &nbsp;</label>
+              <span
+                data-id="ia3"
+                data-name="Force"
+                id="ia3-span"
+              ></span>
+              <select
+                class="selectsResult"
+                id="ia3-select"
+                data-type="force"
+                data-prev="N"
+                data-id="ia3"
+              >
+                <option value="N" selected>newtons (N)</option>
+                <option value="kN">kilonewtons (kN)</option>
+                <option value="lbf">pounds-force (lbf)</option>
+                <option value="dyn">dynes (dyn)</option>
+              </select>
+            </p>
+
+            <p>
+              <label for="ia4-span">Direction of resultant force (θ): &nbsp; </label>
+              <span
+                data-id="ia4"
+                data-name="Angle"
+                id="ia4-span"
+              ></span>
+              <select
+                class="selectsResult"
+                id="ia4-select"
+                data-type="angle"
+                data-prev="deg"
+                data-id="ia4"
+              >
+                <option value="deg" selected>degrees (deg)</option>
+                <option value="rad">radians (rad)</option>
+              </select>
+            </p>
+          </div>
+        `
+        return newDiv
+      }
+
+      function updateNodeList() {
+        inputs = document.querySelectorAll(".inputs");
+        selects = document.querySelectorAll(".selects");
+        components = document.querySelectorAll(".comps");
+
+        inputs.forEach((input) => {
+          input.addEventListener("input", inputHandler);
+        });
+
+        selects.forEach((select) => {
+          select.addEventListener("change", selectChangeHandler);
+        });
+      }
+
+      function calculateResult() {
+        let fx = 0,
+          fy = 0,
+          f = 0,
+          angle = 0;
+
+        for (let i = 0; i < components.length; i++) {
+          let el = components[i];
+
+          let place = parseInt(el.getAttribute("data-place"));
+
+          const input1 = document.getElementById(`i1-${place}-input`);
+          const id1 = input1.getAttribute("data-id");
+
+          const input2 = document.getElementById(`i2-${place}-input`);
+          const id2 = input2.getAttribute("data-id");
+
+          const val1 = document.getElementById(`i1-${place}-input`).value;
+          const val2 = document.getElementById(`i2-${place}-input`).value;
+
+          const bool1 = val1 == "" || val2 == "";
+          if (bool1) continue;
+
+          let [force, angle] = prepareUnit(id1, id2);
+
+          fx += force * Math.cos(angle);
+          fy += force * Math.sin(angle);
+        }
+
+        f = Math.sqrt(fx * fx + fy * fy);
+        angle = Math.atan(fy / fx);
+
+        const result = {
+          1: {
+            result: fx,
+            type: "ia1",
+          },
+          2: {
+            result: fy,
+            type: "ia2",
+          },
+          3: {
+            result: f,
+            type: "ia3",
+          },
+          4: {
+            result: angle,
+            type: "ia4",
+          },
+        };
+
+        setResult(result);
+      }
+
+      function clearHandler() {
+        container.innerHTML = ` <div id="comp-1" data-pos="prev" data-place="1" class="comps">
+        <p>
+          <label for="i1-1-input">Force 1</label>
+          <input
+            type="number"
+            autocomplete="off"
+            data-id="i1-1"
+            data-name="Force"
+            step="any"
+            id="i1-1-input"
+            class="inputs"
+            value="1"
+            data-place="1"
+          />
+          <select
+            class="selects"
+            id="i1-1-select"
+            data-type="force"
+            data-prev="N"
+            data-id="i1-1"
+          >
+            <option value="N" selected>newtons (N)</option>
+            <option value="kN">kilonewtons (kN)</option>
+            <option value="lbf">pounds-force (lbf)</option>
+            <option value="dyn">dynes (dyn)</option>
+          </select>
+        </p>
+
+        <p>
+          <label for="i2-1-input">Angle 1</label>
+          <input
+            type="number"
+            autocomplete="off"
+            data-id="i2-1"
+            data-name="Angle"
+            step="any"
+            id="i2-1-input"
+            class="inputs"
+            value="15"
+            data-place="1"
+          />
+          <select
+            class="selects"
+            id="i2-1-select"
+            data-type="angle"
+            data-prev="deg"
+            data-id="i2-1"
+          >
+            <option value="deg" selected>degrees (deg)</option>
+            <option value="rad">radians (rad)</option>
+          </select>
+        </p>
+      </div>
+
+      <div id="comp-2" data-pos="last" data-place="2" class="comps">
+        <p>
+          <label for="i1-2-input">Force 2</label>
+          <input
+            type="number"
+            autocomplete="off"
+            data-id="i1-2"
+            data-name="Force"
+            step="any"
+            id="i1-2-input"
+            class="inputs"
+            data-place="2"
+          />
+          <select
+            class="selects"
+            id="i1-2-select"
+            data-type="force"
+            data-prev="N"
+            data-id="i1-2"
+          >
+            <option value="N" selected>newtons (N)</option>
+            <option value="kN">kilonewtons (kN)</option>
+            <option value="lbf">pounds-force (lbf)</option>
+            <option value="dyn">dynes (dyn)</option>
+          </select>
+        </p>
+
+        <p>
+          <label for="i2-2-input">Angle 2</label>
+          <input
+            type="number"
+            autocomplete="off"
+            data-id="i2-2"
+            data-name="Angle"
+            step="any"
+            id="i2-2-input"
+            class="inputs"
+            data-place="2"
+          />
+          <select
+            class="selects"
+            id="i2-2-select"
+            data-type="angle"
+            data-prev="deg"
+            data-id="i2-2"
+          >
+            <option value="deg" selected>degrees (deg)</option>
+            <option value="rad">radians (rad)</option>
+          </select>
+        </p>
+      </div>`;
+        updateNodeList();
+      }
+      /* scenarios*/
+      function prepareUnit(...args) {
+        const resultArr = [];
+        for (id of args) {
+          const input = document.getElementById(`${id}-input`);
+          const select = document.getElementById(`${id}-select`);
+          const type = select.getAttribute("data-type");
+          let val = parseFloat(input.value);
+          val = isNaN(val) ? 0 : val;
+          let inUnit = select.value;
+          val = toSIUnit(type, inUnit, val);
+          resultArr.push(val);
+        }
+
+        return resultArr;
+      }
+
+      function validateInput(id) {
+        const input = document.getElementById(`${id}-input`);
+
+        const label = input.getAttribute("data-name").trim();
+        let value = parseFloat(input.value);
+
+        if (value < 0) {
+          alert(`${label} must be non negative number!`);
+          return false;
+        }
+
+        return true;
+      }
+
+      function setResult(resultObj) {
+        for (key of Object.keys(resultObj)) {
+          let val = resultObj[key].result;
+          let id = resultObj[key].type;
+          if (isNaN(val)) {
+            alert("Your input resulted in NAN.\n 0/0 \n Try again with valid input.");
+            return;
+          }
+          if (Math.abs(val) === Infinity) {
+            alert(
+              "Your input resulted in Infinity. \nDivision by zero. \nTry again with valid input."
+            );
+            return;
+          }
+
+          const span = document.getElementById(`${id}-span`);
+          const select = document.getElementById(`${id}-select`);
+          const type = select.getAttribute("data-type");
+          let outUnit = select.value;
+          val = fromSIUnit(type, outUnit, val);
+
+          span.textContent = customPercision(val, 16);
+        }
+      }
+
+      function handleResultsChange(e) {
+        let select = e.target;
+        let id = select.getAttribute("data-id");
+        let span = document.getElementById(`${id}-span`);
+
+        let prevUnit = select.getAttribute("data-prev");
+        let currentUnit = select.value;
+        select.setAttribute("data-prev", currentUnit);
+
+        if (span.textContent === "") {
+          return;
+        }
+
+        let type = select.getAttribute("data-type");
+
+        let value = parseFloat(span.textContent);
+        value = parseFloat(value);
+        if (isNaN(value)) value = 0.0;
+
+        let si = toSIUnit(type, prevUnit, value);
+        let result = fromSIUnit(type, currentUnit, si);
+        span.textContent = customPercision(result, 16);
+      }
+
+      function calculateResults() {
+        try {
+          const resultElement = createElement2()
+          calcResultsEl.innerHTML = resultElement
+
+          const newSelects = document.querySelectorAll(".selectsResult");
+
+          newSelects.forEach((select) => {
+            select.addEventListener("change", handleResultsChange);
+          });
+          
+          calculateResult();
+
+        } catch(error) {
+          alert("An error ocurred. Try again with valid input.");
+          resetResult()
+          return;
+        }
+      }
+
+      function resetForm() {
+        clearHandler()
+      }
+
+      function resetResult() {
+        calcResultsEl.innerHTML = "<p>Result will appear here...</p>";
+      } 
+
+      function resethandler() {
+        resetForm();
+        resetResult();
+      }
+
+      /*************** EVENT LISTINERS ***************/
+
+      selects.forEach((select) => {
+        select.addEventListener("change", resetResult);
+      });
+      inputs.forEach((input) => {
+        input.addEventListener("input", inputHandler);
+      });
+
+      resetBtnEl.addEventListener("click", resethandler);
+      calcBtnEl.addEventListener("click", calculateResults);
+
+    </script>
+  </body>
+</html>

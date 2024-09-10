@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Pressure Calculator</title>
+  </head>
+  <body>
+    <h1>Pressure Calculator</h1>
+      <p>
+        Calculate:
+        <select id="calculateUnit">
+          <option value="fr">Force </option>
+          <option value="ar">Area</option>
+          <option value="pr" selected>Pressure </option>
+        </select>
+      </p>
+
+      <div>
+        <p id="fr-contianer" class="containers">
+          <label for="fr-input">Force </label>
+          <input
+            type="number"
+            step="any"
+            id="fr-input"
+            class="inputs"
+            min="0"
+          />
+          <select id="fr-select">
+            <option value="N" selected>newtons (N)</option>
+            <option value="kN">kilonewtons (kN)</option>
+            <option value="MN">meganewtons (MN)</option>
+            <option value="GN">giganewtons (GN)</option>
+            <option value="TN">teranewtons (TN)</option>
+            <option value="pdl">poundals (pdl)</option>
+            <option value="lbf">pounds-force (lbf)</option>
+          </select>
+        </p>
+        <p id="ar-contianer" class="containers">
+          <label for="ar-input">Area </label>
+          <input
+            type="number"
+            step="any"
+            id="ar-input"
+            class="inputs"
+            min="0"
+          />
+          <select id="ar-select">
+            <option value="mm²">square millimeters (mm²)</option>
+            <option value="cm²">square centimeters (cm²)</option>
+            <option value="dm²">square decimeters (dm²)</option>
+            <option value="m²" selected>square meters (m²)</option>
+            <option value="km²">square kilometers (km²)</option>
+            <option value="in²">square inches (in²)</option>
+            <option value="ft²">square feet (ft²)</option>
+            <option value="yd²">square yards (yd²)</option>
+            <option value="mi²">square miles (mi²)</option>
+            <option value="a">ares (a)</option>
+            <option value="ha">hectares (ha)</option>
+          </select>
+        </p>
+        <p id="pr-contianer" class="containers" style="display: none;">
+          <label for="pr-input">Pressure </label>
+          <input
+            type="number"
+            id="pr-input"
+            step="any"
+            class="inputs"
+            min="0"
+          />
+          <select id="pr-select">
+            <option value="Pa" selected>pascals (Pa)</option>
+            <option value="bar">bars (bar)</option>
+            <option value="psi">pounds per square inch (psi)</option>
+            <option value="at">technical atmospheres (at)</option>
+            <option value="atm">standard atmospheres (atm)</option>
+            <option value="Torr">torr (Torr)</option>
+            <option value="hPa">hectopascals (hPa)</option>
+            <option value="kPa">kilopascals (kPa)</option>
+            <option value="MPa">megapascals (MPa)</option>
+            <option value="GPa">gigapascals (GPa)</option>
+            <option value="inHg">inches of mercury (inHg)</option>
+            <option value="mmHg">millimeters of mercury (mmHg)</option>
+          </select>
+        </p>
+      </div>
+
+      <button id="calcBtn">Calculate</button>
+      <button id="resetBtn">Reset</button>
+      <hr>
+      <div>
+        <h3>Result:</h3>
+        <h3 id="calcResults">Result will appear here...</h3>
+      </div>
+    <script>
+      /*************** ELEMENTS ***************/
+      const calculateUnitEl = document.getElementById("calculateUnit");
+      const containers = document.querySelectorAll(".containers");
+      const inputs = document.querySelectorAll(".inputs");
+
+      const arInput = document.getElementById("ar-input");
+      const frInput = document.getElementById("fr-input");
+      const prInput = document.getElementById("pr-input");
+
+      const arSelect = document.getElementById("ar-select");
+      const frSelect = document.getElementById("fr-select");
+      const prSelect = document.getElementById("pr-select");
+
+      const calcBtnEl = document.getElementById('calcBtn');
+      const resetBtnEl = document.getElementById('resetBtn');
+      const calcResultsEl = document.getElementById('calcResults')
+
+      /*************** GLOBAL VARIBLES ***************/
+      const UNITS = {
+        force: {
+          N: 1,
+          kN: 1e-3,
+          MN: 1e-6,
+          GN: 1e-9,
+          TN: 1e-12,
+          pdl: 7.233,
+          lbf: 0.2248,
+        },
+        area: {
+          "mm²": 1000000,
+          "cm²": 10000,
+          "dm²": 100,
+          "m²": 1,
+          "km²": 0.000001,
+          "in²": 1550,
+          "ft²": 10.764,
+          "yd²": 1.196,
+          "mi²": 0.0000003861,
+          a: 0.01,
+          ha: 0.0001,
+        },
+        pressure: {
+          Pa: 1,
+          bar: 0.00001,
+          psi: 0.00014504,
+          at: 0.000010197,
+          atm: 0.00000987,
+          Torr: 0.0075,
+          hPa: 0.01,
+          kPa: 0.001,
+          MPa: 0.000001,
+          GPa: 0.000000001,
+          inHg: 0.0002953,
+          mmHg: 0.0075,
+        },
+      };
+      /*************** FUNCTIONS ***************/
+      function toSIUnit(type, unit, value) {
+        return value / UNITS[type][unit];
+      }
+
+      function fromSIUnit(type, unit, value) {
+        return value * UNITS[type][unit];
+      }
+
+      function handleCalculateUnitChange(e) {
+        const value = e.target.value
+
+        containers.forEach((container) => {
+          let idVal = container.id.slice(0, 2)
+          if (idVal == value) {
+            container.style.display = 'none'
+          } else {
+            container.style.display = 'block'
+          }
+        })
+
+        resetResult()
+      }
+
+
+      function createElements(resultObj) {
+        const elementNodes = Object.keys(resultObj).map((key) => {
+          //create elements to put the results in
+          const div = document.createElement("div");
+          const span = document.createElement("span");
+          const span2 = document.createElement("span");
+
+          // give the elements id
+          div.setAttribute("class", `result-container`);
+          span.setAttribute("class", `result-title`);
+          span2.setAttribute("class", `result-value`);
+
+          // put the values in the elements
+
+          span.textContent = resultObj[key]["title"];
+          span2.textContent = resultObj[key]["value"];
+
+          // appened them to an element that contians them
+          div.append(span, span2);
+
+          // return that element
+          return div;
+        });
+
+        return elementNodes;
+      }
+
+      function calculateResult(input) {
+        const calculateAr = () => {
+          const { fr, pr } = prepareUnits();
+
+          let result = fr / pr;
+          return {
+            result,
+            type: "area",
+            name: `Area`,
+          };
+        };
+        const calculatePr = () => {
+          const { fr, ar } = prepareUnits();
+          let result = fr / ar;
+          return {
+            result,
+            type: "pressure",
+            name: "Pressure",
+          };
+        };
+        const calculateFr = () => {
+          const { pr, ar } = prepareUnits();
+          let result = pr * ar;
+          return {
+            result,
+            type: "force",
+            name: "Force",
+          };
+        };
+
+        switch (input) {
+          case "ar":
+            return calculateAr();
+          case "fr":
+            return calculateFr();
+          case "pr":
+            return calculatePr();
+          default:
+            console.log("error in calculate result switch");
+        }
+      }
+
+      function prepareUnits() {
+        let pr = parseFloat(prInput.value) ?? 0;
+        let fr = parseFloat(frInput.value) ?? 0;
+        let ar = parseFloat(arInput.value) ?? 0;
+
+        let prUnit = prSelect.value;
+        let frUnit = frSelect.value;
+        let arUnit = arSelect.value;
+
+        pr = toSIUnit("pressure", prUnit, pr);
+        fr = toSIUnit("force", frUnit, fr);
+        ar = toSIUnit("area", arUnit, ar);
+
+        return { pr, fr, ar };
+      }
+
+      function prepareResults(result, type, name) {
+        let resultObj = {};
+        Object.keys(UNITS[type]).forEach((key) => {
+          let ans = fromSIUnit(type, key, result);
+          ans = parseFloat(ans.toFixed(22));
+          if (!(ans > 0 && ans < 1) && !(ans < 0 && ans > -1)) {
+            ans = ans.toLocaleString();
+          }
+
+          resultObj[key] = {
+            title: `${name} (${key}): `,
+            value: ` ${ans} ${key}`,
+          };
+        });
+        return resultObj;
+      }
+
+      function calculateResults() {
+        const calculateUnit = calculateUnitEl.value
+
+        try {
+          const { result, type, name } = calculateResult(calculateUnit);
+
+          if (isNaN(result)) {
+            alert("Your input resulted in NAN.\n 0/0 \n Try again with valid input.");
+            resetResult()
+            return;
+          }
+          if (Math.abs(result) === Infinity) {
+            alert(
+              "Your input resulted in Infinity. \nDivision by zero. \nTry again with valid input."
+            );
+            resetResult()
+            return;
+          }
+
+          const resultObj = prepareResults(result, type, name);
+          const elementNodes = createElements(resultObj);
+          calcResultsEl.innerHTML = "";
+
+          elementNodes.forEach((element) => {
+            calcResultsEl.append(element);
+          });
+        } catch (error) {
+          console.log(error);
+          alert("An error ocurred. Try again with valid input.");
+          resetResult()
+          return;
+        }
+      }
+
+      function resetForm() {
+        [frSelect, arSelect , prSelect].forEach((select, index) => {
+          if (index == 1) {
+            select.selectedIndex = '3'
+          } else {
+            select.selectedIndex = '0'
+          }
+        });
+
+        [arInput, frInput, prInput].forEach((input) => {
+          input.value = ""
+        });
+        calculateUnitEl.selectedIndex = '2';
+        containers.forEach((container) => {
+          let idVal = container.id.slice(0, 2)
+          if (idVal == 'pr') {
+            container.style.display = 'none'
+          } else {
+            container.style.display = 'block'
+          }
+        })
+      }
+
+      function resetResult() {
+        calcResultsEl.innerHTML = "<p>Result will appear here...</p>";
+      } 
+
+      function resethandler() {
+        resetForm();
+        resetResult();
+      }
+
+
+      /*************** EVENT LISTINERS ***************/
+      [arSelect, frSelect, prSelect].forEach((select) => {
+        select.addEventListener("change", resetResult);
+      });
+      [arInput, frInput, prInput].forEach((input) => {
+        input.addEventListener("input", resetResult);
+      });
+      calculateUnitEl.addEventListener("change", handleCalculateUnitChange);
+      resetBtnEl.addEventListener("click", resethandler);
+      calcBtnEl.addEventListener("click", calculateResults);
+
+    </script>
+  </body>
+</html>

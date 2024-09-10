@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Specific Heat Calculator</title>
+  </head>
+  <body>
+    <h1>Specific Heat Calculator</h1>
+      <div>
+        <p>
+          <label for="i1-input">Energy (Q) </label>
+          <input
+            type="number"
+            min="0"
+            autocomplete="off"
+            data-id="i1"
+            step="any"
+            id="i1-input"
+            class="inputs"
+            data-name="Energy"
+          />
+          <select
+            class="selects"
+            id="i1-select"
+            data-type="energy"
+            data-prev="J"
+            data-id="i1"
+          >
+            <option value="J" selected>joules (J)</option>
+
+            <option value="kJ">kilojoules (kJ)</option>
+            <option value="MJ">megajoules (MJ)</option>
+            <option value="Wh">watt hours (Wh)</option>
+            <option value="kWh">kilowatt hours (kWh)</option>
+            <option value="ft-lb">foot-pounds (ft-lb)</option>
+            <option value="kcal">kilocalories (kcal)</option>
+            <option value="eV">electronvolts (eV)</option>
+          </select>
+        </p>
+
+        <p>
+          <label for="i2-input">Change of temperature (ΔT) </label>
+          <input
+            type="number"
+            min="0"
+            autocomplete="off"
+            data-id="i2"
+            step="any"
+            id="i2-input"
+            class="inputs"
+            data-name="Temperature"
+          />
+
+          <select
+            class="selects"
+            id="i2-select"
+            data-type="temperature"
+            data-prev="°C"
+            data-id="i2"
+          >
+            <option value="°C" selected>Celsius (°C)</option>
+            <option value="°F">Fahrenheit (°F)</option>
+            <option value="K">kelvin (K)</option>
+          </select>
+        </p>
+
+        <p>
+          <label for="i3-input">Mass (m) </label>
+          <input
+            type="number"
+            min="0"
+            autocomplete="off"
+            data-id="i3"
+            step="any"
+            class="inputs"
+            id="i3-input"
+            data-name="Mass"
+          />
+          <select
+            class="selects"
+            id="i3-select"
+            data-type="mass"
+            data-prev="kg"
+            data-id="i3"
+          >
+            <option value="µg">micrograms (µg)</option>
+            <option value="mg">milligrams (mg)</option>
+            <option value="g">grams (g)</option>
+            <option value="kg" selected>kilograms (kg)</option>
+            <option value="t">metric tons (t)</option>
+            <option value="oz">ounces (oz)</option>
+            <option value="lb">pounds (lb)</option>
+            <option value="st">stones (st)</option>
+            <option value="US ton">US short tons (US ton)</option>
+            <option value="long ton">impenal tons (long ton)</option>
+            <option value="Earths">masses of the Earth (Earths)</option>
+            <option value="me">electron rest masses (me)</option>
+            <option value="u">atomic mass units (u)</option>
+            <option value="oz t">troy ounces (oz t)</option>
+          </select>
+        </p>
+
+        <p>
+          <label for="P-select"> Substance (optional)</label>
+          <select id="P-select" data-flag="false">
+            <option value="custom" disabled selected>Custom</option>
+            <option value="1012">Air (gas, room cond.)</option>
+            <option value="1003.5">Air (sea level, dry, 0°C)</option>
+            <option value="897">Aluminum (solid)</option>
+            <option value="4700">Ammonia (liquid)</option>
+            <option value="3500">Animal tissue (mixed)</option>
+            <option value="207">Antimony (solid)</option>
+            <option value="520.3">Argon (gas)</option>
+            <option value="328">Arsenic (solid)</option>
+            <option value="920">Asphalt (solid)</option>
+
+            <option value="1820">Beryllium (solid)</option>
+            <option value="123">Bismuth (solid)</option>
+            <option value="840">Brick (solid)</option>
+            <option value="231">Cadmium (solid)</option>
+            <option value="839">Carbon dioxide (gas)</option>
+            <option value="449">Chromium (solid)</option>
+            <option value="880">Concrete (solid)</option>
+            <option value="385">Copper (solid)</option>
+            <option value="509.1">Diamond (solid)</option>
+
+            <option value="2440">Ethanol (liquid)</option>
+            <option value="2220">Gasoline (octane, liquid)</option>
+            <option value="840">Glass (solid)</option>
+            <option value="670">Glass, crown (solid)</option>
+            <option value="503">Glass, flint (solid)</option>
+            <option value="753">Glass, pyrex (solid)</option>
+            <option value="840">Glass, silica (solid)</option>
+            <option value="129">Gold (solid)</option>
+            <option value="790">Granite (solid)</option>
+
+            <option value="710">Graphite (solid)</option>
+            <option value="1090">Gypsum (solid)</option>
+            <option value="5193.2">Helium (gas)</option>
+            <option value="14300">Hydrogen (gas)</option>
+            <option value="1015">Hydrogen sulfide (gas)</option>
+            <option value="450">Iron (solid)</option>
+            <option value="129">Lead (solid)</option>
+            <option value="3580">Lithium (solid)</option>
+            <option value="4379">Lithium at 181 °C (liquid)</option>
+
+            <option value="1020">Magnesium (solid)</option>
+            <option value="880">Marble, mica (solid)</option>
+            <option value="139.5">Mercury (liquid)</option>
+            <option value="2191">Methane at 2°C (gas)</option>
+            <option value="2140">Methanol (liquid)</option>
+            <option value="1560">Molten salt (liquid)</option>
+            <option value="1030.1">Neon (gas)</option>
+            <option value="1040">Nitrogen (gas)</option>
+            <option value="918">Oxygen (gas)</option>
+
+            <option value="2500">Paraffin wax (solid)</option>
+            <option value="2302.7">Polyethylene (solid)</option>
+            <option value="835">Sand (solid)</option>
+            <option value="703">Silica (fused) (solid)</option>
+            <option value="233">Silver (solid)</option>
+            <option value="1230">Sodium (solid)</option>
+            <option value="800">Soil (solid)</option>
+            <option value="466">Steel (solid)</option>
+            <option value="227">Tin (solid)</option>
+
+            <option value="523">Titanium (solid)</option>
+            <option value="134">Tungsten (solid)</option>
+            <option value="116">Uranium (solid)</option>
+            <option value="2050">Water at -10 °C (ice) (solid)</option>
+            <option value="4181.3">Water at 25 °C (liquid)</option>
+            <option value="2080">Water at 100 °C (gas)</option>
+            <option value="1700">Wood (1200 to 2900) (solid)</option>
+            <option value="387">Zinc (solid)</option>
+          </select>
+        </p>
+      </div>
+
+      <button id="calcBtn">Calculate</button>
+      <button id="resetBtn">Reset</button>
+      <hr>
+      <div>
+        <h3>Result:</h3>
+        <h3 id="calcResults">Result will appear here...</h3>
+      </div>
+
+    <script>
+      /*************** ELEMENTS ***************/
+      const selects = document.querySelectorAll(".selects");
+      const inputs = document.querySelectorAll(".inputs");
+      
+      const presetSelect = document.getElementById("P-select");
+
+      const calcBtnEl = document.getElementById('calcBtn');
+      const resetBtnEl = document.getElementById('resetBtn');
+      const calcResultsEl = document.getElementById('calcResults')
+
+      /*************** GLOBAL VARIBLES ***************/
+      const UNITS = {
+        energy: {
+          J: 1,
+          kJ: 0.0009999999999999998,
+          MJ: 0.000001,
+          Wh: 0.0002777777777777777,
+          kWh: 2.7777777777777776e-7,
+          "ft-lb": 0.7375621492772653,
+          kcal: 0.00023900573613766727,
+          eV: 6.241509074460762e18,
+        },
+
+        temperature: {
+          "°C": (value, op) => value,
+          "°F": (value, op) =>
+            op === "+" ? (value - 32) * (5 / 9) : value * (9 / 5) + 32,
+          K: (value, op) => (op === "+" ? value - 273.15 : value + 273.15),
+        },
+        mass: {
+          µg: 1000000000.0,
+          mg: 1000000,
+          g: 1000.0,
+          kg: 1,
+          t: 0.001,
+          oz: 35.27396194958042,
+          lb: 2.204622621848776,
+          st: 0.1574730444177697,
+          "US ton": 0.001102311310924388,
+          "long ton": 0.0009842065276110606,
+          Earths: 1.6744248350691536e-25,
+          me: 1.0977691228098863e30,
+          u: 6.0221400000000005e26,
+          "oz t": 32.15074656862798,
+        },
+        "specific heat": {
+          "J/(kg·K)": 1,
+          "J/(g·K)": 0.001,
+          "cal/(kg·K)": 0.23889154323936937,
+          "cal/(g·K)": 0.00023889154323936934,
+          "kcal/(kg·K)": 0.00023889154323936934,
+          "J/(kg·°C)": 1,
+          "J/(g·°C)": 0.001,
+          "cal/(kg·°C)": 0.23889154323936937,
+          "cal/(g·°C)": 0.00023889154323936934,
+        },
+      };
+      let queue = ["i2", "i1", "i3", "i4"];
+      /*************** FUNCTIONS ***************/
+      function toSIUnit(type, unit, value) {
+        if (type === "exp") {
+          unit = parseFloat("1e" + unit);
+          return value * unit;
+        }
+        if (type === "temperature") {
+          return UNITS[type][unit](value, "+");
+        }
+        return value / UNITS[type][unit];
+      }
+
+      function fromSIUnit(type, unit, value) {
+        if (type === "exp") {
+          unit = parseFloat("1e" + unit);
+          return value / unit;
+        }
+        if (type === "temperature") {
+          return UNITS[type][unit](value, "-");
+        }
+        return value * UNITS[type][unit];
+      }
+
+      function createElement() {
+        const newDiv = `
+          <div>
+            <p>
+              <label for="i4-span">Specific heat capacity (c): &nbsp; </label>
+              <span
+                data-id="i4"
+                step="any"
+                class="spans"
+                id="i4-span"
+                data-name="Specific heat capacity"
+              ></span>
+              <select
+                class="selectsResult"
+                id="i4-select"
+                data-type="specific heat"
+                data-prev="J/(kg·K)"
+                data-id="i4"
+              >
+                <option value="J/(kg·K)" selected>
+                  joules per kilogram per kelvin (J/(kg·K))
+                </option>
+                <option value="J/(g·K)">
+                  joules per gram per kelvin (J/(g·K))
+                </option>
+                <option value="cal/(kg·K)">
+                  calories per kilogram per kelvin (cal/(kg·K))
+                </option>
+                <option value="cal/(g·K)">
+                  calories per gram per kelvin (cal/(g·K))
+                </option>
+                <option value="kcal/(kg·K)">
+                  kilocalories per kilogram per kelvin (kcal/(kg·K))
+                </option>
+                <option value="J/(kg·°C)">
+                  joules per kilogram per Celsius (J/(kg·°C))
+                </option>
+                <option value="J/(g·°C)">
+                  joules per gram per Celsius (J/(g·°C))
+                </option>
+                <option value="cal/(kg·°C)">
+                  calories per kilogram per Celsius (cal/(kg·°C))
+                </option>
+                <option value="cal/(g·°C)">
+                  calories per gram per Celsius (cal/(g·°C))
+                </option>
+              </select>
+            </p>
+          </div>
+        `
+        return newDiv
+      }
+
+
+      function customPercision(ans, to = 8) {
+        return parseFloat(parseFloat(ans).toPrecision(to));
+      }
+
+      function validateInput(id) {
+        const input = document.getElementById(`${id}-input`);
+        const label = input.getAttribute("data-name").trim();
+        let value = parseFloat(input.value);
+
+        if (isNaN(value)) {
+          alert(`${label} is empty!`);
+          return false;
+        }
+
+        if (id !== "i3") return true;
+        if (value <= 0) {
+          alert(`${label} must be greater than zero!`);
+          return false;
+        }
+
+        return true;
+      }
+      
+      function presetHandler() {
+        const value = presetSelect.value;
+        if (value === "custom") return;
+        calculateResults()
+        const span = document.getElementById("i4-span");
+        const select = document.getElementById(`i4-select`);
+        const inType = select.getAttribute("data-type");
+
+        let val = parseFloat(value);
+
+        let inUnit = select.value;
+
+        val = fromSIUnit(inType, inUnit, val);
+
+        span.textContent = val;
+
+        presetSelect.setAttribute("data-flag", "false");
+      }
+
+      // related to caculation
+      function prepareUnit(...args) {
+        const resultArr = [];
+        for (id of args) {
+          const input = document.getElementById(`${id}-input`);
+          const select = document.getElementById(`${id}-select`);
+          const type = select.getAttribute("data-type");
+          let val = parseFloat(input.value);
+          val = isNaN(val) ? 0 : val;
+          let inUnit = select.value;
+          val = toSIUnit(type, inUnit, val);
+          resultArr.push(val);
+        }
+
+        return resultArr;
+      }
+
+      function setResult(resultObj) {
+        for (key of Object.keys(resultObj)) {
+          let val = resultObj[key].result;
+          let id = resultObj[key].type;
+          if (isNaN(val)) {
+            alert("Your input resulted in NAN.\n 0/0 \n Try again with valid input.");
+            return;
+          }
+          if (Math.abs(val) === Infinity) {
+            alert(
+              "Your input resulted in Infinity. \nDivision by zero. \nTry again with valid input."
+            );
+            return;
+          }
+
+          const span = document.getElementById(`${id}-span`);
+          const select = document.getElementById(`${id}-select`);
+          const type = select.getAttribute("data-type");
+          let outUnit = select.value;
+          val = fromSIUnit(type, outUnit, val);
+
+          span.textContent = customPercision(val, 16);
+        }
+      }
+
+      function calculateResult() {
+
+        function calculateI4() {
+          let [val1, val2, val3] = prepareUnit("i1", "i2", "i3");
+
+          let result = val1 / (val2 * val3);
+
+          return {
+            1: { result, type: "i4" },
+          };
+        }
+        return calculateI4()
+      }
+
+      function handleResultsChange(e) {
+        let select = e.target;
+        let id = select.getAttribute("data-id");
+        let span = document.getElementById(`${id}-span`);
+
+        let prevUnit = select.getAttribute("data-prev");
+        let currentUnit = select.value;
+        select.setAttribute("data-prev", currentUnit);
+
+        if (span.textContent === "") {
+          return;
+        }
+
+        let type = select.getAttribute("data-type");
+
+        let value = parseFloat(span.textContent);
+        value = parseFloat(value);
+        if (isNaN(value)) value = 0.0;
+
+        let si = toSIUnit(type, prevUnit, value);
+        let result = fromSIUnit(type, currentUnit, si);
+        span.textContent = customPercision(result, 13);
+      }
+
+      function calculateResults() {
+        if (presetSelect.value == 'custom') {
+          for (el of ["i1", "i2", "i3"]) {
+            if (!validateInput(el)) return;
+          }
+        }      
+
+        try {
+          const resultElement = createElement()
+          calcResultsEl.innerHTML = resultElement
+
+          const newSelects = document.querySelectorAll(".selectsResult");
+
+          newSelects.forEach((select) => {
+            select.addEventListener("change", handleResultsChange);
+          });
+          
+          if (presetSelect.value == 'custom') {
+            const result = calculateResult();
+            setResult(result)
+          }
+        } catch(error) {
+          alert("An error ocurred. Try again with valid input.");
+          resetResult()
+          return;
+        }
+      }
+
+      function handleCustomMedium(e) {
+        if (e.target.id == 'i3-input') {
+          presetSelect.selectedIndex = "0"
+        }
+      }
+
+      function resetForm() {
+        selects.forEach((select, index) => {
+          if (index == 0) {
+            select.selectedIndex = '7'
+          } else {
+            select.selectedIndex = '4'
+          }
+          
+        });
+
+        inputs.forEach((input) => {
+          input.value = "1"
+        });
+      }
+
+      function resetResult() {
+        calcResultsEl.innerHTML = "<p>Result will appear here...</p>";
+      } 
+
+      function resethandler() {
+        resetForm();
+        resetResult();
+      }
+
+      /*************** EVENT LISTINERS ***************/
+      presetSelect.addEventListener("change", presetHandler);
+      selects.forEach((select) => {
+        select.addEventListener("change", resetResult);
+      });
+      inputs.forEach((input) => {
+        input.addEventListener("input", resetResult);
+      });
+
+      inputs.forEach((input) => {
+        input.addEventListener("input", handleCustomMedium);
+      });
+
+      resetBtnEl.addEventListener("click", resethandler);
+      calcBtnEl.addEventListener("click", calculateResults);
+
+    </script>
+  </body>
+</html>

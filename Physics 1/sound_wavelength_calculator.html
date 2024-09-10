@@ -3,13 +3,31 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Engine Displacement Calculator</title>
+    <title>Sound Wavelength Calculator</title>
   </head>
   <body>
-    <h1>Engine Displacement Calculator</h1>
+    <h1>Sound Wavelength Calculator</h1>
+      <p>
+        <label for="P-select"> Wave velocity of</label>
+        <select id="P-select" data-flag="false">
+          <option value="343">Air (20 oc/68 OF)</option>
+          <option value="1007">Helium (20 oc/68 OF)</option>
+          <option value="1270">Hydrogen (20 oc/68 OF)</option>
+          <option value="1403">Water (0 oc/32 'F)</option>
+          <option value="1481">Water (20 oc/68 OF)</option>
+          <option value="1543">Water (100 oc/212 OF)</option>
+          <option value="4540">Glass</option>
+          <option value="4150">Wood (average)</option>
+          <option value="60">Rubber</option>
+          <option value="6420">Aluminum</option>
+          <option value="1960">Lead</option>
+          <option value="5940">Steel</option>
+          <option value="custom" disabled>Custom</option>
+        </select>
+      </p>
       <div>
         <p>
-          <label for="i1-input">Number of cylinders </label>
+          <label for="i1-input">Speed of sound (v)</label>
           <input
             type="number"
             min="0"
@@ -18,23 +36,27 @@
             step="any"
             id="i1-input"
             class="inputs"
-            data-name="Number of cylinders"
+            data-name="Speed of sound"
+            value="343"
           />
-
           <select
             class="selects"
             id="i1-select"
-            data-type="unit"
-            data-prev="unit"
+            data-type="speed"
+            data-prev="m/s"
             data-id="i1"
-            style="display: none"
           >
-            <option value="unit">unit</option>
+            <option value="m/s" selected>meters per second (m/s)</option>
+            <option value="km/h">kilometers per hour (km/h)</option>
+            <option value="ft/s">feet per second (ft/s)</option>
+            <option value="mph">miles per hour (mph)</option>
+            <option value="kn">knots (kn)</option>
+            <option value="ft/min">feet per minute (ft/min)</option>
           </select>
         </p>
 
         <p>
-          <label for="i2-input">Bore diameter </label>
+          <label for="i2-input">Frequency (𝑓)</label>
           <input
             type="number"
             min="0"
@@ -43,50 +65,22 @@
             step="any"
             id="i2-input"
             class="inputs"
-            data-name="Bore diameter"
+            data-name="Frequency"
           />
+
           <select
             class="selects"
             id="i2-select"
-            data-type="distance"
-            data-prev="cm"
+            data-type="frequency"
+            data-prev="Hz"
             data-id="i2"
           >
-            <option value="mm">millimeters (mm)</option>
-            <option value="cm" selected>centimeters (cm)</option>
-            <option value="m">meters (m)</option>
-            <option value="in">inches (in)</option>
-            <option value="ft">feet (ft)</option>
+            <option value="Hz" selected>hertz (Hz)</option>
+            <option value="kHz">kilohertz (kHz)</option>
+            <option value="MHz">megahertz (MHz)</option>
+            <option value="GHz">gigahertz (GHz)</option>
           </select>
         </p>
-
-        <p>
-          <label for="i3-input">Stroke length </label>
-          <input
-            type="number"
-            min="0"
-            autocomplete="off"
-            data-id="i3"
-            step="any"
-            class="inputs"
-            id="i3-input"
-            data-name="Stroke length"
-          />
-          <select
-            class="selects"
-            id="i3-select"
-            data-type="distance"
-            data-prev="cm"
-            data-id="i3"
-          >
-            <option value="mm">millimeters (mm)</option>
-            <option value="cm" selected>centimeters (cm)</option>
-            <option value="m">meters (m)</option>
-            <option value="in">inches (in)</option>
-            <option value="ft">feet (ft)</option>
-          </select>
-        </p>
-
       </div>
 
       <button id="calcBtn">Calculate</button>
@@ -100,6 +94,8 @@
       /*************** ELEMENTS ***************/
       const selects = document.querySelectorAll(".selects");
       const inputs = document.querySelectorAll(".inputs");
+    
+      const presetSelect = document.getElementById("P-select");
 
       const calcBtnEl = document.getElementById('calcBtn');
       const resetBtnEl = document.getElementById('resetBtn');
@@ -107,27 +103,33 @@
 
       /*************** GLOBAL VARIBLES ***************/
       const UNITS = {
+        speed: {
+          "m/s": 1,
+          "km/h": 3.5999999999999996,
+          "ft/s": 3.280839895013123,
+          mph: 2.236936292054402,
+          kn: 1.9438444924406046,
+          "ft/min": 196.85039370078738,
+        },
         distance: {
           mm: 1e3,
           cm: 1e2,
           m: 1,
+          km: 1e-3,
           in: 39.370078740157474,
           ft: 3.2808398950131235,
-        },
-        volume: {
-          "mm³": 1e9,
-          "cm³": 1e6,
-          "m³": 1,
-          "in³": 61023.7440947322916,
-          l: 1e3,
-          "US gal": 264.1720523581484,
+          yd: 1.0936132983377078,
+          mi: 0.000621371192237334,
         },
 
-        unit: {
-          unit: 1,
+        frequency: {
+          Hz: 1,
+          kHz: 1e-3,
+          MHz: 1e-6,
+          GHz: 1e-9,
         },
       };
-      let queue = ["i1", "i2", "i3", "i4"];
+      const queue = ["i1", "i2", "i3"];
       /*************** FUNCTIONS ***************/
       function toSIUnit(type, unit, value) {
         if (type === "exp") {
@@ -145,69 +147,38 @@
         return value * UNITS[type][unit];
       }
 
-      function customPercision(ans, to = 8) {
-        return parseFloat(parseFloat(ans).toPrecision(to));
-      }
-
       function createElement() {
         const newDiv = `
           <div>
             <p>
-              <label for="i4-span"> Engine displacement: &nbsp; </label>
+              <label for="i3-span">Wavelength (λ): &nbsp; </label>
               <span
-                type="number"
-                min="0"
-                autocomplete="off"
-                data-id="i4"
+                data-id="i3"
                 step="any"
                 class="spans"
-                id="i4-span"
-                data-name="Engine displacement"
+                id="i3-span"
+                data-name="Wavelength"
               ></span>
               <select
                 class="selectsResult"
-                id="i4-select"
-                data-type="volume"
-                data-prev="cm³"
-                data-id="i4"
+                id="i3-select"
+                data-type="distance"
+                data-prev="m"
+                data-id="i3"
               >
-                <option value="mm³">cubic millimeters (mm³)</option>
-                <option value="cm³">cubic centimeters (cm³)</option>
-                <option value="m³">cubic meters (m³)</option>
-                <option value="in³">cubic inches (in³)</option>
-                <option value="l">liters (l)</option>
-                <option value="US gal">gallons (US) (US gal)</option>
-                <option value="cm³" selected>cubic centimeters (cc)</option>
+                <option value="mm">millimeters (mm)</option>
+                <option value="cm">centimeters (cm)</option>
+                <option value="m" selected>meters (m)</option>
+                <option value="km">kilometers (km)</option>
+                <option value="in">inches (in)</option>
+                <option value="ft">feet (ft)</option>
+                <option value="yd">yard (yd)</option>
+                <option value="mi">mile (mi)</option>
               </select>
             </p>
           </div>
         `
         return newDiv
-      }
-
-
-      function handleResultsChange(e) {
-        let select = e.target;
-        let id = select.getAttribute("data-id");
-        let span = document.getElementById(`${id}-span`);
-
-        let prevUnit = select.getAttribute("data-prev");
-        let currentUnit = select.value;
-        select.setAttribute("data-prev", currentUnit);
-
-        if (span.textContent === "") {
-          return;
-        }
-
-        let type = select.getAttribute("data-type");
-
-        let value = parseFloat(span.textContent);
-        value = parseFloat(value);
-        if (isNaN(value)) value = 0.0;
-
-        let si = toSIUnit(type, prevUnit, value);
-        let result = fromSIUnit(type, currentUnit, si);
-        span.textContent = customPercision(result, 13);
       }
 
       function validateInput(id) {
@@ -222,7 +193,7 @@
 
         return true;
       }
-      
+
       // related to caculation
       function prepareUnit(...args) {
         const resultArr = [];
@@ -261,27 +232,49 @@
           let outUnit = select.value;
           val = fromSIUnit(type, outUnit, val);
 
-          span.textContent = customPercision(val, 16);
+          span.textContent = parseFloat(val);
         }
       }
 
-      function calculateResult(out) {
-        const C = 4 * Math.PI * 10e-6;
+      function calculateResult() {
 
-        function calculateI4() {
-          let [val1, val2, val3] = prepareUnit("i1", "i2", "i3");
+        function calculateI3() {
+          let [val1, val2] = prepareUnit("i1", "i2");
 
-          let result = (val1 * val3 * Math.PI * val2 * val2 * 1) / 4;
-
+          let result = val1 / val2;
           return {
-            1: { result, type: "i4" },
+            1: { result, type: "i3" },
           };
         }
-        return calculateI4()
+        return calculateI3()
+      }
+
+      function handleResultsChange(e) {
+        let select = e.target;
+        let id = select.getAttribute("data-id");
+        let span = document.getElementById(`${id}-span`);
+
+        let prevUnit = select.getAttribute("data-prev");
+        let currentUnit = select.value;
+        select.setAttribute("data-prev", currentUnit);
+
+        if (span.textContent === "") {
+          return;
+        }
+
+        let type = select.getAttribute("data-type");
+
+        let value = parseFloat(span.textContent);
+        value = parseFloat(value);
+        if (isNaN(value)) value = 0.0;
+
+        let si = toSIUnit(type, prevUnit, value);
+        let result = fromSIUnit(type, currentUnit, si);
+        span.textContent = parseFloat(result);
       }
 
       function calculateResults() {
-        for (el of ["i1", "i2", "i3"]) {
+        for (el of ["i1", "i2"]) {
           if (!validateInput(el)) return;
         }
 
@@ -305,18 +298,30 @@
         }
       }
 
+      function presetHandler() {
+        const value = presetSelect.value;
+        const input = document.getElementById("i1-input");
+        const select = document.getElementById("i1-select");
+        let unit = select.value;
+
+        let val = fromSIUnit("speed", unit, parseFloat(value));
+
+        input.value = val;
+
+        presetSelect.setAttribute("data-flag", "false");
+        resetResult()
+      }
+
       function resetForm() {
+        presetSelect.selectedIndex = '0'
         selects.forEach((select, index) => {
-          if (index > 0) {
-            select.selectedIndex = '1'
-          } else {
-            select.selectedIndex = '0'
-          }
+          select.selectedIndex = '0'
         });
 
         inputs.forEach((input) => {
           input.value = ""
         });
+        presetHandler()  
       }
 
       function resetResult() {
@@ -328,11 +333,22 @@
         resetResult();
       }
 
+      function windowLoadHandler() {
+        presetHandler();
+        // set select data-prev
+        selects.forEach((select) => {
+          let value = select.value;
+          select.setAttribute("data-prev", value);
+        });
+      }
+
+
       /*************** EVENT LISTINERS ***************/
+      window.addEventListener("load", windowLoadHandler);
+      presetSelect.addEventListener("change", presetHandler);
       selects.forEach((select) => {
         select.addEventListener("change", resetResult);
       });
-
       inputs.forEach((input) => {
         input.addEventListener("input", resetResult);
       });

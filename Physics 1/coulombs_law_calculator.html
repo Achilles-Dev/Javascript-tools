@@ -511,9 +511,11 @@
             select.selectedIndex = '9'
           } else if (index == 5) {
             select.selectedIndex = '2'
-          } else  {
+          } else if (index < 2) {
             select.selectedIndex = '1'
-          }   
+          } else {
+            select.selectedIndex = '0'
+          }
         });
         inputs.forEach((input) => {
           input.value = ""

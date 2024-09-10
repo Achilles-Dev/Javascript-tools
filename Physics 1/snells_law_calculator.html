@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Snell's Law Calculator</title>
+  </head>
+  <body>
+    <h1>Snell's Law Calculator</h1>
+      <p>
+        <label for="m1-select"> Medium 1 </label>
+        <select id="m1-select" data-flag="false">
+          <option value="1" selected>Vacuum</option>
+          <option value="1.000293">Air</option>
+          <option value="1.333">Water at 20°C 🌊</option>
+          <option value="1.36">Ethanol</option>
+          <option value="1.31">Ice 🧊</option>
+          <option value="1.49">Acrylic</option>
+          <option value="1.52">Window glass</option>
+          <option value="2.419">Diamond 💎</option>
+          <option value="custom" disabled>Custom</option>
+        </select>
+      </p>
+
+      <p>
+        <label for="i1-input">Refractive index 1 (n₁)</label>
+        <input
+          type="number"
+          autocomplete="off"
+          data-id="i1"
+          data-name="Speed"
+          step="any"
+          id="i1-input"
+          class="inputs"
+        />
+        <select
+          class="selects"
+          id="i1-select"
+          data-type="unit"
+          data-prev="unit"
+          data-id="i1"
+          style="display: none"
+        >
+          <option value="unit" selected disabled>unit</option>
+        </select>
+      </p>
+
+      <p>
+        <label for="m2-select"> Medium 2 </label>
+        <select id="m2-select" data-flag="false">
+          <option value="1">Vacuum</option>
+          <option value="1.000293" selected>Air</option>
+          <option value="1.333">Water at 20°C 🌊</option>
+          <option value="1.36">Ethanol</option>
+          <option value="1.31">Ice 🧊</option>
+          <option value="1.49">Acrylic</option>
+          <option value="1.52">Window glass</option>
+          <option value="2.419">Diamond 💎</option>
+          <option value="custom" disabled>Custom</option>
+        </select>
+      </p>
+
+      <p>
+        <label for="i2-input">Refractive index 2 (n₂)</label>
+        <input
+          type="number"
+          autocomplete="off"
+          data-id="i2"
+          data-name="Refractive index"
+          step="any"
+          id="i2-input"
+          class="inputs"
+        />
+        <select
+          class="selects"
+          id="i2-select"
+          data-type="unit"
+          data-prev="unit"
+          data-id="i2"
+          style="display: none"
+        >
+          <option value="unit" selected disabled>unit</option>
+        </select>
+      </p>
+
+      <p>
+        <label for="i3-input">Angle of incidence (θ₁) </label>
+        <input
+          type="number"
+          min="0"
+          autocomplete="off"
+          data-id="i3"
+          step="any"
+          id="i3-input"
+          class="inputs"
+          data-name="Angle of incidence"
+        />
+
+        <select
+          class="selects"
+          id="i3-select"
+          data-type="angle"
+          data-prev="deg"
+          data-id="i3"
+        >
+          <option value="deg" selected>degrees (deg)</option>
+          <option value="rad">radians (rad)</option>
+          <option value="gon">gradians (gon)</option>
+          <option value="tr">turns (tr)</option>
+          <option value="arcmin">minutes of arc (arcmin)</option>
+          <option value="arcsec">seconds of arc (arcsec)</option>
+          <option value="mrad">milliradians (mrad)</option>
+          <option value="μrad">microradians (μrad)</option>
+          <option value="πrad">radians (× π rad)</option>
+        </select>
+      </p>
+
+      <button id="calcBtn">Calculate</button>
+      <button id="resetBtn">Reset</button>
+      <hr>
+      <div>
+        <h3>Result:</h3>
+        <h3 id="calcResults">Result will appear here...</h3>
+      </div>
+    <script>
+      /*************** ELEMENTS ***************/
+      const selects = document.querySelectorAll(".selects");
+      const inputs = document.querySelectorAll(".inputs");
+
+      const medium1Select = document.getElementById("m1-select");
+      const medium2Select = document.getElementById("m2-select");
+
+      const calcBtnEl = document.getElementById('calcBtn');
+      const resetBtnEl = document.getElementById('resetBtn');
+      const calcResultsEl = document.getElementById('calcResults')
+
+      /*************** GLOBAL VARIBLES ***************/
+
+      const UNITS = {
+        angle: {
+          deg: 57.29577951308232,
+          rad: 1,
+          gon: 63.66197723675813,
+          tr: 0.15915494309189535,
+          arcmin: 3437.746770784939,
+          arcsec: 206264.80624709636,
+          mrad: 1000,
+          μrad: 1e6,
+          πrad: 0.3183098861837907,
+        },
+        unit: {
+          unit: 1,
+        },
+      };
+
+      /*************** FUNCTIONS ***************/
+
+      function toSIUnit(type, unit, value) {
+        if (type === "exp") {
+          unit = parseFloat("1e" + unit);
+          return value * unit;
+        }
+        return value / UNITS[type][unit];
+      }
+
+      function fromSIUnit(type, unit, value) {
+        if (type === "exp") {
+          unit = parseFloat("1e" + unit);
+          return value / unit;
+        }
+        return value * UNITS[type][unit];
+      }
+
+      function createElement() {
+        const newDiv = `
+          <div>
+            <p>
+              <label for="i4-span">Angle of incidence (θ₂): &nbsp; </label>
+              <span
+                data-id="i4"
+                step="any"
+                id="i4-span"
+                class="spans"
+                data-name="Angle of incidence"
+              ></span>
+
+              <select
+                class="selectsResult"
+                id="i4-select"
+                data-type="angle"
+                data-prev="deg"
+                data-id="i4"
+              >
+                <option value="deg" selected>degrees (deg)</option>
+                <option value="rad">radians (rad)</option>
+                <option value="gon">gradians (gon)</option>
+                <option value="tr">turns (tr)</option>
+                <option value="arcmin">minutes of arc (arcmin)</option>
+                <option value="arcsec">seconds of arc (arcsec)</option>
+                <option value="mrad">milliradians (mrad)</option>
+                <option value="μrad">microradians (μrad)</option>
+                <option value="πrad">radians (× π rad)</option>
+              </select>
+            </p>
+          </div>
+        `
+        return newDiv
+      }
+
+      function customPercision(ans, to = 8) {
+        return parseFloat(parseFloat(ans).toPrecision(to));
+      }
+
+      function degreesToRadians(degrees) {
+        return degrees * (Math.PI / 180);
+      }
+
+      function radiansToDegrees(radians) {
+        return radians * (180 / Math.PI);
+      }
+
+      function m1SelectHandler() {
+        let value = medium1Select.value;
+        if (value === "custom") return;
+        value = parseFloat(value);
+
+        const input1 = document.getElementById("i1-input");
+        input1.value = value;
+        medium1Select.setAttribute("data-flag", "false");
+        resetResult()
+      }
+
+      function m2SelectHandler() {
+        let value = medium2Select.value;
+        if (value === "custom") return;
+        value = parseFloat(value);
+
+        const input2 = document.getElementById("i2-input");
+        input2.value = value;
+
+        medium2Select.setAttribute("data-flag", "false");
+        resetResult()
+      }
+
+      function calculateResult() {
+    
+        function calculateI4() {
+          let [val1, val2, val3] = prepareUnit("i1", "i2", "i3");
+
+          let result = Math.asin((val1 * Math.sin(val3)) / val2);
+
+          return {
+            1: { result, type: "i4" },
+          };
+        }
+        return calculateI4()
+      }
+
+      function validateInput(id) {
+        const input = document.getElementById(`${id}-input`);
+        const label = input.getAttribute("data-name").trim();
+        let value = parseFloat(input.value);
+
+        if (isNaN(value)) {
+          alert(`${label} is empty!`);
+          return false;
+        }
+
+        return true;
+      }
+
+      function prepareUnit(...args) {
+        const resultArr = [];
+        for (id of args) {
+          const input = document.getElementById(`${id}-input`);
+          const select = document.getElementById(`${id}-select`);
+          const type = select.getAttribute("data-type");
+          let val = parseFloat(input.value);
+          val = isNaN(val) ? 0 : val;
+          let inUnit = select.value;
+          val = toSIUnit(type, inUnit, val);
+          resultArr.push(val);
+        }
+
+        return resultArr;
+      }
+
+      function setResult(resultObj) {
+        for (key of Object.keys(resultObj)) {
+          let val = resultObj[key].result;
+          let id = resultObj[key].type;
+          if (isNaN(val)) {
+            alert("Your input resulted in NAN.\n 0/0 \n Try again with valid input.");
+            return;
+          }
+          if (Math.abs(val) === Infinity) {
+            alert(
+              "Your input resulted in Infinity. \nDivision by zero. \nTry again with valid input."
+            );
+            return;
+          }
+
+          const span = document.getElementById(`${id}-span`);
+          const select = document.getElementById(`${id}-select`);
+          const type = select.getAttribute("data-type");
+          let outUnit = select.value;
+          val = fromSIUnit(type, outUnit, val);
+          span.textContent = customPercision(val, 16);
+        }
+      }
+
+      function handleResultsChange(e) {
+        let select = e.target;
+        let id = select.getAttribute("data-id");
+        let span = document.getElementById(`${id}-span`);
+
+        let prevUnit = select.getAttribute("data-prev");
+        let currentUnit = select.value;
+        select.setAttribute("data-prev", currentUnit);
+
+        if (span.textContent === "") {
+          return;
+        }
+
+        let type = select.getAttribute("data-type");
+
+        let value = parseFloat(span.textContent);
+        value = parseFloat(value);
+        if (isNaN(value)) value = 0.0;
+
+        let si = toSIUnit(type, prevUnit, value);
+        let result = fromSIUnit(type, currentUnit, si);
+        span.textContent = customPercision(result, 10);
+      }
+
+      function calculateResults() {
+        for (el of ["i1", "i2", "i3"]) {
+          if (!validateInput(el)) return;
+        }
+
+        try {
+          const resultElement = createElement()
+          calcResultsEl.innerHTML = resultElement
+
+          const newSelects = document.querySelectorAll(".selectsResult");
+
+          newSelects.forEach((select) => {
+            select.addEventListener("change", handleResultsChange);
+          });
+          
+          const result = calculateResult();
+          setResult(result)
+
+        } catch(error) {
+          alert("An error ocurred. Try again with valid input.");
+          resetResult()
+          return;
+        }
+      }
+
+      function handleCustomMedium(e) {
+        if (e.target.id == 'i1-input') {
+          medium1Select.selectedIndex = "8"
+        } else if (e.target.id == 'i2-input') {        
+          medium2Select.selectedIndex = "8"
+        }
+      }
+
+      function windowLoadHandler() {
+        m1SelectHandler();
+        m2SelectHandler();
+      }
+
+      function resetForm() {
+        selects.forEach((select, index) => {
+          select.selectedIndex = '0'
+        });
+
+        inputs.forEach((input) => {
+          input.value = ""
+        });
+        m1SelectHandler();
+        m2SelectHandler();
+      }
+
+      function resetResult() {
+        calcResultsEl.innerHTML = "<p>Result will appear here...</p>";
+      } 
+
+      function resethandler() {
+        resetForm();
+        resetResult();
+      }
+
+
+      /*************** EVENT LISTINERS ***************/
+      window.addEventListener("load", windowLoadHandler);
+      selects.forEach((select) => {
+        select.addEventListener("change", resetResult);
+      });
+
+      inputs.forEach((input) => {
+        input.addEventListener("input", resetResult);
+      });
+
+      inputs.forEach((input) => {
+        input.addEventListener("input", handleCustomMedium);
+      });
+
+      medium1Select.addEventListener("change", m1SelectHandler);
+      medium2Select.addEventListener("change", m2SelectHandler);
+
+      resetBtnEl.addEventListener("click", resethandler);
+      calcBtnEl.addEventListener("click", calculateResults);
+
+    </script>
+  </body>
+</html>

@@ -3,13 +3,13 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Engine Displacement Calculator</title>
+    <title>Light Year Calculator</title>
   </head>
   <body>
-    <h1>Engine Displacement Calculator</h1>
+    <h1>Light Year Calculator</h1>
       <div>
         <p>
-          <label for="i1-input">Number of cylinders </label>
+          <label for="i1-input">Speed of light </label>
           <input
             type="number"
             min="0"
@@ -18,23 +18,28 @@
             step="any"
             id="i1-input"
             class="inputs"
-            data-name="Number of cylinders"
+            data-name="Speed"
+            value="299792458"
           />
-
           <select
             class="selects"
             id="i1-select"
-            data-type="unit"
-            data-prev="unit"
+            data-type="speed"
+            data-prev="m/s"
             data-id="i1"
-            style="display: none"
           >
-            <option value="unit">unit</option>
+            <option value="m/s" selected>meters per second (m/s)</option>
+            <option value="km/h">kilometers per hour (km/h)</option>
+            <option value="ft/s">feet per second (ft/s)</option>
+            <option value="mph">miles per hour (mph)</option>
+            <option value="km/s">kilometers per second (km/s)</option>
+            <option value="mi/s">miles per second (mi/s)</option>
+            <option value="ft/min">feet per minute (ft/min)</option>
           </select>
         </p>
 
         <p>
-          <label for="i2-input">Bore diameter </label>
+          <label for="i2-input">Time </label>
           <input
             type="number"
             min="0"
@@ -43,50 +48,28 @@
             step="any"
             id="i2-input"
             class="inputs"
-            data-name="Bore diameter"
+            data-name="Time"
           />
+
           <select
             class="selects"
             id="i2-select"
-            data-type="distance"
-            data-prev="cm"
+            data-type="time"
+            data-prev="yrs"
             data-id="i2"
           >
-            <option value="mm">millimeters (mm)</option>
-            <option value="cm" selected>centimeters (cm)</option>
-            <option value="m">meters (m)</option>
-            <option value="in">inches (in)</option>
-            <option value="ft">feet (ft)</option>
+            <option value="sec">seconds (sec)</option>
+            <option value="min">minutes (min)</option>
+            <option value="hrs">hour (hrs)</option>
+            <option value="days">days (days)</option>
+            <option value="wks">weeks (wks)</option>
+            <option value="mos">months (mos)</option>
+            <option value="yrs" selected>years (yrs)</option>
+            <option value="myrs">million years (myrs)</option>
+            <option value="byrs">billion years (byrs)</option>
+            <option value="Univ.">ages of the Universe (Univ.)</option>
           </select>
         </p>
-
-        <p>
-          <label for="i3-input">Stroke length </label>
-          <input
-            type="number"
-            min="0"
-            autocomplete="off"
-            data-id="i3"
-            step="any"
-            class="inputs"
-            id="i3-input"
-            data-name="Stroke length"
-          />
-          <select
-            class="selects"
-            id="i3-select"
-            data-type="distance"
-            data-prev="cm"
-            data-id="i3"
-          >
-            <option value="mm">millimeters (mm)</option>
-            <option value="cm" selected>centimeters (cm)</option>
-            <option value="m">meters (m)</option>
-            <option value="in">inches (in)</option>
-            <option value="ft">feet (ft)</option>
-          </select>
-        </p>
-
       </div>
 
       <button id="calcBtn">Calculate</button>
@@ -107,27 +90,46 @@
 
       /*************** GLOBAL VARIBLES ***************/
       const UNITS = {
+        speed: {
+          "m/s": 1,
+          "km/h": 3.6,
+          "ft/s": 3.2808398950131235,
+          mph: 2.2369362920544025,
+          "km/s": 0.001,
+          "mi/s": 0.0006213711922373339,
+          "ft/min": 196.8503937007874,
+        },
         distance: {
           mm: 1e3,
           cm: 1e2,
           m: 1,
-          in: 39.370078740157474,
-          ft: 3.2808398950131235,
+          km: 1e-3,
+          in: 39.37007874015748,
+          ft: 3.280839895013123,
+          yd: 1.0936132983377078,
+          mi: 0.0006213711922373339,
+          nmi: 0.0005399568034557236,
+          "R⊕": 1.5696123057604772e-7,
+          "R☉": 1.4374011786689664e-9,
+          ly: 1.0570042385869968e-16,
+          au: 6.684587122268446e-12,
+          pcs: 3.2407557442395566e-17,
+          Mly: 1.0570042385869967e-22,
+          Mpcs: 3.2407557442395566e-23,
         },
-        volume: {
-          "mm³": 1e9,
-          "cm³": 1e6,
-          "m³": 1,
-          "in³": 61023.7440947322916,
-          l: 1e3,
-          "US gal": 264.1720523581484,
-        },
-
-        unit: {
-          unit: 1,
+        time: {
+          sec: 1,
+          min: 0.016666666666666666,
+          hrs: 0.0002777777777777778,
+          days: 0.000011574074074074075,
+          wks: 0.0000016534391534391535,
+          mos: 3.8025705376834745e-7,
+          yrs: 3.1688087814028954e-8,
+          myrs: 3.168808781402895e-14,
+          byrs: 3.168808781402895e-17,
+          "Univ.": 2.2964046535277158e-18,
         },
       };
-      let queue = ["i1", "i2", "i3", "i4"];
       /*************** FUNCTIONS ***************/
       function toSIUnit(type, unit, value) {
         if (type === "exp") {
@@ -145,39 +147,40 @@
         return value * UNITS[type][unit];
       }
 
-      function customPercision(ans, to = 8) {
-        return parseFloat(parseFloat(ans).toPrecision(to));
-      }
-
       function createElement() {
         const newDiv = `
           <div>
             <p>
-              <label for="i4-span"> Engine displacement: &nbsp; </label>
+              <label for="i3-span">Distance: &nbsp; </label>
               <span
-                type="number"
-                min="0"
-                autocomplete="off"
-                data-id="i4"
-                step="any"
                 class="spans"
-                id="i4-span"
-                data-name="Engine displacement"
+                id="i3-span"
+                data-name="Distance"
               ></span>
               <select
                 class="selectsResult"
-                id="i4-select"
-                data-type="volume"
-                data-prev="cm³"
-                data-id="i4"
+                id="i3-select"
+                data-type="distance"
+                data-prev="m"
+                data-id="i3"
               >
-                <option value="mm³">cubic millimeters (mm³)</option>
-                <option value="cm³">cubic centimeters (cm³)</option>
-                <option value="m³">cubic meters (m³)</option>
-                <option value="in³">cubic inches (in³)</option>
-                <option value="l">liters (l)</option>
-                <option value="US gal">gallons (US) (US gal)</option>
-                <option value="cm³" selected>cubic centimeters (cc)</option>
+                <
+                <option value="mm">millimeters (mm)</option>
+                <option value="cm">centimeters (cm)</option>
+                <option value="m" selected>meters (m)</option>
+                <option value="km">kilometers (km)</option>
+                <option value="in">inches (in)</option>
+                <option value="ft">feet (ft)</option>
+                <option value="yd">yards (yd)</option>
+                <option value="mi">miles (mi)</option>
+                <option value="nmi">nautical miles (nmi)</option>
+                <option value="R⊕">Earth radii (R⊕)</option>
+                <option value="R☉">Sun radii (R☉)</option>
+                <option value="ly">light years (ly)</option>
+                <option value="au">astronomical unit (au)</option>
+                <option value="pcs">parsecs (pcs)</option>
+                <option value="Mly">mega light years (Mly)</option>
+                <option value="Mpcs">mega parsecs (Mpcs)</option>
               </select>
             </p>
           </div>
@@ -186,28 +189,8 @@
       }
 
 
-      function handleResultsChange(e) {
-        let select = e.target;
-        let id = select.getAttribute("data-id");
-        let span = document.getElementById(`${id}-span`);
-
-        let prevUnit = select.getAttribute("data-prev");
-        let currentUnit = select.value;
-        select.setAttribute("data-prev", currentUnit);
-
-        if (span.textContent === "") {
-          return;
-        }
-
-        let type = select.getAttribute("data-type");
-
-        let value = parseFloat(span.textContent);
-        value = parseFloat(value);
-        if (isNaN(value)) value = 0.0;
-
-        let si = toSIUnit(type, prevUnit, value);
-        let result = fromSIUnit(type, currentUnit, si);
-        span.textContent = customPercision(result, 13);
+      function customPercision(ans, to = 12) {
+        return parseFloat(ans.toPrecision(to));
       }
 
       function validateInput(id) {
@@ -215,14 +198,25 @@
         const label = input.getAttribute("data-name").trim();
         let value = parseFloat(input.value);
 
-        if (value <= 0 || isNaN(value)) {
+        if (id === "i1") {
+          const select = document.getElementById(`${id}-select`);
+          const type = select.getAttribute("data-type");
+          let inUnit = select.value;
+          val = toSIUnit(type, inUnit, value);
+          if (val > 299792458) {
+            alert(`299,792,458 m/s is the maximum light speed in vacuum!`);
+            return false;
+          }
+        }
+
+        if (value <= 0) {
           alert(`${label} must be greater than zero!`);
           return false;
         }
 
         return true;
       }
-      
+
       // related to caculation
       function prepareUnit(...args) {
         const resultArr = [];
@@ -261,27 +255,48 @@
           let outUnit = select.value;
           val = fromSIUnit(type, outUnit, val);
 
-          span.textContent = customPercision(val, 16);
+          span.textContent = customPercision(val);
         }
       }
 
-      function calculateResult(out) {
-        const C = 4 * Math.PI * 10e-6;
+      function calculateResult() {
+        function calculateI3() {
+          let [val1, val2] = prepareUnit("i1", "i2");
 
-        function calculateI4() {
-          let [val1, val2, val3] = prepareUnit("i1", "i2", "i3");
-
-          let result = (val1 * val3 * Math.PI * val2 * val2 * 1) / 4;
-
+          let result = val1 * val2;
           return {
-            1: { result, type: "i4" },
+            1: { result, type: "i3" },
           };
         }
-        return calculateI4()
+        return calculateI3()
+      }
+
+      function handleResultsChange(e) {
+        let select = e.target;
+        let id = select.getAttribute("data-id");
+        let span = document.getElementById(`${id}-span`);
+
+        let prevUnit = select.getAttribute("data-prev");
+        let currentUnit = select.value;
+        select.setAttribute("data-prev", currentUnit);
+
+        if (span.textContent === "") {
+          return;
+        }
+
+        let type = select.getAttribute("data-type");
+
+        let value = parseFloat(span.textContent);
+        value = parseFloat(value);
+        if (isNaN(value)) value = 0.0;
+
+        let si = toSIUnit(type, prevUnit, value);
+        let result = fromSIUnit(type, currentUnit, si);
+        span.textContent = customPercision(result)
       }
 
       function calculateResults() {
-        for (el of ["i1", "i2", "i3"]) {
+        for (el of ["i1", "i2"]) {
           if (!validateInput(el)) return;
         }
 
@@ -305,17 +320,22 @@
         }
       }
 
+
       function resetForm() {
         selects.forEach((select, index) => {
-          if (index > 0) {
-            select.selectedIndex = '1'
+          if (index == 1) {
+            select.selectedIndex = '6'
           } else {
             select.selectedIndex = '0'
-          }
+          }         
         });
 
-        inputs.forEach((input) => {
-          input.value = ""
+        inputs.forEach((input, index) => {
+          if (index == 0) {
+            input.value = '299792458'
+          } else {
+            input.value = ""
+          }
         });
       }
 
@@ -329,10 +349,10 @@
       }
 
       /*************** EVENT LISTINERS ***************/
+
       selects.forEach((select) => {
         select.addEventListener("change", resetResult);
       });
-
       inputs.forEach((input) => {
         input.addEventListener("input", resetResult);
       });

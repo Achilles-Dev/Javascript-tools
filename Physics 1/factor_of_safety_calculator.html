@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Factor of Safety Calculator</title>
+  </head>
+  <body>
+    <h1>Factor of Safety Calculator</h1>
+      <p>
+        Calculate:
+        <select id="calculateUnit">
+          <option value="ms">Maximum strength</option>
+          <option value="dl">Design load </option>
+          <option value="fs" selected>Factor of Safety</option>
+        </select>
+      </p>
+      
+      <div>
+        <p id="ms-contianer" class="containers">
+          <label for="ms-input">Maximum strength</label>
+          <input
+            type="number"
+            step="any"
+            id="ms-input"
+            class="inputs"
+            min="0"
+          />
+          <select id="ms-select">
+            <option value="N" selected>newtons (N)</option>
+            <option value="kN">kilonewtons (kN)</option>
+            <option value="MN">meganewtons (MN)</option>
+            <option value="lbf">pounds-force (lbf)</option>
+            <option value="kip">kips (kip)</option>
+          </select>
+        </p>
+        <p id="dl-contianer" class="containers">
+          <label for="dl-input">Design load </label>
+          <input
+            type="number"
+            step="any"
+            id="dl-input"
+            class="inputs"
+            min="0"
+          />
+          <select id="dl-select">
+            <option value="N" selected>newtons (N)</option>
+            <option value="kN">kilonewtons (kN)</option>
+            <option value="MN">meganewtons (MN)</option>
+            <option value="lbf">pounds-force (lbf)</option>
+            <option value="kip">kips (kip)</option>
+          </select>
+        </p>
+        <p id="fs-contianer" class="containers" style="display: none;">
+          <label for="fs-input">Factor of Safety </label>
+          <input type="number" id="fs-input" step="any" class="inputs" />
+          <input id="fs-select" type="button" value="Units" />
+        </p>
+      </div>
+      
+      <button id="calcBtn">Calculate</button>
+      <button id="resetBtn">Reset</button>
+      <hr>
+      <div>
+        <h3>Result:</h3>
+        <h3 id="calcResults">Result will appear here...</h3>
+      </div>
+    <script>
+      /*************** ELEMENTS ***************/
+      const calculateUnitEl = document.getElementById("calculateUnit");
+      const containers = document.querySelectorAll(".containers");
+      const inputs = document.querySelectorAll(".inputs");
+
+      const msInput = document.getElementById("ms-input");
+      const dlInput = document.getElementById("dl-input");
+      const fsInput = document.getElementById("fs-input");
+
+      const msSelect = document.getElementById("ms-select");
+      const dlSelect = document.getElementById("dl-select");
+      const fsSelect = document.getElementById("fs-select");
+
+      const calcBtnEl = document.getElementById('calcBtn');
+      const resetBtnEl = document.getElementById('resetBtn');
+      const calcResultsEl = document.getElementById('calcResults')
+
+      /*************** GLOBAL VARIBLES ***************/
+      const UNITS = {
+        force: {
+          N: 1,
+          kN: 0.001,
+          MN: 0.000001,
+          lbf: 0.224809,
+          kip: 0.000225,
+        },
+        ratio: {
+          Units: 1,
+        },
+      };
+
+      /*************** FUNCTIONS ***************/
+      function toSIUnit(type, unit, value) {
+        return value / UNITS[type][unit];
+      }
+
+      function fromSIUnit(type, unit, value) {
+        return UNITS[type][unit] * value;
+      }
+
+      function createElements(resultObj) {
+        const elementNodes = Object.keys(resultObj).map((key) => {
+          //create elements to put the results in
+          const div = document.createElement("div");
+          const span = document.createElement("span");
+          const span2 = document.createElement("span");
+
+          // give the elements id
+          div.setAttribute("class", `result-container`);
+          span.setAttribute("class", `result-title`);
+          span2.setAttribute("class", `result-value`);
+
+          // put the values in the elements
+
+          span.textContent = resultObj[key]["title"];
+          span2.textContent = resultObj[key]["value"];
+
+          // appened them to an element that contians them
+          div.append(span, span2);
+
+          // return that element
+          return div;
+        });
+
+        return elementNodes;
+      }
+
+      function handleCalculateUnitChange(e) {
+        const value = e.target.value
+
+        containers.forEach((container) => {
+          let idVal = container.id.slice(0, 2)
+          if (idVal == value) {
+            container.style.display = 'none'
+          } else {
+            container.style.display = 'block'
+          }
+        })
+
+        resetResult()
+      }
+
+      function calculateResult(input) {
+        const calculateMS = () => {
+          const { dl, fs } = prepareUnits();
+          if (fs <= 1) {
+            alert(
+              "Your structure or its material would fail. Redesign its maximum strength to withstand the design load."
+            );
+          }
+          let result = dl * fs;
+          return {
+            result,
+            type: "force",
+            name: `Maximum strength`,
+          };
+        };
+        const calculateDL = () => {
+          const { fs, ms } = prepareUnits();
+
+          if (fs <= 1) {
+            alert(
+              "Your structure or its material would fail. Redesign its maximum strength to withstand the design load."
+            );
+          }
+          let result = ms / fs;
+          return {
+            result,
+            type: "force",
+            name: "Design load",
+          };
+        };
+        const calculateFS = () => {
+          const { dl, ms } = prepareUnits();
+          let result = ms / dl;
+          return {
+            result,
+            type: "ratio",
+            name: "Factor of Safety",
+          };
+        };
+
+        switch (input) {
+          case "ms":
+            return calculateMS();
+          case "dl":
+            return calculateDL();
+          case "fs":
+            return calculateFS();
+
+          default:
+            console.log("error in calculate result switch");
+        }
+      }
+
+      function prepareUnits() {
+        let ms = parseFloat(msInput.value) ?? 0;
+        let dl = parseFloat(dlInput.value) ?? 0;
+        let fs = parseFloat(fsInput.value) ?? 0;
+
+        let teUnit = msSelect.value;
+        let dpUnit = dlSelect.value;
+        let rhUnit = fsSelect.value;
+
+        ms = toSIUnit("force", teUnit, ms);
+        dl = toSIUnit("force", dpUnit, dl);
+        fs = toSIUnit("ratio", rhUnit, fs);
+
+        return { ms, dl, fs };
+      }
+
+      function prepareResults(result, type, name) {
+        let resultObj = {};
+        Object.keys(UNITS[type]).forEach((key) => {
+          let ans = fromSIUnit(type, key, result);
+          // ans =
+          //   ans > 1 || ans < -1
+          //     ? parseFloat(parseFloat(ans.toExponential(10)).toFixed(4))
+          //     : ans.toExponential(10);
+
+          resultObj[key] = {
+            title: `${name}: `,
+            value: ` ${ans} ${key}`,
+          };
+        });
+        return resultObj;
+      }
+
+      function calculateResults() {
+        const calculateUnit = calculateUnitEl.value
+        try {
+          const { result, type, name } = calculateResult(calculateUnit);
+
+          if (result <= 1 && type === "ratio") {
+            alert(
+              "Your structure or its material would fail. Redesign its maximum strength to withstand the design load."
+            );
+          }
+          if (isNaN(result)) {
+            alert("Your input resulted in NAN.\n 0/0 \n Try again with valid input.");
+            resetResult()
+            return;
+          }
+          if (Math.abs(result) === Infinity) {
+            alert(
+              "Your input resulted in Infinity. \nDivision by zero. \nTry again with valid input."
+            );
+            resetResult()
+            return;
+          }
+
+          const resultObj = prepareResults(result, type, name);
+          const elementNodes = createElements(resultObj);
+          calcResultsEl.innerHTML = "";
+
+          elementNodes.forEach((element) => {
+            calcResultsEl.append(element);
+          });
+        } catch (error) {
+          console.log(error);
+          alert("An error ocurred. Try again with valid input.");
+          resetResult()
+          return;
+        }
+      }
+
+      function resetForm() {
+        [msSelect, dlSelect, fsSelect].forEach((select) => {
+          select.selectedIndex = '0'
+        });
+        [msInput, dlInput, fsInput].forEach((input) => {
+          input.value = ""
+        });
+        calculateUnitEl.selectedIndex = '2';
+        containers.forEach((container) => {
+          let idVal = container.id.slice(0, 2)
+          if (idVal == 'fs') {
+            container.style.display = 'none'
+          } else {
+            container.style.display = 'block'
+          }
+        })
+
+      }
+
+      function resetResult() {
+        calcResultsEl.innerHTML = "<p>Result will appear here...</p>";
+      } 
+
+      function resethandler() {
+        resetForm();
+        resetResult();
+      }
+
+      /*************** EVENT LISTINERS ***************/
+      [msSelect, dlSelect, fsSelect].forEach((select) => {
+        select.addEventListener("change", resetResult);
+      });
+      [msInput, dlInput, fsInput].forEach((input) => {
+        input.addEventListener("input", resetResult);
+      });
+      calculateUnitEl.addEventListener("change", handleCalculateUnitChange);
+      resetBtnEl.addEventListener("click", resethandler);
+      calcBtnEl.addEventListener("click", calculateResults);
+
+    </script>
+  </body>
+</html>

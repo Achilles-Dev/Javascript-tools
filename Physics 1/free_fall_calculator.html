@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Free Fall Calculator</title>
+  </head>
+  <body>
+    <h1>Free Fall Calculator</h1>
+      <div>
+        <p>
+          <label for="i1-input">Gravitational acceleration (g)</label>
+          <input
+            type="number"
+            autocomplete="off"
+            data-id="i1"
+            data-name="Gravitational acceleration"
+            step="any"
+            id="i1-input"
+            class="inputs"
+            value="9.80665"
+          />
+          <select
+            class="selects"
+            id="i1-select"
+            data-type="acceleration"
+            data-prev="m/s²"
+            data-id="i1"
+          >
+            <option value="m/s²" selected>
+              meters per second squared (m/s²)
+            </option>
+            <option value="g">gravitational acc. on Earth (g)</option>
+            <option value="ft/s²">feet per second squared (ft/s²)</option>
+          </select>
+        </p>
+
+        <p>
+          <label for="i2-input">Initial velocity (v₀)</label>
+          <input
+            type="number"
+            autocomplete="off"
+            data-id="i2"
+            data-name="Initial velocity"
+            step="any"
+            id="i2-input"
+            class="inputs"
+            value="0"
+          />
+          <select
+            class="selects"
+            id="i2-select"
+            data-type="speed"
+            data-prev="m/s"
+            data-id="i2"
+          >
+            <option value="m/s" selected>meters per second (m/s)</option>
+            <option value="km/h">kilometers per hour (km/h)</option>
+            <option value="ft/s">feet per second (ft/s)</option>
+            <option value="mph">miles per hour (mph)</option>
+            <option value="kn">knots (kn)</option>
+            <option value="km/s">kilometers per second (km/s)</option>
+            <option value="mi/s">miles per second (mi/s)</option>
+            <option value="ft/min">feet per minute (ft/min)</option>
+            <option value="m/min">meters per minute (m/min)</option>
+          </select>
+        </p>
+
+        <p>
+          <label for="i3-input">Height (h) </label>
+          <input
+            type="number"
+            autocomplete="off"
+            data-id="i3"
+            data-name="Height"
+            step="any"
+            id="i3-input"
+            class="inputs"
+          />
+          <select
+            class="selects"
+            id="i3-select"
+            data-type="distance"
+            data-prev="m"
+            data-id="i3"
+          >
+            <option value="cm">centimeters (cm)</option>
+            <option value="m" selected>meters (m)</option>
+            <option value="km">kilometers (km)</option>
+            <option value="in">inches (in)</option>
+            <option value="ft">feet (ft)</option>
+            <option value="yd">yards (yd)</option>
+            <option value="mi">miles (mi)</option>
+          </select>
+        </p>
+      </div>
+
+      <button id="calcBtn">Calculate</button>
+      <button id="resetBtn">Reset</button>
+      <hr>
+      <div>
+        <h3>Result:</h3>
+        <h3 id="calcResults">Result will appear here...</h3>
+      </div>
+    <script>
+      /*************** ELEMENTS ***************/
+      const selects = document.querySelectorAll(".selects");
+      const inputs = document.querySelectorAll(".inputs");
+      
+      const calcBtnEl = document.getElementById('calcBtn');
+      const resetBtnEl = document.getElementById('resetBtn');
+      const calcResultsEl = document.getElementById('calcResults')
+
+      /*************** GLOBAL VARIBLES ***************/
+      const UNITS = {
+        acceleration: {
+          "m/s²": 1,
+          g: 0.10197162129779282,
+          "ft/s²": 3.28084,
+        },
+        distance: {
+          cm: 1e2,
+          m: 1,
+          km: 1e-3,
+          in: 39.370078740157474,
+          ft: 3.280839895013123,
+          yd: 1.0936132983377078,
+          mi: 0.000621371192237334,
+        },
+        time: {
+          sec: 1,
+          min: 0.016666666666666666,
+          hrs: 0.0002777777777777778,
+        },
+        speed: {
+          "m/s": 1,
+          "km/h": 3.6,
+          "ft/s": 3.2808398950131235,
+          mph: 2.2369362920544025,
+          kn: 1.9438444924406046,
+          "km/s": 0.001,
+          "mi/s": 0.0006213711922373339,
+          "ft/min": 196.8503937007874,
+          "m/min": 60,
+        },
+      };
+      let i2Flag = true;
+      /*************** FUNCTIONS ***************/
+      function toSIUnit(type, unit, value) {
+        return value / UNITS[type][unit];
+      }
+
+      function fromSIUnit(type, unit, value) {
+        return value * UNITS[type][unit];
+      }
+
+      function createElement() {
+        const newDiv = `
+          <div>
+            <p>
+              <label for="i4-span">Time of fall (t): &nbsp;</label>
+              <span
+                id="i4-span"
+                class="spans"
+              ></span>
+              <select
+                class="selectsResult"
+                id="i4-select"
+                data-type="time"
+                data-prev="sec"
+                data-id="i4"
+              >
+                <option value="sec" selected>seconds (sec)</option>
+                <option value="min">minutes (min)</option>
+                <option value="hrs">hour (hrs)</option>
+              </select>
+            </p>
+
+            <p>
+              <label for="i5-span">Velocity (v): &nbsp;</label>
+              <span
+                id="i5-span"
+                class="spans"
+              ></span>
+              <select
+                class="selectsResult"
+                id="i5-select"
+                data-type="speed"
+                data-prev="m/s"
+                data-id="i5"
+              >
+                <option value="m/s" selected>meters per second (m/s)</option>
+                <option value="km/h">kilometers per hour (km/h)</option>
+                <option value="ft/s">feet per second (ft/s)</option>
+                <option value="mph">miles per hour (mph)</option>
+                <option value="kn">knots (kn)</option>
+                <option value="km/s">kilometers per second (km/s)</option>
+                <option value="mi/s">miles per second (mi/s)</option>
+                <option value="ft/min">feet per minute (ft/min)</option>
+                <option value="m/min">meters per minute (m/min)</option>
+              </select>
+            </p>
+          </div>
+        `
+        return newDiv
+      }
+
+      function validateInput(id) {
+        const input = document.getElementById(`${id}-input`);
+
+        const label = input.getAttribute("data-name").trim();
+        let value = parseFloat(input.value);
+
+        if (value < 0 || isNaN(value)) {
+          alert(`${label} must be greater than zero!`);
+          return false;
+        }
+
+        return true;
+      }
+
+      function customPrecision(val) {
+        return parseFloat(parseFloat(val).toPrecision(9));
+      }
+      
+      // related to caculation
+      function prepareUnit(...args) {
+        const resultArr = [];
+        for (id of args) {
+          if (id != 'i4' && id != 'i5') {
+            const input = document.getElementById(`${id}-input`);
+            const select = document.getElementById(`${id}-select`);
+            const type = select.getAttribute("data-type");
+            let val = parseFloat(input.value);
+            val = isNaN(val) ? 0 : val;
+            let inUnit = select.value;
+            val = toSIUnit(type, inUnit, val);
+            resultArr.push(val);
+          } else {
+            const span = document.getElementById(`${id}-span`);
+            const select = document.getElementById(`${id}-select`);
+            const type = select.getAttribute("data-type");
+            let val = parseFloat(span.textContent);
+            val = isNaN(val) ? 0 : val;
+            let inUnit = select.value;
+            val = toSIUnit(type, inUnit, val);
+            resultArr.push(val);
+          }
+        }
+
+        return resultArr;
+      }
+
+      function calculateResult() {
+        let [val1, val2] = prepareUnit('i2', 'i3');
+        let [gravity] = prepareUnit("i1");
+        let initialVelocity = 0;
+        let height = 0;
+        let time = 0;
+        let velocity = 0;
+        let result = 0;
+
+        const calculateI4 = () => {
+          const type = "i4";
+
+          initialVelocity = val1;
+          height = val2;
+          t1 =
+            (-initialVelocity +
+              Math.sqrt(
+                initialVelocity * initialVelocity + 2 * gravity * height
+              )) /
+            gravity;
+          t2 =
+            (-initialVelocity -
+              Math.sqrt(
+                initialVelocity * initialVelocity + 2 * gravity * height
+              )) /
+            gravity;
+
+          time = t1 > 0 ? t1 : t2;
+
+          result = time;
+          return {
+            result,
+            type,
+          };
+        };
+        
+        const calculateI5 = () => {
+          const type = "i5";
+          height = val2;
+          initialVelocity = val1;
+          t1 =
+            (-initialVelocity +
+              Math.sqrt(
+                initialVelocity * initialVelocity + 2 * gravity * height
+              )) /
+            gravity;
+          t2 =
+            (-initialVelocity -
+              Math.sqrt(
+                initialVelocity * initialVelocity + 2 * gravity * height
+              )) /
+            gravity;
+
+          time = t1 > 0 ? t1 : t2;
+          velocity = initialVelocity + gravity * time;
+          result = velocity;
+          return {
+            result,
+            type,
+          };
+        };
+
+        let result1 = calculateI4();
+        let result2 = calculateI5();
+
+        return {
+          result1,
+          result2,
+        };
+      }
+
+      function setResult(resultObj) {
+        for (key of Object.keys(resultObj)) {
+          let val = resultObj[key].result;
+          let id = resultObj[key].type;
+          if (isNaN(val)) {
+            alert("Your input resulted in NAN.\n 0/0 \n Try again with valid input.");
+            return;
+          }
+          if (Math.abs(val) === Infinity) {
+            alert("Your input resulted in Infinity. \nDivision by zero. \nTry again with valid input.");
+            return;
+          }
+
+          const span = document.getElementById(`${id}-span`);
+          const select = document.getElementById(`${id}-select`);
+          const type = select.getAttribute("data-type");
+          let outUnit = select.value;
+          val = fromSIUnit(type, outUnit, val);
+
+          span.textContent = customPrecision(val);
+        }
+      }
+
+      function handleResultsChange(e) {
+        let select = e.target;
+        let id = select.getAttribute("data-id");
+        let span = document.getElementById(`${id}-span`);
+
+        let prevUnit = select.getAttribute("data-prev");
+        let currentUnit = select.value;
+        select.setAttribute("data-prev", currentUnit);
+
+        if (span.textContent === "") {
+          return;
+        }
+
+        let type = select.getAttribute("data-type");
+
+        let value = parseFloat(span.textContent);
+        value = parseFloat(value);
+        if (isNaN(value)) value = 0.0;
+
+        let si = toSIUnit(type, prevUnit, value);
+        let result = fromSIUnit(type, currentUnit, si);
+        span.textContent = customPrecision(result);
+      }
+
+      function calculateResults() {
+        for (el of ["i1", "i2", "i3"]) {
+          if (!validateInput(el)) return;
+        }
+
+        try {
+          const resultElement = createElement()
+          calcResultsEl.innerHTML = resultElement
+
+          const newSelects = document.querySelectorAll(".selectsResult");
+
+          newSelects.forEach((select) => {
+            select.addEventListener("change", handleResultsChange);
+          });
+          let result = calculateResult();
+          setResult(result)
+
+        } catch(error) {
+          alert("An error ocurred. Try again with valid input.");
+          resetResult()
+          return;
+        }
+      }
+
+      function resetForm() {
+        selects.forEach((select, index) => {
+          if (index > 1) {
+            select.selectedIndex = '1'
+          } else {
+            select.selectedIndex = '0'
+          }
+          
+        });
+
+        inputs.forEach((input, index) => {
+          if (index == 0) {
+            input.value = "9.80665"
+          } else if (index == 1) {
+            input.value = "0"
+          } else {
+            input.value = ""
+          }
+        });
+      }
+
+      function resetResult() {
+        calcResultsEl.innerHTML = "<p>Result will appear here...</p>";
+      } 
+
+      function resethandler() {
+        resetForm();
+        resetResult();
+      }
+
+      /*************** EVENT LISTINERS ***************/
+
+      selects.forEach((select) => {
+        select.addEventListener("change", resetResult);
+      });
+
+      inputs.forEach((input) => {
+        input.addEventListener("input", resetResult);
+      });
+
+      resetBtnEl.addEventListener("click", resethandler);
+      calcBtnEl.addEventListener("click", calculateResults);
+
+    </script>
+  </body>
+</html>

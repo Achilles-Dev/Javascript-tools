@@ -3,13 +3,13 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Engine Displacement Calculator</title>
+    <title>Wye to Delta Conversion</title>
   </head>
   <body>
-    <h1>Engine Displacement Calculator</h1>
+    <h1>Wye to Delta Conversion</h1>
       <div>
         <p>
-          <label for="i1-input">Number of cylinders </label>
+          <label for="i1-input">R1 </label>
           <input
             type="number"
             min="0"
@@ -18,23 +18,24 @@
             step="any"
             id="i1-input"
             class="inputs"
-            data-name="Number of cylinders"
+            data-name="Resistivity"
           />
-
           <select
             class="selects"
             id="i1-select"
-            data-type="unit"
-            data-prev="unit"
+            data-type="resistivity"
+            data-prev="Ω"
             data-id="i1"
-            style="display: none"
           >
-            <option value="unit">unit</option>
+            <option value="mΩ">milliohms (mΩ)</option>
+            <option value="Ω" selected>ohms (Ω)</option>
+            <option value="kΩ">kiloohms (kΩ)</option>
+            <option value="MΩ">megaohms (MΩ)</option>
           </select>
         </p>
 
         <p>
-          <label for="i2-input">Bore diameter </label>
+          <label for="i2-input">R2 </label>
           <input
             type="number"
             min="0"
@@ -43,25 +44,25 @@
             step="any"
             id="i2-input"
             class="inputs"
-            data-name="Bore diameter"
+            data-name="Resistivity"
           />
+
           <select
             class="selects"
             id="i2-select"
-            data-type="distance"
-            data-prev="cm"
+            data-type="resistivity"
+            data-prev="Ω"
             data-id="i2"
           >
-            <option value="mm">millimeters (mm)</option>
-            <option value="cm" selected>centimeters (cm)</option>
-            <option value="m">meters (m)</option>
-            <option value="in">inches (in)</option>
-            <option value="ft">feet (ft)</option>
+            <option value="mΩ">milliohms (mΩ)</option>
+            <option value="Ω" selected>ohms (Ω)</option>
+            <option value="kΩ">kiloohms (kΩ)</option>
+            <option value="MΩ">megaohms (MΩ)</option>
           </select>
         </p>
 
         <p>
-          <label for="i3-input">Stroke length </label>
+          <label for="i3-input">R3 </label>
           <input
             type="number"
             min="0"
@@ -70,23 +71,21 @@
             step="any"
             class="inputs"
             id="i3-input"
-            data-name="Stroke length"
+            data-name="Resistivity"
           />
           <select
             class="selects"
             id="i3-select"
-            data-type="distance"
-            data-prev="cm"
+            data-type="resistivity"
+            data-prev="Ω"
             data-id="i3"
           >
-            <option value="mm">millimeters (mm)</option>
-            <option value="cm" selected>centimeters (cm)</option>
-            <option value="m">meters (m)</option>
-            <option value="in">inches (in)</option>
-            <option value="ft">feet (ft)</option>
+            <option value="mΩ">milliohms (mΩ)</option>
+            <option value="Ω" selected>ohms (Ω)</option>
+            <option value="kΩ">kiloohms (kΩ)</option>
+            <option value="MΩ">megaohms (MΩ)</option>
           </select>
         </p>
-
       </div>
 
       <button id="calcBtn">Calculate</button>
@@ -107,27 +106,14 @@
 
       /*************** GLOBAL VARIBLES ***************/
       const UNITS = {
-        distance: {
-          mm: 1e3,
-          cm: 1e2,
-          m: 1,
-          in: 39.370078740157474,
-          ft: 3.2808398950131235,
-        },
-        volume: {
-          "mm³": 1e9,
-          "cm³": 1e6,
-          "m³": 1,
-          "in³": 61023.7440947322916,
-          l: 1e3,
-          "US gal": 264.1720523581484,
-        },
-
-        unit: {
-          unit: 1,
+        resistivity: {
+          mΩ: 1e3,
+          Ω: 1,
+          kΩ: 1e-3,
+          MΩ: 1e-6,
         },
       };
-      let queue = ["i1", "i2", "i3", "i4"];
+
       /*************** FUNCTIONS ***************/
       function toSIUnit(type, unit, value) {
         if (type === "exp") {
@@ -152,62 +138,75 @@
       function createElement() {
         const newDiv = `
           <div>
+            <p>Resulting resistance values</p>
             <p>
-              <label for="i4-span"> Engine displacement: &nbsp; </label>
+              <label for="ia1-span"> Ra: &nbsp; </label>
               <span
-                type="number"
-                min="0"
-                autocomplete="off"
-                data-id="i4"
+                data-id="ia1"
                 step="any"
-                class="spans"
-                id="i4-span"
-                data-name="Engine displacement"
+                id="ia1-span"
+                data-name="Resistivity"
               ></span>
               <select
                 class="selectsResult"
-                id="i4-select"
-                data-type="volume"
-                data-prev="cm³"
-                data-id="i4"
+                id="ia1-select"
+                data-type="resistivity"
+                data-prev="Ω"
+                data-id="ia1"
               >
-                <option value="mm³">cubic millimeters (mm³)</option>
-                <option value="cm³">cubic centimeters (cm³)</option>
-                <option value="m³">cubic meters (m³)</option>
-                <option value="in³">cubic inches (in³)</option>
-                <option value="l">liters (l)</option>
-                <option value="US gal">gallons (US) (US gal)</option>
-                <option value="cm³" selected>cubic centimeters (cc)</option>
+                <option value="mΩ">milliohms (mΩ)</option>
+                <option value="Ω" selected>ohms (Ω)</option>
+                <option value="kΩ">kiloohms (kΩ)</option>
+                <option value="MΩ">megaohms (MΩ)</option>
+              </select>
+            </p>
+
+            <p>
+              <label for="ia2-span"> Rb: &nbsp; </label>
+              <span
+                data-id="ia2"
+                step="any"
+                id="ia2-span"
+                data-name="Resistivity"
+              ></span>
+              <select
+                class="selectsResult"
+                id="ia2-select"
+                data-type="resistivity"
+                data-prev="Ω"
+                data-id="ia2"
+              >
+                <option value="mΩ">milliohms (mΩ)</option>
+                <option value="Ω" selected>ohms (Ω)</option>
+                <option value="kΩ">kiloohms (kΩ)</option>
+                <option value="MΩ">megaohms (MΩ)</option>
+              </select>
+            </p>
+
+            <p>
+              <label for="ia3-span">Rc: &nbsp; </label>
+              <span
+                data-id="ia3"
+                step="any"
+                id="ia3-span"
+                data-name="Resistivity"
+              ></span>
+              <select
+                class="selectsResult"
+                id="ia3-select"
+                data-type="resistivity"
+                data-prev="Ω"
+                data-id="ia3"
+              >
+                <option value="mΩ">milliohms (mΩ)</option>
+                <option value="Ω" selected>ohms (Ω)</option>
+                <option value="kΩ">kiloohms (kΩ)</option>
+                <option value="MΩ">megaohms (MΩ)</option>
               </select>
             </p>
           </div>
         `
         return newDiv
-      }
-
-
-      function handleResultsChange(e) {
-        let select = e.target;
-        let id = select.getAttribute("data-id");
-        let span = document.getElementById(`${id}-span`);
-
-        let prevUnit = select.getAttribute("data-prev");
-        let currentUnit = select.value;
-        select.setAttribute("data-prev", currentUnit);
-
-        if (span.textContent === "") {
-          return;
-        }
-
-        let type = select.getAttribute("data-type");
-
-        let value = parseFloat(span.textContent);
-        value = parseFloat(value);
-        if (isNaN(value)) value = 0.0;
-
-        let si = toSIUnit(type, prevUnit, value);
-        let result = fromSIUnit(type, currentUnit, si);
-        span.textContent = customPercision(result, 13);
       }
 
       function validateInput(id) {
@@ -216,13 +215,13 @@
         let value = parseFloat(input.value);
 
         if (value <= 0 || isNaN(value)) {
-          alert(`${label} must be greater than zero!`);
+         alert(`${label} must be greater than zero!`);
           return false;
         }
 
         return true;
       }
-      
+
       // related to caculation
       function prepareUnit(...args) {
         const resultArr = [];
@@ -265,19 +264,43 @@
         }
       }
 
-      function calculateResult(out) {
-        const C = 4 * Math.PI * 10e-6;
+      function calculateResult() {
+        let ra, rb, rc;
+        let [r1, r2, r3] = prepareUnit("i1", "i2", "i3");
 
-        function calculateI4() {
-          let [val1, val2, val3] = prepareUnit("i1", "i2", "i3");
+        ra = r2 + r3 + (r2 * r3) / r1;
+        rb = r3 + r1 + (r3 * r1) / r2;
+        rc = r1 + r2 + (r1 * r2) / r3;
 
-          let result = (val1 * val3 * Math.PI * val2 * val2 * 1) / 4;
+        return {
+          1: { result: ra, type: "ia1" },
+          2: { result: rb, type: "ia2" },
+          3: { result: rc, type: "ia3" },
+        };
+      }
 
-          return {
-            1: { result, type: "i4" },
-          };
+      function handleResultsChange(e) {
+        let select = e.target;
+        let id = select.getAttribute("data-id");
+        let span = document.getElementById(`${id}-span`);
+
+        let prevUnit = select.getAttribute("data-prev");
+        let currentUnit = select.value;
+        select.setAttribute("data-prev", currentUnit);
+
+        if (span.textContent === "") {
+          return;
         }
-        return calculateI4()
+
+        let type = select.getAttribute("data-type");
+
+        let value = parseFloat(span.textContent);
+        value = parseFloat(value);
+        if (isNaN(value)) value = 0.0;
+
+        let si = toSIUnit(type, prevUnit, value);
+        let result = fromSIUnit(type, currentUnit, si);
+        span.textContent = customPercision(result, 13);
       }
 
       function calculateResults() {
@@ -307,11 +330,7 @@
 
       function resetForm() {
         selects.forEach((select, index) => {
-          if (index > 0) {
             select.selectedIndex = '1'
-          } else {
-            select.selectedIndex = '0'
-          }
         });
 
         inputs.forEach((input) => {
@@ -328,11 +347,11 @@
         resetResult();
       }
 
+
       /*************** EVENT LISTINERS ***************/
       selects.forEach((select) => {
         select.addEventListener("change", resetResult);
       });
-
       inputs.forEach((input) => {
         input.addEventListener("input", resetResult);
       });

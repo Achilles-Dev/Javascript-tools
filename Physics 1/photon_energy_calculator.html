@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Photon Energy Calculator</title>
+  </head>
+  <body>
+    <h1>Photon Energy Calculator</h1>
+      <p>Insert only one field to calculate the other two.</p>
+      <p>
+        Insert:
+        <select id="fieldSelect">
+          <option value="wl" selected>Wavelength</option>
+          <option value="fq">Frequency</option>
+          <option value="en">Energy</option>
+        </select>
+      </p>
+      <div>
+        <p id="wavelengthInput">
+          <label for="i1-input">Wavelength</label>
+          <input
+            type="number"
+            autocomplete="off"
+            id="i1-input"
+            class="inputs"
+            step="any"
+            data-id="i1"
+            data-name="distance"
+          />
+          <select
+            class="selects"
+            id="i1-select"
+            data-type="distance"
+            data-prev="mm"
+            data-id="i1"
+          >
+            <option value="Å">ångström (Å)</option>
+            <option value="pm">picometers (pm)</option>
+            <option value="nm">nanometers (nm)</option>
+            <option value="μm">micrometers (μm)</option>
+            <option value="mm" selected>millimeters (mm)</option>
+            <option value="cm">centimeters (cm)</option>
+            <option value="m">meters (m)</option>
+            <option value="km">kilometers (km)</option>
+            <option value="in">inches (in)</option>
+            <option value="ft">feet (ft)</option>
+            <option value="yd">yards (yd)</option>
+          </select>
+        </p>
+
+        <p id="frequencyInput" style="display: none;">
+          <label for="i2-input">Frequency</label>
+          <input
+            type="number"
+            autocomplete="off"
+            id="i2-input"
+            class="inputs"
+            step="any"
+            data-id="i2"
+            data-name="frequency"
+          />
+          <select
+            class="selects"
+            id="i2-select"
+            data-type="frequency"
+            data-prev="GHz"
+            data-id="i2"
+          >
+            <option value="Hz">hertz (Hz)</option>
+            <option value="kHz">kilohertz (kHz)</option>
+            <option value="MHz">megahertz (MHz)</option>
+            <option value="GHz" selected>gigahertz (GHz)</option>
+            <option value="THz">terahertz (THz)</option>
+            <option value="RPM">revolutions per minute (RPM)</option>
+          </select>
+        </p>
+
+        <p id="energyInput" style="display: none;">
+          <label for="i3-input">Energy</label>
+          <input
+            type="number"
+            autocomplete="off"
+            id="i3-input"
+            class="inputs"
+            step="any"
+            data-id="i3"
+            data-name="energy"
+          />
+          <select
+            class="selects"
+            id="i3-select"
+            data-type="energy"
+            data-prev="meV"
+            data-id="i3"
+          >
+            <option value="neV">nanoelectronvolts (neV)</option>
+            <option value="μeV">microelectronvolts (μeV)</option>
+            <option value="meV" selected>millielectronvolts (meV)</option>
+            <option value="eV">electronvolts (eV)</option>
+            <option value="keV">kiloelectronvolts (keV)</option>
+            <option value="MeV">megaelectronvolts (MeV)</option>
+          </select>
+        </p>
+      </div>
+
+      <button id="calcBtn">Calculate</button>
+      <button id="resetBtn">Reset</button>
+      <hr>
+      <div>
+        <h3>Result:</h3>
+        <h3 id="calcResults">Result will appear here...</h3>
+      </div>
+    <script>
+      /*************** ELEMENTS ***************/
+      const fieldSelectEl = document.getElementById("fieldSelect");
+
+      const selects = document.querySelectorAll(".selects");
+      const inputs = document.querySelectorAll(".inputs");
+
+      const i1Input = document.getElementById("i1-input");
+      const i2Input = document.getElementById("i2-input");
+      const i3Input = document.getElementById("i3-input");
+
+      const i1Select = document.getElementById("i1-select");
+      const i2Select = document.getElementById("i2-select");
+      const i3Select = document.getElementById("i3-select");
+
+      const wavelengthInputEl = document.getElementById("wavelengthInput");
+      const frequencyInputEl = document.getElementById("frequencyInput");
+      const energyInputEl = document.getElementById("energyInput");
+
+      const calcBtnEl = document.getElementById('calcBtn');
+      const resetBtnEl = document.getElementById('resetBtn');
+      const calcResultsEl = document.getElementById('calcResults')
+
+      /*************** GLOBAL VARIBLES ***************/
+      const UNITS = {
+        energy: {
+          neV: 6241509128999772821550722666.268841196796393146718119004882245755,
+          μeV: 6241509128999772821550722.666268841196796393146718119004882245755,
+          meV: 6241509128999772821550.722666268841196796393146718119004882245755,
+          j: 1,
+          eV: 6241509128999772821.550722666268841196796393146718119004882245755,
+          keV: 6241509128999772.821550722666268841196796393146718119004882245755,
+          MeV: 6241509128999.772821550722666268841196796393146718119004882245755,
+        },
+        frequency: {
+          Hz: 1,
+          kHz: 1e-3,
+          MHz: 1e-6,
+          GHz: 1e-9,
+          THz: 1e-12,
+          RPM: 60,
+        },
+        distance: {
+          Å: 1e10,
+          pm: 1e12,
+          nm: 1e9,
+          μm: 1e6,
+          mm: 1e3,
+          cm: 1e2,
+          m: 1,
+          km: 1e-3,
+          in: 39.370078740157474,
+          ft: 3.280839895013123,
+          yd: 1.0936132983377078,
+        },
+      };
+
+      /*************** FUNCTIONS ***************/
+      function toSIUnit(type, unit, value) {
+        return value / UNITS[type][unit];
+      }
+
+      function fromSIUnit(type, unit, value) {
+        return value * UNITS[type][unit];
+      }
+
+      function handleFieldSelectChange(e) {
+        const value = e.target.value
+        wavelengthInputEl.style.display = value == 'wl' ? 'block' : 'none'
+        frequencyInputEl.style.display = value == 'fq' ? 'block' : 'none'
+        energyInputEl.style.display = value == 'en' ? 'block' : 'none'
+
+        resetResult()
+      }
+
+      function createElement() {
+        const field = fieldSelectEl.value
+        const wavelength = `
+          <div>
+            <p>
+              <label for="i1-span">Wavelength: &nbsp;</label>
+              <span
+                id="i1-span"
+                class="spans"
+                step="any"
+                data-id="i1"
+              ></span>
+              <select
+                class="selectsResult"
+                id="i1-select"
+                data-type="distance"
+                data-prev="mm"
+                data-id="i1"
+              >
+                <option value="Å">ångström (Å)</option>
+                <option value="pm">picometers (pm)</option>
+                <option value="nm">nanometers (nm)</option>
+                <option value="μm">micrometers (μm)</option>
+                <option value="mm" selected>millimeters (mm)</option>
+                <option value="cm">centimeters (cm)</option>
+                <option value="m">meters (m)</option>
+                <option value="km">kilometers (km)</option>
+                <option value="in">inches (in)</option>
+                <option value="ft">feet (ft)</option>
+                <option value="yd">yards (yd)</option>
+              </select>
+            </p>
+          </div>
+        `
+        const frequency = `
+          <div>
+            <p>
+              <label for="i2-span">Frequency: &nbsp;</label>
+              <span
+                id="i2-span"
+                class="spans"
+                step="any"
+                data-id="i2"
+              ></span>
+              <select
+                class="selectsResult"
+                id="i2-select"
+                data-type="frequency"
+                data-prev="GHz"
+                data-id="i2"
+              >
+                <option value="Hz">hertz (Hz)</option>
+                <option value="kHz">kilohertz (kHz)</option>
+                <option value="MHz">megahertz (MHz)</option>
+                <option value="GHz" selected>gigahertz (GHz)</option>
+                <option value="THz">terahertz (THz)</option>
+                <option value="RPM">revolutions per minute (RPM)</option>
+              </select>
+            </p>
+          </div>
+        `
+
+        const energy = `
+          <div>
+            <p>
+              <label for="i3-span">Energy: &nbsp;</label>
+              <span
+                id="i3-span"
+                class="spans"
+                step="any"
+                data-id="i3"
+              ></span>
+              <select
+                class="selectsResult"
+                id="i3-select"
+                data-type="energy"
+                data-prev="meV"
+                data-id="i3"
+              >
+                <option value="neV">nanoelectronvolts (neV)</option>
+                <option value="μeV">microelectronvolts (μeV)</option>
+                <option value="meV" selected>millielectronvolts (meV)</option>
+                <option value="eV">electronvolts (eV)</option>
+                <option value="keV">kiloelectronvolts (keV)</option>
+                <option value="MeV">megaelectronvolts (MeV)</option>
+              </select>
+            </p>
+          </div>
+        `
+        if (field == 'wl') {
+          return frequency + energy
+        } else if (field == 'fq') {
+          return wavelength + energy
+        }
+        return wavelength + frequency
+      }
+
+      function validateInput(id) {
+        const input = document.getElementById(`${id}-input`);
+        const label = input.getAttribute("data-name").trim();
+        let value = parseFloat(input.value);
+        if (value <= 0 || isNaN(value)) {
+          alert(`${label} must be greater than zero!`);
+          return false;
+        }
+
+        return true;
+      }
+
+      function setResult(results) {
+        results.forEach((result) => {
+          let id = result.id;
+          let value = result.value;
+          let type = result.type;
+          
+          let select = document.getElementById(`${id}-select`);
+          let span = document.getElementById(`${id}-span`);
+         
+          let currentUnit = select.value;
+          
+          value = fromSIUnit(type, currentUnit, value);
+          span.textContent = value;
+          
+        });
+        if (fieldSelectEl.value == 'en') {
+          let i3Input = document.getElementById(`i3-input`);
+          let i3 = parseFloat(i3Input.value);
+          if (isNaN(i3)) {
+            calcResultsEl.innerHTML += "";
+            return;
+          }
+          let i3Select = document.getElementById(`i3-select`);
+          let i3Unit = i3Select.value;
+          const joules = toSIUnit("energy", i3Unit, i3);
+          calcResultsEl.innerHTML += `<p>This energy is equivalent to ${joules} joules.</p>`;
+        } else {
+          let i3Span = document.getElementById(`i3-span`);
+          let i3 = parseFloat(i3Span.textContent);
+          if (isNaN(i3)) {
+            calcResultsEl.innerHTML += "";
+            return;
+          }
+          let i3Select = document.getElementById(`i3-select`);
+          let i3Unit = i3Select.value;
+          const joules = toSIUnit("energy", i3Unit, i3);
+          calcResultsEl.innerHTML += `<p>This energy is equivalent to ${joules} joules.</p>`;
+        }
+      }
+
+      function calculateResult(id) {
+        const h = 6.62607015e-34;
+        const c = 299792456.2;
+        
+        const calculateI1 = (id) => {         
+          let { i2, i3 } = prepareUnits();        
+          let value = 0;
+          if (id === "i2") {
+            value = c / i2;
+          } else value = (h * c) / i3;
+          return {
+            value,
+            id: "i1",
+            type: "distance",
+          };
+        };
+        const calculateI2 = (id) => {
+          let { i1, i3 } = prepareUnits();
+          let value = 0;
+          if (id === "i1") {
+            value = c / i1;
+          } else value = i3 / h;
+          return {
+            value,
+            id: "i2",
+            type: "frequency",
+          };
+        };
+        const calculateI3 = (id) => {
+          let { i2, i1 } = prepareUnits();
+          let value = 0;
+          if (id === "i2") {
+            value = h * i2;
+          } else value = (c * h) / i1;
+          return {
+            value,
+            id: "i3",
+            type: "energy",
+          };
+        };
+
+        switch (id) {
+          case "i1":
+            return [calculateI2(id), calculateI3(id)];
+          case "i2":
+            return [calculateI1(id), calculateI3(id)];
+          case "i3":
+            return [calculateI2(id), calculateI1(id)];
+          default:
+            console.log("error in switch");
+        }
+      }
+
+      function prepareUnits() {
+        let i1 = parseFloat(i1Input.value);
+        let i2 = parseFloat(i2Input.value);
+        let i3 = parseFloat(i3Input.value);
+
+        i1 = i1 = isNaN(i1) ? 0.0 : i1;
+        i2 = i2 = isNaN(i2) ? 0.0 : i2;
+        i3 = i3 = isNaN(i3) ? 0.0 : i3;
+
+        let i1Unit = i1Select.value;
+        let i2Unit = i2Select.value;
+        let i3Unit = i3Select.value;
+
+        i1 = toSIUnit("distance", i1Unit, i1);
+        i2 = toSIUnit("frequency", i2Unit, i2);
+        i3 = toSIUnit("energy", i3Unit, i3);
+        
+        return { i3, i1, i2 };
+      }
+
+      function handleResultsChange(e) {
+        let select = e.target;
+        let id = select.getAttribute("data-id");
+        let span = document.getElementById(`${id}-span`);
+
+        let prevUnit = select.getAttribute("data-prev");
+        let currentUnit = select.value;
+        select.setAttribute("data-prev", currentUnit);
+
+        if (span.textContent === "") {
+          return;
+        }
+
+        let type = select.getAttribute("data-type");
+
+        let value = parseFloat(span.textContent);
+        value = parseFloat(value);
+        if (isNaN(value)) value = 0.0;
+
+        let si = toSIUnit(type, prevUnit, value);
+        let result = fromSIUnit(type, currentUnit, si);
+        span.textContent = parseFloat(result);
+      }
+
+      function calculateResults() {
+        const field = fieldSelectEl.value
+        if (field == 'wl') {
+          if (!validateInput('i1')) return
+        } else if (field == 'fq') {
+          if (!validateInput('i2')) return
+        } else {
+          if (!validateInput('i3')) return
+        }
+        
+        try {
+          const resultElement = createElement()
+          calcResultsEl.innerHTML = resultElement
+
+          let result;
+          if (field == 'wl') {
+            result = calculateResult('i1')
+          } else if (field == 'fq') {
+            result = calculateResult('i2')
+          } else {
+            result = calculateResult('i3')
+          }
+          setResult(result)
+          const newSelects = document.querySelectorAll(".selectsResult");
+          newSelects.forEach((select) => {
+            select.addEventListener("change", handleResultsChange);
+          });
+
+        } catch(error) {
+          alert("An error ocurred. Try again with valid input.");
+          resetResult()
+          return;
+        }
+      }
+
+      function resetForm() {
+        selects.forEach((select, index) => {
+          select.selectedIndex = '4'
+        });
+
+        inputs.forEach((input) => {
+          input.value = ""
+        });
+        wavelengthInputEl.style.display = 'block';
+        frequencyInputEl.style.display = 'none';
+        energyInputEl.style.display = 'none';
+        fieldSelectEl.selectedIndex = "0"
+      }
+
+      function resetResult() {
+        calcResultsEl.innerHTML = "<p>Result will appear here...</p>";
+      } 
+
+      function resethandler() {
+        resetForm();
+        resetResult();
+      }
+
+      /*************** EVENT LISTINERS ***************/
+
+      inputs.forEach((input) => {
+        input.addEventListener("input", resetResult);
+      });
+      selects.forEach((select) => {
+        select.addEventListener("change", resetResult);
+      });
+      
+      fieldSelectEl.addEventListener("change", handleFieldSelectChange)
+
+      resetBtnEl.addEventListener("click", resethandler);
+      calcBtnEl.addEventListener("click", calculateResults);
+
+    </script>
+  </body>
+</html>

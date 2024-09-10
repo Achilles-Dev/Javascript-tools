@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Quarter Mile Calculator</title>
+  </head>
+  <body>
+    <h1>Quarter Mile Calculator</h1>
+      <div>
+        <p>
+          <label for="eq-select">Equation</label>
+          <select id="eq-select">
+            <option value="224" data-C="6.290" selected>Huntington</option>
+            <option value="230" data-C="6.269">Fox</option>
+            <option value="234" data-C="5.825">Hale</option>
+          </select>
+        </p>
+
+        <p>
+          <label for="i1-input">Weight</label>
+          <input
+            type="number"
+            autocomplete="off"
+            data-id="i1"
+            step="any"
+            id="i1-input"
+            class="inputs"
+            data-name="weight"
+          />
+          <select
+            class="selects"
+            id="i1-select"
+            data-type="mass"
+            data-prev="kg"
+            data-id="i1"
+          >
+            <option value="kg" selected>kilograms (kg)</option>
+            <option value="t">metric tons (t)</option>
+            <option value="lb">pounds (lb)</option>
+            <option value="US ton">US short tons (US ton)</option>
+            <option value="long ton">imperial tons (long ton)</option>
+          </select>
+        </p>
+
+        <p>
+          <label for="i2-input">Power</label>
+          <input
+            type="number"
+            autocomplete="off"
+            data-id="i2"
+            step="any"
+            id="i2-input"
+            class="inputs"
+            data-name="power"
+          />
+          <select
+            class="selects"
+            id="i2-select"
+            data-type="power"
+            data-prev="hp(l)"
+            data-id="i2"
+          >
+            <option value="W">watts (W)</option>
+            <option value="kW">kilowatts (kW)</option>
+            <option value="MW">megawatts (MW)</option>
+            <option value="hp(l)" selected>
+              mechanical horsepowers (hp(l))
+            </option>
+            <option value="hp(M)">metric horsepowers (hp(M))</option>
+          </select>
+        </p>
+      </div>
+
+      <button id="calcBtn">Calculate</button>
+      <button id="resetBtn">Reset</button>
+      <hr>
+      <div>
+        <h3>Result:</h3>
+        <h3 id="calcResults">Result will appear here...</h3>
+      </div>
+    <script>
+      /*************** ELEMENTS ***************/
+      const selects = document.querySelectorAll(".selects");
+      const inputs = document.querySelectorAll(".inputs");
+      const eqSelect = document.getElementById("eq-select");
+
+      const calcBtnEl = document.getElementById('calcBtn');
+      const resetBtnEl = document.getElementById('resetBtn');
+      const calcResultsEl = document.getElementById('calcResults')
+
+      /*************** GLOBAL VARIBLES ***************/
+      const UNITS = {
+        mass: {
+          kg: 0.45359236999999997,
+          t: 0.00045359237,
+          lb: 1,
+          "US ton": 0.0005,
+          "long ton": 0.0004464285714285714,
+        },
+        time: {
+          sec: 1,
+          min: 0.016666666666666666,
+          hrs: 0.0002777777777777778,
+        },
+        speed: {
+          "m/s": 0.44704000000000005,
+          "km/h": 1.609344,
+          "ft/s": 1.4666666666666666,
+          mph: 1,
+          kn: 0.8689762419006479,
+          "ft/min": 88,
+          "m/min": 26.8224,
+        },
+        power: {
+          W: 745.6998715822999,
+          kW: 0.7456998715823,
+          MW: 0.0007456998715822999,
+          "hp(l)": 1,
+          "hp(M)": 1.0138696654240404,
+        },
+      };
+      const queue = ["i1", "i2", "i3", "i4"];
+      /*************** FUNCTIONS ***************/
+      function toSIUnit(type, unit, value) {
+        return value / UNITS[type][unit];
+      }
+
+      function fromSIUnit(type, unit, value) {
+        return value * UNITS[type][unit];
+      }
+
+      function createElement() {
+        const newDiv = `
+          <div>
+            <p>
+              <label for="i3-span">Elapsed time: &nbsp;</label>
+              <span
+                data-id="i3"
+                step="any"
+                id="i3-span"
+                class="spans"
+              ></span>
+              <select
+                class="selectsResult"
+                id="i3-select"
+                data-type="time"
+                data-prev="sec"
+                data-id="i3"
+              >
+                <option value="sec" selected>seconds (sec)</option>
+                <option value="min">minutes (min)</option>
+                <option value="hrs">hour (hrs)</option>
+              </select>
+            </p>
+
+            <p>
+              <label for="i4-span">Trap speed: &nbsp;</label>
+              <span
+                data-id="i4"
+                step="any"
+                id="i4-span"
+                class="spans"
+              ></span>
+              <select
+                class="selectsResult"
+                id="i4-select"
+                data-type="speed"
+                data-prev="m/s"
+                data-id="i4"
+              >
+                <option value="m/s" selected>meters per second (m/s)</option>
+                <option value="km/h">kilometers per hour (km/h)</option>
+                <option value="ft/s">feet per second (ft/s)</option>
+                <option value="mph">miles per hour (mph)</option>
+                <option value="kn">knots (kn)</option>
+                <option value="ft/min">feet per minute (ft/min)</option>
+                <option value="m/min">meters per minute (m/min)</option>
+              </select>
+            </p>
+          </div>
+        `
+        return newDiv
+      }
+
+      function inputHandler(e) {
+        errorP.innerHTML = "";
+        try {
+          let input;
+          if (e.target) input = e.target;
+          else input = e;
+          const id = input.getAttribute("data-id");
+          let [in1, in2, out1, out2] = queue;
+
+          if (input.value == "") {
+            if (inputCounter() < 2) {
+              return;
+            }
+
+            if (id === in1 || id === in2) deleteHandler(out1, out2);
+            return;
+          }
+
+          const index = queue.indexOf(id);
+          queue.splice(index, 1);
+          queue.unshift(id);
+          [in1, in2, out1, out2] = queue;
+
+          if ((in1 == "i3" && in2 == "i4") || (in1 == "i4" && in2 == "i3")) {
+            if (inputCounter() == 2) {
+              return;
+            } else {
+              let in2 = document.getElementById(`${queue[1]}-input`);
+
+              in2.value = "";
+            }
+          }
+          if (inputCounter() < 2) {
+            return;
+          }
+
+          validateQueue(id);
+          [in1, in2, out1, out2] = queue;
+
+          const result = calculateResults(out1, out2, in1, in2);
+          setResult(result);
+        } catch (error) {
+          alert(
+            "An error occurred. Try again with valid input, or try contacting us."
+          );
+          console.log(error);
+        }
+      }
+
+      function inputCounter() {
+        let count = 0;
+
+        inputs.forEach((input) => {
+          if (input.value !== "") {
+            count++;
+          }
+        });
+
+        return count;
+      }
+
+      function validateQueue(prev) {
+        let i2 = queue[1];
+        if (document.getElementById(`${i2}-input`).value == "") {
+          let subqueue = queue.slice(2);
+          for (id of subqueue) {
+            if (document.getElementById(`${id}-input`).value != "") {
+              let index = queue.indexOf(id);
+              queue.splice(index, 1);
+              queue.unshift(id);
+
+              index = queue.indexOf(prev);
+              queue.splice(index, 1);
+              queue.unshift(prev);
+              break;
+            }
+          }
+        }
+        return;
+      }
+      
+      function validateInput(id) {
+        const input = document.getElementById(`${id}-input`);
+        const label = input.getAttribute("data-name").trim();
+        let value = parseFloat(input.value);
+
+        if (value <= 0 || isNaN(value)) {
+          alert(`${label} must be greater than zero!`);
+          return false;
+        }
+
+        return true;
+      }
+
+      // related to caculation
+      function prepareUnit(...args) {
+        const resultArr = [];
+        for (id of args) {
+          const input = document.getElementById(`${id}-input`);
+          const select = document.getElementById(`${id}-select`);
+          const type = select.getAttribute("data-type");
+          let val = parseFloat(input.value);
+          val = isNaN(val) ? 0 : val;
+          let inUnit = select.value;
+          val = toSIUnit(type, inUnit, val);
+          resultArr.push(val);
+        }
+
+        return resultArr;
+      }
+      
+      function setResult(resultObj) {
+        for (key of Object.keys(resultObj)) {
+          let val = resultObj[key].result;
+          let id = resultObj[key].type;
+          if (isNaN(val)) {
+            alert("Your input resulted in NAN.\n 0/0 \n Try again with valid input.");
+            return;
+          }
+          if (Math.abs(val) === Infinity) {
+            alert("Your input resulted in Infinity. \nDivision by zero. \nTry again with valid input.");
+            return;
+          }
+
+          const span = document.getElementById(`${id}-span`);
+          const select = document.getElementById(`${id}-select`);
+          const type = select.getAttribute("data-type");
+          let outUnit = select.value;
+          val = fromSIUnit(type, outUnit, val);
+
+          span.textContent = parseFloat(val.toPrecision(5));
+        }
+      }
+      
+      function calculateResult() {
+        const CV = parseFloat(eqSelect.value);
+        const CE = parseFloat(eqSelect.selectedOptions[0].getAttribute("data-C"));
+
+        let [val1, val2] = prepareUnit('i1', 'i2');
+
+        let result = 0;
+        const calculateI3 = () => {
+          const type = "i3";
+
+          result = CE * Math.cbrt(val1 / val2);
+          return {
+            result,
+            type,
+          };
+        };
+        const calculateI4 = () => {
+          const type = "i4";
+
+          result = CV * Math.cbrt(val2 / val1);
+          return {
+            result,
+            type,
+          };
+        };
+
+        let result1 = { 
+          1: calculateI3()
+        }
+        setResult(result1)
+        let result2 = {
+          1: calculateI4()
+        }
+        setResult(result2)
+        
+      }
+      
+      function handleResultsChange(e) {
+        let select = e.target;
+        let id = select.getAttribute("data-id");
+        let span = document.getElementById(`${id}-span`);
+
+        let prevUnit = select.getAttribute("data-prev");
+        let currentUnit = select.value;
+        select.setAttribute("data-prev", currentUnit);
+
+        if (span.textContent === "") {
+          return;
+        }
+
+        let type = select.getAttribute("data-type");
+
+        let value = parseFloat(span.textContent);
+        value = parseFloat(value);
+        if (isNaN(value)) value = 0.0;
+
+        let si = toSIUnit(type, prevUnit, value);
+        let result = fromSIUnit(type, currentUnit, si);
+        span.textContent = parseFloat(result.toPrecision(5));
+      }
+
+      function calculateResults() {
+        for (el of ["i1", "i2"]) {
+          if (!validateInput(el)) return;
+        }
+
+        try {
+          const resultElement = createElement()
+          calcResultsEl.innerHTML = resultElement
+
+          const newSelects = document.querySelectorAll(".selectsResult");
+
+          newSelects.forEach((select) => {
+            select.addEventListener("change", handleResultsChange);
+          });
+          
+          calculateResult();
+
+        } catch(error) {
+          alert("An error ocurred. Try again with valid input.");
+          resetResult()
+          return;
+        }
+      }
+
+      function resetForm() {
+        selects.forEach((select, index) => {
+          if (index == 1) {
+            select.selectedIndex = '3'
+          } else {
+            select.selectedIndex = '0'
+          }
+          
+        });
+
+        inputs.forEach((input) => {
+          input.value = ""
+        });
+        eqSelect.selectedIndex = '0'
+      }
+
+      function resetResult() {
+        calcResultsEl.innerHTML = "<p>Result will appear here...</p>";
+      } 
+
+      function resethandler() {
+        resetForm();
+        resetResult();
+      }
+
+
+      /*************** EVENT LISTINERS ***************/
+      eqSelect.addEventListener("change", resetResult);
+      selects.forEach((select) => {
+        select.addEventListener("change", resetResult);
+      });
+
+      inputs.forEach((input) => {
+        input.addEventListener("input", resetResult);
+      });
+
+      resetBtnEl.addEventListener("click", resethandler);
+      calcBtnEl.addEventListener("click", calculateResults);
+
+    </script>
+  </body>
+</html>

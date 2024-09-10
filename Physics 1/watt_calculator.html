@@ -3,90 +3,60 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Engine Displacement Calculator</title>
+    <title>Watt Calculator</title>
   </head>
   <body>
-    <h1>Engine Displacement Calculator</h1>
+    <h1>Watt Calculator</h1>
       <div>
         <p>
-          <label for="i1-input">Number of cylinders </label>
+          <label for="i1-input">Resistance (R)</label>
           <input
             type="number"
-            min="0"
             autocomplete="off"
             data-id="i1"
             step="any"
             id="i1-input"
             class="inputs"
-            data-name="Number of cylinders"
+            data-name="resistance"
           />
-
           <select
             class="selects"
             id="i1-select"
-            data-type="unit"
-            data-prev="unit"
+            data-type="resistance"
+            data-prev="Ω"
             data-id="i1"
-            style="display: none"
           >
-            <option value="unit">unit</option>
+            <option value="mΩ">milliohms (mΩ)</option>
+            <option value="Ω" selected>ohms (Ω)</option>
+            <option value="kΩ">kiloohms (kΩ)</option>
+            <option value="MΩ">megaohms (MΩ)</option>
           </select>
         </p>
 
         <p>
-          <label for="i2-input">Bore diameter </label>
+          <label for="i2-input">Voltage (V)</label>
           <input
             type="number"
-            min="0"
             autocomplete="off"
             data-id="i2"
             step="any"
             id="i2-input"
             class="inputs"
-            data-name="Bore diameter"
+            data-name="voltage"
           />
           <select
             class="selects"
             id="i2-select"
-            data-type="distance"
-            data-prev="cm"
+            data-type="voltage"
+            data-prev="V"
             data-id="i2"
           >
-            <option value="mm">millimeters (mm)</option>
-            <option value="cm" selected>centimeters (cm)</option>
-            <option value="m">meters (m)</option>
-            <option value="in">inches (in)</option>
-            <option value="ft">feet (ft)</option>
+            <option value="mV">millivolts (mV)</option>
+            <option value="V" selected>volts (V)</option>
+            <option value="kV">kilovolts (kV)</option>
+            <option value="MV">megavolts (MV)</option>
           </select>
         </p>
-
-        <p>
-          <label for="i3-input">Stroke length </label>
-          <input
-            type="number"
-            min="0"
-            autocomplete="off"
-            data-id="i3"
-            step="any"
-            class="inputs"
-            id="i3-input"
-            data-name="Stroke length"
-          />
-          <select
-            class="selects"
-            id="i3-select"
-            data-type="distance"
-            data-prev="cm"
-            data-id="i3"
-          >
-            <option value="mm">millimeters (mm)</option>
-            <option value="cm" selected>centimeters (cm)</option>
-            <option value="m">meters (m)</option>
-            <option value="in">inches (in)</option>
-            <option value="ft">feet (ft)</option>
-          </select>
-        </p>
-
       </div>
 
       <button id="calcBtn">Calculate</button>
@@ -107,77 +77,97 @@
 
       /*************** GLOBAL VARIBLES ***************/
       const UNITS = {
-        distance: {
-          mm: 1e3,
-          cm: 1e2,
-          m: 1,
-          in: 39.370078740157474,
-          ft: 3.2808398950131235,
+        resistance: {
+          mΩ: 1e3,
+          Ω: 1,
+          kΩ: 1e-3,
+          MΩ: 1e-6,
         },
-        volume: {
-          "mm³": 1e9,
-          "cm³": 1e6,
-          "m³": 1,
-          "in³": 61023.7440947322916,
-          l: 1e3,
-          "US gal": 264.1720523581484,
+        voltage: {
+          mV: 1e3,
+          V: 1,
+          kV: 1e-3,
+          MV: 1e-6,
         },
-
-        unit: {
-          unit: 1,
+        current: {
+          A: 1,
+          mA: 1e3,
+          µA: 1e6,
+        },
+        power: {
+          PW: 1e12,
+          nW: 1e9,
+          µW: 1e6,
+          mW: 1e3,
+          W: 1,
+          kW: 1e-3,
+          MW: 1e-6,
+          GW: 1e-9,
+          TW: 1e-12,
+          PW: 1e-15,
+          "hp(E)": 0.0013404825737265416,
         },
       };
-      let queue = ["i1", "i2", "i3", "i4"];
+      const queue = ["i1", "i2", "i3", "i4"];
       /*************** FUNCTIONS ***************/
       function toSIUnit(type, unit, value) {
-        if (type === "exp") {
-          unit = parseFloat("1e" + unit);
-          return value * unit;
-        }
         return value / UNITS[type][unit];
       }
 
       function fromSIUnit(type, unit, value) {
-        if (type === "exp") {
-          unit = parseFloat("1e" + unit);
-          return value / unit;
-        }
         return value * UNITS[type][unit];
-      }
-
-      function customPercision(ans, to = 8) {
-        return parseFloat(parseFloat(ans).toPrecision(to));
       }
 
       function createElement() {
         const newDiv = `
           <div>
             <p>
-              <label for="i4-span"> Engine displacement: &nbsp; </label>
+              <label for="i3-span">Current (I): &nbsp; </label>
               <span
-                type="number"
-                min="0"
-                autocomplete="off"
+                data-id="i3"
+                step="any"
+                id="i3-span"
+                class="spans"
+              ></span>
+              <select
+                class="selectsResult"
+                id="i3-select"
+                data-type="current"
+                data-prev="A"
+                data-id="i3"
+              >
+                <option value="A" selected>amperes (A)</option>
+                <option value="mA">milliamperes (mA)</option>
+                <option value="µA">microamperes (µA)</option>
+              </select>
+            </p>
+
+            <p>
+              <label for="i4-span">Power (P): &nbsp; </label>
+              <span
                 data-id="i4"
                 step="any"
-                class="spans"
                 id="i4-span"
-                data-name="Engine displacement"
+                class="spans"
               ></span>
               <select
                 class="selectsResult"
                 id="i4-select"
-                data-type="volume"
-                data-prev="cm³"
+                data-type="power"
+                data-prev="W"
                 data-id="i4"
               >
-                <option value="mm³">cubic millimeters (mm³)</option>
-                <option value="cm³">cubic centimeters (cm³)</option>
-                <option value="m³">cubic meters (m³)</option>
-                <option value="in³">cubic inches (in³)</option>
-                <option value="l">liters (l)</option>
-                <option value="US gal">gallons (US) (US gal)</option>
-                <option value="cm³" selected>cubic centimeters (cc)</option>
+                <option value="PW">picowatts (PW)</option>
+                <option value="nW">nanowatts (nW)</option>
+                <option value="µW">microwatts (µW)</option>
+                <option value="mW">milliwatts (mW)</option>
+                <option value="W" selected>watts (W)</option>
+                <option value="kW">kilowatts (kW)</option>
+                <option value="MW">megawatts (MW)</option>
+                <option value="GW">gigawatts (GW)</option>
+                <option value="TW">terawatts (TW)</option>
+                <option value="PW">petawatts (PW)</option>
+                <option value="hp(E)">electric horsepowers (hp(E))</option>
               </select>
             </p>
           </div>
@@ -185,6 +175,90 @@
         return newDiv
       }
 
+      function validateInput(id) {
+        const input = document.getElementById(`${id}-input`);
+        const label = input.getAttribute("data-name").trim();
+        let value = parseFloat(input.value);
+
+        if (value <= 0 || isNaN(value)) {
+          alert(`${label} must be greater than zero!`);
+          return false;
+        }
+
+        return true;
+      }
+
+      // related to caculation
+      function prepareUnit(...args) {
+        const resultArr = [];
+        for (id of args) {
+          const input = document.getElementById(`${id}-input`);
+          const select = document.getElementById(`${id}-select`);
+          const type = select.getAttribute("data-type");
+          let val = parseFloat(input.value);
+          val = isNaN(val) ? 0 : val;
+          let inUnit = select.value;
+          val = toSIUnit(type, inUnit, val);
+          resultArr.push(val);
+        }
+
+        return resultArr;
+      }
+      
+      function setResult(resultObj) {
+        for (key of Object.keys(resultObj)) {
+          let val = resultObj[key].result;
+          let id = resultObj[key].type;
+          if (isNaN(val)) {
+            alert("Your input resulted in NAN.\n 0/0 \n Try again with valid input.");
+            return;
+          }
+          if (Math.abs(val) === Infinity) {
+            alert("Your input resulted in Infinity. \nDivision by zero. \nTry again with valid input.");
+            return;
+          }
+
+          const span = document.getElementById(`${id}-span`);
+          const select = document.getElementById(`${id}-select`);
+          const type = select.getAttribute("data-type");
+          let outUnit = select.value;
+          val = fromSIUnit(type, outUnit, val);
+
+          span.textContent = parseFloat(val.toPrecision(6));
+        }
+      }
+
+      function calculateResult() {
+        let [val1, val2] = prepareUnit('i1', 'i2');
+        
+        let result = 0;
+        const calculateI3 = () => {
+          const type = "i3";
+          result = val2 / val1;
+          return {
+            result,
+            type,
+          };
+        };
+
+        const calculateI4 = () => {
+          const type = "i4";
+          result = (val2 * val2) / val1;
+          return {
+            result,
+            type,
+          };
+        };
+
+        let result1 = {
+          1: calculateI3()
+        } 
+        let result2 = {
+          1: calculateI4()
+        } 
+        setResult(result1)
+        setResult(result2)
+      }
 
       function handleResultsChange(e) {
         let select = e.target;
@@ -207,81 +281,11 @@
 
         let si = toSIUnit(type, prevUnit, value);
         let result = fromSIUnit(type, currentUnit, si);
-        span.textContent = customPercision(result, 13);
-      }
-
-      function validateInput(id) {
-        const input = document.getElementById(`${id}-input`);
-        const label = input.getAttribute("data-name").trim();
-        let value = parseFloat(input.value);
-
-        if (value <= 0 || isNaN(value)) {
-          alert(`${label} must be greater than zero!`);
-          return false;
-        }
-
-        return true;
-      }
-      
-      // related to caculation
-      function prepareUnit(...args) {
-        const resultArr = [];
-        for (id of args) {
-          const input = document.getElementById(`${id}-input`);
-          const select = document.getElementById(`${id}-select`);
-          const type = select.getAttribute("data-type");
-          let val = parseFloat(input.value);
-          val = isNaN(val) ? 0 : val;
-          let inUnit = select.value;
-          val = toSIUnit(type, inUnit, val);
-          resultArr.push(val);
-        }
-
-        return resultArr;
-      }
-
-      function setResult(resultObj) {
-        for (key of Object.keys(resultObj)) {
-          let val = resultObj[key].result;
-          let id = resultObj[key].type;
-          if (isNaN(val)) {
-            alert("Your input resulted in NAN.\n 0/0 \n Try again with valid input.");
-            return;
-          }
-          if (Math.abs(val) === Infinity) {
-            alert(
-              "Your input resulted in Infinity. \nDivision by zero. \nTry again with valid input."
-            );
-            return;
-          }
-
-          const span = document.getElementById(`${id}-span`);
-          const select = document.getElementById(`${id}-select`);
-          const type = select.getAttribute("data-type");
-          let outUnit = select.value;
-          val = fromSIUnit(type, outUnit, val);
-
-          span.textContent = customPercision(val, 16);
-        }
-      }
-
-      function calculateResult(out) {
-        const C = 4 * Math.PI * 10e-6;
-
-        function calculateI4() {
-          let [val1, val2, val3] = prepareUnit("i1", "i2", "i3");
-
-          let result = (val1 * val3 * Math.PI * val2 * val2 * 1) / 4;
-
-          return {
-            1: { result, type: "i4" },
-          };
-        }
-        return calculateI4()
+        span.textContent = parseFloat(result.toPrecision(6));
       }
 
       function calculateResults() {
-        for (el of ["i1", "i2", "i3"]) {
+        for (el of ["i1", "i2"]) {
           if (!validateInput(el)) return;
         }
 
@@ -295,8 +299,7 @@
             select.addEventListener("change", handleResultsChange);
           });
           
-          const result = calculateResult();
-          setResult(result)
+          calculateResult();
 
         } catch(error) {
           alert("An error ocurred. Try again with valid input.");
@@ -307,11 +310,7 @@
 
       function resetForm() {
         selects.forEach((select, index) => {
-          if (index > 0) {
-            select.selectedIndex = '1'
-          } else {
-            select.selectedIndex = '0'
-          }
+          select.selectedIndex = '1'
         });
 
         inputs.forEach((input) => {
@@ -328,7 +327,9 @@
         resetResult();
       }
 
+
       /*************** EVENT LISTINERS ***************/
+
       selects.forEach((select) => {
         select.addEventListener("change", resetResult);
       });

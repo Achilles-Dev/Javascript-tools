@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Force Calculator</title>
+  </head>
+  <body>
+    <h1>Force Calculator</h1>
+
+      <p>
+        Calculate:
+        <select id="calculateUnit">
+          <option value="i1">Mass (m)</option>
+          <option value="i2">Acceleration (a)</option>
+          <option value="i3" selected>Force (F)</option>
+        </select>
+      </p>
+    
+      <div>
+        <p id="i1-contianer" class="containers">
+          <label for="i1-input">Mass (m) </label>
+          <input
+            type="number"
+            step="any"
+            id="i1-input"
+            class="inputs"
+            min="0"
+          />
+          <select id="i1-select">
+            <option value="µg">micrograms (µg)</option>
+            <option value="mg">milligrams (mg)</option>
+            <option value="g">grams (g)</option>
+            <option value="dag">decagrams (dag)</option>
+            <option value="kg" selected>kilograms (kg)</option>
+            <option value="t">metric tons (t)</option>
+            <option value="gr">grains (gr)</option>
+            <option value="dr">drachms (dr)</option>
+            <option value="oz">ounces (oz)</option>
+            <option value="lb">pounds (lb)</option>
+            <option value="st">stones (st)</option>
+            <option value="US ton">US short tons (US ton)</option>
+            <option value="long ton">imperial tons (long ton)</option>
+            <option value="Earths">weights of the Earth (Earths)</option>
+          </select>
+        </p>
+
+        <p id="i2-contianer" class="containers">
+          <label for="i2-input">Acceleration (a) </label>
+          <input type="number" step="any" id="i2-input" class="inputs" />
+          <select id="i2-select">
+            <option value="m/s²" selected>
+              meters per second squared (m/s²)
+            </option>
+            <option value="g">gravitational acc. on Earth (g)</option>
+            <option value="ft/s²">feet per second squared (ft/s²)</option>
+          </select>
+        </p>
+        
+        <p id="i3-contianer" class="containers" style="display: none;">
+          <label for="i3-input">Force (F) </label>
+          <input type="number" id="i3-input" step="any" class="inputs" />
+          <select id="i3-select">
+            <option value="N" selected>newtons (N)</option>
+            <option value="kN">kilonewtons (kN)</option>
+            <option value="MN">meganewtons (MN)</option>
+            <option value="GN">giganewtons (GN)</option>
+            <option value="TN">teranewtons (TN)</option>
+            <option value="lbf">pounds-force (lbf)</option>
+            <option value="kip">kips (kip)</option>
+            <option value="dyn">dynes (dyn)</option>
+          </select>
+        </p>
+      </div>
+
+      <button id="calcBtn">Calculate</button>
+      <button id="resetBtn">Reset</button>
+      <hr>
+      <div>
+        <h3>Result:</h3>
+        <h3 id="calcResults">Result will appear here...</h3>
+      </div>
+    <script>
+      /*************** ELEMENTS ***************/
+      const calculateUnitEl = document.getElementById("calculateUnit");
+      const containers = document.querySelectorAll(".containers");
+      const inputs = document.querySelectorAll(".inputs");
+
+      const i1Input = document.getElementById("i1-input");
+      const i2Input = document.getElementById("i2-input");
+      const i3Input = document.getElementById("i3-input");
+
+      const i1Select = document.getElementById("i1-select");
+      const i2Select = document.getElementById("i2-select");
+      const i3Select = document.getElementById("i3-select");
+
+      const calcBtnEl = document.getElementById('calcBtn');
+      const resetBtnEl = document.getElementById('resetBtn');
+      const calcResultsEl = document.getElementById('calcResults')
+
+      /*************** GLOBAL VARIBLES ***************/
+      const UNITS = {
+        mass: {
+          µg: 1e9,
+          mg: 1e6,
+          g: 1e3,
+          dag: 1e2,
+          kg: 1,
+          t: 1e-3,
+          gr: 15432.35835294143,
+          dr: 564.3833911932867,
+          oz: 35.27396194958042,
+          lb: 2.204622621848776,
+          st: 0.15747304441776971,
+          "US ton": 0.001102311310924388,
+          "long ton": 0.0009842065276110606,
+          Earths: 1.6744248350691538e-25,
+        },
+        acceleration: {
+          "m/s²": 1,
+          g: 0.10197162129779282,
+          "ft/s²": 3.28084,
+        },
+        force: {
+          N: 1,
+          kN: 1e-3,
+          MN: 1e-6,
+          GN: 1e-9,
+          TN: 1e-12,
+          lbf: 0.2248089438709618,
+          kip: 0.00022480894387096178,
+          dyn: 100000,
+        },
+      };
+      /*************** FUNCTIONS ***************/
+      function toSIUnit(type, unit, value) {
+        return value / UNITS[type][unit];
+      }
+
+      function fromSIUnit(type, unit, value) {
+        return value * UNITS[type][unit];
+      }
+
+      function handleCalculateUnitChange(e) {
+        const value = e.target.value
+
+        containers.forEach((container) => {
+          let idVal = container.id.slice(0, 2)
+          if (idVal == value) {
+            container.style.display = 'none'
+          } else {
+            container.style.display = 'block'
+          }
+        })
+
+        resetResult()
+      }
+
+      function createElements(resultObj) {
+        const elementNodes = Object.keys(resultObj).map((key) => {
+          //create elements to put the results in
+          const div = document.createElement("div");
+          const span = document.createElement("span");
+          const span2 = document.createElement("span");
+
+          // give the elements id
+          div.setAttribute("class", `result-container`);
+          span.setAttribute("class", `result-title`);
+          span2.setAttribute("class", `result-value`);
+
+          // put the values in the elements
+
+          span.textContent = resultObj[key]["title"];
+          span2.textContent = resultObj[key]["value"];
+
+          // appened them to an element that contians them
+          div.append(span, span2);
+
+          // return that element
+          return div;
+        });
+
+        return elementNodes;
+      }
+
+      function calculateResult(input) {
+        const calculateI1 = () => {
+          const { i3, i2 } = prepareUnits();
+          let result = i3 / i2;
+          return {
+            result,
+            type: "mass",
+            name: "Mass",
+          };
+        };
+        const calculateI2 = () => {
+          const { i1, i3 } = prepareUnits();
+
+          let result = i3 / i1;
+          return {
+            result,
+            type: "acceleration",
+            name: `Acceleration`,
+          };
+        };
+        const calculateI3 = () => {
+          const { i1, i2 } = prepareUnits();
+          let result = i1 * i2;
+          return {
+            result,
+            type: "force",
+            name: "Force (F)",
+          };
+        };
+
+        switch (input) {
+          case "i1":
+            return calculateI1();
+          case "i2":
+            return calculateI2();
+          case "i3":
+            return calculateI3();
+          default:
+            console.log("error in calculate result switch");
+        }
+      }
+
+      function prepareUnits() {
+        let i1 = parseFloat(i1Input.value) ?? 0;
+        let i2 = parseFloat(i2Input.value) ?? 0;
+        let i3 = parseFloat(i3Input.value) ?? 0;
+
+        let i1Unit = i1Select.value;
+        let i2Unit = i2Select.value;
+        let i3Unit = i3Select.value;
+
+        i1 = toSIUnit("mass", i1Unit, i1);
+        i2 = toSIUnit("acceleration", i2Unit, i2);
+        i3 = toSIUnit("force", i3Unit, i3);
+
+        return { i3, i1, i2 };
+      }
+
+      function prepareResults(result, type, name) {
+        let resultObj = {};
+        Object.keys(UNITS[type]).forEach((key) => {
+          let ans = fromSIUnit(type, key, result);
+          ans = parseFloat(ans.toFixed(15));
+          if (!(ans > 0 && ans < 1) && !(ans < 0 && ans > -1)) {
+            ans = ans.toLocaleString();
+          }
+
+          resultObj[key] = {
+            title: `${name} (${key}): `,
+            value: ` ${ans} ${key}`,
+          };
+        });
+        return resultObj;
+      }
+      function calculateResults() {
+
+        const calculateUnit = calculateUnitEl.value
+
+        try {
+          const { result, type, name } = calculateResult(calculateUnit);
+
+          if (isNaN(result)) {
+            alert("Your input resulted in NAN.\n 0/0 \n Try again with valid input.");
+            resetResult()
+            return;
+          }
+          if (Math.abs(result) === Infinity) {
+            alert(
+              "Your input resulted in Infinity. \nDivision by zero. \nTry again with valid input."
+            );
+            resetResult()
+            return;
+          }
+
+          const resultObj = prepareResults(result, type, name);
+          const elementNodes = createElements(resultObj);
+          calcResultsEl.innerHTML = ``;
+
+          elementNodes.forEach((element) => {
+            calcResultsEl.append(element);
+          });
+        } catch (error) {
+          console.log(error);
+          alert("An error ocurred. Try again with valid input.");
+          resetResult()
+          return;
+        }
+      }
+
+      function resetForm() {
+        [i1Select, i2Select, i3Select].forEach((select, index) => {
+            if (index == 0) {
+               select.selectedIndex = '4'
+            } else {
+               select.selectedIndex = '0'
+            }
+        });
+
+        [i1Input, i2Input, i3Input].forEach((input) => {
+          input.value = ""
+        });
+        calculateUnitEl.selectedIndex = '2';
+        containers.forEach((container) => {
+          let idVal = container.id.slice(0, 2)
+          if (idVal == 'i3') {
+            container.style.display = 'none'
+          } else {
+            container.style.display = 'block'
+          }
+        })
+      }
+
+      function resetResult() {
+        calcResultsEl.innerHTML = "<p>Result will appear here...</p>";
+      } 
+
+      function resethandler() {
+        resetForm();
+        resetResult();
+      }
+
+      /*************** EVENT LISTINERS ***************/
+      [i1Select, i2Select, i3Select].forEach((select) => {
+        select.addEventListener("change", resetResult);
+      });
+      [i1Input, i2Input, i3Input].forEach((input) => {
+        input.addEventListener("input", resetResult);
+      });
+      calculateUnitEl.addEventListener("change", handleCalculateUnitChange);
+      resetBtnEl.addEventListener("click", resethandler);
+      calcBtnEl.addEventListener("click", calculateResults);
+
+    </script>
+  </body>
+</html>

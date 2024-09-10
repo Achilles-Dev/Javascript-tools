@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Resistor Noise Calculator</title>
+  </head>
+  <body>
+    <h1>Resistor Noise Calculator</h1>
+      <p>
+        Calculate:
+        <select id="calculateUnit">
+          <option value="rt">Resitance (R) </option>
+          <option value="tp">Temperature (T)</option>
+          <option value="bw">Bandwidth (ΔF)</option>
+          <option value="rn" selected>Resistor noise (E)</option>
+        </select>
+      </p>
+      
+      <div>
+        <p id="rt-contianer" class="containers">
+          <label for="rt-input">Resitance (R) </label>
+          <input
+            type="number"
+            step="any"
+            id="rt-input"
+            class="inputs"
+            min="1e-20"
+          />
+          <select id="rt-select">
+            <option value="mΩ">milliohms (mΩ)</option>
+            <option value="Ω" selected>ohms (Ω)</option>
+            <option value="kΩ">kiloohms (kΩ)</option>
+            <option value="MΩ">megaohms (MΩ)</option>
+          </select>
+        </p>
+
+        <p id="tp-contianer" class="containers">
+          <label for="tp-input">Temperature (T) </label>
+          <input
+            type="number"
+            step="any"
+            id="tp-input"
+            class="inputs"
+            min="-461.47"
+          />
+          <select id="tp-select">
+            <option value="°C" selected>Celsius (°C)</option>
+            <option value="°F">Fahrenheit (°F)</option>
+            <option value="K">kelvin (K)</option>
+          </select>
+        </p>
+
+        <p id="bw-contianer" class="containers">
+          <label for="bw-input">Bandwidth (ΔF) </label>
+          <input
+            type="number"
+            id="bw-input"
+            step="any"
+            class="inputs"
+            min="1e-20"
+          /><select id="bw-select">
+            <option value="Hz" selected>hertz (Hz)</option>
+            <option value="kHz">kilohertz (kHz)</option>
+            <option value="MHz">megahertz (MHz)</option>
+            <option value="GHz">gigahertz (GHz)</option>
+            <option value="THz">terahertz (THz)</option>
+          </select>
+        </p>
+
+        <p id="rn-contianer" class="containers" style="display: none;">
+          <label for="rn-input">Resistor noise (E) </label>
+          <input
+            type="number"
+            step="any"
+            id="rn-input"
+            class="inputs"
+            min="1e-20"
+          />
+          <select id="rn-select">
+            <option value="nV">nanovolts (nV)</option>
+            <option value="μV">microvolts (μV)</option>
+            <option value="mV" selected>millivolts (mV)</option>
+            <option value="V">volts (V)</option>
+          </select>
+        </p>
+      </div>
+
+      <button id="calcBtn">Calculate</button>
+      <button id="resetBtn">Reset</button>
+      <hr>
+      <div>
+        <h3>Result:</h3>
+        <h3 id="calcResults">Result will appear here...</h3>
+      </div>
+    <script>
+      /*************** ELEMENTS ***************/
+      const calculateUnitEl = document.getElementById("calculateUnit");
+      const containers = document.querySelectorAll(".containers");
+      const inputs = document.querySelectorAll(".inputs");
+
+      const rtInput = document.getElementById("rt-input");
+      const tpInput = document.getElementById("tp-input");
+      const bwInput = document.getElementById("bw-input");
+      const rnInput = document.getElementById("rn-input");
+
+      const rtSelect = document.getElementById("rt-select");
+      const tpSelect = document.getElementById("tp-select");
+      const bwSelect = document.getElementById("bw-select");
+      const rnSelect = document.getElementById("rn-select");
+
+      const calcBtnEl = document.getElementById('calcBtn');
+      const resetBtnEl = document.getElementById('resetBtn');
+      const calcResultsEl = document.getElementById('calcResults')
+
+      /*************** GLOBAL VARIBLES ***************/
+      const UNITS = {
+        resistance: {
+          mΩ: 1e3,
+          Ω: 1,
+          kΩ: 1e-3,
+          MΩ: 1e-6,
+        },
+        voltage: {
+          nV: 1e9,
+          μV: 1e6,
+          mV: 1e3,
+          V: 1,
+        },
+        frequency: {
+          Hz: 1,
+          kHz: 1e-3,
+          MHz: 1e-6,
+          GHz: 1e-9,
+          THz: 1e-12,
+        },
+        temperature: {
+          "°C": (value, op) => (op === "+" ? value + 273.15 : value - 273.15),
+          "°F": (value, op) =>
+            op === "+"
+              ? (value - 32) * (5 / 9) + 273.15
+              : value * (9 / 5) + 32 - 273.15,
+          K: (value, op) => value,
+        },
+      };
+      const k = 1.380649e-23;
+
+      /*************** FUNCTIONS ***************/
+      function toSIUnit(type, unit, value) {
+        return value / UNITS[type][unit];
+      }
+
+      function fromSIUnit(type, unit, value) {
+        return value * UNITS[type][unit];
+      }
+      function toSIUnitTemp(type, unit, value) {
+        return UNITS[type][unit](value, "+");
+      }
+
+      function fromSIUnitTemp(type, unit, value) {
+        return UNITS[type][unit](value, "-");
+      }
+
+      function handleCalculateUnitChange(e) {
+        const value = e.target.value
+
+        containers.forEach((container) => {
+          let idVal = container.id.slice(0, 2)
+          if (idVal == value) {
+            container.style.display = 'none'
+          } else {
+            container.style.display = 'block'
+          }
+        })
+
+        resetResult()
+      }
+
+      function createElements(resultObj) {
+        const elementNodes = Object.keys(resultObj).map((key) => {
+          //create elements to put the results in
+          const div = document.createElement("div");
+          const span = document.createElement("span");
+          const span2 = document.createElement("span");
+
+          // give the elements id
+          div.setAttribute("class", `result-container`);
+          span.setAttribute("class", `result-title`);
+          span2.setAttribute("class", `result-value`);
+
+          // put the values in the elements
+
+          span.textContent = resultObj[key]["title"];
+          span2.textContent = resultObj[key]["value"];
+
+          // appened them to an element that contians them
+          div.append(span, span2);
+
+          // return that element
+          return div;
+        });
+
+        return elementNodes;
+      }
+
+      function calculateResult(input) {
+        const calculateTp = () => {
+          const { rt, bw, rn } = prepareUnits();
+
+          let result = (rn * rn) / (4 * k * bw * rt);
+          return {
+            result,
+            type: "temperature",
+            name: `Temperature`,
+          };
+        };
+        const calculateBw = () => {
+          const { rt, tp, rn } = prepareUnits();
+          let result = (rn * rn) / (4 * k * rt * tp);
+          return {
+            result,
+            type: "frequency",
+            name: "Bandwidth",
+          };
+        };
+        const calculateRt = () => {
+          const { bw, tp, rn } = prepareUnits();
+          let result = (rn * rn) / (4 * k * bw * tp);
+          return {
+            result,
+            type: "resistance",
+            name: "Resitance",
+          };
+        };
+        const calculateRn = () => {
+          const { bw, tp, rt } = prepareUnits();
+          let result = Math.sqrt(4 * k * rt * tp * bw);
+
+          return {
+            result,
+            type: "voltage",
+            name: "Resistor noise",
+          };
+        };
+
+        switch (input) {
+          case "tp":
+            return calculateTp();
+          case "rt":
+            return calculateRt();
+          case "bw":
+            return calculateBw();
+          case "rn":
+            return calculateRn();
+          default:
+            console.log("error in calculate result switch");
+        }
+      }
+      function calculateNoiseLevel(v) {
+        let lu, lv;
+        lu = 20 * Math.log10(v / 0.77459667);
+        lv = 20 * Math.log10(v);
+        lu = parseFloat(lu.toFixed(12));
+        if (!(lu > 0 && lu < 1) && !(lu < 0 && lu > -1)) {
+          lu = lu.toLocaleString();
+        }
+        lv = parseFloat(lv.toFixed(12));
+        if (!(lv > 0 && lv < 1) && !(lv < 0 && lv > -1)) {
+          lv = lv.toLocaleString();
+        }
+        return { lu, lv };
+      }
+
+      function prepareUnits() {
+        let rt = parseFloat(rtInput.value) ?? 0;
+        let tp = parseFloat(tpInput.value) ?? 0;
+        let bw = parseFloat(bwInput.value) ?? 0;
+        let rn = parseFloat(rnInput.value) ?? 0;
+
+        let rtUnit = rtSelect.value;
+        let tpUnit = tpSelect.value;
+        let bwUnit = bwSelect.value;
+        let rnUnit = rnSelect.value;
+
+        rt = toSIUnit("resistance", rtUnit, rt);
+        tp = toSIUnitTemp("temperature", tpUnit, tp);
+
+        bw = toSIUnit("frequency", bwUnit, bw);
+        rn = toSIUnit("voltage", rnUnit, rn);
+
+        return { bw, rt, tp, rn };
+      }
+
+      function prepareResults(result, type, name) {
+        let resultObj = {};
+        Object.keys(UNITS[type]).forEach((key) => {
+          let ans = 0;
+          if (type === "temperature") ans = fromSIUnitTemp(type, key, result);
+          else ans = fromSIUnit(type, key, result);
+          ans = parseFloat(ans.toFixed(12));
+          if (!(ans > 0 && ans < 1) && !(ans < 0 && ans > -1)) {
+            ans = ans.toLocaleString();
+          }
+
+          resultObj[key] = {
+            title: `${name} (${key}): `,
+            value: ` ${ans} ${key}`,
+          };
+        });
+        return resultObj;
+      }
+      
+      function calculateResults() {
+        const calculateUnit = calculateUnitEl.value
+
+        try {
+          // check for temprature
+          let tp = parseFloat(tpInput.value) ?? 0;
+          let tpUnit = tpSelect.value;
+          tp = toSIUnitTemp("temperature", tpUnit, tp);
+          if (tp < 0) {
+            alert(
+              "Temperature in Kelvin should not be negative. \nTry again with valid input."
+            );
+            tpInput.value = 0;
+            resetResult()
+            return;
+          }
+          // get the result
+          const { result, type, name } = calculateResult(calculateUnit);
+
+          if (isNaN(result)) {
+            alert("Your input resulted in NAN.\n 0/0 \n Try again with valid input.");
+            resetResult()
+            return;
+          }
+          if (Math.abs(result) === Infinity) {
+            alert(
+              "Your input resulted in Infinity. \nDivision by zero. \nTry again with valid input."
+            );
+
+            resetResult()
+            return;
+          }
+
+          // calculte noise level
+          let lu = 0;
+          let lv = 0;
+          let nlObj = {};
+          if (type === "voltage") {
+            nlObj = calculateNoiseLevel(result);
+          } else {
+            let rn = parseFloat(rnInput.value) ?? 0;
+            let rnUnit = rnSelect.value;
+            rn = toSIUnit("voltage", rnUnit, rn);
+            nlObj = calculateNoiseLevel(rn);
+          }
+          lu = nlObj.lu;
+          lv = nlObj.lv;
+          let noiselvlStr = `
+          <div class="result-container">
+            <span class="result-title">Noise level Lᵤ: </span>
+            <span class="result-value"> ${lu} dBu</span>
+          </div>
+          <div class="result-container">
+            <span class="result-title">Noise level Lᵥ: </span>
+            <span class="result-value"> ${lv} dBVs</span>
+          </div>
+          <br />
+          `;
+
+          const resultObj = prepareResults(result, type, name);
+          const elementNodes = createElements(resultObj);
+          calcResultsEl.innerHTML = "";
+
+          calcResultsEl.innerHTML += noiselvlStr;
+          elementNodes.forEach((element) => {
+            calcResultsEl.append(element);
+          });
+        } catch (error) {
+          console.log(error);
+          alert("An error ocurred. Try again with valid input.");
+          resetResult()
+          return;
+        }
+      }
+
+      function resetForm() {
+        [rtSelect, tpSelect, bwSelect, rnSelect].forEach((select, index) => {
+          if (index == 0) {
+            select.selectedIndex = '1'
+          } else {
+            select.selectedIndex = '0'
+          }
+        });
+
+        [rtInput, tpInput, bwInput, rnInput].forEach((input) => {
+          input.value = ""
+        });
+        calculateUnitEl.selectedIndex = '3';
+        containers.forEach((container) => {
+          let idVal = container.id.slice(0, 2)
+          if (idVal == 'rn') {
+            container.style.display = 'none'
+          } else {
+            container.style.display = 'block'
+          }
+        })
+      }
+
+      function resetResult() {
+        calcResultsEl.innerHTML = "<p>Result will appear here...</p>";
+      } 
+
+      function resethandler() {
+        resetForm();
+        resetResult();
+      }
+
+      /*************** EVENT LISTINERS ***************/
+      [rtSelect, tpSelect, bwSelect, rnSelect].forEach((select) => {
+        select.addEventListener("change", resetResult);
+      });
+      [rtInput, tpInput, bwInput, rnInput].forEach((input) => {
+        input.addEventListener("input", resetResult);
+      });
+      calculateUnitEl.addEventListener("change", handleCalculateUnitChange);
+      resetBtnEl.addEventListener("click", resethandler);
+      calcBtnEl.addEventListener("click", calculateResults);
+
+    </script>
+  </body>
+</html>

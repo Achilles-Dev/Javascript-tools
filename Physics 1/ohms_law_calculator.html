@@ -1,0 +1,551 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Ohm's Law Calculator</title>
+  </head>
+  <body>
+    <h1>Ohm's Law Calculator</h1>
+    <p>Enter two and only two parameters to calculate the other two.</p>
+    <div>
+      <p>
+        Calculate:
+        <select id="calculateUnit">
+          <option value="rp" selected>Resistance & Power</option>
+          <option value="vc">Voltage & Current</option>
+          <option value="vr">Voltage & Resistance</option>
+          <option value="vp">Voltage & Power</option>
+          <option value="cp">Current & Power</option>
+          <option value="cr">Current & Resistance</option>
+        </select>
+      </p>
+      <p id="voltageContainer" class="container">
+        <label for="voltage-input">Voltage (V)</label>
+        <input
+          type="number"
+          step="any"
+          min="0"
+          id="voltage-input"
+          data-type="voltage"
+        />
+        <select id="voltage-unit-select">
+          <option value="milliv">MilliVolts (mV)</option>
+          <option value="v" selected="selected">Volts (V)</option>
+          <option value="kilov">KiloVolts (KV)</option>
+          <option value="megav">MegaVolts (MV)</option>
+        </select>
+      </p>
+      <p id="currentContainer" class="container">
+        <label for="current-input">Current (I)</label>
+        <input
+          type="number"
+          step="any"
+          min="0"
+          id="current-input"
+          data-type="current"
+        />
+        <select id="current-unit-select">
+          <option value="milliamp">Milliamperes (mA)</option>
+          <option value="amp" selected="selected">Amperes (A)</option>
+        </select>
+      </p>
+      <p id="resistanceContainer" class="container" style="display: none;">
+        <label for="resistance-input">Resistance (R)</label>
+        <input
+          type="number"
+          step="any"
+          min="0"
+          id="resistance-input"
+          data-type="resistance"
+        />
+        <select id="resistance-unit-select">
+          <option value="ohm" selected="selected">Ohms (Ω)</option>
+          <option value="kiloohm">KiloOhms (KΩ)</option>
+          <option value="megaohm">MegaOhms (MΩ)</option>
+        </select>
+      </p>
+      <p id="powerContainer" class="container" style="display: none;">
+        <label for="power-input">Power (P) </label>
+        <input
+          type="number"
+          step="any"
+          min="0"
+          id="power-input"
+          data-type="power"
+        />
+        <select id="power-unit-select">
+          <option value="milliwatt">MilliWatts (mW)</option>
+          <option value="watt" selected="selected">Watts (W)</option>
+          <option value="kilowatt">KiloWatts (KW)</option>
+          <option value="megawatt">MegaWatts (MW)</option>
+          <option value="gigawatt">GigaWatts (GW)</option>
+        </select>
+      </p>
+      <button id="calcBtn">Calculate</button>
+      <button id="resetBtn">Reset</button>
+      <hr>
+      <div>
+        <h3>Result:</h3>
+        <h3 id="calcResults">Result will appear here...</h3>
+      </div>
+    <script>
+      /*************** ELEMENTS ***************/
+      const calculateUnitEl = document.getElementById("calculateUnit");
+      const containers = document.querySelectorAll(".container")
+      const voltageInput = document.getElementById("voltage-input");
+      const currentInput = document.getElementById("current-input");
+      const resistanceInput = document.getElementById("resistance-input");
+      const powerInput = document.getElementById("power-input");
+
+      const calcBtnEl = document.getElementById('calcBtn');
+      const resetBtnEl = document.getElementById('resetBtn');
+      const calcResultsEl = document.getElementById('calcResults')
+
+      /*************** GLOBAL VARIABLES ***************/
+      const UNITS = {
+        current: { milliamp: 1000, amp: 1 },
+        voltage: {
+          milliv: 1000,
+          v: 1,
+          kilov: 0.001,
+          megav: 0.000001,
+        },
+        resistance: {
+          ohm: 1,
+          kiloohm: 0.001,
+          megaohm: 0.000001,
+        },
+        power: {
+          milliwatt: 1000,
+          watt: 1,
+          kilowatt: 0.001,
+          megawatt: 0.000001,
+          gigawatt: 1e-9,
+        },
+      };
+      /*************** FUNCTIONS ***************/
+      function toSIUnit(type, unit, value) {
+        return value / UNITS[type][unit];
+      }
+      function fromSIUnit(type, unit, value) {
+        return value * UNITS[type][unit];
+      }
+
+      function clearFields() {
+        voltageInput.value = "";
+        currentInput.value = "";
+        resistanceInput.value = "";
+        powerInput.value = "";
+      }
+
+      function handleCalculateUnitChange(e) {
+        const value = e.target.value
+        containers.forEach((container) => {
+          let idVal = container.id.slice(0, 1)     
+          if (value.includes(idVal)) {
+            container.style.display = 'none'
+          } else {
+            container.style.display = 'block'
+          }
+        })
+        clearFields()
+        resetResult()
+      }
+
+      function createElement() {
+        const voltDiv = `
+          <div>
+            <p>
+              <label for="voltage-input">Voltage (V)</label>
+              <input
+                type="number"
+                step="any"
+                min="0"
+                id="voltage-inputResult"
+                data-type="voltage"
+                disabled
+              />
+              <select id="voltage-unit-select" class="selectsResult">
+                <option value="milliv">MilliVolts (mV)</option>
+                <option value="v" selected="selected">Volts (V)</option>
+                <option value="kilov">KiloVolts (KV)</option>
+                <option value="megav">MegaVolts (MV)</option>
+              </select>
+            </p>
+          </div>
+        `
+        const currDiv = `
+          <div>
+            <p>
+              <label for="current-input">Current (I)</label>
+              <input
+                type="number"
+                step="any"
+                min="0"
+                id="current-inputResult"
+                data-type="current"
+                disabled
+              />
+              <select id="current-unit-select" class="selectsResult">
+                <option value="milliamp">Milliamperes (mA)</option>
+                <option value="amp" selected="selected">Amperes (A)</option>
+              </select>
+            </p>
+          </div>
+        `
+
+        const restDiv = `
+          <div>
+            <p>
+              <label for="resistance-input">Resistance (R)</label>
+              <input
+                type="number"
+                step="any"
+                min="0"
+                id="resistance-inputResult"
+                data-type="resistance"
+                disabled
+              />
+              <select id="resistance-unit-select" class="selectsResult">
+                <option value="ohm" selected="selected">Ohms (Ω)</option>
+                <option value="kiloohm">KiloOhms (KΩ)</option>
+                <option value="megaohm">MegaOhms (MΩ)</option>
+              </select>
+            </p>
+          </div>
+        `
+        const powerDiv = `
+          <div>
+            <p>
+              <label for="power-input">Power (P) </label>
+              <input
+                type="number"
+                step="any"
+                min="0"
+                id="power-inputResult"
+                data-type="power"
+                disabled
+              />
+              <select id="power-unit-select" class="selectsResult">
+                <option value="milliwatt">MilliWatts (mW)</option>
+                <option value="watt" selected="selected">Watts (W)</option>
+                <option value="kilowatt">KiloWatts (KW)</option>
+                <option value="megawatt">MegaWatts (MW)</option>
+                <option value="gigawatt">GigaWatts (GW)</option>
+              </select>
+            </p>
+          </div>
+        `
+        const calculateUnit = calculateUnitEl.value
+        if (calculateUnit == 'rp') {
+          return restDiv + powerDiv
+        } else if (calculateUnit == 'vc') {
+          return voltDiv + currDiv
+        } else if (calculateUnit == 'vr') {
+          return voltDiv + restDiv
+        } else if (calculateUnit == 'vp') {
+          return voltDiv + powerDiv
+        } else if (calculateUnit == 'cp') {
+          return currDiv + powerDiv
+        } else if (calculateUnit == 'cr') {
+          return currDiv + restDiv
+        }
+      }
+
+      function handleResultsChange(e) {
+        let select = e.target;
+        let id = select.getAttribute("data-id");
+        let input = document.getElementById(`${id}-input`);
+
+        let prevUnit = select.getAttribute("data-prev");
+        let currentUnit = select.value;
+        select.setAttribute("data-prev", currentUnit);
+
+        if (span.value === "") {
+          return;
+        }
+
+        let type = select.getAttribute("data-type");
+
+        let value = parseFloat(input.value);
+        value = parseFloat(value);
+        if (isNaN(value)) value = 0.0;
+
+        let si = toSIUnit(type, prevUnit, value);
+        let result = fromSIUnit(type, currentUnit, si);
+        input.value = parseFloat(result);
+      }
+
+      function calculateResults() {
+        if (!validateParameters()) {
+          alert("Enter two and only two parameters to calculate the other two.");
+          clearFields();
+          return;
+        }
+        if (!isNegative()) {
+          alert("Negative Numbers are not allowed");
+          clearFields();
+          return;
+        }
+        const { out1, out2, in1, in2 } = prepareParmaters();
+        
+        let { result1, result2 } = calculateResult(out1, out2, in1, in2);
+
+        if (result1 === Infinity || result2 === Infinity) {
+          alert(
+            "You entered a value that resulted in (Infinity).\nTry again with valid input."
+          );
+          clearFields();
+          return;
+        }
+
+        const resultElement = createElement()
+        calcResultsEl.innerHTML = resultElement
+
+        const newSelects = document.querySelectorAll(".selectsResult");
+
+        newSelects.forEach((select) => {
+          select.addEventListener("change", handleResultsChange);
+        });
+        const out1Element = document.getElementById(`${out1}-inputResult`);
+        const out2Element = document.getElementById(`${out2}-inputResult`);
+
+        const unitOut1 = document.getElementById(`${out1}-unit-select`).value;
+        const unitOut2 = document.getElementById(`${out2}-unit-select`).value;
+
+        result1 = fromSIUnit(out1, unitOut1, result1);
+        result2 = fromSIUnit(out2, unitOut2, result2);
+
+        result1 = result1 > 1 ? result1.toFixed(2) : result1;
+        result2 = result2 > 1 ? result2.toFixed(2) : result2;
+
+        out1Element.value = result1;
+        out2Element.value = result2;
+      }
+
+      function calculateResult(out1, out2, in1, in2) {
+        const calculateVoltage = (in1, in2) => {
+          const inType = in1.type + in2.type;
+          const val1 = in1.value;
+          const val2 = in2.value;
+          switch (inType) {
+            case "currentresistance":
+              return val1 * val2;
+            case "resistancecurrent":
+              return val2 * val1;
+            case "powercurrent":
+              return val1 / val2;
+            case "currentpower":
+              return val2 / val1;
+            case "powerresistance":
+              return Math.sqrt(val1 * val2);
+            case "resistancepower":
+              return Math.sqrt(val2 * val1);
+            default:
+              return;
+          }
+        };
+        const calculateResistance = (in1, in2) => {
+          const inType = in1.type + in2.type;
+          const val1 = in1.value;
+          const val2 = in2.value;
+          switch (inType) {
+            case "powercurrent":
+              return val1 / (val2 * val2);
+            case "currentpower":
+              return val2 / (val1 * val1);
+            case "powervoltage":
+              return (val2 * val2) / val1;
+            case "voltagepower":
+              return (val1 * val1) / val2;
+            case "currentvoltage":
+              return val2 / val1;
+            case "voltagecurrent":
+              return val1 / val2;
+            default:
+              return;
+          }
+        };
+        const calculateCurrent = (in1, in2) => {
+          const inType = in1.type + in2.type;
+          const val1 = in1.value;
+          const val2 = in2.value;
+          switch (inType) {
+            case "voltageresistance":
+              return val1 / val2;
+            case "resistancevoltage":
+              return val2 / val1;
+            case "powervoltage":
+              return val1 / val2;
+            case "voltagepower":
+              return val2 / val1;
+            case "resistancepower":
+              return Math.sqrt(val2 / val1);
+            case "powerresistance":
+              return Math.sqrt(val1 / val2);
+            default:
+              return;
+          }
+        };
+        const calculatePower = (in1, in2) => {
+          const inType = in1.type + in2.type;
+          const val1 = in1.value;
+          const val2 = in2.value;
+          switch (inType) {
+            case "voltagecurrent":
+              return val1 * val2;
+            case "currentvoltage":
+              return val2 * val1;
+            case "voltageresistance":
+              return (val1 * val1) / val2;
+            case "resistancevoltage":
+              return (val2 * val2) / val1;
+            case "currentresistance":
+              return val1 * val1 * val2;
+            case "resistancecurrent":
+              return val2 * val2 * val1;
+            default:
+              return;
+          }
+        };
+
+        const calculateOutput = (out, in1, in2) => {
+          switch (out) {
+            case "voltage":
+              return calculateVoltage(in1, in2);
+            case "current":
+              return calculateCurrent(in1, in2);
+            case "resistance":
+              return calculateResistance(in1, in2);
+            case "power":
+              return calculatePower(in1, in2);
+          }
+        };
+        return {
+          result1: calculateOutput(out1, in1, in2),
+          result2: calculateOutput(out2, in1, in2),
+        };
+      }
+
+      function validateParameters() {
+        let count = 0;
+        if (voltageInput.value.trim() !== "") count++;
+        if (currentInput.value.trim() !== "") count++;
+        if (resistanceInput.value.trim() !== "") count++;
+        if (powerInput.value.trim() !== "") count++;
+        if (count !== 2) {
+          return false;
+        }
+        return true;
+      }
+      
+      function isNegative() {
+        if (
+          parseInt(voltageInput.value) !== isNaN() &&
+          parseInt(voltageInput.value) < 0
+        ) {
+          return false;
+        }
+        if (
+          parseInt(currentInput.value) !== isNaN() &&
+          parseInt(currentInput.value) < 0
+        ) {
+          return false;
+        }
+        if (
+          parseInt(resistanceInput.value) !== isNaN() &&
+          parseInt(resistanceInput.value) < 0
+        ) {
+          return false;
+        }
+        if (
+          parseInt(powerInput.value) !== isNaN() &&
+          parseInt(powerInput.value) < 0
+        ) {
+          return false;
+        }
+        return true;
+      }
+      
+      function prepareParmaters() {
+        const arrayWithValues = [];
+        const arrayWithoutValues = [];
+        // Separate inputs into arrays
+        if (voltageInput.value.trim() !== "") {
+          arrayWithValues.push(voltageInput);
+        } else {
+          arrayWithoutValues.push(voltageInput);
+        }
+
+        if (resistanceInput.value.trim() !== "") {
+          arrayWithValues.push(resistanceInput);
+        } else {
+          arrayWithoutValues.push(resistanceInput);
+        }
+
+        if (currentInput.value.trim() !== "") {
+          arrayWithValues.push(currentInput);
+        } else {
+          arrayWithoutValues.push(currentInput);
+        }
+
+        if (powerInput.value.trim() !== "") {
+          arrayWithValues.push(powerInput);
+        } else {
+          arrayWithoutValues.push(powerInput);
+        }
+
+        // prepare parameters
+        const type1 = arrayWithValues[0].getAttribute("data-type");
+        const unit1 = document.getElementById(`${type1}-unit-select`).value;
+        const value1 = toSIUnit(type1, unit1, parseFloat(arrayWithValues[0].value));
+        const in1 = {
+          type: type1,
+          value: value1,
+        };
+
+        const type2 = arrayWithValues[1].getAttribute("data-type");
+        const unit2 = document.getElementById(`${type2}-unit-select`).value;
+        const value2 = toSIUnit(type2, unit2, parseFloat(arrayWithValues[1].value));
+        const in2 = {
+          type: type2,
+          value: value2,
+        };
+        const out1 = arrayWithoutValues[0].getAttribute("data-type");
+        const out2 = arrayWithoutValues[1].getAttribute("data-type");
+
+        return { out1, out2, in1, in2 };
+      }
+
+      function resetForm() {
+        clearFields()
+        containers.forEach((container) => {
+          let idVal = container.id.slice(0, 1)     
+          if ('rp'.includes(idVal)) {
+            container.style.display = 'none'
+          } else {
+            container.style.display = 'block'
+            container.lastElementChild.selectedIndex = '1'
+          }
+        })
+        calculateUnitEl.selectedIndex = '0'
+      }
+
+      function resetResult() {
+        calcResultsEl.innerHTML = "<p>Result will appear here...</p>";
+      } 
+
+      function resethandler() {
+        resetForm();
+        resetResult();
+      }
+      
+      /*************** EVENTLISTINERS ***************/
+      calculateUnitEl.addEventListener("change", handleCalculateUnitChange);
+      resetBtnEl.addEventListener("click", resethandler);
+      calcBtnEl.addEventListener("click", calculateResults);
+
+    </script>
+  </body>
+</html>

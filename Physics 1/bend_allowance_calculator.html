@@ -391,8 +391,12 @@
           input.value = ""
         });
         
-        selects.forEach((select) => {
-          select.selectedIndex = '3'
+        selects.forEach((select, index) => {
+          if (index == 1) {
+            select.selectedIndex = '2'
+          } else {
+            select.selectedIndex = '0'
+          }
         });
       }
 

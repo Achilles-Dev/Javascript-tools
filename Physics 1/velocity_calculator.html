@@ -1,0 +1,1042 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Velocity Calculator</title>
+  </head>
+  <body>
+    <h1>Velocity Calculator</h1>
+      <p>How would you like to calculate velocity?</p>
+      <p>
+        Method:
+        <select id="methodUnit">
+          <option value="dc" selected>Distance covered </option>
+          <option value="ac">Acceleration</option>
+          <option value="av">Average velocity (from up to 10 velocities) </option>
+        </select>
+      </p>
+
+      <div id="app1-contianer" style="display: none;">
+        <p>Average velocity (up to ten velocites)</p>
+        <div id="components-container">
+          <div id="comp-1" data-pos="prev" data-place="1" class="comps">
+            <p>
+              <label for="i1-1-input">Velocity 1</label>
+              <input
+                type="number"
+                autocomplete="off"
+                data-id="i1-1"
+                data-name="Velocity"
+                step="any"
+                id="i1-1-input"
+                class="inputs"
+                value="5"
+                data-place="1"
+              />
+              <select
+                class="selects"
+                id="i1-1-select"
+                data-type="speed"
+                data-prev="m/s"
+                data-id="i1-1"
+              >
+                <option value="m/s" selected>meters per second (m/s)</option>
+                <option value="km/h">kilometers per hour (km/h)</option>
+                <option value="ft/s">feet per second (ft/s)</option>
+                <option value="mph">miles per hour (mph)</option>
+                <option value="kn">knots (kn)</option>
+                <option value="km/s">kilometers per second (km/s)</option>
+                <option value="mi/s">miles per second (mi/s)</option>
+                <option value="ft/min">feet per minute (ft/min)</option>
+                <option value="m/min">meters per minute (m/min)</option>
+                <option value="cm/s">centimeters per second (cm/s)</option>
+              </select>
+            </p>
+
+            <p>
+              <label for="i2-1-input">Time 1</label>
+              <input
+                type="number"
+                autocomplete="off"
+                data-id="i2-1"
+                data-name="Time"
+                step="any"
+                id="i2-1-input"
+                class="inputs"
+                value="2"
+                data-place="1"
+              />
+              <select
+                class="selects"
+                id="i2-1-select"
+                data-type="time"
+                data-prev="sec"
+                data-id="i2-1"
+              >
+                <option value="sec" selected>seconds (sec)</option>
+                <option value="min">minutes (min)</option>
+                <option value="hrs">hour (hrs)</option>
+                <option value="days">days (days)</option>
+                <option value="wks">weeks (wks)</option>
+                <option value="mos">months (mos)</option>
+                <option value="yrs">years (yrs)</option>
+              </select>
+            </p>
+          </div>
+
+          <div id="comp-2" data-pos="last" data-place="2" class="comps">
+            <p>
+              <label for="i1-2-input">Velocity 2</label>
+              <input
+                type="number"
+                autocomplete="off"
+                data-id="i1-2"
+                data-name="Velocity"
+                step="any"
+                id="i1-2-input"
+                class="inputs"
+                data-place="2"
+              />
+              <select
+                class="selects"
+                id="i1-2-select"
+                data-type="speed"
+                data-prev="m/s"
+                data-id="i1-2"
+              >
+                <option value="m/s" selected>meters per second (m/s)</option>
+                <option value="km/h">kilometers per hour (km/h)</option>
+                <option value="ft/s">feet per second (ft/s)</option>
+                <option value="mph">miles per hour (mph)</option>
+                <option value="kn">knots (kn)</option>
+                <option value="km/s">kilometers per second (km/s)</option>
+                <option value="mi/s">miles per second (mi/s)</option>
+                <option value="ft/min">feet per minute (ft/min)</option>
+                <option value="m/min">meters per minute (m/min)</option>
+                <option value="cm/s">centimeters per second (cm/s)</option>
+              </select>
+            </p>
+
+            <p>
+              <label for="i2-2-input">Time 2</label>
+              <input
+                type="number"
+                autocomplete="off"
+                data-id="i2-2"
+                data-name="Time"
+                step="any"
+                id="i2-2-input"
+                class="inputs"
+                data-place="2"
+              />
+              <select
+                class="selects"
+                id="i2-2-select"
+                data-type="time"
+                data-prev="sec"
+                data-id="i2-2"
+              >
+                <option value="sec" selected>seconds (sec)</option>
+                <option value="min">minutes (min)</option>
+                <option value="hrs">hour (hrs)</option>
+                <option value="days">days (days)</option>
+                <option value="wks">weeks (wks)</option>
+                <option value="mos">months (mos)</option>
+                <option value="yrs">years (yrs)</option>
+              </select>
+            </p>
+          </div>
+        </div>
+      </div>
+      <div id="app2-contianer">
+        <p>
+          <label for="i1-input">Distance </label>
+          <input
+            type="number"
+            min="0"
+            autocomplete="off"
+            data-id="i1"
+            step="any"
+            class="inputs2"
+            id="i1-input"
+            data-name="Distance"
+          />
+          <select
+            class="selects"
+            id="i1-select"
+            data-type="distance"
+            data-prev="m"
+            data-id="i1"
+          >
+            <
+            <option value="mm">millimeters (mm)</option>
+            <option value="cm">centimeters (cm)</option>
+            <option value="m" selected>meters (m)</option>
+            <option value="km">kilometers (km)</option>
+            <option value="in">inches (in)</option>
+            <option value="ft">feet (ft)</option>
+            <option value="yd">yards (yd)</option>
+            <option value="mi">miles (mi)</option>
+          </select>
+        </p>
+
+        <p>
+          <label for="i2-input">Time </label>
+          <input
+            type="number"
+            min="0"
+            autocomplete="off"
+            data-id="i2"
+            step="any"
+            id="i2-input"
+            class="inputs2"
+            data-name="Time"
+          />
+
+          <select
+            class="selects"
+            id="i2-select"
+            data-type="time"
+            data-prev="sec"
+            data-id="i2"
+          >
+            <option value="sec" selected>seconds (sec)</option>
+            <option value="min">minutes (min)</option>
+            <option value="hrs">hour (hrs)</option>
+            <option value="days">days (days)</option>
+            <option value="wks">weeks (wks)</option>
+            <option value="mos">months (mos)</option>
+            <option value="yrs">years (yrs)</option>
+          </select>
+        </p>       
+      </div>
+      <div id="app3-contianer" style="display: none;">
+        <p>
+          <label for="i13-input">Initial velocity </label>
+          <input
+            type="number"
+            min="0"
+            autocomplete="off"
+            data-id="i13"
+            step="any"
+            id="i13-input"
+            class="inputs3"
+            data-name="Initial velocity"
+          />
+          <select
+            class="selects"
+            id="i13-select"
+            data-type="speed"
+            data-prev="m/s"
+            data-id="i13"
+          >
+            <option value="m/s" selected>meters per second (m/s)</option>
+            <option value="km/h">kilometers per hour (km/h)</option>
+            <option value="ft/s">feet per second (ft/s)</option>
+            <option value="mph">miles per hour (mph)</option>
+            <option value="kn">knots (kn)</option>
+            <option value="km/s">kilometers per second (km/s)</option>
+            <option value="mi/s">miles per second (mi/s)</option>
+            <option value="ft/min">feet per minute (ft/min)</option>
+            <option value="m/min">meters per minute (m/min)</option>
+            <option value="cm/s">centimeters per second (cm/s)</option>
+          </select>
+        </p>
+
+        <p>
+          <label for="i23-input">Acceleration </label>
+          <input
+            type="number"
+            min="0"
+            autocomplete="off"
+            data-id="i23"
+            step="any"
+            id="i23-input"
+            class="inputs3"
+            data-name="Acceleration"
+          />
+
+          <select
+            class="selects"
+            id="i23-select"
+            data-type="acceleration"
+            data-prev="m/s²"
+            data-id="i23"
+          >
+            <option value="m/s²" selected>
+              meters per second squared (m/s²)
+            </option>
+            <option value="g">gravitational acc. on Earth (g)</option>
+            <option value="ft/s²">feet per second squared (ft/s²)</option>
+          </select>
+        </p>
+
+        <p>
+          <label for="i33-input">Time </label>
+          <input
+            type="number"
+            min="0"
+            autocomplete="off"
+            data-id="i33"
+            step="any"
+            class="inputs3"
+            id="i33-input"
+            data-name="Time"
+          />
+          <select
+            class="selects"
+            id="i33-select"
+            data-type="time"
+            data-prev="sec"
+            data-id="i33"
+          >
+            <option value="sec" selected>seconds (sec)</option>
+            <option value="min">minutes (min)</option>
+            <option value="hrs">hour (hrs)</option>
+            <option value="days">days (days)</option>
+            <option value="wks">weeks (wks)</option>
+            <option value="mos">months (mos)</option>
+            <option value="yrs">years (yrs)</option>
+          </select>
+        </p>
+      </div>
+
+      <button id="calcBtn">Calculate</button>
+      <button id="resetBtn">Reset</button>
+      <hr>
+      <div>
+        <h3>Result:</h3>
+        <h3 id="calcResults">Result will appear here...</h3>
+      </div>
+    <script>
+      /*************** ELEMENTS ***************/
+      let selects = document.querySelectorAll(".selects");
+      let inputs = document.querySelectorAll(".inputs");
+      const inputs2 = document.querySelectorAll(".inputs2");
+      const inputs3 = document.querySelectorAll(".inputs3");
+      let components = document.querySelectorAll(".comps");
+      const container = document.getElementById("components-container");
+
+      const app1InutContainerEl = document.getElementById("app1-contianer");
+      const app2InutContainerEl = document.getElementById("app2-contianer");
+      const app3InutContainerEl = document.getElementById("app3-contianer");
+      const methodUnitEl = document.getElementById("methodUnit");
+
+      const calcBtnEl = document.getElementById('calcBtn');
+      const resetBtnEl = document.getElementById('resetBtn');
+      const calcResultsEl = document.getElementById('calcResults')
+
+      /*************** GLOBAL VARIBLES ***************/
+
+      const UNITS = {
+        speed: {
+          "m/s": 1,
+          "km/h": 3.6,
+          "ft/s": 3.2808398950131235,
+          mph: 2.2369362920544025,
+          kn: 1.9438444924406049,
+          "km/s": 0.001,
+          "mi/s": 0.0006213711922373339,
+          "ft/min": 196.8503937007874,
+          "m/min": 60,
+          "cm/s": 100,
+        },
+        distance: {
+          mm: 1e3,
+          cm: 1e2,
+          m: 1,
+          km: 1e-3,
+          in: 39.37007874015748,
+          ft: 3.280839895013123,
+          yd: 1.0936132983377078,
+          mi: 0.0006213711922373339,
+        },
+        time: {
+          sec: 1,
+          min: 0.016666666666666666,
+          hrs: 0.0002777777777777778,
+          days: 0.000011574074074074075,
+          wks: 0.0000016534391534391535,
+          mos: 3.8025705376834745e-7,
+          yrs: 3.1688087814028954e-8,
+        },
+
+        acceleration: {
+          "m/s²": 1,
+          g: 0.10197162129779282,
+          "ft/s²": 3.28084,
+        },
+      };
+      const queue2 = ["i1", "i2", "i3"];
+      let queue3 = ["i13", "i23", "i33", "i43"];
+
+      /*************** FUNCTIONS ***************/
+
+      function toSIUnit(type, unit, value) {
+        if (type === "exp") {
+          unit = parseFloat("1e" + unit);
+          return value * unit;
+        }
+        return value / UNITS[type][unit];
+      }
+
+      function fromSIUnit(type, unit, value) {
+        if (type === "exp") {
+          unit = parseFloat("1e" + unit);
+          return value / unit;
+        }
+        return value * UNITS[type][unit];
+      }
+
+      function handleMethodUnitChange(e) {
+        const value = e.target.value;
+        
+        app1InutContainerEl.style.display = value == 'av' ? 'block' : 'none';
+        app2InutContainerEl.style.display = value == 'dc' ? 'block' : 'none';
+        app3InutContainerEl.style.display = value == 'ac' ? 'block' : 'none';
+
+        resetResult()
+      }
+
+      function createElement2() {
+        const newDiv1 = `
+          <div>
+            <p>
+              <label for="i3-span">Velocity: &nbsp; </label>
+              <span
+                data-id="i3"
+                step="any"
+                id="i3-span"
+                class="spans2"
+                data-name="Velocity"
+              ></span>
+              <select
+                class="selectsResult"
+                id="i3-select"
+                data-type="speed"
+                data-prev="m/s"
+                data-id="i3"
+              >
+                <option value="m/s" selected>meters per second (m/s)</option>
+                <option value="km/h">kilometers per hour (km/h)</option>
+                <option value="ft/s">feet per second (ft/s)</option>
+                <option value="mph">miles per hour (mph)</option>
+                <option value="kn">knots (kn)</option>
+                <option value="km/s">kilometers per second (km/s)</option>
+                <option value="mi/s">miles per second (mi/s)</option>
+                <option value="ft/min">feet per minute (ft/min)</option>
+                <option value="m/min">meters per minute (m/min)</option>
+                <option value="cm/s">centimeters per second (cm/s)</option>
+              </select>
+            </p>
+          </div>
+        `
+        const newDiv2 = `
+          <div>
+            <p>
+              <label for="i43-span"> Final velocity: &nbsp; </label>
+              <span
+                data-id="i43"
+                step="any"
+                class="spans3"
+                id="i43-span"
+                data-name="Final velocity"
+              ></span>
+              <select
+                class="selectsResult"
+                id="i43-select"
+                data-type="speed"
+                data-prev="m/s"
+                data-id="i43"
+              >
+                <option value="m/s" selected>meters per second (m/s)</option>
+                <option value="km/h">kilometers per hour (km/h)</option>
+                <option value="ft/s">feet per second (ft/s)</option>
+                <option value="mph">miles per hour (mph)</option>
+                <option value="kn">knots (kn)</option>
+                <option value="km/s">kilometers per second (km/s)</option>
+                <option value="mi/s">miles per second (mi/s)</option>
+                <option value="ft/min">feet per minute (ft/min)</option>
+                <option value="m/min">meters per minute (m/min)</option>
+                <option value="cm/s">centimeters per second (cm/s)</option>
+              </select>
+            </p>
+          </div>
+        `
+        const newDiv3 = `
+          <div>
+            <p>
+              <p>The average velocity is:</p>
+
+              <div>
+                <label for="ia1-span">Average Velocity: &nbsp; </label>
+                <span
+                  data-id="ia1"
+                  data-name="Velocity"
+                  step="any"
+                  id="ia1-span"
+                  disabled
+                ></span>
+                <select
+                  class="selectsResult"
+                  id="ia1-select"
+                  data-type="speed"
+                  data-prev="m/s"
+                  data-id="ia1"
+                >
+                  <option value="m/s" selected>meters per second (m/s)</option>
+                  <option value="km/h">kilometers per hour (km/h)</option>
+                  <option value="ft/s">feet per second (ft/s)</option>
+                  <option value="mph">miles per hour (mph)</option>
+                  <option value="kn">knots (kn)</option>
+                  <option value="km/s">kilometers per second (km/s)</option>
+                  <option value="mi/s">miles per second (mi/s)</option>
+                  <option value="ft/min">feet per minute (ft/min)</option>
+                  <option value="m/min">meters per minute (m/min)</option>
+                  <option value="cm/s">centimeters per second (cm/s)</option>
+                </select>
+              </div>
+            </p>
+          </div>
+        `
+        const method = methodUnitEl.value
+        if (method == 'dc') {
+          return newDiv1
+        } else if (method == 'ac') {
+          return newDiv2
+        } else {
+          return newDiv3
+        }
+      }
+
+
+      function customPercision(ans, to = 12) {
+        return parseFloat(parseFloat(ans).toPrecision(to));
+      }
+
+      function inputHandler(e, inp = null) {
+        try {
+          let flag = true;
+          for (let inps of inputs) {
+            let id = inps.getAttribute("data-id");
+            if (!validateInput(id)) flag = false;
+          }
+          const input = e.target;
+          
+          const place = input.getAttribute("data-place");
+          const el = document.getElementById(`comp-${place}`);
+
+          el.pos = el.getAttribute("data-pos");
+          el.place = parseInt(el.getAttribute("data-place"));
+
+          const val1 = document.getElementById(`i1-${place}-input`).value;
+          const val2 = document.getElementById(`i2-${place}-input`).value;
+
+          const bool1 = val1 !== "" && val2 !== "";
+          const bool2 = val1 === "" || val2 === "";
+
+          let scenario_one = el.place != 10 && el.pos == "last" && bool1;
+          let scenario_two = el.place != 1 && el.pos == "prev" && bool2;
+          let scenario_three = el.place == 10 && bool2;
+
+          if (scenario_one) {
+            scenarioOne(el);
+          } else if (scenario_two) {
+            scenarioTwo(el, bool2);
+          } else if (scenario_three) {
+            scenarioThree(el);
+          }
+
+          flag = true;
+          for (let inps of inputs) {
+            let id = inps.getAttribute("data-id");
+            if (!validateInput(id)) flag = false;
+          }
+          resetResult()
+        } catch (error) {
+          alert(
+            "An error occurred. Try again with valid input, or try contacting us."
+          );
+          console.log(error);
+        }
+      }
+      
+      function inputHandler2(e, inp = null) {
+        try {
+          let input;
+          if (e) input = e.target;
+          else if (inp) input = inp;
+          const id = input.getAttribute("data-id");
+          
+          for (el of ["i1", "i2"]) {
+            if (!validateInput(el)) return;
+          }
+
+          if (input.value == "") {
+            if (inputCounter2() < 2) {
+              return;
+            }
+
+            if (id === in1 || id === in2) {
+              deleteHandler(out);
+              return;
+            }
+            for (el of ["i1", "i2"]) {
+              if (!validateInput(el)) return;
+            }
+            return;
+          }
+
+          if (!validateInput(id)) return;
+
+          if (inputCounter2() < 2) {
+            return;
+          }
+
+          for (el of ["i1", "i2"]) {
+            if (!validateInput(el)) return;
+          }
+
+          for (el of ["i1", "i2"]) {
+            if (!validateInput(el)) return;
+          }
+          resetResult()
+        } catch (error) {
+          alert(
+            "An error occurred. Try again with valid input, or try contacting us."
+          );
+          console.log(error);
+        }
+      }
+      
+      function inputHandler3(e, inp = null) {
+        try {
+          let input;
+          if (e) input = e.target;
+          else if (inp) input = inp;
+          const id = input.getAttribute("data-id");
+
+          if (input.value == "") {
+            if (inputCounter3() < 3) {
+              return;
+            }
+
+            if (id !== out) {
+              deleteHandler(out);
+            }
+            return;
+          }
+
+          if (!validateInput(id)) return;
+
+          if (inputCounter3() < 3) {
+            return;
+          }
+
+          for (el of ["i13", "i23", "i33"]) {
+            if (!validateInput(el)) return;
+          }
+
+          resetResult()
+
+        } catch (error) {
+          alert(
+            "An error occurred. Try again with valid input, or try contacting us."
+          );
+          console.log(error);
+        }
+      }
+
+      /* scenarios */
+      function scenarioOne(el) {
+        let prevEl = document.querySelector('[data-pos="prev"]');
+        prevEl.setAttribute("data-pos", "null");
+        el.setAttribute("data-pos", "prev");
+        let nextEl = createElement(el.place + 1);
+        container.append(nextEl);
+        updateNodeList();
+      }
+
+      function scenarioTwo(el) {
+        const elPlace = el.getAttribute("data-place");
+        const nextEl = document.querySelector('[data-pos = "last"]');
+        const nextPlace = nextEl.getAttribute("data-place");
+
+        const val1 = document.getElementById(`i1-${elPlace}-input`).value;
+        const val2 = document.getElementById(`i2-${elPlace}-input`).value;
+        const bool1 = val1 == "" || val2 == "";
+
+        const val1Next = document.getElementById(`i1-${nextPlace}-input`).value;
+        const val2next = document.getElementById(`i2-${nextPlace}-input`).value;
+        const bool2 = val1Next === "" || val2next === "";
+
+        if (el.place != 1 && el.pos == "prev" && bool1 && bool2) {
+          let tbd = document.getElementById(
+            `comp-${nextEl.getAttribute("data-place")}`
+          );
+
+          tbd.remove();
+
+          el.setAttribute("data-pos", "last");
+          const newPrev = document.querySelector(`[data-place ="${el.place - 1}"]`);
+          newPrev.setAttribute("data-pos", "prev");
+          newPrev.place = newPrev.getAttribute("data-place");
+          newPrev.pos = newPrev.getAttribute("data-pos");
+          updateNodeList();
+          el.focus();
+          scenarioTwo(newPrev);
+        }
+      }
+
+      function scenarioThree(el) {
+        const newPrev = document.getElementById(`comp-${el.place - 1}`);
+        const nextPlace = newPrev.getAttribute("data-place");
+        const elPlace = el.getAttribute("data-place");
+
+        const val1Next = document.getElementById(`i1-${nextPlace}-input`).value;
+        const val2next = document.getElementById(`i2-${nextPlace}-input`).value;
+        const bool2 = val1Next === "" || val2next === "";
+
+        const val1 = document.getElementById(`i1-${elPlace}-input`).value;
+        const val2 = document.getElementById(`i2-${elPlace}-input`).value;
+        const bool1 = val1 !== "" || val2 !== "";
+
+        newPrev.setAttribute("data-pos", "prev");
+        newPrev.place = newPrev.getAttribute("data-place");
+        newPrev.pos = newPrev.getAttribute("data-pos");
+        if (el.place == 10 && bool1 && bool2) {
+          scenarioTwo(newPrev);
+        }
+      }
+
+      function createElement(place) {
+        let templateStr = `<div id="comp-${place}" data-pos="last" data-place="${place}" class="comps">
+        <p>
+          <label for="i1-${place}-input">Velocity ${place}</label>
+          <input
+            type="number"
+            autocomplete="off"
+            data-id="i1-${place}"
+            data-name="Velocity"
+            step="any"
+            id="i1-${place}-input"
+            class="inputs"
+            data-place="${place}"
+          />
+          <select
+            class="selects"
+            id="i1-${place}-select"
+            data-type="speed"
+            data-prev="m/s"
+            data-id="i1-${place}"
+          >
+          <option value="m/s" selected>meters per second (m/s)</option>
+          <option value="km/h">kilometers per hour (km/h)</option>
+          <option value="ft/s">feet per second (ft/s)</option>
+          <option value="mph">miles per hour (mph)</option>
+          <option value="kn">knots (kn)</option>
+          <option value="km/s">kilometers per second (km/s)</option>
+          <option value="mi/s">miles per second (mi/s)</option>
+          <option value="ft/min">feet per minute (ft/min)</option>
+          <option value="m/min">meters per minute (m/min)</option>
+          <option value="cm/s">centimeters per second (cm/s)</option>
+          </select>
+        </p>
+
+        <p>
+          <label for="i2-${place}-input">Time ${place}</label>
+          <input
+            type="number"
+            autocomplete="off"
+            data-id="i2-${place}"
+            data-name="Time"
+            step="any"
+            id="i2-${place}-input"
+            class="inputs"
+            data-place="${place}"
+          />
+          <select
+            class="selects"
+            id="i2-${place}-select"
+            data-type="time"
+            data-prev="sec"
+            data-id="i2-${place}"
+          >
+          <option value="sec" selected>seconds (sec)</option>
+          <option value="min">minutes (min)</option>
+          <option value="hrs">hour (hrs)</option>
+          <option value="days">days (days)</option>
+          <option value="wks">weeks (wks)</option>
+          <option value="mos">months (mos)</option>
+          <option value="yrs">years (yrs)</option>
+          </select>
+        </p>
+        </div>`;
+
+        let nextEl = document.createElement("div");
+        nextEl.innerHTML = templateStr;
+        return nextEl.firstChild;
+      }
+
+      function updateNodeList() {
+        inputs = document.querySelectorAll(".inputs");
+        selects = document.querySelectorAll(".selects");
+        components = document.querySelectorAll(".comps");
+
+        inputs.forEach((input) => {
+          input.addEventListener("input", inputHandler);
+        });
+
+        selects.forEach((select) => {
+          select.addEventListener("change", resetResult);
+        });
+      }
+
+      function calculateResult() {
+        let Vav = 0;
+        let tTotal = 0;
+        for (let i = 0; i < components.length; i++) {
+          let el = components[i];
+
+          let place = parseInt(el.getAttribute("data-place"));
+
+          const input1 = document.getElementById(`i1-${place}-input`);
+          const id1 = input1.getAttribute("data-id");
+
+          const input2 = document.getElementById(`i2-${place}-input`);
+          const id2 = input2.getAttribute("data-id");
+
+          const val1 = document.getElementById(`i1-${place}-input`).value;
+          const val2 = document.getElementById(`i2-${place}-input`).value;
+
+          const bool1 = val1 == "" || val2 == "";
+          if (bool1) continue;
+
+          let [v, t] = prepareUnit(id1, id2);
+
+          Vav += v * t;
+          tTotal += t;
+        }
+
+        Vav = Vav / tTotal;
+        const result = {
+          1: {
+            result: Vav,
+            type: "ia1",
+          },
+        };
+
+        return result
+      }
+      
+      function calculateResults2() {
+        function calculateI3() {
+          let [val1, val2] = prepareUnit("i1", "i2");
+          let result = val1 / val2;
+          return {
+            1: { result, type: "i3" },
+          };
+        }
+        return calculateI3()
+      }
+
+      function calculateResults3() {
+
+        function calculateI4() {
+          let [val1, val2, val3] = prepareUnit("i13", "i23", "i33");
+
+          let result = val1 + val2 * val3;
+
+          return {
+            1: { result, type: "i43" },
+          };
+        }
+        return calculateI4()
+      }
+
+      /* scenarios*/
+      function prepareUnit(...args) {
+        const resultArr = [];
+        for (id of args) {
+          const input = document.getElementById(`${id}-input`);
+          const select = document.getElementById(`${id}-select`);
+          const type = select.getAttribute("data-type");
+          let val = parseFloat(input.value);
+          val = isNaN(val) ? 0 : val;
+          let inUnit = select.value;
+          val = toSIUnit(type, inUnit, val);
+          resultArr.push(val);
+        }
+
+        return resultArr;
+      }
+
+      function validateInput(id) {
+        const input = document.getElementById(`${id}-input`);
+        const label = input.getAttribute("data-name").trim();
+        let value = parseFloat(input.value);
+        return true;
+      }
+
+      function deleteHandler(...args) {
+        for (let id of args) {
+          document.getElementById(`${id}-input`).value = "";
+        }
+      }
+      
+      function inputCounter2() {
+        let count = 0;
+
+        inputs2.forEach((input) => {
+          if (input.value !== "") {
+            count++;
+          }
+        });
+
+        return count;
+      }
+
+      function inputCounter3() {
+        let count = 0;
+
+        inputs3.forEach((input) => {
+          if (input.value !== "") {
+            count++;
+          }
+        });
+
+        return count;
+      }
+      
+      function setResult(resultObj) {
+        for (key of Object.keys(resultObj)) {
+          let val = resultObj[key].result;
+          let id = resultObj[key].type;
+          if (isNaN(val)) {
+            alert("Your input resulted in NAN.\n 0/0 \n Try again with valid input.");
+            return;
+          }
+          if (Math.abs(val) === Infinity) {
+            alert(
+              "Your input resulted in Infinity. \nDivision by zero. \nTry again with valid input."
+            );
+            return;
+          }
+          
+          const span = document.getElementById(`${id}-span`);
+          const select = document.getElementById(`${id}-select`);
+          const type = select.getAttribute("data-type");
+          let outUnit = select.value;
+          val = fromSIUnit(type, outUnit, val);
+          
+          span.textContent = customPercision(val, 13);
+        }
+      }
+
+      function handleResultsChange(e) {
+        let select = e.target;
+        let id = select.getAttribute("data-id");
+        let span = document.getElementById(`${id}-span`);
+
+        let prevUnit = select.getAttribute("data-prev");
+        let currentUnit = select.value;
+        select.setAttribute("data-prev", currentUnit);
+
+        if (span.textContent === "") {
+          return;
+        }
+
+        let type = select.getAttribute("data-type");
+
+        let value = parseFloat(span.textContent);
+        value = parseFloat(value);
+        if (isNaN(value)) value = 0.0;
+
+        let si = toSIUnit(type, prevUnit, value);
+        let result = fromSIUnit(type, currentUnit, si);
+        span.textContent = customPercision(result, 11);
+      }
+
+
+      function calculateResults() {
+        const method = methodUnitEl.value
+        
+
+        try {
+          const resultElement = createElement2()
+          calcResultsEl.innerHTML = resultElement
+
+          const newSelects = document.querySelectorAll(".selectsResult");
+
+          newSelects.forEach((select) => {
+            select.addEventListener("change", handleResultsChange);
+          });
+          let result;
+          if (method == 'dc') {
+            result = calculateResults2()
+          } else if (method == 'ac') {
+            result = calculateResults3()
+          } else {
+            result = calculateResult()
+          }
+          
+          setResult(result)
+
+        } catch(error) {
+          alert("An error ocurred. Try again with valid input.");
+          resetResult()
+          return;
+        }
+      }
+
+      function resetForm() {
+        selects.forEach((select, index) => {
+          if (index == 4) {
+            select.selectedIndex = '2'
+          } else {
+            select.selectedIndex = '0'
+          }
+          
+        });
+
+        inputs.forEach((input) => {
+          input.value = "1"
+        });
+        app1InutContainerEl.style.display = 'none';
+        app2InutContainerEl.style.display = 'block';
+        app3InutContainerEl.style.display = 'none';
+      }
+
+      function resetResult() {
+        calcResultsEl.innerHTML = "<p>Result will appear here...</p>";
+      } 
+
+      function resethandler() {
+        resetForm();
+        resetResult();
+      }
+
+      /*************** EVENT LISTINERS ***************/
+
+      // window.addEventListener("load", windowLoadHandler);
+      methodUnitEl.addEventListener("click", handleMethodUnitChange);
+      selects.forEach((select) => {
+        select.addEventListener("change", resetResult);
+      });
+      inputs.forEach((input) => {
+        input.addEventListener("input", inputHandler);
+      });
+      inputs2.forEach((input) => {
+        input.addEventListener("input", inputHandler2);
+      });
+      inputs3.forEach((input) => {
+        input.addEventListener("input", inputHandler3);
+      });
+
+      resetBtnEl.addEventListener("click", resethandler);
+      calcBtnEl.addEventListener("click", calculateResults);
+
+    </script>
+  </body>
+</html>
