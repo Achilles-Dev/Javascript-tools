@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Arrow Speed Calculator</title>
+  </head>
+  <body>
+    <h1>Arrow Speed Calculator</h1>
+      <p>
+        <label for="i1-input">Bow IBO rating</label>
+        <input
+          type="number"
+          min="0"
+          autocomplete="off"
+          data-id="i1"
+          step="any"
+          id="i1-input"
+          class="inputs"
+          data-name="Bow IBO rating"
+        />
+        <select
+          class="selects"
+          id="i1-select"
+          data-type="speed"
+          data-prev="m/s"
+          data-id="i1"
+        >
+          <option value="m/s" selected>meters per second (m/s)</option>
+          <option value="km/h">kilometers per hour (km/h)</option>
+          <option value="ft/s">feet per second (ft/s)</option>
+          <option value="mph">miles per hour (mph)</option>
+          <option value="kn">knots (kn)</option>
+          <option value="ft/min">feet per minute (ft/min)</option>
+        </select>
+      </p>
+      <p>
+        <label for="i2-input">Draw length of the bow</label>
+        <input
+          type="number"
+          min="0"
+          autocomplete="off"
+          data-id="i2"
+          step="any"
+          id="i2-input"
+          class="inputs"
+          data-name="Draw length of the bow"
+          disabled
+        />
+
+        <select
+          class="selects"
+          id="i2-select"
+          data-type="distance"
+          data-prev="cm"
+          data-id="i2"
+        >
+          <option value="mm">millimeters (mm)</option>
+          <option value="cm" selected>centimeters (cm)</option>
+          <option value="m">meters (m)</option>
+          <option value="in">inches (in)</option>
+          <option value="ft">feet (ft)</option>
+        </select>
+      </p>
+      <p>
+        <label for="i3-input">Peak draw weight</label>
+        <input
+          type="number"
+          min="0"
+          autocomplete="off"
+          data-id="i3"
+          step="any"
+          id="i3-input"
+          class="inputs"
+          data-name="Peak draw weight"
+        />
+        <select
+          class="selects"
+          id="i3-select"
+          data-type="mass"
+          data-prev="kg"
+          data-id="i3"
+        >
+          <option value="g">grams (g)</option>
+          <option value="kg" selected>kilograms (kg)</option>
+          <option value="gr">grains (gr)</option>
+          <option value="oz">ounces (oz)</option>
+          <option value="lb">pounds (lb)</option>
+          <option value="st">stones (st)</option>
+        </select>
+      </p>
+      <p>
+        <label for="i4-input">Arrow weight</label>
+        <input
+          type="number"
+          min="0"
+          autocomplete="off"
+          data-id="i4"
+          step="any"
+          id="i4-input"
+          class="inputs"
+          data-name="Arrow weight"
+        />
+
+        <select
+          class="selects"
+          id="i4-select"
+          data-type="mass"
+          data-prev="gr"
+          data-id="i4"
+        >
+          <option value="mg">milligrams (mg)</option>
+          <option value="g">grams (g)</option>
+          <option value="dag">decagrams (dag)</option>
+          <option value="kg">kilograms (kg)</option>
+          <option value="gr" selected>grains (gr)</option>
+          <option value="dr">drachms (dr)</option>
+          <option value="oz">ounces (oz)</option>
+          <option value="lb">pounds (lb)</option>
+          <option value="st">stones (st)</option>
+        </select>
+      </p>
+      <p>
+        <label for="i5-input">Additional weight on string</label>
+        <input
+          type="number"
+          min="0"
+          autocomplete="off"
+          data-id="i5"
+          step="any"
+          id="i5-input"
+          class="inputs"
+          data-name="Additional weight on string"
+        />
+
+        <select
+          class="selects"
+          id="i5-select"
+          data-type="mass"
+          data-prev="gr"
+          data-id="i5"
+        >
+          <option value="mg">milligrams (mg)</option>
+          <option value="g">grams (g)</option>
+          <option value="dag">decagrams (dag)</option>
+          <option value="kg">kilograms (kg)</option>
+          <option value="gr" selected>grains (gr)</option>
+          <option value="dr">drachms (dr)</option>
+          <option value="oz">ounces (oz)</option>
+          <option value="lb">pounds (lb)</option>
+          <option value="st">stones (st)</option>
+        </select>
+      </p>
+
+      <button id="calcBtn">Calculate</button>
+      <button id="resetBtn">Reset</button>
+      <hr>
+      <div>
+        <h3>Result:</h3>
+        <h3 id="calcResults">Result will appear here...</h3>
+      </div>
+
+    <script>
+      /*************** ELEMENTS ***************/
+      const selects = document.querySelectorAll(".selects");
+      const inputs = document.querySelectorAll(".inputs");
+
+      const calcBtnEl = document.getElementById('calcBtn');
+      const resetBtnEl = document.getElementById('resetBtn');
+      const calcResultsEl = document.getElementById('calcResults')
+
+      /*************** GLOBAL VARIBLES ***************/
+      const UNITS = {
+        mass: {
+          mg: 999999.9999999999,
+          g: 999.9999999999999,
+          dag: 100,
+          kg: 1,
+          t: 0.001,
+          gr: 15432.35835294143,
+          dr: 564.3833911932866,
+          oz: 35.27396194958041,
+          lb: 2.2046226218487757,
+          st: 0.1574730444177697,
+        },
+        speed: {
+          "m/s": 1,
+          "km/h": 3.6,
+          "ft/s": 3.280839895013123,
+          mph: 2.236936292054402,
+          kn: 1.9438444924406046,
+          "ft/min": 196.85039370078738,
+        },
+        distance: {
+          mm: 1e3,
+          cm: 1e2,
+          dm: 1e1,
+          m: 1,
+          in: 39.37007874015748,
+          ft: 3.2808398950131235,
+          yd: 1.0936132983377078,
+        },
+        energy: {
+          J: 1,
+          kJ: 0.001,
+          MJ: 1e-6,
+          Wh: 0.000277778,
+          kWh: 0.000000277778,
+          "ft-lb": 0.737562,
+        },
+      };
+
+      /*************** FUNCTIONS ***************/
+      function toSIUnit(type, unit, value) {
+        if (type === "temperature") {
+          return UNITS[type][unit](value, "+");
+        }
+        return value / UNITS[type][unit];
+      }
+
+      function fromSIUnit(type, unit, value) {
+        if (type === "temperature") {
+          return UNITS[type][unit](value, "-");
+        }
+        return value * UNITS[type][unit];
+      }
+
+      function createElement() {
+        const newDiv = `
+          <div>
+            <p>
+              <label for="i6-span">Speed: &nbsp; </label>
+              <span
+                data-id="i6"
+                step="any"
+                id="i6-span"
+                class="spans"
+                data-name="Speed"
+              ></span>
+
+              <select
+                class="selectsResult"
+                id="i6-select"
+                data-type="speed"
+                data-prev="m/s"
+                data-id="i6"
+              >
+                <option value="m/s" selected>meters per second (m/s)</option>
+                <option value="km/h">kilometers per hour (km/h)</option>
+                <option value="ft/s">feet per second (ft/s)</option>
+                <option value="mph">miles per hour (mph)</option>
+                <option value="kn">knots (kn)</option>
+                <option value="ft/min">feet per minute (ft/min)</option>
+              </select>
+            </p>
+            <p>
+              <label for="i7-span">Momentum: &nbsp; </label>
+              <span
+                data-id="i7"
+                step="any"
+                id="i7-span"
+                class="spans"
+                data-name="Momentum"
+              ></span>
+
+              <select
+                class="selectsResult"
+                id="i7-select"
+                data-type="momentum"
+                data-prev="N.s"
+                data-id="i7"
+              >
+                <option value="N.s" selected>newton-seconds (N.s)</option>
+                <option value="kN.s">kilonewton-seconds (kN.s)</option>
+                <option value="kg.m/s">kilogram meters per second (kg.m/s)</option>
+              </select>
+            </p>
+            <p>
+              <label for="i8-span">Kinetic energy: &nbsp; </label>
+              <span
+                data-id="i8"
+                step="any"
+                id="i8-span"
+                class="spans"
+                data-name="Kinetic energy"
+              ></span>
+
+              <select
+                class="selectsResult"
+                id="i8-select"
+                data-type="energy"
+                data-prev="N.s"
+                data-id="i8"
+              >
+                <option value="J" selected>joules (J)</option>
+                <option value="kJ">kilojoules (kJ)</option>
+                <option value="MJ">megajoules (MJ)</option>
+                <option value="Wh">watt hours (Wh)</option>
+                <option value="kWh">kilowatt hours (kWh)</option>
+                <option value="ft-lb">foot-pounds (ft-lb)</option>
+              </select>
+            </p>
+          </div>
+        `
+        return newDiv
+      }
+
+      // related to caculation
+      function prepareUnit(...args) {
+        const resultArr = [];
+        for (id of args) {
+          const input = document.getElementById(`${id}-input`);
+          const select = document.getElementById(`${id}-select`);
+          const type = select.getAttribute("data-type");
+          let val = parseFloat(input.value);
+
+          val = isNaN(val) ? 0 : val;
+          let inUnit = select.value;
+
+          val = toSIUnit(type, inUnit, val);
+
+          resultArr.push(val);
+        }
+
+        return resultArr;
+      }
+
+      function setResult(resultObj) {
+        for (key of Object.keys(resultObj)) {
+          let val = resultObj[key].result;
+          let id = resultObj[key].type;
+
+          if (isNaN(val)) {
+           alert("Your input resulted in NAN.\n 0/0 \n Try again with valid input.");
+            return;
+          }
+          if (Math.abs(val) === Infinity) {
+            alert("Your input resulted in Infinity. \nDivision by zero. \nTry again with valid input.");
+            return;
+          }
+          if (id != 'i2') {
+            const input = document.getElementById(`${id}-input`);
+            const select = document.getElementById(`${id}-select`);
+            const type = select.getAttribute("data-type");
+            let outUnit = select.value;
+
+            val = fromSIUnit(type, outUnit, val);
+            input.value = parseFloat(val);
+
+            !validateInput(id);
+          } else {
+            const span = document.getElementById(`${id}-span`);
+            const select = document.getElementById(`${id}-select`);
+            const type = select.getAttribute("data-type");
+            let outUnit = select.value;
+            val = fromSIUnit(type, outUnit, val);
+
+            span.textContent = parseFloat(val);
+          }
+        }
+      }
+
+      function calculateResult() {
+        const R = 8.31446261815324;
+        const M = 0.0289647;
+        const ro = 1.4;
+
+        const k = (ro * R) / M;
+        
+        function calculateI2() {
+          let [val1] = prepareUnit("i1");
+          let result = Math.sqrt(val1 * k);
+          return {
+            1: { result, type: "i2" },
+          };
+        }
+        return calculateI2()
+      }
+
+      function selectsIIChangeHandler(e, inp = false) {
+        let select;
+        if (e) {
+          select = e.target;
+        } else select = inp;
+        let val = parseFloat(select.value);
+        let resultObj = {
+          1: { result: val, type: "i2II" },
+        };
+        setResult(resultObj, "II");
+      }
+
+      function selectChangeHandler(e) {
+        let select = e.target;
+        let id = select.getAttribute("data-id");
+        let input = document.getElementById(`${id}-input`);
+
+        let prevUnit = select.getAttribute("data-prev");
+        let currentUnit = select.value;
+
+        select.setAttribute("data-prev", currentUnit);
+
+        let type = select.getAttribute("data-type");
+
+        let value = input.value;
+
+        if (value == "") return;
+        value = parseFloat(value);
+        if (isNaN(value)) value = 0.0;
+
+        let si = toSIUnit(type, prevUnit, value);
+        let result = fromSIUnit(type, currentUnit, si);
+        input.value = parseFloat(result);
+      }
+
+      function validateInput(id) {
+        const input = document.getElementById(`${id}-input`);
+        const label = input.getAttribute("data-name").trim();
+        let value = parseFloat(input.value);
+
+        if (label === "Temperature") {
+          let unit = document.getElementById(`${id}-select`).value;
+          let siValue = toSIUnit("temperature", unit, value);
+          if (siValue <= 0 || isNaN(value)) {
+            alert(`Temperature must be greater than zero kelvin (273.15 °C, -459.7 °F).`);
+            return false;
+          }
+          return true;
+        }
+
+        if (value < 0) {
+          alert(`Speed of sound in dry air cannot be negative.`);
+          return false;
+        }
+
+        return true;
+      }
+
+      function handleResultsChange(e) {
+        let select = e.target;
+        let id = select.getAttribute("data-id");
+        let span = document.getElementById(`${id}-span`);
+
+        let prevUnit = select.getAttribute("data-prev");
+        let currentUnit = select.value;
+        select.setAttribute("data-prev", currentUnit);
+
+        if (span.textContent === "") {
+          return;
+        }
+
+        let type = select.getAttribute("data-type");
+
+        let value = parseFloat(span.textContent);
+        value = parseFloat(value);
+        if (isNaN(value)) value = 0.0;
+
+        let si = toSIUnit(type, prevUnit, value);
+        let result = fromSIUnit(type, currentUnit, si);
+        span.textContent = parseFloat(result);
+      }
+
+      function calculateResults() {
+        if (!validateInput("i1")) return;
+        
+        try {
+          const resultElement = createElement()
+          calcResultsEl.innerHTML = resultElement
+
+          const newSelects = document.querySelectorAll(".selectsResult");
+
+          newSelects.forEach((select) => {
+            select.addEventListener("change", handleResultsChange);
+          });
+        
+          const result = calculateResult();
+          setResult(result)
+
+        } catch(error) {
+          alert("An error ocurred. Try again with valid input.");
+          resetResult()
+          return;
+        }
+      }
+
+      function resetForm() {
+        selects.forEach((select, index) => {
+          select.selectedIndex = '0'
+        });
+
+        inputs.forEach((input) => {
+          input.value = ""
+        });
+      }
+
+      function resetResult() {
+        calcResultsEl.innerHTML = "<p>Result will appear here...</p>";
+      } 
+
+      function resethandler() {
+        resetForm();
+        resetResult();
+      }
+
+      /*************** EVENT LISTINERS ***************/
+
+      selects.forEach((select, index) => {
+        if (index == 0) {
+          select.addEventListener("change", resetResult);
+        } else {
+          select.addEventListener("change", selectChangeHandler)
+        }
+      });
+
+      inputs.forEach((input) => {
+        input.addEventListener("input", resetResult);
+      });
+
+      resetBtnEl.addEventListener("click", resethandler);
+      calcBtnEl.addEventListener("click", calculateResults);
+
+    </script>
+  </body>
+</html>

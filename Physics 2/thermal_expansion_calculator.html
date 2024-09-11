@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Thermal Expansion Calculator</title>
+</head>
+<body>
+    <h1>Thermal Expansion Calculator</h1>
+    <p>Easily calculate the thermal expansion in length, volume or the change in density with a change in temperature. This thermal <br >
+       expansion calculator can be used to calculate linear or volumetric expansion of a material. Supports a variety of input metrics <br />
+        such as Celsius, Fahrenheit, Kelvin, length and volume in both metric and imperial units.
+    </p>
+    <p>
+      Calculate:
+      <select id="calcSelect">
+        <option value="le" selected>Linear Expansion</option>
+        <option value="ve">Volumetric Expansion</option>
+        <option value="dc">Density Change</option>
+      </select>
+    </p>
+    <p>
+      CLTE:
+      <input type="number" id="clteVal">
+      <select name="clte" id="clteSelect">
+        <option value="ppmk" selected="selected">ppm/K</option>
+        <option value="k">/K</option>
+      </select>
+    </p>
+    <p>
+      Initial Temperature: 
+      <input type="number" id="initialTempVal">
+      <select name="initialTemp" id="initialTempSelect">
+        <option value="k" selected="selected">K</option>
+        <option value="c">°C</option>
+        <option value="f">°F</option>
+        <option value="r">°R</option>
+        <option value="re">°Re</option>
+      </select> 
+    </p>
+    <p>
+      Final Temperature: 
+      <input type="number" id="finalTempVal">
+      <select name="finalTemp" id="finalTempSelect">
+        <option value="k" selected="selected">K</option>
+        <option value="c">°C</option>
+        <option value="f">°F</option>
+        <option value="r">°R</option>
+        <option value="re">°Re</option>
+      </select> 
+    </p>
+    <p id="leContainer" class="containers">
+      Initial Length: 
+      <input type="number" id="initialLenVal">
+      <select id="initialLenSelect" name="initialLenth" >
+        <option value="nm">nm</option>
+        <option value="μm">μm</option>
+        <option value="mm">mm</option>
+        <option value="cm">cm</option>
+        <option value="m" selected="selected">m</option>
+        <option value="km">km</option>
+        <option value="in">in</option>
+        <option value="ft">ft</option>
+        <option value="yd">yd</option>
+        <option value="mi">mi</option>
+      </select>
+    </p>
+    <p id="veContainer" class="containers" style="display: none;">
+      Initial Volume: 
+      <input type="number" id="initialVolVal">
+      <select id="initialVolSelect" name="initialVolume">
+        <option value="mm3">mm3</option>
+        <option value="cm3">cm3</option>
+        <option value="m3" selected="selected">m3</option>
+        <option value="ml">ml</option>
+        <option value="l">L</option>
+        <option value="gallons">Gallons</option>
+        <option value="floz">fl oz</option>
+        <option value="cuin">cu in</option>
+        <option value="cuft">cu ft</option>
+        <option value="cuyd">cu yd</option>
+      </select>
+    </p>
+    <p id="dcContainer" class="containers" style="display: none;">
+      Initial Density: 
+      <input type="number" id="initialDenVal">
+      <select id="initialDenSelect" name="initialDensity">
+        <option value="gm3">g/m3</option>
+        <option value="gcm3">g/cm3</option>
+        <option value="kgm3" selected="selected">kg/m3</option>
+        <option value="kgcm3">kg/cm3</option>
+        <option value="ozin3">oz/cu in</option>
+        <option value="lbft3">lb/cu ft</option>
+        <option value="lbyd3">lb/cu yd</option>
+        <option value="gl">g/litre</option>
+      </select>
+    </p>
+
+    <button id="calcBtn">Calculate</button>
+    <button id="resetBtn">Reset</button>
+    <hr>
+    <div>
+      <h3>Result:</h3>
+      <h3 id="calcResults">Result will appear here...</h3>
+    </div>
+
+    <script>
+      // Get required elements from the HTML
+      const calcSelectEl = document.getElementById("calcSelect");
+      const clteValEl = document.getElementById("clteVal");
+      const initialTempValEl = document.getElementById("initialTempVal");
+      const finalTempValEl = document.getElementById("finalTempVal");
+      const initialLenValEl = document.getElementById("initialLenVal");
+      const initialVolValEl = document.getElementById("initialVolVal");
+      const initialDenValEl = document.getElementById("initialDenVal");
+
+      const clteSelectEl = document.getElementById("clteSelect");
+      const initialTempSelectEl = document.getElementById("initialTempSelect");
+      const finalTempSelectEl = document.getElementById("finalTempSelect");
+      const initialLenSelectEl = document.getElementById("initialLenSelect");
+      const initialVolSelectEl = document.getElementById("initialVolSelect");
+      const initialDenSelectEl = document.getElementById("initialDenSelect");
+
+      const containtersEl = document.querySelectorAll(".containers");
+
+      const calcBtnEl = document.getElementById('calcBtn');
+      const resetBtnEl = document.getElementById('resetBtn');
+      const calcResultsEl = document.getElementById('calcResults') 
+
+      const UNITS = {
+        mass: {
+          mg: 1e6,
+          g: 1000,
+          kg: 1,
+          t: 0.001,
+          oz: 35.274,
+          lb: 2.20462,
+          ton: 0.00110231,
+          "US ton": 0.00110231,
+          "Long ton": 0.000984207,
+        },
+        speed: {
+          ms: 1,
+          kmh: 3.6,
+          fts: 3.28084,
+          mph: 2.23694,
+          kms: 0,
+          mps: 0,
+          ins: 0,
+          yds: 0,
+          knots: 1.94384,
+        },
+        energy: {
+          J: 1,
+          kJ: 0.001,
+          MJ: 1e-6,
+          Wh: 0.000277778,
+          kWh: 0.000000277778,
+          "ft-lbs": 0.737562,
+          kcal: 0.000239006,
+        },
+      }
+
+      /*************** FUNCTIONS ***************/
+      function toSIUnit(type, unit, value) {
+        return value / UNITS[type][unit];
+      }
+
+      function fromSIUnit(type, unit, value) {
+        return value * UNITS[type][unit];
+      }
+
+      function handlecalcSelectChange(e) {
+        const value = e.target.value
+
+        containtersEl.forEach((container) => {
+          let idVal = container.id.slice(0, 2)
+          if (value == idVal) {
+            container.style.display = 'block'
+          } else {
+            container.style.display = 'none'
+          }
+        })
+      }
+
+      function createElements(resultObj) {
+        const elementNodes = Object.keys(resultObj).map((key) => {
+          //create elements to put the results in
+          const div = document.createElement("div");
+          const span = document.createElement("span");
+          const span2 = document.createElement("span");
+
+          // give the elements id
+          div.setAttribute("class", `result-container`);
+          span.setAttribute("class", `result-title`);
+          span2.setAttribute("class", `result-value`);
+
+          // put the values in the elements
+
+          span.textContent = resultObj[key]["title"];
+          span2.textContent = resultObj[key]["value"];
+
+          // appened them to an element that contians them
+          div.append(span, span2);
+
+          // return that element
+          return div;
+        });
+
+        return elementNodes;
+      }
+
+      function prepareUnits() {
+        let k = parseFloat(energyValEl.value) ?? 0;
+        let m = parseFloat(initialTempValEl.value) ?? 0;
+        let v = parseFloat(finalTempValEl.value) ?? 0;
+
+        let uUnit = energySelectEl.value;
+        let kUnit = initialTempSelectEl.value;
+        let xUnit = finalTempSelectEl.value;
+
+        k = toSIUnit("energy", uUnit, k);
+        m = toSIUnit("mass", kUnit, m);
+        v = toSIUnit("speed", xUnit, v);
+
+        return { k, m, v };
+      }
+
+      function prepareResults(result, type, name) {
+        let resultObj = {};
+        Object.keys(UNITS[type]).forEach((key) => {
+          let ans = fromSIUnit(type, key, result);
+
+          resultObj[key] = {
+            title: `${name} (${key}): `,
+            value: ` ${ans} ${key}`,
+          };
+        });
+        return resultObj;
+      }
+
+      function calculateResult(input) {
+        const calculateV = () => {
+          const { m, k } = prepareUnits();
+
+          return {
+            result: Math.sqrt((2 * k) / m),
+            type: "speed",
+            name: `Velocity`,
+          };
+        };
+        const calculateK = () => {
+          const { m, v } = prepareUnits();
+          return {
+            result: 0.5 * m * v * v,
+            type: "energy",
+            name: "Kinetic energy",
+          };
+        };
+        const calculateM = () => {
+          const { k, v } = prepareUnits();
+          return {
+            result: (2 * k) / (v * v),
+            type: "mass",
+            name: "Mass",
+          };
+        };
+
+        switch (input) {
+          case "ve":
+            return calculateV();
+          case "ma":
+            return calculateM();
+          case "en":
+            return calculateK();
+          default:
+            console.log("error in calculate result switch");
+        }
+      }
+
+      function calculateResults() {
+        const calcVal = calcSelectEl.value
+
+          try {
+            const { result, type, name } = calculateResult(calcVal);
+
+          if (isNaN(result)) {
+            alert("Your input resulted in NAN.\n 0/0 \n Try again with valid input.");
+            resetResult()
+            return;
+          }
+          if (Math.abs(result) === Infinity) {
+            alert(
+              "Your input resulted in Infinity. \nDivision by zero. \nTry again with valid input."
+            );
+            resetResult()
+            return;
+          }
+            
+          const resultObj = prepareResults(result, type, name);
+          const elementNodes = createElements(resultObj);
+          calcResultsEl.innerHTML = "";
+
+          elementNodes.forEach((element) => {
+            calcResultsEl.append(element);
+          });
+            // calcResultsEl.innerHTML = `<p> Percent error: ${results.toFixed(2) * 1}%</p>`
+          } catch (error) {
+            alert("Something Went Wrong!!!");
+            resethandler()
+          }
+      }
+
+      function resetForm() {
+        [clteValEl, initialTempValEl, finalTempValEl, initialLenSelectEl, initialVolSelectEl].forEach((input) => {
+          input.value = ""
+        });
+        clteSelectEl.selectedIndex = '0'
+        initialTempSelectEl.selectedIndex = '2'
+        finalTempSelectEl.selectedIndex = '4'
+        initialLenSelectEl.selectedIndex = '2'
+        initialVolSelectEl.selectedIndex = '1'
+
+        calcSelectEl.selectedIndex = '0'
+
+        containtersEl.forEach((container) => {
+          let idVal = container.id.slice(0, 3)
+          if (idVal == 'imf') {
+            container.style.display = 'none'
+          } else {
+            container.style.display = 'block'
+          }
+        })
+      }
+
+      function resetResult() {
+        calcResultsEl.innerHTML = "<p>Result will appear here...</p>";
+      } 
+
+      function resethandler() {
+        resetForm();
+        resetResult();
+      }
+
+      /*************** EVENTLISTINERS ***************/
+      [clteValEl, initialTempValEl, finalTempValEl, initialLenValEl, initialVolValEl, initialDenValEl].forEach((el) => {
+        el.addEventListener("input", resetResult);
+      }); 
+            
+      [clteSelectEl, initialTempSelectEl, finalTempSelectEl, initialLenSelectEl, initialVolSelectEl, initialDenSelectEl].forEach((el) => {
+        el.addEventListener("change", resetResult);
+      }); 
+
+      calcSelectEl.addEventListener("change", handlecalcSelectChange)
+
+      resetBtnEl.addEventListener("click", resethandler);
+      calcBtnEl.addEventListener("click", calculateResults);
+
+    </script>
+</body>
+</html>
