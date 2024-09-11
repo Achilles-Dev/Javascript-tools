@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Van der Waals Calculator</title>
+</head>
+<body>
+    <h1>Van der Waals Calculator</h1>
+    <p>Easily calculate the pressure, volume, temperature or quantity in moles of a gas using this Van der Waals equation calculator. <br />
+      Supports a variety of input metrics such as Celsius, Fahrenheit, Kelvin, Pascals, bars, atmospheres, and volume in both metric <br />
+      and imperial units cubed.
+    </p>
+    <p>
+      Calculate:
+      <select id="calcSelect">
+        <option value="pr" selected>Pressure</option>
+        <option value="vo">Volume</option>
+        <option value="te">Temperature</option>
+        <option value="mo">Moles</option>
+      </select>
+    </p>
+    <p id="prContainer" class="containers" style="display: none;">
+      Pressure (P):
+      <input type="number" id="pressureVal">
+      <select id="pressureSelect" name="pressure">
+        <option value="Pa" selected>Pa</option>
+        <option value="kPa">kPa</option>
+        <option value="MPa">MPa</option>
+        <option value="GPa">GPa</option>
+        <option value="mbar">mbar</option>
+        <option value="bar">bar</option>
+        <option value="atm">atm</option>
+        <option value="mmHg">mm Hg (Torr)</option>
+        <option value="mmH2O">mm H20</option>
+        <option value="psi">psi</option>
+      </select>
+    </p>
+    <p id="voContainer" class="containers">
+      Volume (V): 
+      <input type="number" id="volumeVal">
+      <select id="volumeSelect" name="volume">
+        <option value="mm3">mm3</option>
+        <option value="cm3">cm3</option>
+        <option value="m3" selected>m3</option>
+        <option value="ml">ml</option>
+        <option value="l">L</option>
+        <option value="gallons">Gallons</option>
+        <option value="floz">fl oz</option>
+        <option value="cuin">cu in</option>
+        <option value="cuft">cu ft</option>
+        <option value="cuyd">cu yd</option>
+      </select>
+    </p>
+    <p id="moContainer" class="containers">
+      Moles (n): 
+      <input type="number" id="moleVal">
+      <span>mol</span>
+    </p>
+
+    <p id="teContainer" class="containers">
+      Temperature (T): 
+      <input type="number" id="tempVal">
+      <select id="tempSelect" name="temp">
+        <option value="k" selected>K</option>
+        <option value="c">°C</option>
+        <option value="f">°F</option>
+        <option value="r">°R</option>
+        <option value="re">°Re</option>
+      </select>
+    </p>
+    <p>
+      Constant a: 
+      <input type="number" id="constAVal">
+      <select id="constASelect" name="constantA" >
+        <option value="jm3mol2">J·m3/mol2</option>
+        <option value="Pam6">Pa·m6/mol2</option>
+        <option value="barm6" selected>bar·m6/mol2</option>
+        <option value="psim6">psi·m6/mol2</option>
+        <option value="torrm6">Torr·m6/mol2</option>
+      </select>
+    </p>
+    <p>
+      Constant b: 
+      <input type="number" id="constBVal">
+      <select id="constBSelect" name="constantB">
+        <option value="mm3">mm3/mol</option>
+        <option value="cm3">cm3/mol</option>
+        <option value="m3" selected>m3/mol</option>
+        <option value="ml">ml/mol</option>
+        <option value="l">L/mol</option>
+        <option value="floz">fl oz/mol</option>
+        <option value="cuin">cu in/mol</option>
+        <option value="cuft">cu ft/mol</option>
+        <option value="cuyd">cu yd/mol</option>
+      </select>
+    </p>
+    <p id="pressureUnitContainer" class="unitContainers">
+      <span>Pressure Unit:</span>
+      <select id="pressureUSelect" name="pressureUnit">
+        <option value="Pa" selected>Pa</option>
+        <option value="kPa">kPa</option>
+        <option value="MPa">MPa</option>
+        <option value="GPa">GPa</option>
+        <option value="mbar">mbar</option>
+        <option value="bar">bar</option>
+        <option value="atm">atm</option>
+        <option value="mmHg">mm Hg (Torr)</option>
+        <option value="mmH2O">mm H20</option>
+        <option value="psi">psi</option>
+      </select>       
+    </p>
+    <p id="volumeUnitContainer" class="unitContainers" style="display: none;">
+      <span>Volume Unit:</span>
+      <select id="volumeUSelect" name="volumeUnit">
+        <option value="mm3">mm3</option>
+        <option value="cm3">cm3</option>
+        <option value="m3" selected>m3</option>
+        <option value="ml">ml</option>
+        <option value="l">L</option>
+        <option value="gallons">Gallons</option>
+        <option value="floz">fl oz</option>
+        <option value="cuin">cu in</option>
+        <option value="cuft">cu ft</option>
+        <option value="cuyd">cu yd</option>
+      </select>
+    </p>
+    <p id="tempUnitContainer" style="display: none;" class="unitContainers">
+      <span>Temperature Unit:</span>
+      <select id="tempUSelect" name="tempUnit">
+        <option value="k" selected>K</option>
+        <option value="c">°C</option>
+        <option value="f">°F</option>
+        <option value="r">°R</option>
+        <option value="re">°Re</option>
+      </select>
+    </p>
+    <button id="calcBtn">Calculate</button>
+    <button id="resetBtn">Reset</button>
+    <hr>
+    <div>
+      <h3>Result:</h3>
+      <h3 id="calcResults">Result will appear here...</h3>
+    </div>
+
+    <script>
+      // Get required elements from the HTML
+      const calcSelectEl = document.getElementById("calcSelect");
+      const pressureValEl = document.getElementById("pressureVal");
+      const volumeValEl = document.getElementById("volumeVal");
+      const moleValEl = document.getElementById("moleVal");
+      const tempValEl = document.getElementById("tempVal");
+      const constAValEl = document.getElementById("constAVal");
+      const constBValEl = document.getElementById("constBVal");
+
+      const pressureSelectEl = document.getElementById("pressureSelect");
+      const volumeSelectEl = document.getElementById("volumeSelect");
+      const tempSelectEl = document.getElementById("tempSelect");
+      const constASelectEl = document.getElementById("constASelect");
+      const constBSelectEl = document.getElementById("constBSelect");
+
+      const pressureUSelectEl = document.getElementById("pressureUSelect");
+      const volumeUSelectEl = document.getElementById("volumeUSelect");
+      const tempUSelectEl = document.getElementById("tempUSelect");
+
+      const containtersEl = document.querySelectorAll(".containers");
+      const unitContainersEl = document.querySelectorAll(".unitContainers");
+
+      const calcBtnEl = document.getElementById('calcBtn');
+      const resetBtnEl = document.getElementById('resetBtn');
+      const calcResultsEl = document.getElementById('calcResults') 
+
+      const UNITS = {
+        time: {
+          ns: 0,
+          ms: 0,
+          s: 1,
+          m: 0.01666666666,
+          h: 0.0002777777777777778,
+          days: 0.000011574074074074073,
+          wks: 0.0000016534391534391535,
+          mos: 3.8025705376834734e-7,
+          yrs: 3.1688087814028954e-8,
+        },
+      }
+
+      /*************** FUNCTIONS ***************/
+      function toSIUnit(type, unit, value) {
+        return value / UNITS[type][unit];
+      }
+
+      function fromSIUnit(type, unit, value) {
+        return value * UNITS[type][unit];
+      }
+
+      function handlecalcSelectChange(e) {
+        const value = e.target.value
+
+        containtersEl.forEach((container) => {
+          let idVal = container.id.slice(0, 2)
+          if (value == idVal) {
+            container.style.display = 'none'
+          } else {
+            container.style.display = 'block'
+          }
+        })
+
+        unitContainersEl.forEach((container) => {
+          let idVal = container.id.slice(0, 2)
+          if (value == idVal) {
+            container.style.display = 'block'
+          } else {
+            container.style.display = 'none'
+          }
+        })
+      }
+
+      function handleHLInputChange(e) {
+        const value = parseFloat(e.target.value)
+        const id = e.target.id
+        let val1 = 0
+        let val2 = 0 
+        halfLifeEl.forEach((input) => {
+          if (input.id != id) {
+            if (id == 'halfLifeVal') {
+              val1 =  isNaN(value) ? '' : (Math.log(2) / value);
+              val2 =  isNaN(value) ? '' : (value / Math.log(2));
+              input.value = input.id == 'decConstVal' ? val1 : val2
+            } else if (id == 'decConstVal') {
+              val1 =  isNaN(value) ? '' : (Math.log(2) / value);
+              val2 =  isNaN(value) ? '' : (1 / value);
+              input.value = input.id == 'halfLifeVal' ? val1 : val2
+            } else {
+              val1 =  isNaN(value) ? '' : (Math.log(2) * value);
+              val2 =  isNaN(value) ? '' : (1 / value);
+              input.value = input.id == 'halfLifeVal' ? val1 : val2
+            }
+          }
+        })
+      }
+
+      function handleHLSelectChange(e) {
+        const index = e.target.selectedIndex
+        const id = e.target.id
+        halfLifeSelectEl.forEach((select) => {
+          if (select.id != id) {
+            select.selectedIndex = index
+          }
+        })
+      }
+
+      function prepareUnits() {
+        let iq = parseFloat(iniQtyValEl.value) ?? 0;
+        let rq = parseFloat(remQtyValEl.value) ?? 0;
+        let te = parseFloat(timeValEl.value) ?? 0;
+        let hl = parseFloat(document.getElementById('halfLifeVal').value) ?? 0;
+
+        let teUnit = timeSelectEl.value;
+        let hlUnit = document.getElementById('halfLifeSelect').value;
+
+        te = toSIUnit("time", teUnit, te);
+        hl = toSIUnit("time", hlUnit, hl);
+
+        return { iq, rq, te , hl};
+      }
+
+      function calculateResults() {
+          // Retrieve input values
+          // const observedVal = parseFloat(observedValEl.value);
+          // const trueVal = parseFloat(trueValEl.value);
+
+          if (isNaN(observedVal) || isNaN(trueVal)) {
+            alert("Please Enter All Details.");
+            return;
+          } else if (trueVal < 0  ) {
+            alert("The relative uncertainty cannot be negative.");
+              return;
+          }
+
+          try {
+            const results = ((observedVal -trueVal) / trueVal) * 100
+            
+            calcResultsEl.innerHTML = `<p> Percent error: ${results.toFixed(2) * 1}%</p>`
+          } catch (error) {
+            alert("Something Went Wrong!!!");
+            resethandler()
+          }
+      }
+
+      function resetForm() {
+        observedValEl.value = ""
+        trueValEl.value = ""
+      }
+
+      function resetResult() {
+        calcResultsEl.innerHTML = "<p>Result will appear here...</p>";
+      } 
+
+      function resethandler() {
+        resetForm();
+        resetResult();
+      }
+
+      /*************** EVENTLISTINERS ***************/
+      [pressureValEl, volumeValEl, moleValEl, tempValEl, constAValEl, constBValEl].forEach((el) => {
+        el.addEventListener("input", resetResult);
+      }); 
+            
+      [pressureSelectEl, volumeSelectEl, tempSelectEl, pressureUSelectEl, volumeUSelectEl, tempUSelectEl,
+        constASelectEl, constBSelectEl
+      ].forEach((el) => {
+        el.addEventListener("change", resetResult);
+      }); 
+
+      calcSelectEl.addEventListener("change", handlecalcSelectChange)
+
+      resetBtnEl.addEventListener("click", resethandler);
+      calcBtnEl.addEventListener("click", calculateResults);
+
+    </script>
+</body>
+</html>
