@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Momentum Calculator</title>
+  </head>
+  <body>
+    <h1>Momentum Calculator</h1>
+      <p>
+        Calculate:
+        <select id="calcSelect">
+          <option value="one" selected>Momentum in one dimension</option>
+          <option value="two">Momentum in two or three dimensions</option>
+        </select>
+      </p>
+      <div id="oneContainer" class="containers">
+        <p>
+          <label for="i1-input">Mass (m)</label>
+          <input
+            type="number"
+            min="0"
+            autocomplete="off"
+            data-id="i1"
+            step="any"
+            id="i1-input"
+            class="inputs"
+            data-name="Mass (m)"
+          />
+          <select
+            class="selects"
+            id="i1-select"
+            data-type="speed"
+            data-prev="kn"
+            data-id="i1"
+          >
+            <option value="m/s">meters per second (m/s)</option>
+            <option value="km/h">kilometers per hour (km/h)</option>
+            <option value="ft/s">feet per second (ft/s)</option>
+            <option value="mph">miles per hour (mph)</option>
+            <option value="kn" selected>knots (kn)</option>
+          </select>
+        </p>
+        <p>
+          <label for="i2-input">Velocity (v)</label>
+          <input
+            type="number"
+            min="0"
+            autocomplete="off"
+            data-id="i2"
+            step="any"
+            id="i2-input"
+            class="inputs"
+            data-name="Velocity (v)"
+            disabled
+          />
+  
+          <select
+            class="selects"
+            id="i2-select"
+            data-type="speed"
+            data-prev="kn"
+            data-id="i2"
+          >
+            <option value="m/s">meters per second (m/s)</option>
+            <option value="km/h">kilometers per hour (km/h)</option>
+            <option value="ft/s">feet per second (ft/s)</option>
+            <option value="mph">miles per hour (mph)</option>
+            <option value="kn" selected>knots (kn)</option>
+          </select>
+        </p>
+      </div>
+      <div id="oneContainer" class="containers">
+        <p>
+          <label for="i1-input">Momentum in x-direction</label>
+          <input
+            type="number"
+            min="0"
+            autocomplete="off"
+            data-id="i1"
+            step="any"
+            id="i1-input"
+            class="inputs"
+            data-name="Momentum in x-direction"
+          />
+          <select
+            class="selects"
+            id="i1-select"
+            data-type="speed"
+            data-prev="kn"
+            data-id="i1"
+          >
+            <option value="m/s">meters per second (m/s)</option>
+            <option value="km/h">kilometers per hour (km/h)</option>
+            <option value="ft/s">feet per second (ft/s)</option>
+            <option value="mph">miles per hour (mph)</option>
+            <option value="kn" selected>knots (kn)</option>
+          </select>
+        </p>
+        <p>
+          <label for="i2-input">Momentum in y-direction</label>
+          <input
+            type="number"
+            min="0"
+            autocomplete="off"
+            data-id="i2"
+            step="any"
+            id="i2-input"
+            class="inputs"
+            data-name="Momentum in y-direction"
+            disabled
+          />
+  
+          <select
+            class="selects"
+            id="i2-select"
+            data-type="speed"
+            data-prev="kn"
+            data-id="i2"
+          >
+            <option value="m/s">meters per second (m/s)</option>
+            <option value="km/h">kilometers per hour (km/h)</option>
+            <option value="ft/s">feet per second (ft/s)</option>
+            <option value="mph">miles per hour (mph)</option>
+            <option value="kn" selected>knots (kn)</option>
+          </select>
+        </p>
+        <p>
+          <label for="i3-input">Momentum in z-direction</label>
+          <input
+            type="number"
+            min="0"
+            autocomplete="off"
+            data-id="i3"
+            step="any"
+            id="i3-input"
+            class="inputs"
+            data-name="Momentum in z-direction"
+          />
+          <select
+            class="selects"
+            id="i3-select"
+            data-type="angle"
+            data-prev="deg"
+            data-id="i3"
+          >
+            <option value="deg" selected>degrees (deg)</option>
+            <option value="rad">radians (rad)</option>
+          </select>
+        </p>
+      </div>
+
+      <button id="calcBtn">Calculate</button>
+      <button id="resetBtn">Reset</button>
+      <hr>
+      <div>
+        <h3>Result:</h3>
+        <h3 id="calcResults">Result will appear here...</h3>
+      </div>
+
+    <script>
+      /*************** ELEMENTS ***************/
+      const selects = document.querySelectorAll(".selects");
+      const inputs = document.querySelectorAll(".inputs");
+
+      const calcBtnEl = document.getElementById('calcBtn');
+      const resetBtnEl = document.getElementById('resetBtn');
+      const calcResultsEl = document.getElementById('calcResults')
+
+      /*************** GLOBAL VARIBLES ***************/
+      const UNITS = {
+        speed: {
+          "m/s": 1,
+          "km/h": 3.6,
+          "ft/s": 3.280839895013123,
+          mph: 2.236936292054402,
+          kn: 1.9438444924406046,
+          "ft/min": 196.85039370078738,
+        },
+        angle: {
+          deg: 1,
+          rad: 0.0174532925199433,
+        },
+      };
+
+      /*************** FUNCTIONS ***************/
+      function toSIUnit(type, unit, value) {
+        if (type === "temperature") {
+          return UNITS[type][unit](value, "+");
+        }
+        return value / UNITS[type][unit];
+      }
+
+      function fromSIUnit(type, unit, value) {
+        if (type === "temperature") {
+          return UNITS[type][unit](value, "-");
+        }
+        return value * UNITS[type][unit];
+      }
+
+      function createElement() {
+        const newDiv = `
+          <div>
+            <p>
+              <label for="i5-span">Wind correction angle: &nbsp; </label>
+              <span
+                data-id="i5"
+                step="any"
+                id="i5-span"
+                class="spans"
+                data-name="Wind correction angle"
+              ></span>
+
+              <select
+                class="selectsResult"
+                id="i5-select"
+                data-type="angle"
+                data-prev="deg"
+                data-id="i5"
+              >
+                <option value="deg" selected>degrees (deg)</option>
+                <option value="rad">radians (rad)</option>
+              </select>
+            </p>
+            <p>
+              <label for="i6-span">Heading: &nbsp; </label>
+              <span
+                data-id="i6"
+                step="any"
+                id="i6-span"
+                class="spans"
+                data-name="Heading"
+              ></span>
+
+              <select
+                class="selectsResult"
+                id="i6-select"
+                data-type="angle"
+                data-prev="deg"
+                data-id="i6"
+              >
+                <option value="deg" selected>degrees (deg)</option>
+                <option value="rad">radians (rad)</option>
+              </select>
+            </p>
+            <p>
+              <label for="i7-span">Ground speed: &nbsp; </label>
+              <span
+                data-id="i7"
+                step="any"
+                id="i7-span"
+                class="spans"
+                data-name="Ground speed"
+              ></span>
+
+              <select
+                class="selectsResult"
+                id="i7-select"
+                data-type="angle"
+                data-prev="deg"
+                data-id="i7"
+              >
+                <option value="deg" selected>degrees (deg)</option>
+                <option value="rad">radians (rad)</option>
+              </select>
+            </p>
+          </div>
+        `
+        return newDiv
+      }
+
+      // related to caculation
+      function prepareUnit(...args) {
+        const resultArr = [];
+        for (id of args) {
+          const input = document.getElementById(`${id}-input`);
+          const select = document.getElementById(`${id}-select`);
+          const type = select.getAttribute("data-type");
+          let val = parseFloat(input.value);
+
+          val = isNaN(val) ? 0 : val;
+          let inUnit = select.value;
+
+          val = toSIUnit(type, inUnit, val);
+
+          resultArr.push(val);
+        }
+
+        return resultArr;
+      }
+
+      function setResult(resultObj) {
+        for (key of Object.keys(resultObj)) {
+          let val = resultObj[key].result;
+          let id = resultObj[key].type;
+
+          if (isNaN(val)) {
+           alert("Your input resulted in NAN.\n 0/0 \n Try again with valid input.");
+            return;
+          }
+          if (Math.abs(val) === Infinity) {
+            alert("Your input resulted in Infinity. \nDivision by zero. \nTry again with valid input.");
+            return;
+          }
+          if (id != 'i2') {
+            const input = document.getElementById(`${id}-input`);
+            const select = document.getElementById(`${id}-select`);
+            const type = select.getAttribute("data-type");
+            let outUnit = select.value;
+
+            val = fromSIUnit(type, outUnit, val);
+            input.value = parseFloat(val);
+
+            !validateInput(id);
+          } else {
+            const span = document.getElementById(`${id}-span`);
+            const select = document.getElementById(`${id}-select`);
+            const type = select.getAttribute("data-type");
+            let outUnit = select.value;
+            val = fromSIUnit(type, outUnit, val);
+
+            span.textContent = parseFloat(val);
+          }
+        }
+      }
+
+      function calculateResult() {
+        const R = 8.31446261815324;
+        const M = 0.0289647;
+        const ro = 1.4;
+
+        const k = (ro * R) / M;
+        
+        function calculateI2() {
+          let [val1] = prepareUnit("i1");
+          let result = Math.sqrt(val1 * k);
+          return {
+            1: { result, type: "i2" },
+          };
+        }
+        return calculateI2()
+      }
+
+      function selectsIIChangeHandler(e, inp = false) {
+        let select;
+        if (e) {
+          select = e.target;
+        } else select = inp;
+        let val = parseFloat(select.value);
+        let resultObj = {
+          1: { result: val, type: "i2II" },
+        };
+        setResult(resultObj, "II");
+      }
+
+      function selectChangeHandler(e) {
+        let select = e.target;
+        let id = select.getAttribute("data-id");
+        let input = document.getElementById(`${id}-input`);
+
+        let prevUnit = select.getAttribute("data-prev");
+        let currentUnit = select.value;
+
+        select.setAttribute("data-prev", currentUnit);
+
+        let type = select.getAttribute("data-type");
+
+        let value = input.value;
+
+        if (value == "") return;
+        value = parseFloat(value);
+        if (isNaN(value)) value = 0.0;
+
+        let si = toSIUnit(type, prevUnit, value);
+        let result = fromSIUnit(type, currentUnit, si);
+        input.value = parseFloat(result);
+      }
+
+      function validateInput(id) {
+        const input = document.getElementById(`${id}-input`);
+        const label = input.getAttribute("data-name").trim();
+        let value = parseFloat(input.value);
+
+        if (label === "Temperature") {
+          let unit = document.getElementById(`${id}-select`).value;
+          let siValue = toSIUnit("temperature", unit, value);
+          if (siValue <= 0 || isNaN(value)) {
+            alert(`Temperature must be greater than zero kelvin (273.15 °C, -459.7 °F).`);
+            return false;
+          }
+          return true;
+        }
+
+        if (value < 0) {
+          alert(`Speed of sound in dry air cannot be negative.`);
+          return false;
+        }
+
+        return true;
+      }
+
+      function handleResultsChange(e) {
+        let select = e.target;
+        let id = select.getAttribute("data-id");
+        let span = document.getElementById(`${id}-span`);
+
+        let prevUnit = select.getAttribute("data-prev");
+        let currentUnit = select.value;
+        select.setAttribute("data-prev", currentUnit);
+
+        if (span.textContent === "") {
+          return;
+        }
+
+        let type = select.getAttribute("data-type");
+
+        let value = parseFloat(span.textContent);
+        value = parseFloat(value);
+        if (isNaN(value)) value = 0.0;
+
+        let si = toSIUnit(type, prevUnit, value);
+        let result = fromSIUnit(type, currentUnit, si);
+        span.textContent = parseFloat(result);
+      }
+
+      function calculateResults() {
+        if (!validateInput("i1")) return;
+        
+        try {
+          const resultElement = createElement()
+          calcResultsEl.innerHTML = resultElement
+
+          const newSelects = document.querySelectorAll(".selectsResult");
+
+          newSelects.forEach((select) => {
+            select.addEventListener("change", handleResultsChange);
+          });
+        
+          const result = calculateResult();
+          setResult(result)
+
+        } catch(error) {
+          alert("An error ocurred. Try again with valid input.");
+          resetResult()
+          return;
+        }
+      }
+
+      function resetForm() {
+        selects.forEach((select, index) => {
+          select.selectedIndex = '0'
+        });
+
+        inputs.forEach((input) => {
+          input.value = ""
+        });
+      }
+
+      function resetResult() {
+        calcResultsEl.innerHTML = "<p>Result will appear here...</p>";
+      } 
+
+      function resethandler() {
+        resetForm();
+        resetResult();
+      }
+
+      /*************** EVENT LISTINERS ***************/
+
+      selects.forEach((select, index) => {
+        if (index == 0) {
+          select.addEventListener("change", resetResult);
+        } else {
+          select.addEventListener("change", selectChangeHandler)
+        }
+      });
+
+      inputs.forEach((input) => {
+        input.addEventListener("input", resetResult);
+      });
+
+      resetBtnEl.addEventListener("click", resethandler);
+      calcBtnEl.addEventListener("click", calculateResults);
+
+    </script>
+  </body>
+</html>

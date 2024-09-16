@@ -771,7 +771,7 @@
           });
 
           let result;
-          if (eFieldUnit == 'dc' && modeUnit == 'sm') {
+          if (eFieldUnit == 'dc') {
             result = calculateResults2()
           } else {
             result = calculateResult()
@@ -808,7 +808,7 @@
       input4.addEventListener("input", resetResult);
 
       selects.forEach((select) => {
-        select.addEventListener("change", selectChangeHandler);
+        select.addEventListener("change", resetResult);
       });
 
       inputs.forEach((input) => {

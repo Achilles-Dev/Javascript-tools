@@ -39,16 +39,16 @@
       Volume (V): 
       <input type="number" id="volumeVal">
       <select id="volumeSelect" name="volume">
-        <option value="mm3">mm3</option>
-        <option value="cm3">cm3</option>
-        <option value="m3" selected>m3</option>
+        <option value="mm³">mm3</option>
+        <option value="cm³">cm3</option>
+        <option value="m³" selected>m3</option>
         <option value="ml">ml</option>
-        <option value="l">L</option>
-        <option value="gallons">Gallons</option>
-        <option value="floz">fl oz</option>
-        <option value="cuin">cu in</option>
-        <option value="cuft">cu ft</option>
-        <option value="cuyd">cu yd</option>
+        <option value="L">L</option>
+        <option value="Gallons">Gallons</option>
+        <option value="fl oz">fl oz</option>
+        <option value="cu in">cu in</option>
+        <option value="cu ft">cu ft</option>
+        <option value="cu yd">cu yd</option>
       </select>
     </p>
     <p id="moContainer" class="containers">
@@ -61,11 +61,11 @@
       Temperature (T): 
       <input type="number" id="tempVal">
       <select id="tempSelect" name="temp">
-        <option value="k" selected>K</option>
-        <option value="c">°C</option>
-        <option value="f">°F</option>
-        <option value="r">°R</option>
-        <option value="re">°Re</option>
+        <option value="K" selected>K</option>
+        <option value="°C">°C</option>
+        <option value="°F">°F</option>
+        <option value="°R">°R</option>
+        <option value="°Re">°Re</option>
       </select>
     </p>
     <p id="pressureUnitContainer" class="unitContainers">
@@ -86,26 +86,26 @@
     <p id="volumeUnitContainer" class="unitContainers" style="display: none;">
       <span>Volume Unit:</span>
       <select id="volumeUSelect" name="volumeUnit">
-        <option value="mm3">mm3</option>
-        <option value="cm3">cm3</option>
-        <option value="m3" selected>m3</option>
+        <option value="mm³">mm3</option>
+        <option value="cm³">cm3</option>
+        <option value="m³" selected>m3</option>
         <option value="ml">ml</option>
-        <option value="l">L</option>
-        <option value="gallons">Gallons</option>
-        <option value="floz">fl oz</option>
-        <option value="cuin">cu in</option>
-        <option value="cuft">cu ft</option>
-        <option value="cuyd">cu yd</option>
+        <option value="L">L</option>
+        <option value="Gallons">Gallons</option>
+        <option value="fl oz">fl oz</option>
+        <option value="cu in">cu in</option>
+        <option value="cu ft">cu ft</option>
+        <option value="cu yd">cu yd</option>
       </select>
     </p>
     <p id="tempUnitContainer" style="display: none;" class="unitContainers">
       <span>Temperature Unit:</span>
       <select id="tempUSelect" name="tempUnit">
-        <option value="k" selected>K</option>
-        <option value="c">°C</option>
-        <option value="f">°F</option>
-        <option value="r">°R</option>
-        <option value="re">°Re</option>
+        <option value="K" selected>K</option>
+        <option value="°C">°C</option>
+        <option value="°F">°F</option>
+        <option value="°R">°R</option>
+        <option value="°Re">°Re</option>
       </select>
     </p>
     <button id="calcBtn">Calculate</button>
@@ -140,25 +140,57 @@
       const calcResultsEl = document.getElementById('calcResults') 
 
       const UNITS = {
-        time: {
-          ns: 0,
-          ms: 0,
-          s: 1,
-          m: 0.01666666666,
-          h: 0.0002777777777777778,
-          days: 0.000011574074074074073,
-          wks: 0.0000016534391534391535,
-          mos: 3.8025705376834734e-7,
-          yrs: 3.1688087814028954e-8,
+        pressure: {
+          Pa: 1,
+          bar: 0.00001,
+          psi: 0.0001450377,
+          at: 0.0000101972,
+          atm: 0.0000098692,
+          Torr: 0.0075006168,
+          hPa: 0.01,
+          kPa: 0.001,
+          MPa: 0.000001,
+          GPa: 1e-9,
+          inHg: 0.0002953006,
+          mmHg: 0.0075006376,
         },
+        volume: {
+          "mm³": 1000000000,
+          "cm³": 1000000,
+          "m³": 1,
+          "L": 1000,
+          "ml": 1000000,
+          "Gallons": 264.17217686,
+          "fl oz": 35195.079728,
+          "cu in": 61023.744095,
+          "cu ft": 35.314666721,
+          "cu yd": 1.3079506193,
+        },
+        temperature: {
+          "°C": (value, op) => (op === "+" ? value + 273.15 : value - 273.15),
+          "°F": (value, op) =>
+            op === "+" ? (value * (5 / 9)) + 255.372222222 : value * (9 / 5) - 459.67,
+          K: (value, op) => value,
+          "°R": (value, op) => op === "+" ? value * (5 / 9) : value * (9 / 5),
+          "°Re": (value, op) => op === "+" ? (value * (5 / 4)) + 273.15 : (value * (4 / 5)) - 218.52,
+        },
+        mol: {
+          mol: 1
+        }
       }
 
       /*************** FUNCTIONS ***************/
       function toSIUnit(type, unit, value) {
+        if (type === "temperature") {
+          return UNITS[type][unit](value, "+");
+        }
         return value / UNITS[type][unit];
       }
 
       function fromSIUnit(type, unit, value) {
+        if (type === "temperature") {
+          return UNITS[type][unit](value, "-");
+        }
         return value * UNITS[type][unit];
       }
 
@@ -184,76 +216,129 @@
         })
       }
 
-      function handleHLInputChange(e) {
-        const value = parseFloat(e.target.value)
-        const id = e.target.id
-        let val1 = 0
-        let val2 = 0 
-        halfLifeEl.forEach((input) => {
-          if (input.id != id) {
-            if (id == 'halfLifeVal') {
-              val1 =  isNaN(value) ? '' : (Math.log(2) / value);
-              val2 =  isNaN(value) ? '' : (value / Math.log(2));
-              input.value = input.id == 'decConstVal' ? val1 : val2
-            } else if (id == 'decConstVal') {
-              val1 =  isNaN(value) ? '' : (Math.log(2) / value);
-              val2 =  isNaN(value) ? '' : (1 / value);
-              input.value = input.id == 'halfLifeVal' ? val1 : val2
-            } else {
-              val1 =  isNaN(value) ? '' : (Math.log(2) * value);
-              val2 =  isNaN(value) ? '' : (1 / value);
-              input.value = input.id == 'halfLifeVal' ? val1 : val2
-            }
-          }
-        })
-      }
-
-      function handleHLSelectChange(e) {
-        const index = e.target.selectedIndex
-        const id = e.target.id
-        halfLifeSelectEl.forEach((select) => {
-          if (select.id != id) {
-            select.selectedIndex = index
-          }
-        })
-      }
-
       function prepareUnits() {
-        let iq = parseFloat(iniQtyValEl.value) ?? 0;
-        let rq = parseFloat(remQtyValEl.value) ?? 0;
-        let te = parseFloat(timeValEl.value) ?? 0;
-        let hl = parseFloat(document.getElementById('halfLifeVal').value) ?? 0;
+        let pr = parseFloat(pressureValEl.value) ?? 0;
+        let vo = parseFloat(volumeValEl.value) ?? 0;
+        let mo = parseFloat(moleValEl.value) ?? 0;
+        let te = parseFloat(tempValEl.value) ?? 0;
 
-        let teUnit = timeSelectEl.value;
-        let hlUnit = document.getElementById('halfLifeSelect').value;
+        let prUnit = pressureSelectEl.value;
+        let voUnit = volumeSelectEl.value;
+        let teUnit = tempSelectEl.value;
 
-        te = toSIUnit("time", teUnit, te);
-        hl = toSIUnit("time", hlUnit, hl);
 
-        return { iq, rq, te , hl};
+        pr = toSIUnit("pressure", prUnit, pr);
+        vo = toSIUnit("volume", voUnit, vo);
+        te = toSIUnit("temperature", teUnit, te);
+
+        return { pr, vo, te , mo};
+      }
+
+      function calculateResult(input) {
+        let R = 8.314459848
+        const calculatePR = () => {
+          const { vo, te, mo } = prepareUnits();
+          let result = (mo * R * te) / vo
+          return {
+            result,
+            type: "pressure",
+            name: "Pressure",
+          };
+        };
+        const calculateVO = () => {
+          const { pr, te, mo } = prepareUnits();
+          let result = (mo * R * te) / pr
+          return {
+            result,
+            type: "volume",
+            name: `Volume`,
+          };
+        };
+        const calculateTE = () => {
+          const { vo, pr, mo } = prepareUnits();
+          let result = (pr * vo) / (mo * R )
+          return {
+            result,
+            type: "temperature",
+            name: "Temperature",
+          };
+        };
+
+        const calculateMO = () => {
+          const { vo, pr, te } = prepareUnits();
+          let result = (pr * vo) / (te * R )
+          return {
+            result,
+            type: "mol",
+            name: "Mole",
+          };
+        };
+
+
+        switch (input) {
+          case "pr":
+            return calculatePR();
+          case "vo":
+            return calculateVO();
+          case "te":
+            return calculateTE();
+          case "mo":
+            return calculateMO();
+          default:
+            console.log("error in calculate result switch");
+        }
+      }
+
+      function prepareResults(result, type) {
+        let resObj = {};
+        let ans;
+        let unit;
+        if (type === 'pressure') {
+          unit = pressureUSelectEl.value
+          ans = fromSIUnit(type, unit, result);
+        } else if (type === 'volume') {
+          unit = volumeUSelectEl.value
+          ans = fromSIUnit(type, unit, result);
+        } else if (type === 'temperature') {
+          unit = tempUSelectEl.value
+          ans = fromSIUnit(type, unit, result);
+        } else {
+          ans = result
+          unit = type
+        }
+        resObj = {
+          result: parseFloat(ans.toFixed(6) * 1),
+          unit
+        }
+        
+        return resObj;
       }
 
       function calculateResults() {
-          // Retrieve input values
-          // const observedVal = parseFloat(observedValEl.value);
-          // const trueVal = parseFloat(trueValEl.value);
+        const calcUnit = calcSelectEl.value
 
-          if (isNaN(observedVal) || isNaN(trueVal)) {
-            alert("Please Enter All Details.");
+        try {
+          const { result, type, name, unit } = calculateResult(calcUnit);
+          if (isNaN(result)) {
+            alert("Your input resulted in NAN.\n 0/0 \n Try again with valid input.");
+            resetResult()
             return;
-          } else if (trueVal < 0  ) {
-            alert("The relative uncertainty cannot be negative.");
-              return;
           }
-
-          try {
-            const results = ((observedVal -trueVal) / trueVal) * 100
-            
-            calcResultsEl.innerHTML = `<p> Percent error: ${results.toFixed(2) * 1}%</p>`
-          } catch (error) {
-            alert("Something Went Wrong!!!");
-            resethandler()
+          if (Math.abs(result) === Infinity) {
+            alert(
+              "Your input resulted in Infinity. \nDivision by zero. \nTry again with valid input."
+            );
+            resetResult()
+            return;
           }
+          const resObj = prepareResults(result, type)
+          calcResultsEl.innerHTML = `${name} = ${resObj.result} ${resObj.unit}`;          
+        } catch (error) {
+          console.log(error);
+          alert("An error ocurred. Try again with valid input.");
+          resetResult()
+          return;
+        }
       }
 
       function resetForm() {

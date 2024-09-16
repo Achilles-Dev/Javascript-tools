@@ -49,8 +49,8 @@
         <input type="number" id="halfLifeVal" class="halfLife">
         <select id="halfLifeSelect" class="halfLifeSelect">
           <option value="ns">Nanoseconds</option>
-          <option value="ms" selected>Milliseconds</option>
-          <option value="s">Seconds</option>
+          <option value="ms">Milliseconds</option>
+          <option value="s" selected>Seconds</option>
           <option value="m">Minutes</option>
           <option value="h">Hours</option>
           <option value="d">Days</option>
@@ -64,8 +64,8 @@
         <input type="number" id="decConstVal" class="halfLife">
         <select id="decConstSelect" class="halfLifeSelect">
           <option value="ns">Nanoseconds</option>
-          <option value="ms" selected>Milliseconds</option>
-          <option value="s">Seconds</option>
+          <option value="ms">Milliseconds</option>
+          <option value="s" selected>Seconds</option>
           <option value="m">Minutes</option>
           <option value="h">Hours</option>
           <option value="d">Days</option>
@@ -79,8 +79,8 @@
         <input type="number" id="mLifeTVal" class="halfLife">
         <select id="mLifeSelect" class="halfLifeSelect">
           <option value="ns">Nanoseconds</option>
-          <option value="ms" selected>Milliseconds</option>
-          <option value="s">Seconds</option>
+          <option value="ms">Milliseconds</option>
+          <option value="s" selected>Seconds</option>
           <option value="m">Minutes</option>
           <option value="h">Hours</option>
           <option value="d">Days</option>
@@ -116,28 +116,7 @@
       const resetBtnEl = document.getElementById('resetBtn');
       const calcResultsEl = document.getElementById('calcResults') 
 
-      const UNITS = {
-        time: {
-          ns: 0,
-          ms: 0,
-          s: 1,
-          m: 0.01666666666,
-          h: 0.0002777777777777778,
-          days: 0.000011574074074074073,
-          wks: 0.0000016534391534391535,
-          mos: 3.8025705376834734e-7,
-          yrs: 3.1688087814028954e-8,
-        },
-      }
-
       /*************** FUNCTIONS ***************/
-      function toSIUnit(type, unit, value) {
-        return value / UNITS[type][unit];
-      }
-
-      function fromSIUnit(type, unit, value) {
-        return value * UNITS[type][unit];
-      }
 
       function handleSolveForSelectChange(e) {
         const value = e.target.value
@@ -192,41 +171,115 @@
         let te = parseFloat(timeValEl.value) ?? 0;
         let hl = parseFloat(document.getElementById('halfLifeVal').value) ?? 0;
 
-        let teUnit = timeSelectEl.value;
-        let hlUnit = document.getElementById('halfLifeSelect').value;
-
-        te = toSIUnit("time", teUnit, te);
-        hl = toSIUnit("time", hlUnit, hl);
-
         return { iq, rq, te , hl};
       }
 
+      function calculateResult(input) {
+        const calculateTE = () => {
+          const { iq, rq, hl } = prepareUnits();
+          let result = (hl * Math.log(rq / iq)) / (-1 * Math.log(2))
+          return {
+            result,
+            type: "time",
+            unit: document.getElementById('halfLifeSelect').value,
+            name: "Time passed",
+          };
+        };
+        const calculateHL = () => {
+          const { iq, rq, te } = prepareUnits();
+
+          let result = (te * (-1 * Math.log(2))) / Math.log(rq / iq)
+          return {
+            result,
+            type: "time",
+            unit: timeSelectEl.value,
+            name: `Half life`,
+          };
+        };
+        const calculateIQ = () => {
+          const { hl, rq, te } = prepareUnits();
+          let result = Math.log(rq) - ((te * (-1 * Math.log(2))) / hl)
+          return {
+            result,
+            type: "time",
+            unit: '',
+            name: "Initial quantity",
+          };
+        };
+
+        const calculateRQ = () => {
+          const { hl, iq, te } = prepareUnits();
+          let result = ((te * (-1 * Math.log(2))) / hl) + Math.log(iq)
+          return {
+            result,
+            type: "time",
+            unit: '',
+            name: "Remaining quantity",
+          };
+        };
+
+
+        switch (input) {
+          case "te":
+            return calculateTE();
+          case "hl":
+            return calculateHL();
+          case "iq":
+            return calculateIQ();
+          case "rq":
+            return calculateRQ();
+          default:
+            console.log("error in calculate result switch");
+        }
+      }
+
       function calculateResults() {
-          // Retrieve input values
-          // const observedVal = parseFloat(observedValEl.value);
-          // const trueVal = parseFloat(trueValEl.value);
+        const solveUnit = solveForSelectEl.value
 
-          if (isNaN(observedVal) || isNaN(trueVal)) {
-            alert("Please Enter All Details.");
+        try {
+          const { result, type, name, unit } = calculateResult(solveUnit);
+          if (isNaN(result)) {
+            alert("Your input resulted in NAN.\n 0/0 \n Try again with valid input.");
+            resetResult()
             return;
-          } else if (trueVal < 0  ) {
-            alert("The relative uncertainty cannot be negative.");
-              return;
           }
-
-          try {
-            const results = ((observedVal -trueVal) / trueVal) * 100
-            
-            calcResultsEl.innerHTML = `<p> Percent error: ${results.toFixed(2) * 1}%</p>`
-          } catch (error) {
-            alert("Something Went Wrong!!!");
-            resethandler()
+          if (Math.abs(result) === Infinity) {
+            alert(
+              "Your input resulted in Infinity. \nDivision by zero. \nTry again with valid input."
+            );
+            resetResult()
+            return;
           }
+          
+          calcResultsEl.innerHTML = `${name} = ${result.toFixed(12) * 1} ${unit}`;          
+        } catch (error) {
+          console.log(error);
+          alert("An error ocurred. Try again with valid input.");
+          resetResult()
+          return;
+        }
       }
 
       function resetForm() {
-        observedValEl.value = ""
-        trueValEl.value = ""
+        iniQtyValEl.value = ""
+        remQtyValEl.value = ""
+        timeValEl.value = ""
+        solveForSelectEl.selectedIndex = "0"
+        timeSelectEl.selectedIndex = "2"
+        halfLifeEl.forEach((input) => {
+          input.value = ""
+        })
+        halfLifeSelectEl.forEach((select) => {
+          select.selectedIndex = "2"
+        })
+        containtersEl.forEach((container) => {
+          let idVal = container.id.slice(0, 2)
+          if (idVal == 'te') {
+            container.style.display = 'none'
+          } else {
+            container.style.display = 'block'
+          }
+        })
       }
 
       function resetResult() {

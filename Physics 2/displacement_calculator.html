@@ -108,6 +108,13 @@
           </select>
         </p>
         <p>
+          Use:
+          <select id="calc2Select">
+            <option value="ifv"selected>Initial and final velocity</option>
+            <option value="acc"> Acceleration</option>
+          </select>
+        </p>
+        <p id="accContainer" class="containers2" style="display: none;">
           <label for="i2-input">Acceleration (a)</label>
           <input
             type="number"
@@ -131,66 +138,68 @@
             <option value="ft/s²">feet per second squared (ft/s²)</option>
           </select>
         </p>
-        <p>
-          <label for="i3-input">Initial velocity (v₀)</label>
-          <input
-            type="number"
-            autocomplete="off"
-            data-id="i3"
-            data-name="Initial velocity"
-            step="any"
-            id="i3-input"
-            class="inputs3"
-            value="0"
-          />
-          <select
-            class="selects"
-            id="i3-select"
-            data-type="speed"
-            data-prev="m/s"
-            data-id="i3"
-          >
-            <option value="m/s" selected>meters per second (m/s)</option>
-            <option value="km/h">kilometers per hour (km/h)</option>
-            <option value="ft/s">feet per second (ft/s)</option>
-            <option value="mph">miles per hour (mph)</option>
-            <option value="kn">knots (kn)</option>
-            <option value="mi/s">miles per second (mi/s)</option>
-            <option value="ft/min">feet per minute (ft/min)</option>
-            <option value="m/min">meters per minute (m/min)</option>
-            <option value="cm/s">centimeters per second (cm/s)</option>
-          </select>
-        </p>
-        <p>
-          <label for="i4-input">Final velocity (v₁)</label>
-          <input
-            type="number"
-            autocomplete="off"
-            data-id="i4"
-            data-name="Final velocity"
-            step="any"
-            id="i4-input"
-            class="inputs3"
-            value="0"
-          />
-          <select
-            class="selects"
-            id="i4-select"
-            data-type="speed"
-            data-prev="m/s"
-            data-id="i4"
-          >
-            <option value="m/s" selected>meters per second (m/s)</option>
-            <option value="km/h">kilometers per hour (km/h)</option>
-            <option value="ft/s">feet per second (ft/s)</option>
-            <option value="mph">miles per hour (mph)</option>
-            <option value="kn">knots (kn)</option>
-            <option value="mi/s">miles per second (mi/s)</option>
-            <option value="ft/min">feet per minute (ft/min)</option>
-            <option value="m/min">meters per minute (m/min)</option>
-            <option value="cm/s">centimeters per second (cm/s)</option>
-          </select>
-        </p>
+        <div id="ifvContainer" class="containers2">
+          <p>
+            <label for="i3-input">Initial velocity (v₀)</label>
+            <input
+              type="number"
+              autocomplete="off"
+              data-id="i3"
+              data-name="Initial velocity"
+              step="any"
+              id="i3-input"
+              class="inputs3"
+              value="0"
+            />
+            <select
+              class="selects"
+              id="i3-select"
+              data-type="speed"
+              data-prev="m/s"
+              data-id="i3"
+            >
+              <option value="m/s" selected>meters per second (m/s)</option>
+              <option value="km/h">kilometers per hour (km/h)</option>
+              <option value="ft/s">feet per second (ft/s)</option>
+              <option value="mph">miles per hour (mph)</option>
+              <option value="kn">knots (kn)</option>
+              <option value="mi/s">miles per second (mi/s)</option>
+              <option value="ft/min">feet per minute (ft/min)</option>
+              <option value="m/min">meters per minute (m/min)</option>
+              <option value="cm/s">centimeters per second (cm/s)</option>
+            </select>
+          </p>
+          <p>
+            <label for="i4-input">Final velocity (v₁)</label>
+            <input
+              type="number"
+              autocomplete="off"
+              data-id="i4"
+              data-name="Final velocity"
+              step="any"
+              id="i4-input"
+              class="inputs3"
+              value="0"
+            />
+            <select
+              class="selects"
+              id="i4-select"
+              data-type="speed"
+              data-prev="m/s"
+              data-id="i4"
+            >
+              <option value="m/s" selected>meters per second (m/s)</option>
+              <option value="km/h">kilometers per hour (km/h)</option>
+              <option value="ft/s">feet per second (ft/s)</option>
+              <option value="mph">miles per hour (mph)</option>
+              <option value="kn">knots (kn)</option>
+              <option value="mi/s">miles per second (mi/s)</option>
+              <option value="ft/min">feet per minute (ft/min)</option>
+              <option value="m/min">meters per minute (m/min)</option>
+              <option value="cm/s">centimeters per second (cm/s)</option>
+            </select>
+          </p>
+        </div>
       </div>
       <div id="uptvContainer" style="display: none;">
         <p>Average velocity (up to ten velocites)</p>
@@ -273,15 +282,18 @@
       let inputs = document.querySelectorAll(".inputs");
       const inputs2 = document.querySelectorAll(".inputs2");
       const inputs3 = document.querySelectorAll(".inputs3");
+      const containers2El = document.querySelectorAll(".containers2");
 
       let components = document.querySelectorAll(".comps");
 
       const container = document.getElementById("components-container");
+      
 
       const convContainerEl = document.getElementById("convContainer");
       const ifvaContainerEl = document.getElementById("ifvaContainer");
       const uptvContainerEl = document.getElementById("uptvContainer");
       const calcSelectEl = document.getElementById("calcSelect");
+      const calc2SelectEl = document.getElementById("calc2Select");
 
       const calcBtnEl = document.getElementById('calcBtn');
       const resetBtnEl = document.getElementById('resetBtn');
@@ -348,6 +360,21 @@
         convContainerEl.style.display = value == 'conv' ? 'block' : 'none';
         ifvaContainerEl.style.display = value == 'ifva' ? 'block' : 'none';
         uptvContainerEl.style.display = value == 'uptv' ? 'block' : 'none';
+
+        resetResult()
+      }
+
+      function handlecalc2SelectChange(e) {
+        const value = e.target.value;
+        
+        containers2El.forEach((container) => {
+          let idVal = container.id.slice(0,3)
+          if (idVal === value) {
+            container.style.display = 'block'
+          } else {
+            container.style.display = 'none'
+          }
+        })
 
         resetResult()
       }
@@ -832,6 +859,7 @@
       });
 
       calcSelectEl.addEventListener("change", handlecalcSelectChange)
+      calc2SelectEl.addEventListener("change", handlecalc2SelectChange)
 
       resetBtnEl.addEventListener("click", resethandler);
       calcBtnEl.addEventListener("click", calculateResults);

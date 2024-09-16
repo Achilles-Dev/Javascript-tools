@@ -37,7 +37,7 @@
         <option value="mg">mg</option>
         <option value="g">g</option>
         <option value="kg" selected>kg</option>
-        <option value="t">tonne</option>
+        <option value="tonne">tonne</option>
         <option value="oz">oz</option>
         <option value="lb">lb</option>
         <option value="ton">ton</option>
@@ -109,36 +109,45 @@
       const calcResultsEl = document.getElementById('calcResults') 
 
       const UNITS = {
+        force: {
+          N: 1,
+          kN: 1e-3,
+          MN: 1e-6,
+          GN: 1e-9,
+          lbf: 0.22480894387096184,
+        },
         mass: {
           mg: 1e6,
           g: 1000,
           kg: 1,
-          t: 0.001,
+          tonne: 0.001,
           oz: 35.274,
           lb: 2.20462,
           ton: 0.00110231,
-          "US ton": 0.00110231,
-          "Long ton": 0.000984207,
         },
         speed: {
           ms: 1,
           kmh: 3.6,
           fts: 3.28084,
           mph: 2.23694,
-          kms: 0,
-          mps: 0,
-          ins: 0,
-          yds: 0,
+          kms: 1e-3,
+          mps: 0.0006213711922373339,
+          ins: 39.37007874015748,
+          yds: 1.09361329833771,
           knots: 1.94384,
         },
-        energy: {
-          J: 1,
-          kJ: 0.001,
-          MJ: 1e-6,
-          Wh: 0.000277778,
-          kWh: 0.000000277778,
-          "ft-lbs": 0.737562,
-          kcal: 0.000239006,
+        time: {
+          ms: 1000,
+          sec: 1,
+          min: 0.016666666666666666,
+        },
+        distance: {
+          mm: 1e3,
+          cm: 1e2,
+          m: 1,
+          in: 39.37007874015748,
+          ft: 3.2808398950131235,
+          yd: 1.0936132983377078,
         },
       }
 
@@ -192,19 +201,25 @@
       }
 
       function prepareUnits() {
-        let k = parseFloat(energyValEl.value) ?? 0;
+        let imf = parseFloat(impForceValEl.value) ?? 0;
         let m = parseFloat(massValEl.value) ?? 0;
         let v = parseFloat(velocityValEl.value) ?? 0;
+        let cdi = parseFloat(collDistValEl.value) ?? 0;
+        let cdu = parseFloat(collDuraValEl.value) ?? 0;
 
-        let uUnit = energySelectEl.value;
-        let kUnit = massSelectEl.value;
-        let xUnit = velocitySelectEl.value;
+        let imfUnit = impForceSelectEl.value;
+        let mUnit = massSelectEl.value;
+        let vUnit = velocitySelectEl.value;
+        let cdiUnit = collDistSelectEl.value;
+        let cduUnit = collDuraSelectEl.value;
 
-        k = toSIUnit("energy", uUnit, k);
-        m = toSIUnit("mass", kUnit, m);
-        v = toSIUnit("speed", xUnit, v);
-
-        return { k, m, v };
+        imf = toSIUnit("force", imfUnit, imf);
+        m = toSIUnit("mass", mUnit, m);
+        v = toSIUnit("speed", vUnit, v);
+        cdi = toSIUnit("distance", cdiUnit, cdi);
+        cdu = toSIUnit("time", cduUnit, cdu);
+       
+        return { imf, m, v, cdi, cdu };
       }
 
       function prepareResults(result, type, name) {
@@ -214,46 +229,97 @@
 
           resultObj[key] = {
             title: `${name} (${key}): `,
-            value: ` ${ans} ${key}`,
+            value: ` ${ans.toFixed(3) * 1} ${key}`,
           };
         });
         return resultObj;
       }
 
       function calculateResult(input) {
-        const calculateV = () => {
-          const { m, k } = prepareUnits();
-
+        const calculateIF = () => {
+          const { m, v, cdi, cdu } = prepareUnits();
+          let result;
+          if (isNaN(cdi)) {
+            result = (m * v) / cdu
+          } else {
+            result = (0.5 * m * (v ** 2)) / cdi
+          }
           return {
-            result: Math.sqrt((2 * k) / m),
-            type: "speed",
-            name: `Velocity`,
-          };
-        };
-        const calculateK = () => {
-          const { m, v } = prepareUnits();
-          return {
-            result: 0.5 * m * v * v,
-            type: "energy",
-            name: "Kinetic energy",
+            result,
+            type: "force",
+            name: `Average Impact Force`,
           };
         };
         const calculateM = () => {
-          const { k, v } = prepareUnits();
+          const { imf, v, cdi, cdu} = prepareUnits();
+          let result;
+          if (isNaN(cdi)) {
+            result =  (cdu * imf) / v
+          } else {
+            result = (cdi * imf) / (0.5 * (v ** 2))
+          }
           return {
-            result: (2 * k) / (v * v),
+            result,
             type: "mass",
             name: "Mass",
           };
         };
+        const calculateV = () => {
+          const { imf, m, cdi, cdu} = prepareUnits();
+          let result;
+          if (isNaN(cdi)) {
+            result =  (cdu * imf) / m
+          } else {
+            result = Math.sqrt((cdi * imf) / (0.5 * m))
+          }
+          return {
+            result,
+            type: "speed",
+            name: "Velocity on impact",
+          };
+        };
+        const calculateCDI = () => {
+          const { imf, v, m, cdu} = prepareUnits();
+          let result;
+          if (isNaN(imf)) {
+            let myImf = (m * v) / cdu
+            result =  (0.5 * m * (v ** 2)) / myImf
+          } else {
+            result = (0.5 * m * (v ** 2)) / imf
+          }
+          return {
+            result,
+            type: "distance",
+            name: "Collision distance",
+          };
+        };
+        const calculateCDU = () => {
+          const { imf, v, m, cdi} = prepareUnits();
+          let result;
+          if (isNaN(imf)) {
+            let myImf = (0.5 * m * (v ** 2)) / cdi
+            result =  (m * v) / myImf
+          } else {
+            result = (m * v) / imf
+          }
+          return {
+            result: (2 * k) / (v * v),
+            type: "time",
+            name: "Collision duration",
+          };
+        };
 
         switch (input) {
-          case "ve":
-            return calculateV();
-          case "ma":
+          case "imf":
+            return calculateIF();
+          case "mas":
             return calculateM();
-          case "en":
-            return calculateK();
+          case "vel":
+            return calculateV();
+          case "cdi":
+            return calculateCDI();
+          case "cdu":
+            return calculateCDU();
           default:
             console.log("error in calculate result switch");
         }
@@ -265,27 +331,25 @@
           try {
             const { result, type, name } = calculateResult(calcVal);
 
-          if (isNaN(result)) {
-            alert("Your input resulted in NAN.\n 0/0 \n Try again with valid input.");
-            resetResult()
-            return;
-          }
-          if (Math.abs(result) === Infinity) {
-            alert(
-              "Your input resulted in Infinity. \nDivision by zero. \nTry again with valid input."
-            );
-            resetResult()
-            return;
-          }
-            
-          const resultObj = prepareResults(result, type, name);
-          const elementNodes = createElements(resultObj);
-          calcResultsEl.innerHTML = "";
+            if (isNaN(result)) {
+              alert("Your input resulted in NAN.\n 0/0 \n Try again with valid input.");
+              resetResult()
+              return;
+            }
+            if (Math.abs(result) === Infinity) {
+              alert(
+                "Your input resulted in Infinity. \nDivision by zero. \nTry again with valid input."
+              );
+              resetResult()
+              return;
+            }
+            const resultObj = prepareResults(result, type, name);
+            const elementNodes = createElements(resultObj);
+            calcResultsEl.innerHTML = "";
 
-          elementNodes.forEach((element) => {
-            calcResultsEl.append(element);
-          });
-            // calcResultsEl.innerHTML = `<p> Percent error: ${results.toFixed(2) * 1}%</p>`
+            elementNodes.forEach((element) => {
+              calcResultsEl.append(element);
+            });
           } catch (error) {
             alert("Something Went Wrong!!!");
             resethandler()
@@ -293,7 +357,7 @@
       }
 
       function resetForm() {
-        [impForceValEl, massValEl, velocityValEl, collDistSelectEl, collDuraSelectEl].forEach((input) => {
+        [impForceValEl, massValEl, velocityValEl, collDistValEl, collDuraValEl].forEach((input) => {
           input.value = ""
         });
         impForceSelectEl.selectedIndex = '0'
