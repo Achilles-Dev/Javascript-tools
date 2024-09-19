@@ -29,22 +29,22 @@
       Initial Temperature: 
       <input type="number" id="initialTempVal">
       <select name="initialTemp" id="initialTempSelect">
-        <option value="k" selected="selected">K</option>
-        <option value="c">°C</option>
-        <option value="f">°F</option>
-        <option value="r">°R</option>
-        <option value="re">°Re</option>
+        <option value="K" selected="selected">K</option>
+        <option value="°C">°C</option>
+        <option value="°F">°F</option>
+        <option value="°R">°R</option>
+        <option value="°Re">°Re</option>
       </select> 
     </p>
     <p>
       Final Temperature: 
       <input type="number" id="finalTempVal">
       <select name="finalTemp" id="finalTempSelect">
-        <option value="k" selected="selected">K</option>
-        <option value="c">°C</option>
-        <option value="f">°F</option>
-        <option value="r">°R</option>
-        <option value="re">°Re</option>
+        <option value="K" selected="selected">K</option>
+        <option value="°C">°C</option>
+        <option value="°F">°F</option>
+        <option value="°R">°R</option>
+        <option value="°Re">°Re</option>
       </select> 
     </p>
     <p id="leContainer" class="containers">
@@ -67,30 +67,30 @@
       Initial Volume: 
       <input type="number" id="initialVolVal">
       <select id="initialVolSelect" name="initialVolume">
-        <option value="mm3">mm3</option>
-        <option value="cm3">cm3</option>
-        <option value="m3" selected="selected">m3</option>
+        <option value="mm³">mm3</option>
+        <option value="cm³">cm3</option>
+        <option value="m³" selected="selected">m3</option>
         <option value="ml">ml</option>
-        <option value="l">L</option>
-        <option value="gallons">Gallons</option>
-        <option value="floz">fl oz</option>
-        <option value="cuin">cu in</option>
-        <option value="cuft">cu ft</option>
-        <option value="cuyd">cu yd</option>
+        <option value="L">L</option>
+        <option value="Gallons">Gallons</option>
+        <option value="fl oz">fl oz</option>
+        <option value="cu in">cu in</option>
+        <option value="cu ft">cu ft</option>
+        <option value="cu yd">cu yd</option>
       </select>
     </p>
     <p id="dcContainer" class="containers" style="display: none;">
       Initial Density: 
       <input type="number" id="initialDenVal">
       <select id="initialDenSelect" name="initialDensity">
-        <option value="gm3">g/m3</option>
-        <option value="gcm3">g/cm3</option>
-        <option value="kgm3" selected="selected">kg/m3</option>
-        <option value="kgcm3">kg/cm3</option>
-        <option value="ozin3">oz/cu in</option>
-        <option value="lbft3">lb/cu ft</option>
-        <option value="lbyd3">lb/cu yd</option>
-        <option value="gl">g/litre</option>
+        <option value="g/m³">g/m3</option>
+        <option value="g/cm³">g/cm3</option>
+        <option value="kg/m³" selected="selected">kg/m3</option>
+        <option value="kg/cm³">kg/cm3</option>
+        <option value="ozin³">oz/cu in</option>
+        <option value="lbft³">lb/cu ft</option>
+        <option value="lbyd³">lb/cu yd</option>
+        <option value="g/litre">g/litre</option>
       </select>
     </p>
 
@@ -126,45 +126,66 @@
       const calcResultsEl = document.getElementById('calcResults') 
 
       const UNITS = {
-        mass: {
-          mg: 1e6,
-          g: 1000,
-          kg: 1,
-          t: 0.001,
-          oz: 35.274,
-          lb: 2.20462,
-          ton: 0.00110231,
-          "US ton": 0.00110231,
-          "Long ton": 0.000984207,
+        volume: {
+          "mm³": 1000000000,
+          "cm³": 1000000,
+          "m³": 1,
+          "L": 1000,
+          "ml": 1000000,
+          "Gallons": 264.17217686,
+          "fl oz": 35195.079728,
+          "cu in": 61023.744095,
+          "cu ft": 35.314666721,
+          "cu yd": 1.3079506193,
         },
-        speed: {
-          ms: 1,
-          kmh: 3.6,
-          fts: 3.28084,
-          mph: 2.23694,
-          kms: 0,
-          mps: 0,
-          ins: 0,
-          yds: 0,
-          knots: 1.94384,
+        temperature: {
+          "°C": (value, op) => (op === "+" ? value + 273.15 : value - 273.15),
+          "°F": (value, op) =>
+            op === "+" ? (value * (5 / 9)) + 255.372222222 : value * (9 / 5) - 459.67,
+          K: (value, op) => value,
+          "°R": (value, op) => op === "+" ? value * (5 / 9) : value * (9 / 5),
+          "°Re": (value, op) => op === "+" ? (value * (5 / 4)) + 273.15 : (value * (4 / 5)) - 218.52,
         },
-        energy: {
-          J: 1,
-          kJ: 0.001,
-          MJ: 1e-6,
-          Wh: 0.000277778,
-          kWh: 0.000000277778,
-          "ft-lbs": 0.737562,
-          kcal: 0.000239006,
+        distance: {
+          nm: 999999999.9999999,
+          μm: 1000000,
+          mm: 1000,
+          cm: 100,
+          m: 1,
+          km: 0.001,
+          in: 39.37007874015748,
+          ft: 3.2808398950131235,
+          yd: 1.0936132983377078,
+          mi: 0.0006213711922373339,
         },
+        density: {
+          "g/m³": 1000,
+          "g/cm³": 0.001,
+          "kg/m³": 1,
+          "kg/cm³": 0.000001,
+          "ozin³": 0.000578037,
+          "lbft³": 0.0624279606,
+          "lbyd³": 1.6855549356,
+          "g/litre": 1,
+        },
+        clte: {
+          "ppmk": 1e6,
+          "k": 1
+        }
       }
 
       /*************** FUNCTIONS ***************/
       function toSIUnit(type, unit, value) {
+        if (type === "temperature") {
+          return UNITS[type][unit](value, "+");
+        }
         return value / UNITS[type][unit];
       }
 
       function fromSIUnit(type, unit, value) {
+        if (type === "temperature") {
+          return UNITS[type][unit](value, "-");
+        }
         return value * UNITS[type][unit];
       }
 
@@ -181,96 +202,70 @@
         })
       }
 
-      function createElements(resultObj) {
-        const elementNodes = Object.keys(resultObj).map((key) => {
-          //create elements to put the results in
-          const div = document.createElement("div");
-          const span = document.createElement("span");
-          const span2 = document.createElement("span");
-
-          // give the elements id
-          div.setAttribute("class", `result-container`);
-          span.setAttribute("class", `result-title`);
-          span2.setAttribute("class", `result-value`);
-
-          // put the values in the elements
-
-          span.textContent = resultObj[key]["title"];
-          span2.textContent = resultObj[key]["value"];
-
-          // appened them to an element that contians them
-          div.append(span, span2);
-
-          // return that element
-          return div;
-        });
-
-        return elementNodes;
-      }
-
       function prepareUnits() {
-        let k = parseFloat(energyValEl.value) ?? 0;
-        let m = parseFloat(initialTempValEl.value) ?? 0;
-        let v = parseFloat(finalTempValEl.value) ?? 0;
+        let ctle = parseFloat(clteValEl.value) ?? 0;
+        let itmp = parseFloat(initialTempValEl.value) ?? 0;
+        let ftmp = parseFloat(finalTempValEl.value) ?? 0;
+        let ilen = parseFloat(initialLenValEl.value) ?? 0;
+        let ivol = parseFloat(initialVolValEl.value) ?? 0;
+        let iden = parseFloat(initialDenValEl.value) ?? 0;
 
-        let uUnit = energySelectEl.value;
-        let kUnit = initialTempSelectEl.value;
-        let xUnit = finalTempSelectEl.value;
+        let ctleUnit = clteSelectEl.value;
+        let iTmpUnit = initialTempSelectEl.value;
+        let ftmpUnit = finalTempSelectEl.value;
+        let ilentleUnit = initialLenSelectEl.value;
+        let ivolUnit = initialVolSelectEl.value;
+        let idenUnit = initialDenSelectEl.value;
 
-        k = toSIUnit("energy", uUnit, k);
-        m = toSIUnit("mass", kUnit, m);
-        v = toSIUnit("speed", xUnit, v);
+        ctle = toSIUnit("clte", ctleUnit, ctle);
+        itmp = toSIUnit("temperature", iTmpUnit, itmp);
+        ftmp = toSIUnit("temperature", ftmpUnit, ftmp);
+        ilen = toSIUnit("distance", 'm', ilen);
+        ivol = toSIUnit("volume", 'm³', ivol);
+        iden = toSIUnit("density", 'kg/m³', iden);
 
-        return { k, m, v };
-      }
-
-      function prepareResults(result, type, name) {
-        let resultObj = {};
-        Object.keys(UNITS[type]).forEach((key) => {
-          let ans = fromSIUnit(type, key, result);
-
-          resultObj[key] = {
-            title: `${name} (${key}): `,
-            value: ` ${ans} ${key}`,
-          };
-        });
-        return resultObj;
+        return { ctle, itmp, ftmp, ilen, ivol, iden };
       }
 
       function calculateResult(input) {
-        const calculateV = () => {
-          const { m, k } = prepareUnits();
-
+        const calculateLE = () => {
+          const {ctle, itmp, ftmp, ilen} = prepareUnits();
+          let result = ctle * ilen * (ftmp - itmp)
           return {
-            result: Math.sqrt((2 * k) / m),
-            type: "speed",
-            name: `Velocity`,
+            result,
+            unit: initialLenSelectEl.value,
+            type: "distance",
+            name: `Length Increase`,
           };
         };
-        const calculateK = () => {
-          const { m, v } = prepareUnits();
+        const calculateVE = () => {
+          const { ctle, itmp, ftmp, ivol  } = prepareUnits();
+          let result = (3 * ctle) * ivol * (ftmp - itmp)
           return {
-            result: 0.5 * m * v * v,
-            type: "energy",
-            name: "Kinetic energy",
+            result,
+            unit: initialVolSelectEl.value,
+            type: "volume",
+            name: "Volume Increase",
           };
         };
-        const calculateM = () => {
-          const { k, v } = prepareUnits();
+        const calculateDC = () => {
+          const { ctle, itmp, ftmp, iden  } = prepareUnits();
+          let result = (iden / (1 + ((3 * ctle) * (ftmp - itmp)))) - iden
           return {
-            result: (2 * k) / (v * v),
-            type: "mass",
-            name: "Mass",
+            result,
+            unit: initialDenSelectEl.value,
+            type: "density",
+            name: "Density Change",
           };
         };
 
         switch (input) {
+          case "le":
+            return calculateLE();
           case "ve":
-            return calculateV();
-          case "ma":
-            return calculateM();
-          case "en":
-            return calculateK();
+            return calculateVE();
+          case "dc":
+            return calculateDC();
           default:
             console.log("error in calculate result switch");
         }
@@ -280,9 +275,9 @@
         const calcVal = calcSelectEl.value
 
           try {
-            const { result, type, name } = calculateResult(calcVal);
+            const { result, type, name , unit} = calculateResult(calcVal);
 
-          if (isNaN(result)) {
+            if (isNaN(result)) {
             alert("Your input resulted in NAN.\n 0/0 \n Try again with valid input.");
             resetResult()
             return;
@@ -294,15 +289,36 @@
             resetResult()
             return;
           }
+          let finalName = '';
+          let finalValue;
+          let leUnit = '';
+          let leVal;
+          if (calcVal === "le") {
+            let index = initialLenSelectEl.selectedIndex - 1
+            if (index >= 0 ) {
+              const newVal = toSIUnit("distance", initialLenSelectEl.value, result)
+              leUnit = initialLenSelectEl[index].value  
+              leVal = fromSIUnit("distance", leUnit, newVal)
+            }      
+            finalName = "Final Length"
+            finalValue = parseFloat(initialLenValEl.value) + result
+          } else if (calcVal === "ve") {
+            let index = initialVolSelectEl.selectedIndex - 1
+            if (index >= 0) {
+              const newVal = toSIUnit("volume", initialVolSelectEl.value, result)
+              leUnit = initialVolSelectEl[index].value 
+              leVal = fromSIUnit("volume", leUnit, newVal)
+            }
+            finalName = "Final Volume"
+            finalValue = parseFloat(initialVolValEl.value) + result
+          } else {
+            finalName = "Final Density"
+            finalValue = parseFloat(initialDenValEl.value) + result
+          }
             
-          const resultObj = prepareResults(result, type, name);
-          const elementNodes = createElements(resultObj);
-          calcResultsEl.innerHTML = "";
-
-          elementNodes.forEach((element) => {
-            calcResultsEl.append(element);
-          });
-            // calcResultsEl.innerHTML = `<p> Percent error: ${results.toFixed(2) * 1}%</p>`
+          calcResultsEl.innerHTML = `<p>${name} = ${result.toFixed(6) * 1} ${unit} ${leUnit !== '' ? `(${leVal.toFixed(6) * 1} ${leUnit})`: ''}</p>
+                                    <p> ${finalName} = ${finalValue.toFixed(10) * 1} ${unit} </p>
+          `;    
           } catch (error) {
             alert("Something Went Wrong!!!");
             resethandler()
@@ -314,19 +330,19 @@
           input.value = ""
         });
         clteSelectEl.selectedIndex = '0'
-        initialTempSelectEl.selectedIndex = '2'
-        finalTempSelectEl.selectedIndex = '4'
-        initialLenSelectEl.selectedIndex = '2'
-        initialVolSelectEl.selectedIndex = '1'
+        initialTempSelectEl.selectedIndex = '0'
+        finalTempSelectEl.selectedIndex = '0'
+        initialLenSelectEl.selectedIndex = '4'
+        initialVolSelectEl.selectedIndex = '0'
 
         calcSelectEl.selectedIndex = '0'
 
         containtersEl.forEach((container) => {
-          let idVal = container.id.slice(0, 3)
-          if (idVal == 'imf') {
-            container.style.display = 'none'
-          } else {
+          let idVal = container.id.slice(0, 2)
+          if (idVal == 'le') {
             container.style.display = 'block'
+          } else {
+            container.style.display = 'none'
           }
         })
       }

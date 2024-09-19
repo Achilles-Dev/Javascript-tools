@@ -342,8 +342,36 @@
       }
 
       function resetForm() {
-        observedValEl.value = ""
-        trueValEl.value = ""
+        pressureValEl.value = ""
+        volumeValEl.value = ""
+        moleValEl.value = ""
+        tempValEl.value = ""
+        
+        calcSelectEl.selectedIndex = '0'
+        pressureSelectEl.selectedIndex = '0'
+        volumeSelectEl.selectedIndex = '2'
+        tempSelectEl.selectedIndex = '0'
+        pressureUSelectEl.selectedIndex = '0'
+        volumeUSelectEl.selectedIndex = '2'
+        tempUSelectEl.selectedIndex = '0'
+
+        containtersEl.forEach((container) => {
+          let idVal = container.id.slice(0, 2)
+          if (idVal === 'pr') {
+            container.style.display = 'none'
+          } else {
+            container.style.display = 'block'
+          }
+        })
+
+        unitContainersEl.forEach((container) => {
+          let idVal = container.id.slice(0, 2)
+          if (idVal == 'pr') {
+            container.style.display = 'block'
+          } else {
+            container.style.display = 'none'
+          }
+        })
       }
 
       function resetResult() {

@@ -19,7 +19,7 @@
       <p>
         Dynamic viscosity:
         <input type="number" id="dynamicVal">
-        <select name="dynamic" id="dynamicSelect">
+        <select name="viscosity" id="dynamicSelect">
           <option value="kgms" selected>kg/m·s</option>
           <option value="nsm2">N·s/m2</option>
           <option value="pas">Pa·s</option>
@@ -30,14 +30,14 @@
         Density: 
         <input type="number" id="densityVal">
         <select name="density" id="densitySelect">
-          <option value="gm3">g/m3</option>
-          <option value="gcm3">g/cm3</option>
-          <option value="kgm3" selected>kg/m3</option>
-          <option value="kgcm3">kg/cm3</option>
-          <option value="ozin3">oz/cu in</option>
-          <option value="lbft3">lb/cu ft</option>
-          <option value="lbyd3">lb/cu yd</option>
-          <option value="gl">g/litre</option>
+          <option value="g/m³">g/m3</option>
+          <option value="g/cm³">g/cm3</option>
+          <option value="kg/m³" selected>kg/m3</option>
+          <option value="kg/cm³">kg/cm3</option>
+          <option value="ozin³">oz/cu in</option>
+          <option value="lbft³">lb/cu ft</option>
+          <option value="lbyd³">lb/cu yd</option>
+          <option value="g/litre">g/litre</option>
         </select>
       </p>
     </div>
@@ -53,7 +53,7 @@
     <p>
       Flow velocity: 
       <input type="number" id="flowVVal">
-      <select id="flowVSelect" name="flowVelocity" >
+      <select id="flowVSelect" name="speed" >
         <option value="ms" selected>m/s</option>
         <option value="kms">km/s</option>
         <option value="mps">miles/s</option>
@@ -112,16 +112,49 @@
       const calcResultsEl = document.getElementById('calcResults') 
 
       const UNITS = {
-        time: {
-          ns: 0,
-          ms: 0,
-          s: 1,
-          m: 0.01666666666,
-          h: 0.0002777777777777778,
-          days: 0.000011574074074074073,
-          wks: 0.0000016534391534391535,
-          mos: 3.8025705376834734e-7,
-          yrs: 3.1688087814028954e-8,
+        density: {
+          "g/m³": 1000,
+          "g/cm³": 0.001,
+          "kg/m³": 1,
+          "kg/cm³": 0.000001,
+          "ozin³": 0.000578037,
+          "lbft³": 0.0624279606,
+          "lbyd³": 1.6855549356,
+          "g/litre": 1,
+        },
+        viscosity: {
+          "kgms": 1,
+          "nsm2": 1,
+          "pas": 1,
+          "cp": 10
+        },
+        kViscosity: {
+          "m2s": 1,
+          "st": 1e4,
+          "cst": 1e2,
+        },
+        speed: {
+          "mph": 2.2369362920544,
+          "kmh": 3.6,
+          "mps": 0.000621371,
+          "kms": 0.001,
+          "ms": 1,
+          "ins": 39.37007874015748,
+          "yds": 1.09361,
+          "fts": 3.28084,
+          knots: 1.94384,
+        },
+        distance: {
+          nm: 999999999.9999999,
+          μm: 1000000,
+          mm: 1000,
+          cm: 100,
+          m: 1,
+          km: 0.001,
+          in: 39.37007874015748,
+          ft: 3.2808398950131235,
+          yd: 1.0936132983377078,
+          mi: 0.0006213711922373339,
         },
       }
 
@@ -145,92 +178,111 @@
             container.style.display = 'none'
           }
         })
+      }
 
-        unitContainersEl.forEach((container) => {
-          let idVal = container.id.slice(0, 2)
-          if (value == idVal) {
+      function prepareUnits() {
+        let dy = parseFloat(dynamicValEl.value) ?? 0;
+        let de = parseFloat(densityValEl.value) ?? 0;
+        let kv = parseFloat(kinViscValEl.value) ?? 0;
+        let fv = parseFloat(flowVValEl.value) ?? 0;
+        let cl = parseFloat(charLenValEl.value) ?? 0;
+
+        let dyUnit = dynamicSelectEl.value;
+        let deUnit = densitySelectEl.value;
+        let kvUnit = kinViscSelectEl.value;
+        let fvUnit = flowVSelectEl.value;
+        let clUnit = charLenSelectEl.value;
+
+        dy = toSIUnit("viscosity", dyUnit, dy);
+        de = toSIUnit("density", deUnit, de);
+        kv = toSIUnit("kViscosity", kvUnit, kv);
+        fv = toSIUnit("speed", fvUnit, fv);
+        cl = toSIUnit("distance", clUnit, cl);
+
+
+        return { dy, de, kv , fv, cl};
+      }
+
+      function calculateResult(input) {
+        const calculateDVD = () => {
+          const { dy, de, fv, cl } = prepareUnits();
+          let result = (de * fv * cl) / dy
+          return {
+            result: result.toFixed(4) * 1,
+            type: "dvd",
+            name: "Reynolds Number",
+          };
+        };
+
+        const calculateKIV = () => {
+          const { fv, kv, cl } = prepareUnits();
+          let result = (fv * cl) / kv
+          return {
+            result: result.toFixed(4) * 1,
+            type: "kiv",
+            name: `Reynolds Number`,
+          };
+        };
+    
+        switch (input) {
+          case "dvd":
+            return calculateDVD();
+          case "kiv":
+            return calculateKIV();
+          default:
+            console.log("error in calculate result switch");
+        }
+      }
+
+      function calculateResults() {
+        const calcUnit = calcSelectEl.value
+
+        try {
+          const { result, type, name, unit } = calculateResult(calcUnit);
+          if (isNaN(result)) {
+            alert("Your input resulted in NAN.\n 0/0 \n Try again with valid input.");
+            resetResult()
+            return;
+          }
+          if (Math.abs(result) === Infinity) {
+            alert(
+              "Your input resulted in Infinity. \nDivision by zero. \nTry again with valid input."
+            );
+            resetResult()
+            return;
+          }
+          
+          calcResultsEl.innerHTML = `${name} = ${result.toFixed(12) * 1}`;          
+        } catch (error) {
+          console.log(error);
+          alert("An error ocurred. Try again with valid input.");
+          resetResult()
+          return;
+        }
+      }
+
+      function resetForm() {
+        dynamicValEl.value = ""
+        densityValEl.value = ""
+        kinViscValEl.value = ""
+        flowVValEl.value = ""
+        charLenValEl.value = ""
+
+        calcSelectEl.selectedIndex = '0'
+        dynamicSelectEl.selectedIndex = '0'
+        densitySelectEl.selectedIndex = '2'
+        kinViscSelectEl.selectedIndex = '0'
+        flowVSelectEl.selectedIndex = '0'
+        charLenSelectEl.selectedIndex = '4'
+
+        containtersEl.forEach((container) => {
+          let idVal = container.id.slice(0, 3)
+          if (idVal === 'dvd') {
             container.style.display = 'block'
           } else {
             container.style.display = 'none'
           }
         })
-      }
-
-      function handleHLInputChange(e) {
-        const value = parseFloat(e.target.value)
-        const id = e.target.id
-        let val1 = 0
-        let val2 = 0 
-        halfLifeEl.forEach((input) => {
-          if (input.id != id) {
-            if (id == 'halfLifeVal') {
-              val1 =  isNaN(value) ? '' : (Math.log(2) / value);
-              val2 =  isNaN(value) ? '' : (value / Math.log(2));
-              input.value = input.id == 'decConstVal' ? val1 : val2
-            } else if (id == 'decConstVal') {
-              val1 =  isNaN(value) ? '' : (Math.log(2) / value);
-              val2 =  isNaN(value) ? '' : (1 / value);
-              input.value = input.id == 'halfLifeVal' ? val1 : val2
-            } else {
-              val1 =  isNaN(value) ? '' : (Math.log(2) * value);
-              val2 =  isNaN(value) ? '' : (1 / value);
-              input.value = input.id == 'halfLifeVal' ? val1 : val2
-            }
-          }
-        })
-      }
-
-      function handleHLSelectChange(e) {
-        const index = e.target.selectedIndex
-        const id = e.target.id
-        halfLifeSelectEl.forEach((select) => {
-          if (select.id != id) {
-            select.selectedIndex = index
-          }
-        })
-      }
-
-      function prepareUnits() {
-        let iq = parseFloat(iniQtyValEl.value) ?? 0;
-        let rq = parseFloat(remQtyValEl.value) ?? 0;
-        let te = parseFloat(timeValEl.value) ?? 0;
-        let hl = parseFloat(document.getElementById('halfLifeVal').value) ?? 0;
-
-        let teUnit = timeSelectEl.value;
-        let hlUnit = document.getElementById('halfLifeSelect').value;
-
-        te = toSIUnit("time", teUnit, te);
-        hl = toSIUnit("time", hlUnit, hl);
-
-        return { iq, rq, te , hl};
-      }
-
-      function calculateResults() {
-          // Retrieve input values
-          // const observedVal = parseFloat(observedValEl.value);
-          // const trueVal = parseFloat(trueValEl.value);
-
-          if (isNaN(observedVal) || isNaN(trueVal)) {
-            alert("Please Enter All Details.");
-            return;
-          } else if (trueVal < 0  ) {
-            alert("The relative uncertainty cannot be negative.");
-              return;
-          }
-
-          try {
-            const results = ((observedVal -trueVal) / trueVal) * 100
-            
-            calcResultsEl.innerHTML = `<p> Percent error: ${results.toFixed(2) * 1}%</p>`
-          } catch (error) {
-            alert("Something Went Wrong!!!");
-            resethandler()
-          }
-      }
-
-      function resetForm() {
-        observedValEl.value = ""
-        trueValEl.value = ""
       }
 
       function resetResult() {
