@@ -44,7 +44,6 @@
           id="i2-input"
           class="inputs"
           data-name="Wind speed"
-          disabled
         />
 
         <select
@@ -129,16 +128,16 @@
       /*************** GLOBAL VARIBLES ***************/
       const UNITS = {
         speed: {
-          "m/s": 1,
-          "km/h": 3.6,
-          "ft/s": 3.280839895013123,
-          mph: 2.236936292054402,
-          kn: 1.9438444924406046,
-          "ft/min": 196.85039370078738,
+          "m/s": 0.5144444444,
+          "km/h": 1.852,
+          "ft/s": 1.6878098571,
+          mph: 1.150779448,
+          kn: 1,
+          "ft/min": 101.26859143,
         },
         angle: {
           deg: 1,
-          rad: 0.0174532925199433,
+          rad: Math.PI / 180,
         },
       };
 
@@ -215,17 +214,24 @@
               <select
                 class="selectsResult"
                 id="i7-select"
-                data-type="angle"
-                data-prev="deg"
+                data-type="speed"
+                data-prev="kn"
                 data-id="i7"
               >
-                <option value="deg" selected>degrees (deg)</option>
-                <option value="rad">radians (rad)</option>
+                <option value="m/s">meters per second (m/s)</option>
+                <option value="km/h">kilometers per hour (km/h)</option>
+                <option value="ft/s">feet per second (ft/s)</option>
+                <option value="mph">miles per hour (mph)</option>
+                <option value="kn" selected>knots (kn)</option>
               </select>
             </p>
           </div>
         `
         return newDiv
+      }
+
+      function customPercision(ans, to = 8) {
+        return parseFloat(parseFloat(ans).toPrecision(to));
       }
 
       // related to caculation
@@ -252,87 +258,43 @@
         for (key of Object.keys(resultObj)) {
           let val = resultObj[key].result;
           let id = resultObj[key].type;
-
           if (isNaN(val)) {
-           alert("Your input resulted in NAN.\n 0/0 \n Try again with valid input.");
+            alert("Your input resulted in NAN.\n 0/0 \n Try again with valid input.");
             return;
           }
           if (Math.abs(val) === Infinity) {
-            alert("Your input resulted in Infinity. \nDivision by zero. \nTry again with valid input.");
+            alert(
+              "Your input resulted in Infinity. \nDivision by zero. \nTry again with valid input."
+            );
             return;
           }
-          if (id != 'i2') {
-            const input = document.getElementById(`${id}-input`);
-            const select = document.getElementById(`${id}-select`);
-            const type = select.getAttribute("data-type");
-            let outUnit = select.value;
-
-            val = fromSIUnit(type, outUnit, val);
-            input.value = parseFloat(val);
-
-            !validateInput(id);
-          } else {
-            const span = document.getElementById(`${id}-span`);
-            const select = document.getElementById(`${id}-select`);
-            const type = select.getAttribute("data-type");
-            let outUnit = select.value;
-            val = fromSIUnit(type, outUnit, val);
-
-            span.textContent = parseFloat(val);
-          }
+          
+          const span = document.getElementById(`${id}-span`);
+          const select = document.getElementById(`${id}-select`);
+          const type = select.getAttribute("data-type");
+          let outUnit = select.value;
+          val = fromSIUnit(type, outUnit, val);
+          
+          span.textContent = customPercision(val, 13);
         }
       }
 
       function calculateResult() {
-        const R = 8.31446261815324;
-        const M = 0.0289647;
-        const ro = 1.4;
-
-        const k = (ro * R) / M;
-        
-        function calculateI2() {
-          let [val1] = prepareUnit("i1");
-          let result = Math.sqrt(val1 * k);
+        function calculateI7() {
+          let [val1, val2, val3, val4] = prepareUnit("i1", "i2", "i3", "i4");
+          let radVal1 = fromSIUnit("angle", "rad",(val4 - val3))
+          let val5 = Math.asin(((val2 / val1) * Math.sin(radVal1)))
+          val5 = toSIUnit("angle", "rad", val5)
+          let result = (val1 ** 2) + (val2 ** 2) - (((2 * val1 * val2) * Math.cos(fromSIUnit("angle", "rad", (val3 - val4 + val5)))))
+          result = Math.sqrt(result);
+          
           return {
-            1: { result, type: "i2" },
+            1: { result: result.toFixed(4) * 1, type: "i7" },
+            2: {result: val5.toFixed(4) * 1, type: "i5"},
+            3: {result: (val5 + val3).toFixed(4) * 1, type: "i6"}
           };
         }
-        return calculateI2()
-      }
-
-      function selectsIIChangeHandler(e, inp = false) {
-        let select;
-        if (e) {
-          select = e.target;
-        } else select = inp;
-        let val = parseFloat(select.value);
-        let resultObj = {
-          1: { result: val, type: "i2II" },
-        };
-        setResult(resultObj, "II");
-      }
-
-      function selectChangeHandler(e) {
-        let select = e.target;
-        let id = select.getAttribute("data-id");
-        let input = document.getElementById(`${id}-input`);
-
-        let prevUnit = select.getAttribute("data-prev");
-        let currentUnit = select.value;
-
-        select.setAttribute("data-prev", currentUnit);
-
-        let type = select.getAttribute("data-type");
-
-        let value = input.value;
-
-        if (value == "") return;
-        value = parseFloat(value);
-        if (isNaN(value)) value = 0.0;
-
-        let si = toSIUnit(type, prevUnit, value);
-        let result = fromSIUnit(type, currentUnit, si);
-        input.value = parseFloat(result);
+        return calculateI7()
       }
 
       function validateInput(id) {
@@ -340,18 +302,18 @@
         const label = input.getAttribute("data-name").trim();
         let value = parseFloat(input.value);
 
-        if (label === "Temperature") {
+        if (id === "i3" || id == "i4") {
           let unit = document.getElementById(`${id}-select`).value;
-          let siValue = toSIUnit("temperature", unit, value);
-          if (siValue <= 0 || isNaN(value)) {
-            alert(`Temperature must be greater than zero kelvin (273.15 °C, -459.7 °F).`);
+          let siValue = toSIUnit("angle", unit, value);
+          if (siValue < 0 || siValue > 360) {
+            alert(`The ${label} is an angle between 0° and 360°`);
             return false;
           }
           return true;
         }
 
-        if (value < 0) {
-          alert(`Speed of sound in dry air cannot be negative.`);
+        if (value <= 0 && id === 'i1' ) {
+          alert(`${label} value must be greater than zero.`);
           return false;
         }
 
@@ -379,12 +341,14 @@
 
         let si = toSIUnit(type, prevUnit, value);
         let result = fromSIUnit(type, currentUnit, si);
-        span.textContent = parseFloat(result);
+        span.textContent = parseFloat(result).toFixed(6) * 1;
       }
 
       function calculateResults() {
-        if (!validateInput("i1")) return;
-        
+        for (el of ["i1", "i2", "i3", "i4"]) {
+          if (!validateInput(el)) return;
+        }
+
         try {
           const resultElement = createElement()
           calcResultsEl.innerHTML = resultElement
@@ -394,7 +358,6 @@
           newSelects.forEach((select) => {
             select.addEventListener("change", handleResultsChange);
           });
-        
           const result = calculateResult();
           setResult(result)
 
@@ -426,12 +389,8 @@
 
       /*************** EVENT LISTINERS ***************/
 
-      selects.forEach((select, index) => {
-        if (index == 0) {
-          select.addEventListener("change", resetResult);
-        } else {
-          select.addEventListener("change", selectChangeHandler)
-        }
+      selects.forEach((select) => {
+        select.addEventListener("change", resetResult);
       });
 
       inputs.forEach((input) => {

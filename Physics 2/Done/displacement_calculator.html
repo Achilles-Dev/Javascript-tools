@@ -80,23 +80,23 @@
       </div>
       <div id="ifvaContainer" style="display: none;">
         <p>
-          <label for="i1-input">Time (t)</label>
+          <label for="i12-input">Time (t)</label>
           <input
             type="number"
             min="0"
             autocomplete="off"
-            data-id="i1"
+            data-id="i12"
             step="any"
-            id="i1-input"
+            id="i12-input"
             class="inputs3"
             data-name="Time (t)"
           />
           <select
             class="selects"
-            id="i1-select"
+            id="i12-select"
             data-type="time"
             data-prev="sec"
-            data-id="i1"
+            data-id="i12"
           >
             <option value="sec">seconds (sec)</option>
             <option value="min">minutes (min)</option>
@@ -114,92 +114,88 @@
             <option value="acc"> Acceleration</option>
           </select>
         </p>
+        <p>
+          <label for="i32-input">Initial velocity (v₀)</label>
+          <input
+            type="number"
+            autocomplete="off"
+            data-id="i32"
+            data-name="Initial velocity"
+            step="any"
+            id="i32-input"
+            class="inputs3"
+          />
+          <select
+            class="selects"
+            id="i32-select"
+            data-type="speed"
+            data-prev="m/s"
+            data-id="i32"
+          >
+            <option value="m/s" selected>meters per second (m/s)</option>
+            <option value="km/h">kilometers per hour (km/h)</option>
+            <option value="ft/s">feet per second (ft/s)</option>
+            <option value="mph">miles per hour (mph)</option>
+            <option value="kn">knots (kn)</option>
+            <option value="mi/s">miles per second (mi/s)</option>
+            <option value="ft/min">feet per minute (ft/min)</option>
+            <option value="m/min">meters per minute (m/min)</option>
+            <option value="cm/s">centimeters per second (cm/s)</option>
+          </select>
+        </p>
         <p id="accContainer" class="containers2" style="display: none;">
-          <label for="i2-input">Acceleration (a)</label>
+          <label for="i22-input">Acceleration (a)</label>
           <input
             type="number"
             min="0"
             autocomplete="off"
-            data-id="i2"
+            data-id="i22"
             step="any"
-            id="i2-input"
+            id="i22-input"
             class="inputs3"
             data-name="Acceleration (a)"
           />
           <select
             class="selects"
-            id="i2-select"
+            id="i22-select"
             data-type="acceleration"
             data-prev="kg"
-            data-id="i2"
+            data-id="i22"
           >
             <option value="m/s²" selected>meters per second squared (m/s²)</option>
             <option value="g">gravitational acc. on Earth (g)</option>
             <option value="ft/s²">feet per second squared (ft/s²)</option>
           </select>
         </p>
-        <div id="ifvContainer" class="containers2">
-          <p>
-            <label for="i3-input">Initial velocity (v₀)</label>
-            <input
-              type="number"
-              autocomplete="off"
-              data-id="i3"
-              data-name="Initial velocity"
-              step="any"
-              id="i3-input"
-              class="inputs3"
-              value="0"
-            />
-            <select
-              class="selects"
-              id="i3-select"
-              data-type="speed"
-              data-prev="m/s"
-              data-id="i3"
-            >
-              <option value="m/s" selected>meters per second (m/s)</option>
-              <option value="km/h">kilometers per hour (km/h)</option>
-              <option value="ft/s">feet per second (ft/s)</option>
-              <option value="mph">miles per hour (mph)</option>
-              <option value="kn">knots (kn)</option>
-              <option value="mi/s">miles per second (mi/s)</option>
-              <option value="ft/min">feet per minute (ft/min)</option>
-              <option value="m/min">meters per minute (m/min)</option>
-              <option value="cm/s">centimeters per second (cm/s)</option>
-            </select>
-          </p>
-          <p>
-            <label for="i4-input">Final velocity (v₁)</label>
-            <input
-              type="number"
-              autocomplete="off"
-              data-id="i4"
-              data-name="Final velocity"
-              step="any"
-              id="i4-input"
-              class="inputs3"
-              value="0"
-            />
-            <select
-              class="selects"
-              id="i4-select"
-              data-type="speed"
-              data-prev="m/s"
-              data-id="i4"
-            >
-              <option value="m/s" selected>meters per second (m/s)</option>
-              <option value="km/h">kilometers per hour (km/h)</option>
-              <option value="ft/s">feet per second (ft/s)</option>
-              <option value="mph">miles per hour (mph)</option>
-              <option value="kn">knots (kn)</option>
-              <option value="mi/s">miles per second (mi/s)</option>
-              <option value="ft/min">feet per minute (ft/min)</option>
-              <option value="m/min">meters per minute (m/min)</option>
-              <option value="cm/s">centimeters per second (cm/s)</option>
-            </select>
-          </p>
-        </div>
+        <p id="ifvContainer" class="containers2">
+          <label for="i42-input">Final velocity (v₁)</label>
+          <input
+            type="number"
+            autocomplete="off"
+            data-id="i42"
+            data-name="Final velocity"
+            step="any"
+            id="i42-input"
+            class="inputs3"
+          />
+          <select
+            class="selects"
+            id="i42-select"
+            data-type="speed"
+            data-prev="m/s"
+            data-id="i42"
+          >
+            <option value="m/s" selected>meters per second (m/s)</option>
+            <option value="km/h">kilometers per hour (km/h)</option>
+            <option value="ft/s">feet per second (ft/s)</option>
+            <option value="mph">miles per hour (mph)</option>
+            <option value="kn">knots (kn)</option>
+            <option value="mi/s">miles per second (mi/s)</option>
+            <option value="ft/min">feet per minute (ft/min)</option>
+            <option value="m/min">meters per minute (m/min)</option>
+            <option value="cm/s">centimeters per second (cm/s)</option>
+          </select>
+        </p>
       </div>
       <div id="uptvContainer" style="display: none;">
         <p>Average velocity (up to ten velocites)</p>
@@ -379,6 +375,10 @@
         resetResult()
       }
 
+      function customPercision(ans, to = 8) {
+        return parseFloat(parseFloat(ans).toPrecision(to));
+      }
+
       function createElement2() {
         const newDiv = `
           <div>
@@ -391,26 +391,22 @@
                 class="spans"
                 data-name="Displacement (d)"
               ></span>
-
               <select
                 class="selectsResult"
                 id="i6-select"
                 data-type="distance"
-                data-prev="m/s"
+                data-prev="m"
                 data-id="i6"
               >
-                <select id="dh-select">
                   <option value="mm">millimeters (mm)</option>
                   <option value="cm">centimeters (cm)</option>
-                  <option value="m">meters (m)</option>
+                  <option value="m" selected>meters (m)</option>
                   <option value="km">kilometers (km)</option>
                   <option value="in">inches (in)</option>
                   <option value="ft">feet (ft)</option>
                   <option value="yd">yards (yd)</option>
                   <option value="mi">miles (mi)</option>
                   <option value="nmi">nautical miles (nmi)</option>
-                  <option value="ft/in">feet / inches (ft/in)</option>
-                  <option value="m/cm" selected>meters / centimeters (m/cm)</option>
               </select>
             </p>
           </div>
@@ -435,11 +431,14 @@
           
           const val1 = document.getElementById(`i1-${place}-input`).value;
           const val2 = document.getElementById(`i2-${place}-input`).value;
+
           const bool1 = val1 !== "" && val2 !== "";
           const bool2 = val1 === "" || val2 === "";
+          
           let scenario_one = el.place != 10 && el.pos == "last" && bool1;
           let scenario_two = el.place != 0 && el.pos == "prev" && bool2;
           let scenario_three = el.place == 10 && bool2;
+          let scenario_four = el.place === 0 && bool2;
 
           if (scenario_one) {
             scenarioOne(el);
@@ -447,6 +446,8 @@
             scenarioTwo(el, bool2);
           } else if (scenario_three) {
             scenarioThree(el);
+          } else if (scenario_four) {
+            scenarioFour(el);
           }
 
           resetResult()
@@ -457,93 +458,7 @@
           console.log(error);
         }
       }
-      
-      function inputHandler2(e, inp = null) {
-        try {
-          let input;
-          if (e) input = e.target;
-          else if (inp) input = inp;
-          const id = input.getAttribute("data-id");
-          
-          for (el of ["i1", "i2"]) {
-            if (!validateInput(el)) return;
-          }
-
-          if (input.value == "") {
-            if (inputCounter2() < 2) {
-              return;
-            }
-
-            if (id === in1 || id === in2) {
-              deleteHandler(out);
-              return;
-            }
-            for (el of ["i1", "i2"]) {
-              if (!validateInput(el)) return;
-            }
-            return;
-          }
-
-          if (!validateInput(id)) return;
-
-          if (inputCounter2() < 2) {
-            return;
-          }
-
-          for (el of ["i1", "i2"]) {
-            if (!validateInput(el)) return;
-          }
-
-          for (el of ["i1", "i2"]) {
-            if (!validateInput(el)) return;
-          }
-          resetResult()
-        } catch (error) {
-          alert(
-            "An error occurred. Try again with valid input, or try contacting us."
-          );
-          console.log(error);
-        }
-      }
-      
-      function inputHandler3(e, inp = null) {
-        try {
-          let input;
-          if (e) input = e.target;
-          else if (inp) input = inp;
-          const id = input.getAttribute("data-id");
-
-          if (input.value == "") {
-            if (inputCounter3() < 3) {
-              return;
-            }
-
-            if (id !== out) {
-              deleteHandler(out);
-            }
-            return;
-          }
-
-          if (!validateInput(id)) return;
-
-          if (inputCounter3() < 3) {
-            return;
-          }
-
-          for (el of ["i13", "i23", "i33"]) {
-            if (!validateInput(el)) return;
-          }
-
-          resetResult()
-
-        } catch (error) {
-          alert(
-            "An error occurred. Try again with valid input, or try contacting us."
-          );
-          console.log(error);
-        }
-      }
-
+    
       /* scenarios */
       function scenarioOne(el) {
         let prevEl = document.querySelector('[data-pos="last"]');
@@ -602,6 +517,30 @@
         newPrev.pos = newPrev.getAttribute("data-pos");
         if (el.place == 10 && bool1 && bool2) {
           scenarioTwo(newPrev);
+        }
+      }
+
+      function scenarioFour(el) {
+        const elPlace = el.getAttribute("data-place");
+        const nextEl = document.querySelector('[data-pos = "last"]');
+        const nextPlace = nextEl.getAttribute("data-place");
+        
+        const val1 = document.getElementById(`i1-${elPlace}-input`).value;
+        const val2 = document.getElementById(`i2-${elPlace}-input`).value;
+        const bool1 = val1 == "" || val2 == "";
+  
+        const val1Next = document.getElementById(`i1-${nextPlace}-input`).value;
+        const val2next = document.getElementById(`i2-${nextPlace}-input`).value;
+        const bool2 = val1Next === "" || val2next === "";
+        
+        if (nextPlace === "1" && el.pos == "prev" && bool1) {
+          let tbd = document.getElementById(
+            `comp-${nextEl.getAttribute("data-place")}`
+          );
+          tbd.remove();
+          el.setAttribute("data-pos", "last");
+          updateNodeList();
+          el.focus();
         }
       }
 
@@ -691,6 +630,7 @@
       function prepareUnit(...args) {
         const resultArr = [];
         for (id of args) {
+          if (!validateInput(id)) return;
           const input = document.getElementById(`${id}-input`);
           const select = document.getElementById(`${id}-select`);
           const type = select.getAttribute("data-type");
@@ -706,42 +646,14 @@
 
       function validateInput(id) {
         const input = document.getElementById(`${id}-input`);
-        console.log(input)
         const label = input.getAttribute("data-name").trim();
         let value = parseFloat(input.value);
+        if (isNaN(value)) {
+          return false
+        }
         return true;
       }
 
-      function deleteHandler(...args) {
-        for (let id of args) {
-          document.getElementById(`${id}-input`).value = "";
-        }
-      }
-      
-      function inputCounter2() {
-        let count = 0;
-
-        inputs2.forEach((input) => {
-          if (input.value !== "") {
-            count++;
-          }
-        });
-
-        return count;
-      }
-
-      function inputCounter3() {
-        let count = 0;
-
-        inputs3.forEach((input) => {
-          if (input.value !== "") {
-            count++;
-          }
-        });
-
-        return count;
-      }
-      
       function setResult(resultObj) {
         for (key of Object.keys(resultObj)) {
           let val = resultObj[key].result;
@@ -767,6 +679,83 @@
         }
       }
 
+      function calculateResult(input) {
+        function calculateCV() {
+          let [val1, val2] = prepareUnit("i1", "i2");
+          
+          let result = val1 * val2
+
+          return {
+            1: { result: result.toFixed(4) * 1, type: "i6" },   
+          };
+        }
+        
+        function calculateIFA() {
+          const calc2 = calc2SelectEl.value
+          let result;
+          if (calc2 === "acc") {
+            let [val1, val2, val3] = prepareUnit("i12", "i22", "i32");
+            result = (0.5 * (val2 * (val1 ** 2))) + (val3 * val1)
+          } else if (calc2 === "ifv") {
+            let [val1, val3, val4] = prepareUnit("i12", "i32", "i42");
+            let ac = 0.5 * (val4 - val3)
+            result = (0.5 * (ac * (val1 ** 2))) + (val3 * val1)
+          }
+          
+          return {
+            1: { result: result.toFixed(4) * 1, type: "i6" },   
+          };
+        }
+
+        function calculateDV() {
+          let n = -1
+          let sum = 0
+          for (let i = 0; i < components.length; i++) {
+            let el = components[i];
+
+            let place = parseInt(el.getAttribute("data-place"));
+
+            const input1 = document.getElementById(`i1-${place}-input`);
+            const id1 = input1.getAttribute("data-id");
+
+            const input2 = document.getElementById(`i2-${place}-input`);
+            const id2 = input2.getAttribute("data-id");
+
+            const val1 = document.getElementById(`i1-${place}-input`).value;
+            const val2 = document.getElementById(`i2-${place}-input`).value;
+
+            const bool1 = val1 == "" || val2 == "";
+            if (bool1) continue;
+
+            let [v0, v1] = prepareUnit(id1, id2);
+
+            sum += v0 * v1
+            n += 1
+          }
+          console.log(sum)
+          return {
+            1: {
+              result: (1/n) * sum,
+              type: "i6",
+            },
+          };
+        }
+
+        switch(input) {
+          case "conv":
+            return calculateCV()
+            break;
+          case "ifva":
+            return calculateIFA()
+            break;
+          case "uptv":
+            return calculateDV()
+            break;
+          default:
+            console.log("error in calculate result switch");
+        }
+      }
+
       function handleResultsChange(e) {
         let select = e.target;
         let id = select.getAttribute("data-id");
@@ -788,14 +777,12 @@
 
         let si = toSIUnit(type, prevUnit, value);
         let result = fromSIUnit(type, currentUnit, si);
-        span.textContent = customPercision(result, 11);
+        span.textContent = customPercision(result, 4);
       }
-
-
+      
       function calculateResults() {
-        const method = methodUnitEl.value
-        
-
+        const calcUnit = calcSelectEl.value
+      
         try {
           const resultElement = createElement2()
           calcResultsEl.innerHTML = resultElement
@@ -805,15 +792,8 @@
           newSelects.forEach((select) => {
             select.addEventListener("change", handleResultsChange);
           });
-          let result;
-          if (method == 'dc') {
-            result = calculateResults2()
-          } else if (method == 'ac') {
-            result = calculateResults3()
-          } else {
-            result = calculateResult()
-          }
           
+          const result = calculateResult(calcUnit)
           setResult(result)
 
         } catch(error) {
@@ -852,10 +832,10 @@
         input.addEventListener("input", inputHandler);
       });
       inputs2.forEach((input) => {
-        input.addEventListener("input", inputHandler2);
+        input.addEventListener("input", resetResult);
       });
       inputs3.forEach((input) => {
-        input.addEventListener("input", inputHandler3);
+        input.addEventListener("input", resetResult);
       });
 
       calcSelectEl.addEventListener("change", handlecalcSelectChange)

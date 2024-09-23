@@ -23,12 +23,12 @@
           class="selects"
           id="i1-select"
           data-type="speed"
-          data-prev="m/s"
+          data-prev="ft/s"
           data-id="i1"
         >
-          <option value="m/s" selected>meters per second (m/s)</option>
+          <option value="m/s">meters per second (m/s)</option>
           <option value="km/h">kilometers per hour (km/h)</option>
-          <option value="ft/s">feet per second (ft/s)</option>
+          <option value="ft/s" selected>feet per second (ft/s)</option>
           <option value="mph">miles per hour (mph)</option>
           <option value="kn">knots (kn)</option>
           <option value="ft/min">feet per minute (ft/min)</option>
@@ -45,20 +45,19 @@
           id="i2-input"
           class="inputs"
           data-name="Draw length of the bow"
-          disabled
         />
 
         <select
           class="selects"
           id="i2-select"
           data-type="distance"
-          data-prev="cm"
+          data-prev="in"
           data-id="i2"
         >
           <option value="mm">millimeters (mm)</option>
-          <option value="cm" selected>centimeters (cm)</option>
+          <option value="cm">centimeters (cm)</option>
           <option value="m">meters (m)</option>
-          <option value="in">inches (in)</option>
+          <option value="in" selected>inches (in)</option>
           <option value="ft">feet (ft)</option>
         </select>
       </p>
@@ -78,14 +77,14 @@
           class="selects"
           id="i3-select"
           data-type="mass"
-          data-prev="kg"
+          data-prev="lb"
           data-id="i3"
         >
           <option value="g">grams (g)</option>
-          <option value="kg" selected>kilograms (kg)</option>
+          <option value="kg">kilograms (kg)</option>
           <option value="gr">grains (gr)</option>
           <option value="oz">ounces (oz)</option>
-          <option value="lb">pounds (lb)</option>
+          <option value="lb" selected>pounds (lb)</option>
           <option value="st">stones (st)</option>
         </select>
       </p>
@@ -105,7 +104,7 @@
         <select
           class="selects"
           id="i4-select"
-          data-type="mass"
+          data-type="weight"
           data-prev="gr"
           data-id="i4"
         >
@@ -130,13 +129,14 @@
           step="any"
           id="i5-input"
           class="inputs"
+          value="0"
           data-name="Additional weight on string"
         />
 
         <select
           class="selects"
           id="i5-select"
-          data-type="mass"
+          data-type="weight"
           data-prev="gr"
           data-id="i5"
         >
@@ -172,33 +172,40 @@
       /*************** GLOBAL VARIBLES ***************/
       const UNITS = {
         mass: {
-          mg: 999999.9999999999,
-          g: 999.9999999999999,
-          dag: 100,
-          kg: 1,
+          g: 453.59237,
+          kg: 0.45359237,
+          gr: 7000,
+          oz: 16,
+          lb: 1,
+          st: 0.08,
+        },
+        weight: {
+          mg: 64.79891,
+          g: 0.06479891,
+          dag: 0.006479891,
+          kg: 0.0000647989,
           t: 0.001,
-          gr: 15432.35835294143,
-          dr: 564.3833911932866,
-          oz: 35.27396194958041,
-          lb: 2.2046226218487757,
-          st: 0.1574730444177697,
+          gr: 1,
+          dr: 0.0190585029,
+          oz: 0.0022857143,
+          lb: 0.0001428571,
+          st: 0.0000114286,
         },
         speed: {
-          "m/s": 1,
-          "km/h": 3.6,
-          "ft/s": 3.280839895013123,
-          mph: 2.236936292054402,
-          kn: 1.9438444924406046,
-          "ft/min": 196.85039370078738,
+          "m/s": 0.3048,
+          "km/h": 1.09728,
+          "ft/s": 1,
+          mph: 0.6818181818,
+          kn: 0.5924838013,
+          "ft/min": 60,
         },
         distance: {
-          mm: 1e3,
-          cm: 1e2,
-          dm: 1e1,
-          m: 1,
-          in: 39.37007874015748,
-          ft: 3.2808398950131235,
-          yd: 1.0936132983377078,
+          mm: 25.4,
+          cm: 2.54,
+          m: 0.0254,
+          in: 1,
+          ft: 0.0833333333,
+          yd: 0.0277777778,
         },
         energy: {
           J: 1,
@@ -208,6 +215,11 @@
           kWh: 0.000000277778,
           "ft-lb": 0.737562,
         },
+        momentum: {
+          "N.s": 1,
+          "kN.s": 0.001,
+          "kg.m/s": 1,
+        }
       };
 
       /*************** FUNCTIONS ***************/
@@ -228,6 +240,8 @@
       function createElement() {
         const newDiv = `
           <div>
+            <p>Actual arrow speed</p>
+            <span>Plus its momentum and kinetic energy</span>
             <p>
               <label for="i6-span">Speed: &nbsp; </label>
               <span
@@ -242,12 +256,12 @@
                 class="selectsResult"
                 id="i6-select"
                 data-type="speed"
-                data-prev="m/s"
+                data-prev="ft/s"
                 data-id="i6"
               >
-                <option value="m/s" selected>meters per second (m/s)</option>
+                <option value="m/s">meters per second (m/s)</option>
                 <option value="km/h">kilometers per hour (km/h)</option>
-                <option value="ft/s">feet per second (ft/s)</option>
+                <option value="ft/s" selected>feet per second (ft/s)</option>
                 <option value="mph">miles per hour (mph)</option>
                 <option value="kn">knots (kn)</option>
                 <option value="ft/min">feet per minute (ft/min)</option>
@@ -289,7 +303,7 @@
                 class="selectsResult"
                 id="i8-select"
                 data-type="energy"
-                data-prev="N.s"
+                data-prev="J"
                 data-id="i8"
               >
                 <option value="J" selected>joules (J)</option>
@@ -337,56 +351,32 @@
           if (Math.abs(val) === Infinity) {
             alert("Your input resulted in Infinity. \nDivision by zero. \nTry again with valid input.");
             return;
-          }
-          if (id != 'i2') {
-            const input = document.getElementById(`${id}-input`);
-            const select = document.getElementById(`${id}-select`);
-            const type = select.getAttribute("data-type");
-            let outUnit = select.value;
+          }       
+          const span = document.getElementById(`${id}-span`);
+          const select = document.getElementById(`${id}-select`);
+          const type = select.getAttribute("data-type");
+          let outUnit = select.value;
+          val = fromSIUnit(type, outUnit, val);
 
-            val = fromSIUnit(type, outUnit, val);
-            input.value = parseFloat(val);
-
-            !validateInput(id);
-          } else {
-            const span = document.getElementById(`${id}-span`);
-            const select = document.getElementById(`${id}-select`);
-            const type = select.getAttribute("data-type");
-            let outUnit = select.value;
-            val = fromSIUnit(type, outUnit, val);
-
-            span.textContent = parseFloat(val);
-          }
+          span.textContent = parseFloat(val);
         }
       }
 
       function calculateResult() {
-        const R = 8.31446261815324;
-        const M = 0.0289647;
-        const ro = 1.4;
+        function calculateSMKE() {
+          let [val1, val2, val3, val4, val5] = prepareUnit("i1", "i2", "i3", "i4", "i5");
+          
+          let result1 = val1 + (val2 - 30) * 10 - (val5 / 3) + Math.min(0, (-1 * (val4 - (5 * val3)) / 3))
+          let result2 = fromSIUnit("weight", "kg", val4) *  fromSIUnit("speed", "m/s", result1)
+          let result3 = (fromSIUnit("weight", "kg", val4) * (fromSIUnit("speed", "m/s", result1) ** 2)) / 2
 
-        const k = (ro * R) / M;
-        
-        function calculateI2() {
-          let [val1] = prepareUnit("i1");
-          let result = Math.sqrt(val1 * k);
           return {
-            1: { result, type: "i2" },
+            1: { result: result1.toFixed(4) * 1, type: "i6" },
+            2: { result: result2.toFixed(4) * 1, type: "i7" },
+            3: { result: result3.toFixed(4) * 1, type: "i8" },
           };
         }
-        return calculateI2()
-      }
-
-      function selectsIIChangeHandler(e, inp = false) {
-        let select;
-        if (e) {
-          select = e.target;
-        } else select = inp;
-        let val = parseFloat(select.value);
-        let resultObj = {
-          1: { result: val, type: "i2II" },
-        };
-        setResult(resultObj, "II");
+        return calculateSMKE()
       }
 
       function selectChangeHandler(e) {
@@ -456,11 +446,13 @@
 
         let si = toSIUnit(type, prevUnit, value);
         let result = fromSIUnit(type, currentUnit, si);
-        span.textContent = parseFloat(result);
+        span.textContent = (parseFloat(result)).toFixed(6);
       }
 
       function calculateResults() {
-        if (!validateInput("i1")) return;
+        for (el of ["i1", "i2", "i3", "i4", "i5"]) {
+          if (!validateInput(el)) return;
+        }
         
         try {
           const resultElement = createElement()
@@ -471,7 +463,7 @@
           newSelects.forEach((select) => {
             select.addEventListener("change", handleResultsChange);
           });
-        
+          
           const result = calculateResult();
           setResult(result)
 
@@ -484,11 +476,21 @@
 
       function resetForm() {
         selects.forEach((select, index) => {
-          select.selectedIndex = '0'
+          if (index == 0) {
+            select.selectedIndex = '2'
+          } else if (index === 1) {
+            select.selectedIndex = '3'
+          } else if (index > 1 && index < 5) {
+            select.selectedIndex = '4'
+          }
         });
 
-        inputs.forEach((input) => {
-          input.value = ""
+        inputs.forEach((input, index) => {
+          if (index === 4) {
+            input.value = "0"
+          } else {
+            input.value = ""
+          }
         });
       }
 
@@ -504,11 +506,7 @@
       /*************** EVENT LISTINERS ***************/
 
       selects.forEach((select, index) => {
-        if (index == 0) {
-          select.addEventListener("change", resetResult);
-        } else {
-          select.addEventListener("change", selectChangeHandler)
-        }
+        resetResult()
       });
 
       inputs.forEach((input) => {
