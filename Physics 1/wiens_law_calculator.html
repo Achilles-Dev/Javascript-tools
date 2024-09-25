@@ -199,7 +199,7 @@
                 class="selectsResult"
                 id="i1-select"
                 data-type="temprature"
-                data-prev="°C"
+                data-prev="K"
                 data-id="i1"
               >
                 <option value="°C">Celsius (°C)</option>
@@ -422,9 +422,16 @@
         let value = parseFloat(span.textContent);
         value = parseFloat(value);
         if (isNaN(value)) value = 0.0;
+        let result;
+        if (type === "temprature") {
+          let si = toSIUnitTemp(type, prevUnit, value);
+          result = fromSIUnitTemp(type, currentUnit, si);
+        } else {
+          let si = toSIUnit(type, prevUnit, value);
+          result = fromSIUnit(type, currentUnit, si);
+        }
 
-        let si = toSIUnit(type, prevUnit, value);
-        let result = fromSIUnit(type, currentUnit, si);
+        
         span.textContent = result;
       }
 

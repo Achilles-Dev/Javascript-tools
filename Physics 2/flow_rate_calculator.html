@@ -90,7 +90,7 @@
     <p id="pdContainer" class="containers">
       Dynamic viscosity: 
       <input type="number" id="dynVscVal">
-      <select id="dynVscSelect" name="dynamicVel" >
+      <select id="dynVscSelect" name="dynamicVsc" >
         <option value="kgms" selected="selected">kg/m·s</option>
         <option value="nsm2">N·s/m2</option>
         <option value="pas">Pa·s</option>
@@ -142,14 +142,14 @@
       Liquid density: 
       <input type="number" id="lqDenVal" placeholder="(optional, liquids only)">
       <select id="lqDenSelect" name="liquidDen">
-        <option value="gm3">g/m3</option>
-        <option value="gcm3">g/cm3</option>
-        <option value="kgm3">kg/m3</option>
-        <option value="kgcm3">kg/cm3</option>
-        <option value="ozin3">oz/cu in</option>
-        <option value="lbft3" selected>lb/cu ft</option>
-        <option value="lbyd3">lb/cu yd</option>
-        <option value="gl">g/litre</option>
+        <option value="g/m³">g/m3</option>
+        <option value="g/cm³">g/cm3</option>
+        <option value="kg/m³">kg/m3</option>
+        <option value="kg/cm³">kg/cm3</option>
+        <option value="oz/in³">oz/cu in</option>
+        <option value="lb/ft³" selected>lb/cu ft</option>
+        <option value="lb/yd³">lb/cu yd</option>
+        <option value="g/litre">g/litre</option>
       </select>
     </p>
     <button id="calcBtn">Calculate</button>
@@ -193,17 +193,68 @@
       const calcResultsEl = document.getElementById('calcResults') 
 
       const UNITS = {
-        time: {
-          ns: 0,
-          ms: 0,
-          s: 1,
-          m: 0.01666666666,
-          h: 0.0002777777777777778,
-          days: 0.000011574074074074073,
-          wks: 0.0000016534391534391535,
-          mos: 3.8025705376834734e-7,
-          yrs: 3.1688087814028954e-8,
+        distance: {
+          mm: 1e3,
+          cm: 1e2,
+          m: 1,
+          in: 39.37007874015748,
+          ft: 3.2808398950131235,
+          yd: 1.0936132983377078,
         },
+        pressure: {
+          Pa: 1,
+          bar: 0.000009999999999999999,
+          mbar: 0.01,
+          psi: 0.00014503769999999998,
+          atm: 0.000009869232667160129,
+          kPa: 0.001,
+          MPa: 0.000001,
+          GPa: 9.999999999999999e-10,
+          mmHg: 0.007500615758456562,
+          mmH2O: 0.10197162129779283,
+        },
+        speed: {
+          "mph": 2.2369362920544,
+          "kmh": 3.6,
+          "mps": 0.000621371,
+          "kms": 0.001,
+          "ms": 1,
+          "ins": 39.3701,
+          "yds": 1.09361,
+          "fts": 3.28084,
+          knots: 1.94384,
+        },
+        density: {
+          "g/m³": 1000,
+          "g/cm³": 0.001,
+          "kg/m³": 1,
+          "kg/cm³": 0.000001,
+          "oz/in³": 0.000578037,
+          "lb/ft³": 0.0624279606,
+          "lb/yd³": 1.6855549356,
+          "g/litre": 1,
+        },
+        viscosity: {
+          "kgms": 1,
+          "nsm2": 1,
+          "pas": 1,
+          "cp": 10
+        },
+        flowrate1: {
+          "f³/h": 1,
+          "f³/min": 0.01666666666667,
+          "yd³/h": 0.03703698259756,
+          "yd³/min": 0.0006172830432927,
+          "gal/h": 7.480515625,
+          "gal/min": 0.1246752604167,
+        },
+        flowrate2: {
+          "m³/h": 1,
+          "m³/min": 0.01666666666667,
+          "l/h": 0.03703698259756,
+          "l/min": 0.0006172830432927,
+        }
+
       }
 
       /*************** FUNCTIONS ***************/
@@ -262,81 +313,211 @@
         })
       }
 
-      function handleHLInputChange(e) {
-        const value = parseFloat(e.target.value)
-        const id = e.target.id
-        let val1 = 0
-        let val2 = 0 
-        halfLifeEl.forEach((input) => {
-          if (input.id != id) {
-            if (id == 'halfLifeVal') {
-              val1 =  isNaN(value) ? '' : (Math.log(2) / value);
-              val2 =  isNaN(value) ? '' : (value / Math.log(2));
-              input.value = input.id == 'decConstVal' ? val1 : val2
-            } else if (id == 'decConstVal') {
-              val1 =  isNaN(value) ? '' : (Math.log(2) / value);
-              val2 =  isNaN(value) ? '' : (1 / value);
-              input.value = input.id == 'halfLifeVal' ? val1 : val2
+      function prepareUnits() {
+        let psv = parseFloat(pressureSValEl.value) ?? 0;
+        let pev = parseFloat(pressureEValEl.value) ?? 0;
+        let dv = parseFloat(diamValEl.value) ?? 0;
+        let plv = parseFloat(ppLenValEl.value) ?? 0;
+        let dvv = parseFloat(dynVscValEl.value) ?? 0;
+        let wv = parseFloat(widthValEl.value) ?? 0;
+        let hv = parseFloat(heigthValEl.value) ?? 0;
+        let fvv = parseFloat(flowVValEl.value) ?? 0;
+        let ldv = parseFloat(lqDenValEl.value) ?? 0;
+
+        let psvUnit = pressureSSelectEl.value;
+        let pevUnit = pressureESelectEl.value;
+        let dvUnit = diamSelectEl.value;
+        let plvUnit = ppLenSelectEl.value;
+        let dvvUnit = dynVscSelectEl.value;
+        let wvUnit = widthSelectEl.value;
+        let hvUnit = heigthSelectEl.value;
+        let fvvUnit = flowVSelectEl.value;
+        let ldvUnit = lqDenSelectEl.value;
+
+        psv = toSIUnit("pressure", psvUnit, psv);
+        pev = toSIUnit("pressure", pevUnit, pev);
+        dv = toSIUnit("distance", dvUnit, dv);
+        plv = toSIUnit("distance", plvUnit, plv);
+        dvv = toSIUnit("viscosity", dvvUnit, dvv);
+        wv = toSIUnit("distance", wvUnit, wv);
+        hv = toSIUnit("distance", hvUnit, hv);
+        fvv = toSIUnit("speed", fvvUnit, fvv);
+        ldv = toSIUnit("density", ldvUnit, ldv);
+        
+
+        return { psv, pev, dv , plv, dvv, wv, hv, fvv, ldv};
+      }
+
+      function prepareResults(result, type, name) {
+        let resultObj = {};
+        Object.keys(UNITS[type]).forEach((key) => {
+          let ans = fromSIUnit(type, key, result);
+
+          resultObj[key] = {
+            title: `${name} (${key}): `,
+            value: ` ${ans.toFixed(3) * 1} ${key}`,
+          };
+        });
+        return resultObj;
+      }
+
+      function calculateResult(input) {
+        const PI = 3.14159 
+        const unit = unitSysSelectEl.value
+        const calculatePD = () => {
+          const { psv, pev, dv, plv, dvv, ldv } = prepareUnits();
+          let result;
+          let newldv = ldv
+          if (unit === "imp") {
+            let newdv = fromSIUnit("distance", "in", dv)
+            let newplv = fromSIUnit("distance", "in", plv)
+            newldv = fromSIUnit("density", "lb/ft³", ldv)
+            result = (PI * ((newdv / 2) ** 4) * (psv - pev)) / (8 * dvv * newplv)
+          } else {
+            result = (PI * ((dv / 2) ** 4) * (psv - pev)) / (8 * dvv * plv)
+          }
+          
+          let result2;
+          if (ldv) {
+            result2 = result * newldv
+          }
+          return {
+            result: result.toFixed(6) * 1,
+            result2,
+            type: "pd",
+            name: "Volumetric Flow Rate",
+          };
+        };
+
+        const calculateFV = () => {
+          const pipe = pipeSelectEl.value
+          let result;
+          let result2;
+          if (pipe === "rnd") {
+            const { dv, fvv, ldv } = prepareUnits();
+            let newldv = ldv
+            if (unit === "imp") {
+              let newdv = fromSIUnit("distance", "in", dv)
+              let newfvv = fromSIUnit("speed", "fts", fvv)
+              newldv = fromSIUnit("density", "lb/ft³", ldv)
+              let area = 2 * PI * newdv
+              result = area * newfvv
             } else {
-              val1 =  isNaN(value) ? '' : (Math.log(2) * value);
-              val2 =  isNaN(value) ? '' : (1 / value);
-              input.value = input.id == 'halfLifeVal' ? val1 : val2
+              let area = 2 * PI * dv
+              result = area * fvv 
+            }
+            
+            if (ldv) {
+              result2 = result * newldv
+            }
+          } else {
+            const { wv, hv, fvv, ldv } = prepareUnits();
+            let newldv = ldv
+            if (unit === "imp") {
+              let newwv = fromSIUnit("distance", "in", wv)
+              let newhv = fromSIUnit("distance", "in", hv)
+              let newfvv = fromSIUnit("speed", "fts", fvv)
+              newldv = fromSIUnit("density", "lb/ft³", ldv)
+              let area = newwv * newhv
+              result = area * newfvv
+            } else {
+              let area = wv * hv
+              result = area * fvv
+            }
+            
+            if (ldv) {
+              result2 = result * newldv
             }
           }
-        })
-      }
-
-      function handleHLSelectChange(e) {
-        const index = e.target.selectedIndex
-        const id = e.target.id
-        halfLifeSelectEl.forEach((select) => {
-          if (select.id != id) {
-            select.selectedIndex = index
-          }
-        })
-      }
-
-      function prepareUnits() {
-        let iq = parseFloat(iniQtyValEl.value) ?? 0;
-        let rq = parseFloat(remQtyValEl.value) ?? 0;
-        let te = parseFloat(timeValEl.value) ?? 0;
-        let hl = parseFloat(document.getElementById('halfLifeVal').value) ?? 0;
-
-        let teUnit = timeSelectEl.value;
-        let hlUnit = document.getElementById('halfLifeSelect').value;
-
-        te = toSIUnit("time", teUnit, te);
-        hl = toSIUnit("time", hlUnit, hl);
-
-        return { iq, rq, te , hl};
+              
+          return {
+            result: result.toFixed(6) * 1,
+            result2,
+            type: unit === "imp" ? "flowrate1" : "flowrate2",
+            name: `Volumetric Flow Rate`,
+          };
+        };
+    
+        switch (input) {
+          case "pd":
+            return calculatePD();
+          case "fv":
+            return calculateFV();
+          default:
+            console.log("error in calculate result switch");
+        }
       }
 
       function calculateResults() {
-          // Retrieve input values
-          // const observedVal = parseFloat(observedValEl.value);
-          // const trueVal = parseFloat(trueValEl.value);
+        const calcUnit = solveSelectEl.value
 
-          if (isNaN(observedVal) || isNaN(trueVal)) {
-            alert("Please Enter All Details.");
+        try {
+          const { result, result2, type, name } = calculateResult(calcUnit);
+          if (isNaN(result)) {
+            alert("Your input resulted in NAN.\n 0/0 \n Try again with valid input.");
+            resetResult()
             return;
-          } else if (trueVal < 0  ) {
-            alert("The relative uncertainty cannot be negative.");
-              return;
           }
+          if (Math.abs(result) === Infinity) {
+            alert(
+              "Your input resulted in Infinity. \nDivision by zero. \nTry again with valid input."
+            );
+            resetResult()
+            return;
+          }
+          
+          console.log(result, result2)
+          // const resultObj = prepareResults(result, type, name);
+          // const elementNodes = createElements(resultObj);
+          // calcResultsEl.innerHTML = "";
 
-          try {
-            const results = ((observedVal -trueVal) / trueVal) * 100
-            
-            calcResultsEl.innerHTML = `<p> Percent error: ${results.toFixed(2) * 1}%</p>`
-          } catch (error) {
-            alert("Something Went Wrong!!!");
-            resethandler()
-          }
+          // elementNodes.forEach((element) => {
+          //   calcResultsEl.append(element);
+          // });      
+        } catch (error) {
+          console.log(error);
+          alert("An error ocurred. Try again with valid input.");
+          resetResult()
+          return;
+        }
       }
 
       function resetForm() {
-        observedValEl.value = ""
-        trueValEl.value = ""
+        pressureSValEl.value = ""
+        pressureEValEl.value = ""
+        diamValEl.value = ""
+        ppLenValEl.value = ""
+        dynVscValEl.value = ""
+        widthValEl.value = ""
+        heigthValEl.value = ""
+        flowVValEl.value = ""
+        lqDenValEl.value = ""
+
+        pressureSSelectEl.selectedIndex = '0'
+        pressureESelectEl.selectedIndex = '0'
+        diamSelectEl.selectedIndex = '3'
+        ppLenSelectEl.selectedIndex = '3'
+        dynVscSelectEl.selectedIndex = '0'
+        widthSelectEl.selectedIndex = '4'
+        heigthSelectEl.selectedIndex = '3'
+        flowVSelectEl.selectedIndex = '7'
+        lqDenSelectEl.selectedIndex = '5'
+
+        solveSelectEl.selectedIndex = '0'
+        pipeSelectEl.selectedIndex = "0"
+        unitSysSelectEl.selectedIndex = "0"
+
+        containtersEl.forEach((container) => {
+          let idVal = container.id.slice(0, 2)
+          if (idVal === "bt" && 
+            ((solveSelectEl.value == "pd") || (solveSelectEl.value == "fv" && pipeSelectEl.value === "rnd"))) {
+            container.style.display = 'block'
+          } else if (idVal == "pd") {
+            container.style.display = 'block'
+          } else {
+            container.style.display = 'none'
+          }
+        })
       }
 
       function resetResult() {
