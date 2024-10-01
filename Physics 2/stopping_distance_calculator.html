@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Stopping Distance Calculator</title>
+  </head>
+  <body>
+    <h1>Stopping Distance Calculator</h1>    
+      <p>
+        <label for="i1-input">Vehicle speed </label>
+        <input
+          type="number"
+          min="0"
+          autocomplete="off"
+          data-id="i1"
+          id="i1-input"
+          class="inputs"
+          step="any"
+          data-name="Vehicle speed"
+        />
+        <select
+          class="selects"
+          id="i1-select"
+          data-type="speed"
+          data-prev="km/h"
+          data-id="i1"
+        >
+          <option value="m/s">meters per second (m/s)</option>
+          <option value="km/h" selected>kilometers per hour (km/h)</option>
+          <option value="ft/s">feet per second (ft/s)</option>
+          <option value="mph">miles per hour (mph)</option>
+        </select>
+      </p>
+      <p>
+        <label for="i2-input">Perception-reaction time: </label>
+        <input
+          type="number"
+          min="0"
+          autocomplete="off"
+          data-id="i2"
+          id="i2-input"
+          class="inputs"
+          step="any"
+          data-name="Perception-reaction time"
+        />
+        <select
+          class="selects"
+          id="i2-select"
+          data-type="time"
+          data-prev="sec"
+          data-id="i2"
+        >
+          <option value="sec" selected>seconds (sec)</option>
+          <option value="min">minutes (min)</option>
+          <option value="hrs">hour (hrs)</option>
+        </select>
+      </p>
+      <p>
+        <label for="i3-input">Road grade (slope) </label>
+        <input
+          type="number"
+          step="any"
+          id="i3-input"
+          class="inputs"
+          min="-45"
+          max="45"
+          data-name="Road grade (slope)"
+        />
+        <span>%</span>
+      </p>
+
+      <div>
+        <span>The road is...  </span>
+        <p>
+          <select id="dwUnit">
+            <option value="dry" selected>dry</option>
+            <option value="wet">wet</option>
+          </select>
+          <input
+            type="number"
+            autocomplete="off"
+            data-id="i4"
+            id="i4-input"
+            class="inputs"
+            step="any"
+            value="0.7"
+            data-name="The road is..."
+            disabled
+          />
+        </p>
+      </div>
+
+      <p id="advancedInput" style="display: none;">
+        <label for="i5-input">Deceleration </label>
+        <input
+          type="number"
+          min="0"
+          autocomplete="off"
+          data-id="i5"
+          id="i5-input"
+          class="inputs"
+          step="any"
+          data-name="Deceleration"
+        />
+        <select
+          class="selects"
+          id="i5-select"
+          data-type="acceleration"
+          data-prev="m/s²"
+          data-id="i5"
+        >
+          <option value="m/s²" selected>meters per second squared (m/s²)</option>
+          <option value="ft/s²">feet per second squared (ft/s²)</option>
+        </select>
+      </p>
+      <p>
+        Mode:
+        <select id="modeUnit">
+          <option value="am">Advanced mode</option>
+          <option value="sm" selected>Simple mode</option>
+        </select>
+      </p>
+
+      <button id="calcBtn">Calculate</button>
+      <button id="resetBtn">Reset</button>
+      <hr>
+      <div>
+        <h3>Result:</h3>
+        <h3 id="calcResults">Result will appear here...</h3>
+      </div>
+    <script>
+      /*************** ELEMENTS ***************/
+      const modeUnitEl = document.getElementById("modeUnit");
+      const containers = document.querySelectorAll(".containers");
+      const inputs = document.querySelectorAll(".inputs");
+      const selects = document.querySelectorAll(".selects");
+      const dwUnitEl = document.getElementById("dwUnit");
+      const advancedInputEl = document.getElementById("advancedInput");
+
+      const calcBtnEl = document.getElementById('calcBtn');
+      const resetBtnEl = document.getElementById('resetBtn');
+      const calcResultsEl = document.getElementById('calcResults')
+
+      /*************** GLOBAL VARIBLES ***************/
+      const UNITS = {
+        distance: {
+          cm: 1e2,
+          m: 1,
+          km: 1e-3,
+          in: 39.370078740157474,
+          ft: 3.280839895013123,
+          yd: 1.0936132983377078,
+          mi: 0.000621371192237334,
+        },
+        speed: {
+          "m/s": 0.2777777778,
+          "km/h": 1,
+          "ft/s": 0.9113444153,
+          mph: 0.6213711922,
+        },
+        time: {
+          sec: 1,
+          min: 0.01666666666666666666666666666666666666666666667,
+          hrs: 0.00027777777777777777777777777777777777777777778,
+        },
+        acceleration: {
+          "m/s²": 1,
+          g: 0.10197162129779282,
+          "ft/s²": 3.28084,
+        },
+      };
+      /*************** FUNCTIONS ***************/
+      function toSIUnit(type, unit, value) {
+        return value / UNITS[type][unit];
+      }
+
+      function fromSIUnit(type, unit, value) {
+        return value * UNITS[type][unit];
+      }
+
+      function handleModeUnitChange(e) {
+        const value = e.target.value;
+        advancedInputEl.style.display = value == 'am' ? 'block' : 'none'
+
+        resetResult()
+      }
+
+      function handleDWChange(e) {
+        const value = e.target.value
+        const input = document.getElementById('i4-input');
+        if (value === 'dry') {
+          input.value = '0.7'
+        } else {
+          input.value = '0.4'
+        }
+        resetResult()
+      }
+
+      function createElement() {
+        const newDiv = `
+            <p>
+              <label for="i11-span">Stopping distance: &nbsp; </label>
+              <span
+                data-id="i11"
+                step="any"
+                id="i11-span"
+                class="spans"
+                data-name="Stopping distance"
+              ></span>
+              <select
+                class="selectsResult"
+                id="i11-select"
+                data-type="distance"
+                data-prev="m"
+                data-id="i11"
+              >
+                <option value="cm">centimeters (cm)</option>
+                <option value="m" selected>meters (m)</option>
+                <option value="km">kilometers (km)</option>
+                <option value="in">inches (in)</option>
+                <option value="ft">feet (ft)</option>
+                <option value="yd">yards (yd)</option>
+                <option value="mi">miles (mi)</option>
+              </select>
+            </p>
+        `
+        const newDiv2 = `
+          <p>
+            <label for="i12-span">Braking time: &nbsp; </label>
+            <span
+              data-id="i12"
+              step="any"
+              id="i12-span"
+              class="spans"
+              data-name="Wind correction angle"
+            ></span>
+            <select
+                class="selectsResult"
+                id="i12-select"
+                data-type="time"
+                data-prev="sec"
+                data-id="i12"
+              >
+                <option value="sec" selected>seconds (sec)</option>
+                <option value="min">minutes (min)</option>
+              </select>
+          </p>
+        `
+        if (modeUnitEl.value === "am") {
+          return newDiv + newDiv2
+        } else {
+          return newDiv
+        }
+      }
+      
+      // related to caculation
+      function prepareUnit(...args) {
+        const resultArr = [];
+        for (id of args) {
+          const input = document.getElementById(`${id}-input`);
+          const select = document.getElementById(`${id}-select`);
+          const type = select.getAttribute("data-type");
+          let val = parseFloat(input.value);
+
+          val = isNaN(val) ? 0 : val;
+          let inUnit = select.value;
+
+          val = toSIUnit(type, inUnit, val);
+
+          resultArr.push(val);
+        }
+
+        return resultArr;
+      }
+
+      function setResult(resultObj) {
+        for (key of Object.keys(resultObj)) {
+          let val = resultObj[key].result;
+          let id = resultObj[key].type;
+
+          if (isNaN(val)) {
+           alert("Your input resulted in NAN.\n 0/0 \n Try again with valid input.");
+            return;
+          }
+          if (Math.abs(val) === Infinity) {
+            alert("Your input resulted in Infinity. \nDivision by zero. \nTry again with valid input.");
+            return;
+          }
+          const span = document.getElementById(`${id}-span`);
+          const select = document.getElementById(`${id}-select`);
+          const type = select.getAttribute("data-type");
+          let outUnit = select.value;
+          val = fromSIUnit(type, outUnit, val);
+
+          span.textContent = parseFloat(val);
+        }
+      }
+
+      function calculateResult() {  
+        const unit = modeUnitEl.value 
+           
+        function calculateRes() {
+          let [val1, val2] = prepareUnit("i1", "i2");
+          let val3 = parseFloat(document.getElementById(`i3-input`).value);
+          let val4 = parseFloat(document.getElementById(`i4-input`).value);
+          val3 = val3 / 100
+
+          let result = ((0.278 * val2 * val1) + (val1 ** 2)) / (254 * (val4 + val3))
+          if (unit === 'am') {
+            let [val5] = prepareUnit("i5")
+            let result2 = val5
+            return {
+              1: { result, type: "i11" },
+              2: {result: result2, type: "i12"}
+            }
+          }
+
+          return {
+            1: { result, type: "i11" },
+          };
+        }
+        return calculateRes()
+      }
+
+      function validateInput(id) {
+        const input = document.getElementById(`${id}-input`);
+        const label = input.getAttribute("data-name").trim();
+        let value = parseFloat(input.value);
+        if (isNaN(value)) {
+          alert(`${label} value cannot be empty.`);
+          return false;
+        } 
+
+        if (id === 'i3' && (value < -45 || value > 45)) {
+          alert(`${label} must e between -45 and 45.`);
+          return false;
+        }
+
+        if (value < 0) {
+          alert(`${label} value cannot be negative.`);
+          return false;
+        }
+
+        return true;
+      }
+
+      function handleResultsChange(e) {
+        let select = e.target;
+        let id = select.getAttribute("data-id");
+        let span = document.getElementById(`${id}-span`);
+
+        let prevUnit = select.getAttribute("data-prev");
+        let currentUnit = select.value;
+        select.setAttribute("data-prev", currentUnit);
+
+        if (span.textContent === "") {
+          return;
+        }
+
+        let type = select.getAttribute("data-type");
+
+        let value = parseFloat(span.textContent);
+        value = parseFloat(value);
+        if (isNaN(value)) value = 0.0;
+
+        let si = toSIUnit(type, prevUnit, value);
+        let result = fromSIUnit(type, currentUnit, si);
+        span.textContent = parseFloat(result).toFixed(5) * 1;
+      }
+
+      function calculateResults() {
+        const unit = modeUnitEl.value
+        for (el of ["i1", "i2", "i3", "i4"]) {
+          if (!validateInput(el)) return;
+        }
+        if (unit === "am") {
+          for (el of ["i5"]) {
+            if (!validateInput(el)) return;
+          }
+        }
+
+        try {
+          const resultElement = createElement()
+          
+          calcResultsEl.innerHTML = resultElement
+
+          const newSelects = document.querySelectorAll(".selectsResult");
+
+          newSelects.forEach((select) => {
+            select.addEventListener("change", handleResultsChange);
+          });
+
+          const result = calculateResult();
+          console.log(result)
+          setResult(result)
+
+        } catch(error) {
+          alert("An error ocurred. Try again with valid input.");
+          resetResult()
+          return;
+        }
+      }
+
+      function resetForm() {
+        [i1Select, i2Select, i3Select, i4Select].forEach((select, index) => {
+          if (index < 2) {
+            select.selectedIndex = '1'
+          } else {
+            select.selectedIndex = '0'
+          }
+        });
+
+        [i1Input, i2Input, i3Input, i4Input].forEach((input) => {
+          input.value = ""
+        });
+        peSelect.selectedIndex = '24'
+        peInput.value = "0.66743"
+        calculateUnitEl.selectedIndex = '3';
+        modeUnitEl.selectedIndex = '1'
+        containers.forEach((container) => {
+          let idVal = container.id.slice(0, 2)
+          if (idVal == 'i4' || idVal == "pe") {
+            container.style.display = 'none'
+          } else {
+            container.style.display = 'block'
+          }
+        })
+      }
+
+      function resetResult() {
+        calcResultsEl.innerHTML = "<p>Result will appear here...</p>";
+      } 
+
+      function resethandler() {
+        resetForm();
+        resetResult();
+      }
+
+      /*************** EVENT LISTINERS ***************/
+      selects.forEach((select) => {
+        select.addEventListener("change", resetResult);
+      });
+      inputs.forEach((input) => {
+        input.addEventListener("input", resetResult);
+      });
+      modeUnitEl.addEventListener("change", handleModeUnitChange);
+      dwUnitEl.addEventListener("change", handleDWChange);
+      resetBtnEl.addEventListener("click", resethandler);
+      calcBtnEl.addEventListener("click", calculateResults);
+
+    </script>
+  </body>
+</html>
