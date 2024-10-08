@@ -91,37 +91,6 @@
         </p>
       </div>
 
-      <p id="advancedInput" style="display: none;">
-        <label for="i5-input">Deceleration </label>
-        <input
-          type="number"
-          min="0"
-          autocomplete="off"
-          data-id="i5"
-          id="i5-input"
-          class="inputs"
-          step="any"
-          data-name="Deceleration"
-        />
-        <select
-          class="selects"
-          id="i5-select"
-          data-type="acceleration"
-          data-prev="m/s²"
-          data-id="i5"
-        >
-          <option value="m/s²" selected>meters per second squared (m/s²)</option>
-          <option value="ft/s²">feet per second squared (ft/s²)</option>
-        </select>
-      </p>
-      <p>
-        Mode:
-        <select id="modeUnit">
-          <option value="am">Advanced mode</option>
-          <option value="sm" selected>Simple mode</option>
-        </select>
-      </p>
-
       <button id="calcBtn">Calculate</button>
       <button id="resetBtn">Reset</button>
       <hr>
@@ -136,7 +105,6 @@
       const inputs = document.querySelectorAll(".inputs");
       const selects = document.querySelectorAll(".selects");
       const dwUnitEl = document.getElementById("dwUnit");
-      const advancedInputEl = document.getElementById("advancedInput");
 
       const calcBtnEl = document.getElementById('calcBtn');
       const resetBtnEl = document.getElementById('resetBtn');
@@ -179,13 +147,6 @@
         return value * UNITS[type][unit];
       }
 
-      function handleModeUnitChange(e) {
-        const value = e.target.value;
-        advancedInputEl.style.display = value == 'am' ? 'block' : 'none'
-
-        resetResult()
-      }
-
       function handleDWChange(e) {
         const value = e.target.value
         const input = document.getElementById('i4-input');
@@ -225,33 +186,8 @@
               </select>
             </p>
         `
-        const newDiv2 = `
-          <p>
-            <label for="i12-span">Braking time: &nbsp; </label>
-            <span
-              data-id="i12"
-              step="any"
-              id="i12-span"
-              class="spans"
-              data-name="Wind correction angle"
-            ></span>
-            <select
-                class="selectsResult"
-                id="i12-select"
-                data-type="time"
-                data-prev="sec"
-                data-id="i12"
-              >
-                <option value="sec" selected>seconds (sec)</option>
-                <option value="min">minutes (min)</option>
-              </select>
-          </p>
-        `
-        if (modeUnitEl.value === "am") {
-          return newDiv + newDiv2
-        } else {
-          return newDiv
-        }
+        return newDiv
+        
       }
       
       // related to caculation
@@ -297,27 +233,16 @@
         }
       }
 
-      function calculateResult() {  
-        const unit = modeUnitEl.value 
-           
+      function calculateResult() {             
         function calculateRes() {
           let [val1, val2] = prepareUnit("i1", "i2");
           let val3 = parseFloat(document.getElementById(`i3-input`).value);
           let val4 = parseFloat(document.getElementById(`i4-input`).value);
           val3 = val3 / 100
 
-          let result = ((0.278 * val2 * val1) + (val1 ** 2)) / (254 * (val4 + val3))
-          if (unit === 'am') {
-            let [val5] = prepareUnit("i5")
-            let result2 = val5
-            return {
-              1: { result, type: "i11" },
-              2: {result: result2, type: "i12"}
-            }
-          }
-
+          let result = ((0.278 * val2 * val1)) + ((val1 ** 2) / (254 * (val4 + val3)))
           return {
-            1: { result, type: "i11" },
+            1: { result: Math.abs(result) > 1 ? result.toFixed(3) * 1 : result, type: "i11" },
           };
         }
         return calculateRes()
@@ -370,14 +295,8 @@
       }
 
       function calculateResults() {
-        const unit = modeUnitEl.value
         for (el of ["i1", "i2", "i3", "i4"]) {
           if (!validateInput(el)) return;
-        }
-        if (unit === "am") {
-          for (el of ["i5"]) {
-            if (!validateInput(el)) return;
-          }
         }
 
         try {
@@ -392,7 +311,6 @@
           });
 
           const result = calculateResult();
-          console.log(result)
           setResult(result)
 
         } catch(error) {
@@ -403,29 +321,22 @@
       }
 
       function resetForm() {
-        [i1Select, i2Select, i3Select, i4Select].forEach((select, index) => {
-          if (index < 2) {
+        selects.forEach((select, index) => {
+          if (index < 1) {
             select.selectedIndex = '1'
           } else {
             select.selectedIndex = '0'
           }
         });
-
-        [i1Input, i2Input, i3Input, i4Input].forEach((input) => {
-          input.value = ""
-        });
-        peSelect.selectedIndex = '24'
-        peInput.value = "0.66743"
-        calculateUnitEl.selectedIndex = '3';
-        modeUnitEl.selectedIndex = '1'
-        containers.forEach((container) => {
-          let idVal = container.id.slice(0, 2)
-          if (idVal == 'i4' || idVal == "pe") {
-            container.style.display = 'none'
+        dwUnitEl.selectedIndex = "0"
+        inputs.forEach((input, index) => {
+          if (index === 3) {
+            input.value = "0.7"
           } else {
-            container.style.display = 'block'
+            input.value = ""
           }
-        })
+        });
+        
       }
 
       function resetResult() {
@@ -444,7 +355,7 @@
       inputs.forEach((input) => {
         input.addEventListener("input", resetResult);
       });
-      modeUnitEl.addEventListener("change", handleModeUnitChange);
+
       dwUnitEl.addEventListener("change", handleDWChange);
       resetBtnEl.addEventListener("click", resethandler);
       calcBtnEl.addEventListener("click", calculateResults);
