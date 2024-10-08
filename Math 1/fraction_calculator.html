@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fraction Calculator – Ultimate Fraction Solver</title>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.6.5/dist/sweetalert2.all.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11.6.5/dist/sweetalert2.min.css" rel="stylesheet">
+</head>
+
+<body>
+    <div id="calculator">
+        <h1>Fraction Calculator</h1>
+				<p>
+					<label for="whole1">Whole Number 1:</label>
+					<input type="number" id="whole1">
+				</p>
+
+        <p>
+            <label for="numerator1">Numerator 1:</label>
+            <input type="number" id="numerator1" required>
+        </p>
+        <p>
+            <label for="denominator1">Denominator 1:</label>
+            <input type="number" id="denominator1" required>
+        </p>
+
+        <p>
+            <label for="operation">Operation:</label>
+            <select id="operation" required>
+                <option value="add">Add</option>
+                <option value="subtract">Subtract</option>
+                <option value="multiply">Multiply</option>
+                <option value="divide">Divide</option>
+                <option value="compare">Compare</option>
+            </select>
+        </p>
+
+				<p>
+					<label for="whole2">Whole Number 2:</label>
+					<input type="number" id="whole2"> (Optional for some operations)
+				</p>
+
+        <p>
+            <label for="numerator2">Numerator 2:</label>
+            <input type="number" id="numerator2"> (Optional for some operations)
+        </p>
+        <p>
+            <label for="denominator2">Denominator 2:</label>
+            <input type="number" id="denominator2"> (Optional for some operations)
+        </p>
+
+        <button id="calculate">Calculate</button>
+        <button id="reset">Reset</button>
+
+        <hr>
+        <div id="result"></div>
+    </div>
+
+    <script>
+        // Get all required elements from the HTML
+				const wholeNumber1El = document.getElementById("whole1");
+        const numerator1El = document.getElementById("numerator1");
+        const denominator1El = document.getElementById("denominator1");
+        const operationEl = document.getElementById("operation");
+				const wholeNumber2El = document.getElementById("whole2");
+        const numerator2El = document.getElementById("numerator2");
+        const denominator2El = document.getElementById("denominator2");
+        const calculateEl = document.getElementById("calculate");
+        const resultEl = document.getElementById("result");
+        const resetEl = document.getElementById("reset");
+
+        // Calculate function
+        function calculate() {
+            try{
+							const wholeNum1 = parseInt(wholeNumber1El.value);
+	            const numerator1 = parseInt(numerator1El.value);
+	            const denominator1 = parseInt(denominator1El.value);
+							const wholeNum2 = parseInt(wholeNumber2El.value);
+	            const numerator2 = parseInt(numerator2El.value) || 0; // Handle optional input for numerator2
+	            const denominator2 = parseInt(denominator2El.value) || 0; // Handle optional input for denominator2
+	            const operation = operationEl.value;
+	
+	            // Validate input
+	            if (isNaN(numerator1) || isNaN(denominator1) || isNaN(numerator2) || isNaN(denominator2)) {
+	                showError("Please enter valid numbers for all required fields.");
+	                return;
+	            }
+	
+	            if (denominator1 === 0 || denominator2 === 0) {
+	                showError("Denominator cannot be zero.");
+	                return;
+	            }
+	
+	            // Perform the calculation based on operation
+	            let resultFraction, resultDecimal;
+	            switch (operation) {
+	                case "add":
+	                    resultFraction = addFractions(wholeNum1, numerator1, denominator1, wholeNum2, numerator2, denominator2);
+	                    break;
+	                case "subtract":
+	                    resultFraction = subtractFractions(wholeNum1, numerator1, denominator1, wholeNum2, numerator2, denominator2);
+	                    break;
+	                case "multiply":
+	                    resultFraction = multiplyFractions(wholeNum1, numerator1, denominator1, wholeNum2, numerator2, denominator2);
+	                    break;
+	                case "divide":
+	                    resultFraction = divideFractions(wholeNum1, numerator1, denominator1, wholeNum2, numerator2, denominator2);
+	                    break;
+	                case "compare":
+	                    resultFraction = compareFractions(wholeNum1, numerator1, denominator1, wholeNum2, numerator2, denominator2);
+	                    break;
+	            }
+	            
+				fractionResultString = `${operation=="compare" ? 'Result :' : 'Fraction: '} ${resultFraction}`;
+	      		resultDecimal = operation=="compare" ? '' : `Decimal: ${evaluateDecimal(resultFraction)}`;
+	
+	      		// Display the result
+	      		resultEl.innerHTML = `<p>${fractionResultString}<br />${resultDecimal}</p>`;
+	        } catch (error) {
+	            showError("Something Went Wrong!!!\n" + error);
+	        }
+	    }
+	
+		// Helper functions
+		function addFractions(w1, n1, d1, w2, n2, d2) {
+			let whole1 = isNaN(w1) ? 0 : w1
+			let whole2 = isNaN(w2) ? 0 : w2
+			const numerator = (((whole1 * d1) + n1) * d2) + (((whole2 * d2) + n2) * d1);
+			const denominator = d1 * d2;
+			return simplifyFraction(numerator, denominator);
+		}
+		
+		function subtractFractions(w1, n1, d1, w2, n2, d2) {
+			let whole1 = isNaN(w1) ? 0 : w1
+			let whole2 = isNaN(w2) ? 0 : w2
+			const numerator = (((whole1 * d1) + n1) * d2) - (((whole2 * d2) + n2) * d1);
+			const denominator = d1 * d2;
+			return simplifyFraction(numerator, denominator);
+		}
+		
+		function multiplyFractions(w1, n1, d1, w2, n2, d2) {
+			let whole1 = isNaN(w1) ? 0 : w1
+			let whole2 = isNaN(w2) ? 0 : w2
+			const numerator = ((whole1 * d1) + n1) * ((whole2 * d2) + n2);
+			const denominator = d1 * d2;
+			return simplifyFraction(numerator, denominator);
+		}
+		
+		function divideFractions(w1, n1, d1, w2, n2, d2) {
+			let whole1 = isNaN(w1) ? 0 : w1
+			let whole2 = isNaN(w2) ? 0 : w2
+			const numerator = ((whole1 * d1) + n1) *  d2;
+			const denominator = d1 * ((whole2 * d2) + n2);
+			return simplifyFraction(numerator, denominator);
+		}
+		
+		function compareFractions(w1, n1, d1, w2, n2, d2) {
+			let whole1 = isNaN(w1) ? 0 : w1
+			let whole2 = isNaN(w2) ? 0 : w2
+			const fraction1 = ((whole1 * d1) + n1) / d1;
+			const fraction2 = ((whole2 * d2) + n2) / d2;
+			
+			if (fraction1 > fraction2) {
+				return "Fraction 1 is greater than Fraction 2";
+			} else if (fraction1 < fraction2) {
+				return "Fraction 1 is less than Fraction 2";
+			} else {
+				return "Both fractions are equal";
+			}
+		}
+		
+		function simplifyFraction(numerator, denominator) {
+			const whole = Math.floor(numerator / denominator)
+			numerator = numerator % denominator
+			const gcd = calculateGCD(numerator, denominator);
+			numerator /= gcd;
+			denominator /= gcd;
+			if (numerator === 0) return `${whole}`
+			return (whole > 0 ? `${whole} (${numerator} / ${denominator})` : `${numerator} / ${denominator}`);
+		}
+		
+		function calculateGCD(a, b) {
+			if (b === 0) {
+				return a;
+			}
+			return calculateGCD(b, a % b);
+		}
+		
+		function evaluateDecimal(fraction) {
+			const parts = fraction.split("/");
+			if (parts.length > 2 || parts.length < 1) {
+				return "Invalid fraction";
+			}
+			
+			let numerator = parseInt(parts[0]);
+			const denominator = parseInt(parts[1]);
+			if (parts[0].trim().length > 1) {
+				const topPart = parts[0].split("(")
+				const whole = parseInt(topPart[0])
+				numerator = (whole * denominator) + parseInt(topPart[1])
+			}
+			const decimal = numerator / denominator;
+			return decimal.toFixed(2);
+		}
+		
+		function resetForm() {
+		    numerator1El.value = '';
+		    denominator1El.value = '';
+		
+		    numerator2El.value = '';
+		    denominator2El.value = '';
+		
+		    resultEl.innerHTML = "<p>Result will appear here...</p>";
+		}
+		
+		
+		function showError(errorMessage) {
+		    Swal.fire({
+		        icon: "error",
+		        title: "Error",
+		        text: errorMessage,
+		    });
+		}
+		[wholeNumber1El, wholeNumber2El, numerator1El, numerator2El, denominator1El, denominator2El].forEach((input) => {
+			input.addEventListener("input", () => resultEl.innerHTML = "<p>Result will appear here...</p>")
+		})
+		// Event Listeners
+		calculateEl.addEventListener("click", calculate);
+		resetEl.addEventListener("click", resetForm);
+		
+  </script>
+</body>
+</html>

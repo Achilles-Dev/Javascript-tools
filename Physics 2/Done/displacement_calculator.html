@@ -1,0 +1,849 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Displacement Calculator</title>
+  </head>
+  <body>
+    <h1>Displacement Calculator</h1>
+      <p>
+        Calculate displacement using...
+        <select id="calcSelect">
+          <option value="conv" selected>Constant velocity</option>
+          <option value="ifva">Initial and final velocity (or acceleration)</option>
+          <option value="uptv">Up to 10 different velocities</option>
+        </select>
+      </p>
+      
+      <div id="convContainer">
+        <p>
+          <label for="i1-input">Time (t)</label>
+          <input
+            type="number"
+            min="0"
+            autocomplete="off"
+            data-id="i1"
+            step="any"
+            id="i1-input"
+            class="inputs2"
+            data-name="Time (t)"
+          />
+          <select
+            class="selects"
+            id="i1-select"
+            data-type="time"
+            data-prev="sec"
+            data-id="i1"
+          >
+            <option value="sec">seconds (sec)</option>
+            <option value="min">minutes (min)</option>
+            <option value="hrs">hour (hrs)</option>
+            <option value="days">days (days)</option>
+            <option value="wks">weeks (wks)</option>
+            <option value="mos">months (mos)</option>
+            <option value="yrs">years (yrs)</option>
+          </select>
+        </p>
+        <p>
+          <label for="i2-input">Average velocity (v)</label>
+          <input
+            type="number"
+            min="0"
+            autocomplete="off"
+            data-id="i2"
+            step="any"
+            id="i2-input"
+            class="inputs2"
+            data-name="Average velocity (v)"
+          />
+  
+          <select
+            class="selects"
+            id="i2-select"
+            data-type="speed"
+            data-prev="m/s"
+            data-id="i2"
+          >
+            <option value="m/s" selected>meters per second (m/s)</option>
+            <option value="km/h">kilometers per hour (km/h)</option>
+            <option value="ft/s">feet per second (ft/s)</option>
+            <option value="mph">miles per hour (mph)</option>
+            <option value="kn">knots (kn)</option>
+            <option value="km/s">kilometers per second (km/s)</option>
+            <option value="mi/s">miles per second (mi/s)</option>
+            <option value="ft/min">feet per minute (ft/min)</option>
+            <option value="m/min">meters per minute (m/min)</option>
+            <option value="cm/s">centimeters per second (cm/s)</option>
+          </select>
+        </p>      
+      </div>
+      <div id="ifvaContainer" style="display: none;">
+        <p>
+          <label for="i12-input">Time (t)</label>
+          <input
+            type="number"
+            min="0"
+            autocomplete="off"
+            data-id="i12"
+            step="any"
+            id="i12-input"
+            class="inputs3"
+            data-name="Time (t)"
+          />
+          <select
+            class="selects"
+            id="i12-select"
+            data-type="time"
+            data-prev="sec"
+            data-id="i12"
+          >
+            <option value="sec">seconds (sec)</option>
+            <option value="min">minutes (min)</option>
+            <option value="hrs">hour (hrs)</option>
+            <option value="days">days (days)</option>
+            <option value="wks">weeks (wks)</option>
+            <option value="mos">months (mos)</option>
+            <option value="yrs">years (yrs)</option>
+          </select>
+        </p>
+        <p>
+          Use:
+          <select id="calc2Select">
+            <option value="ifv"selected>Initial and final velocity</option>
+            <option value="acc"> Acceleration</option>
+          </select>
+        </p>
+        <p>
+          <label for="i32-input">Initial velocity (v₀)</label>
+          <input
+            type="number"
+            autocomplete="off"
+            data-id="i32"
+            data-name="Initial velocity"
+            step="any"
+            id="i32-input"
+            class="inputs3"
+          />
+          <select
+            class="selects"
+            id="i32-select"
+            data-type="speed"
+            data-prev="m/s"
+            data-id="i32"
+          >
+            <option value="m/s" selected>meters per second (m/s)</option>
+            <option value="km/h">kilometers per hour (km/h)</option>
+            <option value="ft/s">feet per second (ft/s)</option>
+            <option value="mph">miles per hour (mph)</option>
+            <option value="kn">knots (kn)</option>
+            <option value="mi/s">miles per second (mi/s)</option>
+            <option value="ft/min">feet per minute (ft/min)</option>
+            <option value="m/min">meters per minute (m/min)</option>
+            <option value="cm/s">centimeters per second (cm/s)</option>
+          </select>
+        </p>
+        <p id="accContainer" class="containers2" style="display: none;">
+          <label for="i22-input">Acceleration (a)</label>
+          <input
+            type="number"
+            min="0"
+            autocomplete="off"
+            data-id="i22"
+            step="any"
+            id="i22-input"
+            class="inputs3"
+            data-name="Acceleration (a)"
+          />
+          <select
+            class="selects"
+            id="i22-select"
+            data-type="acceleration"
+            data-prev="kg"
+            data-id="i22"
+          >
+            <option value="m/s²" selected>meters per second squared (m/s²)</option>
+            <option value="g">gravitational acc. on Earth (g)</option>
+            <option value="ft/s²">feet per second squared (ft/s²)</option>
+          </select>
+        </p>
+        <p id="ifvContainer" class="containers2">
+          <label for="i42-input">Final velocity (v₁)</label>
+          <input
+            type="number"
+            autocomplete="off"
+            data-id="i42"
+            data-name="Final velocity"
+            step="any"
+            id="i42-input"
+            class="inputs3"
+          />
+          <select
+            class="selects"
+            id="i42-select"
+            data-type="speed"
+            data-prev="m/s"
+            data-id="i42"
+          >
+            <option value="m/s" selected>meters per second (m/s)</option>
+            <option value="km/h">kilometers per hour (km/h)</option>
+            <option value="ft/s">feet per second (ft/s)</option>
+            <option value="mph">miles per hour (mph)</option>
+            <option value="kn">knots (kn)</option>
+            <option value="mi/s">miles per second (mi/s)</option>
+            <option value="ft/min">feet per minute (ft/min)</option>
+            <option value="m/min">meters per minute (m/min)</option>
+            <option value="cm/s">centimeters per second (cm/s)</option>
+          </select>
+        </p>
+      </div>
+      <div id="uptvContainer" style="display: none;">
+        <p>Average velocity (up to ten velocites)</p>
+        <div id="components-container">
+          <div id="comp-0" data-pos="last" data-place="0" class="comps">
+            <p>
+              <label for="i1-0-input">Initial velocity (v₀)</label>
+              <input
+                type="number"
+                autocomplete="off"
+                data-id="i1-0"
+                data-name="Initial velocity"
+                step="any"
+                id="i1-0-input"
+                class="inputs"
+                data-place="0"
+              />
+              <select
+                class="selects"
+                id="i1-0-select"
+                data-type="speed"
+                data-prev="m/s"
+                data-id="i1-0"
+              >
+                <option value="m/s" selected>meters per second (m/s)</option>
+                <option value="km/h">kilometers per hour (km/h)</option>
+                <option value="ft/s">feet per second (ft/s)</option>
+                <option value="mph">miles per hour (mph)</option>
+                <option value="kn">knots (kn)</option>
+                <option value="mi/s">miles per second (mi/s)</option>
+                <option value="ft/min">feet per minute (ft/min)</option>
+                <option value="m/min">meters per minute (m/min)</option>
+                <option value="cm/s">centimeters per second (cm/s)</option>
+              </select>
+            </p>
+            <p>
+              <label for="i2-0-input">lasted for (t₀)</label>
+              <input
+                type="number"
+                min="0"
+                autocomplete="off"
+                data-id="i2-0"
+                step="any"
+                id="i2-0-input"
+                class="inputs"
+                data-name="lasted for (t₀)"
+                data-place="0"
+              />
+              <select
+                class="selects"
+                id="i2-0-select"
+                data-type="time"
+                data-prev="sec"
+                data-id="i2-0"
+              >
+                <option value="sec">seconds (sec)</option>
+                <option value="min">minutes (min)</option>
+                <option value="hrs">hour (hrs)</option>
+                <option value="days">days (days)</option>
+                <option value="wks">weeks (wks)</option>
+                <option value="mos">months (mos)</option>
+                <option value="yrs">years (yrs)</option>
+              </select>
+            </p>
+          </div>
+        </div>
+      </div>
+    
+      <button id="calcBtn">Calculate</button>
+      <button id="resetBtn">Reset</button>
+      <hr>
+      <div>
+        <h3>Result:</h3>
+        <h3 id="calcResults">Result will appear here...</h3>
+      </div>
+
+    <script>
+      /*************** ELEMENTS ***************/
+      let selects = document.querySelectorAll(".selects");
+      let inputs = document.querySelectorAll(".inputs");
+      const inputs2 = document.querySelectorAll(".inputs2");
+      const inputs3 = document.querySelectorAll(".inputs3");
+      const containers2El = document.querySelectorAll(".containers2");
+
+      let components = document.querySelectorAll(".comps");
+
+      const container = document.getElementById("components-container");
+      
+
+      const convContainerEl = document.getElementById("convContainer");
+      const ifvaContainerEl = document.getElementById("ifvaContainer");
+      const uptvContainerEl = document.getElementById("uptvContainer");
+      const calcSelectEl = document.getElementById("calcSelect");
+      const calc2SelectEl = document.getElementById("calc2Select");
+
+      const calcBtnEl = document.getElementById('calcBtn');
+      const resetBtnEl = document.getElementById('resetBtn');
+      const calcResultsEl = document.getElementById('calcResults')
+
+      /*************** GLOBAL VARIBLES ***************/
+      const UNITS = {
+        speed: {
+          "m/s": 1,
+          "km/h": 3.6,
+          "ft/s": 3.2808398950131235,
+          mph: 2.2369362920544025,
+          kn: 1.9438444924406049,
+          "km/s": 0.001,
+          "mi/s": 0.0006213711922373339,
+          "ft/min": 196.8503937007874,
+          "m/min": 60,
+          "cm/s": 100,
+        },
+        distance: {
+          mm: 1e3,
+          cm: 1e2,
+          m: 1,
+          km: 1e-3,
+          in: 39.37007874015748,
+          ft: 3.280839895013123,
+          yd: 1.0936132983377078,
+          mi: 0.0006213711922373339,
+        },
+        acceleration: {
+          "m/s²": 1,
+          g: 0.10197162129779282,
+          "ft/s²": 3.28084,
+        },
+        time: {
+          sec: 1,
+          min: 0.016666666666666666,
+          hrs: 0.0002777777777777778,
+          days: 0.000011574074074074075,
+          wks: 0.0000016534391534391535,
+          mos: 3.8025705376834745e-7,
+          yrs: 3.1688087814028954e-8,
+        },
+      };
+
+      /*************** FUNCTIONS ***************/
+      function toSIUnit(type, unit, value) {
+        if (type === "temperature") {
+          return UNITS[type][unit](value, "+");
+        }
+        return value / UNITS[type][unit];
+      }
+
+      function fromSIUnit(type, unit, value) {
+        if (type === "temperature") {
+          return UNITS[type][unit](value, "-");
+        }
+        return value * UNITS[type][unit];
+      }
+
+      function handlecalcSelectChange(e) {
+        const value = e.target.value;
+        
+        convContainerEl.style.display = value == 'conv' ? 'block' : 'none';
+        ifvaContainerEl.style.display = value == 'ifva' ? 'block' : 'none';
+        uptvContainerEl.style.display = value == 'uptv' ? 'block' : 'none';
+
+        resetResult()
+      }
+
+      function handlecalc2SelectChange(e) {
+        const value = e.target.value;
+        
+        containers2El.forEach((container) => {
+          let idVal = container.id.slice(0,3)
+          if (idVal === value) {
+            container.style.display = 'block'
+          } else {
+            container.style.display = 'none'
+          }
+        })
+
+        resetResult()
+      }
+
+      function customPercision(ans, to = 8) {
+        return parseFloat(parseFloat(ans).toPrecision(to));
+      }
+
+      function createElement2() {
+        const newDiv = `
+          <div>
+            <p>
+              <label for="i6-span">Displacement (d): &nbsp; </label>
+              <span
+                data-id="i6"
+                step="any"
+                id="i6-span"
+                class="spans"
+                data-name="Displacement (d)"
+              ></span>
+              <select
+                class="selectsResult"
+                id="i6-select"
+                data-type="distance"
+                data-prev="m"
+                data-id="i6"
+              >
+                  <option value="mm">millimeters (mm)</option>
+                  <option value="cm">centimeters (cm)</option>
+                  <option value="m" selected>meters (m)</option>
+                  <option value="km">kilometers (km)</option>
+                  <option value="in">inches (in)</option>
+                  <option value="ft">feet (ft)</option>
+                  <option value="yd">yards (yd)</option>
+                  <option value="mi">miles (mi)</option>
+                  <option value="nmi">nautical miles (nmi)</option>
+              </select>
+            </p>
+          </div>
+        `
+        return newDiv
+      }
+
+      function inputHandler(e, inp = null) {
+        try {
+          let flag = true;
+          for (let inps of inputs) {
+            let id = inps.getAttribute("data-id");
+            if (!validateInput(id)) flag = false;
+          }
+          const input = e.target;
+         
+          const place = input.getAttribute("data-place");
+          const el = document.getElementById(`comp-${place}`);
+          
+          el.pos = el.getAttribute("data-pos");
+          el.place = parseInt(el.getAttribute("data-place"));
+          
+          const val1 = document.getElementById(`i1-${place}-input`).value;
+          const val2 = document.getElementById(`i2-${place}-input`).value;
+
+          const bool1 = val1 !== "" && val2 !== "";
+          const bool2 = val1 === "" || val2 === "";
+          
+          let scenario_one = el.place != 10 && el.pos == "last" && bool1;
+          let scenario_two = el.place != 0 && el.pos == "prev" && bool2;
+          let scenario_three = el.place == 10 && bool2;
+          let scenario_four = el.place === 0 && bool2;
+
+          if (scenario_one) {
+            scenarioOne(el);
+          } else if (scenario_two) {
+            scenarioTwo(el, bool2);
+          } else if (scenario_three) {
+            scenarioThree(el);
+          } else if (scenario_four) {
+            scenarioFour(el);
+          }
+
+          resetResult()
+        } catch (error) {
+          alert(
+            "An error occurred. Try again with valid input, or try contacting us."
+          );
+          console.log(error);
+        }
+      }
+    
+      /* scenarios */
+      function scenarioOne(el) {
+        let prevEl = document.querySelector('[data-pos="last"]');
+        prevEl.setAttribute("data-pos", "null");
+        el.setAttribute("data-pos", "prev");
+        let nextEl = createElement(el.place + 1);
+        container.append(nextEl);
+        updateNodeList();
+      }
+
+      function scenarioTwo(el) {
+        const elPlace = el.getAttribute("data-place");
+        const nextEl = document.querySelector('[data-pos = "last"]');
+        const nextPlace = nextEl.getAttribute("data-place");
+        
+        const val1 = document.getElementById(`i1-${elPlace}-input`).value;
+        const val2 = document.getElementById(`i2-${elPlace}-input`).value;
+        const bool1 = val1 == "" || val2 == "";
+  
+        const val1Next = document.getElementById(`i1-${nextPlace}-input`).value;
+        const val2next = document.getElementById(`i2-${nextPlace}-input`).value;
+        const bool2 = val1Next === "" || val2next === "";
+
+        if (el.place != 0 && el.pos == "prev" && bool1 && bool2) {
+          let tbd = document.getElementById(
+            `comp-${nextEl.getAttribute("data-place")}`
+          );
+
+          tbd.remove();
+
+          el.setAttribute("data-pos", "last");
+          const newPrev = document.querySelector(`[data-place ="${el.place - 1}"]`);
+          newPrev.setAttribute("data-pos", "prev");
+          newPrev.place = newPrev.getAttribute("data-place");
+          newPrev.pos = newPrev.getAttribute("data-pos");
+          updateNodeList();
+          el.focus();
+          scenarioTwo(newPrev);
+        }
+      }
+
+      function scenarioThree(el) {
+        const newPrev = document.getElementById(`comp-${el.place - 1}`);
+        const nextPlace = newPrev.getAttribute("data-place");
+        const elPlace = el.getAttribute("data-place");
+        const val1Next = document.getElementById(`i1-${nextPlace}-input`).value;
+        const val2next = document.getElementById(`i2-${nextPlace}-input`).value;
+        const bool2 = val1Next === "" || val2next === "";
+
+        const val1 = document.getElementById(`i1-${elPlace}-input`).value;
+        const val2 = document.getElementById(`i2-${elPlace}-input`).value;
+        const bool1 = val1 !== "" || val2 !== "";
+
+        newPrev.setAttribute("data-pos", "prev");
+        newPrev.place = newPrev.getAttribute("data-place");
+        newPrev.pos = newPrev.getAttribute("data-pos");
+        if (el.place == 10 && bool1 && bool2) {
+          scenarioTwo(newPrev);
+        }
+      }
+
+      function scenarioFour(el) {
+        const elPlace = el.getAttribute("data-place");
+        const nextEl = document.querySelector('[data-pos = "last"]');
+        const nextPlace = nextEl.getAttribute("data-place");
+        
+        const val1 = document.getElementById(`i1-${elPlace}-input`).value;
+        const val2 = document.getElementById(`i2-${elPlace}-input`).value;
+        const bool1 = val1 == "" || val2 == "";
+  
+        const val1Next = document.getElementById(`i1-${nextPlace}-input`).value;
+        const val2next = document.getElementById(`i2-${nextPlace}-input`).value;
+        const bool2 = val1Next === "" || val2next === "";
+        
+        if (nextPlace === "1" && el.pos == "prev" && bool1) {
+          let tbd = document.getElementById(
+            `comp-${nextEl.getAttribute("data-place")}`
+          );
+          tbd.remove();
+          el.setAttribute("data-pos", "last");
+          updateNodeList();
+          el.focus();
+        }
+      }
+
+      function createElement(place) {
+        let templateStr = `<div id="comp-${place}" data-pos="last" data-place="${place}" class="comps">     
+        <p>
+          <label for="i1-${place}-input">#${place} Velocity (v<sub>${place}</sub>)</label>
+          <input
+            type="number"
+            autocomplete="off"
+            data-id="i1-${place}"
+            data-name="Velocity"
+            step="any"
+            id="i1-${place}-input"
+            class="inputs"
+            data-place="${place}"
+          />
+          <select
+            class="selects"
+            id="i1-${place}-select"
+            data-type="speed"
+            data-prev="m/s"
+            data-id="i1-${place}"
+          >
+            <option value="m/s" selected>meters per second (m/s)</option>
+            <option value="km/h">kilometers per hour (km/h)</option>
+            <option value="ft/s">feet per second (ft/s)</option>
+            <option value="mph">miles per hour (mph)</option>
+            <option value="kn">knots (kn)</option>
+            <option value="mi/s">miles per second (mi/s)</option>
+            <option value="ft/min">feet per minute (ft/min)</option>
+            <option value="m/min">meters per minute (m/min)</option>
+            <option value="cm/s">centimeters per second (cm/s)</option>
+          </select>
+        </p>
+
+        <p>
+          <label for="i2-${place}-input">lasted for (t<sub>${place}</sub>)</label>
+          <input
+            type="number"
+            autocomplete="off"
+            data-id="i2-${place}"
+            data-name="Time"
+            step="any"
+            id="i2-${place}-input"
+            class="inputs"
+            data-place="${place}"
+          />
+          <select
+            class="selects"
+            id="i2-${place}-select"
+            data-type="time"
+            data-prev="sec"
+            data-id="i2-${place}"
+          >
+            <option value="sec">seconds (sec)</option>
+            <option value="min">minutes (min)</option>
+            <option value="hrs">hour (hrs)</option>
+            <option value="days">days (days)</option>
+            <option value="wks">weeks (wks)</option>
+            <option value="mos">months (mos)</option>
+            <option value="yrs">years (yrs)</option>
+          </select>
+        </p>
+        </div>`;
+
+        let nextEl = document.createElement("div");
+        nextEl.innerHTML = templateStr;
+        return nextEl.firstChild;
+      }
+
+      function updateNodeList() {
+        inputs = document.querySelectorAll(".inputs");
+        selects = document.querySelectorAll(".selects");
+        components = document.querySelectorAll(".comps");
+
+        inputs.forEach((input) => {
+          input.addEventListener("input", inputHandler);
+        });
+
+        selects.forEach((select) => {
+          select.addEventListener("change", resetResult);
+        });
+      }
+
+      // related to caculation
+      function prepareUnit(...args) {
+        const resultArr = [];
+        for (id of args) {
+          if (!validateInput(id)) return;
+          const input = document.getElementById(`${id}-input`);
+          const select = document.getElementById(`${id}-select`);
+          const type = select.getAttribute("data-type");
+          let val = parseFloat(input.value);
+          val = isNaN(val) ? 0 : val;
+          let inUnit = select.value;
+          val = toSIUnit(type, inUnit, val);
+          resultArr.push(val);
+        }
+
+        return resultArr;
+      }
+
+      function validateInput(id) {
+        const input = document.getElementById(`${id}-input`);
+        const label = input.getAttribute("data-name").trim();
+        let value = parseFloat(input.value);
+        if (isNaN(value)) {
+          return false
+        }
+        return true;
+      }
+
+      function setResult(resultObj) {
+        for (key of Object.keys(resultObj)) {
+          let val = resultObj[key].result;
+          let id = resultObj[key].type;
+          if (isNaN(val)) {
+            alert("Your input resulted in NAN.\n 0/0 \n Try again with valid input.");
+            return;
+          }
+          if (Math.abs(val) === Infinity) {
+            alert(
+              "Your input resulted in Infinity. \nDivision by zero. \nTry again with valid input."
+            );
+            return;
+          }
+          
+          const span = document.getElementById(`${id}-span`);
+          const select = document.getElementById(`${id}-select`);
+          const type = select.getAttribute("data-type");
+          let outUnit = select.value;
+          val = fromSIUnit(type, outUnit, val);
+          
+          span.textContent = customPercision(val, 13);
+        }
+      }
+
+      function calculateResult(input) {
+        function calculateCV() {
+          let [val1, val2] = prepareUnit("i1", "i2");
+          
+          let result = val1 * val2
+
+          return {
+            1: { result: result.toFixed(4) * 1, type: "i6" },   
+          };
+        }
+        
+        function calculateIFA() {
+          const calc2 = calc2SelectEl.value
+          let result;
+          if (calc2 === "acc") {
+            let [val1, val2, val3] = prepareUnit("i12", "i22", "i32");
+            result = (0.5 * (val2 * (val1 ** 2))) + (val3 * val1)
+          } else if (calc2 === "ifv") {
+            let [val1, val3, val4] = prepareUnit("i12", "i32", "i42");
+            let ac = 0.5 * (val4 - val3)
+            result = (0.5 * (ac * (val1 ** 2))) + (val3 * val1)
+          }
+          
+          return {
+            1: { result: result.toFixed(4) * 1, type: "i6" },   
+          };
+        }
+
+        function calculateDV() {
+          let n = -1
+          let sum = 0
+          for (let i = 0; i < components.length; i++) {
+            let el = components[i];
+
+            let place = parseInt(el.getAttribute("data-place"));
+
+            const input1 = document.getElementById(`i1-${place}-input`);
+            const id1 = input1.getAttribute("data-id");
+
+            const input2 = document.getElementById(`i2-${place}-input`);
+            const id2 = input2.getAttribute("data-id");
+
+            const val1 = document.getElementById(`i1-${place}-input`).value;
+            const val2 = document.getElementById(`i2-${place}-input`).value;
+
+            const bool1 = val1 == "" || val2 == "";
+            if (bool1) continue;
+
+            let [v0, v1] = prepareUnit(id1, id2);
+
+            sum += v0 * v1
+            n += 1
+          }
+          console.log(sum)
+          return {
+            1: {
+              result: (1/n) * sum,
+              type: "i6",
+            },
+          };
+        }
+
+        switch(input) {
+          case "conv":
+            return calculateCV()
+            break;
+          case "ifva":
+            return calculateIFA()
+            break;
+          case "uptv":
+            return calculateDV()
+            break;
+          default:
+            console.log("error in calculate result switch");
+        }
+      }
+
+      function handleResultsChange(e) {
+        let select = e.target;
+        let id = select.getAttribute("data-id");
+        let span = document.getElementById(`${id}-span`);
+
+        let prevUnit = select.getAttribute("data-prev");
+        let currentUnit = select.value;
+        select.setAttribute("data-prev", currentUnit);
+
+        if (span.textContent === "") {
+          return;
+        }
+
+        let type = select.getAttribute("data-type");
+
+        let value = parseFloat(span.textContent);
+        value = parseFloat(value);
+        if (isNaN(value)) value = 0.0;
+
+        let si = toSIUnit(type, prevUnit, value);
+        let result = fromSIUnit(type, currentUnit, si);
+        span.textContent = customPercision(result, 4);
+      }
+      
+      function calculateResults() {
+        const calcUnit = calcSelectEl.value
+      
+        try {
+          const resultElement = createElement2()
+          calcResultsEl.innerHTML = resultElement
+
+          const newSelects = document.querySelectorAll(".selectsResult");
+
+          newSelects.forEach((select) => {
+            select.addEventListener("change", handleResultsChange);
+          });
+          
+          const result = calculateResult(calcUnit)
+          setResult(result)
+
+        } catch(error) {
+          alert("An error ocurred. Try again with valid input.");
+          resetResult()
+          return;
+        }
+      }
+
+      function resetForm() {
+        selects.forEach((select, index) => {
+          select.selectedIndex = '0'
+        });
+
+        inputs.forEach((input) => {
+          input.value = ""
+        });
+      }
+
+      function resetResult() {
+        calcResultsEl.innerHTML = "<p>Result will appear here...</p>";
+      } 
+
+      function resethandler() {
+        resetForm();
+        resetResult();
+      }
+
+      /*************** EVENT LISTINERS ***************/
+
+      selects.forEach((select, index) => {
+        select.addEventListener("change", resetResult);
+      });
+
+      inputs.forEach((input) => {
+        input.addEventListener("input", inputHandler);
+      });
+      inputs2.forEach((input) => {
+        input.addEventListener("input", resetResult);
+      });
+      inputs3.forEach((input) => {
+        input.addEventListener("input", resetResult);
+      });
+
+      calcSelectEl.addEventListener("change", handlecalcSelectChange)
+      calc2SelectEl.addEventListener("change", handlecalc2SelectChange)
+
+      resetBtnEl.addEventListener("click", resethandler);
+      calcBtnEl.addEventListener("click", calculateResults);
+
+    </script>
+  </body>
+</html>

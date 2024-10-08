@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Centrifugal Force Calculator</title>
+  </head>
+  <body>
+    <h1>Centrifugal Force Calculator</h1>
+      <p>
+        <label for="i1-input">Mass (m)</label>
+        <input
+          type="number"
+          step="any"
+          id="i1-input"
+          class="inputs"
+          min="0"
+          autocomplete="off"
+          data-id="i1"
+          step="any"
+          data-name="Mass (m)"
+        />
+        <select 
+          class="selects"
+          id="i1-select"
+          data-type="mass"
+          data-prev="kg"
+          data-id="i1"
+        >
+          <option value="g">grams (g)</option>
+          <option value="dag">decagrams (dag)</option>
+          <option value="kg" selected>kilograms (kg)</option>
+          <option value="gr">grains (gr)</option>
+          <option value="dr">drachms (dr)</option>
+          <option value="oz">ounces (oz)</option>
+          <option value="lb">pounds (lb)</option>
+          <option value="st">stones (st)</option>
+        </select>
+      </p>
+      <p>
+        <label for="i2-input">Radius (r) </label>
+        <input
+          type="number"
+          step="any"
+          id="i2-input"
+          class="inputs"
+          min="0"
+          autocomplete="off"
+          data-id="i2"
+          step="any"
+          data-name="Radius (r)"
+        />
+        <select 
+          class="selects"
+          id="i2-select"
+          data-type="distance"
+          data-prev="m"
+          data-id="i2"
+        >
+        <option value="mm">millimeters (mm)</option>
+        <option value="cm">centimeters (cm)</option>
+        <option value="m" selected>meters (m)</option>
+        <option value="km">kilometers (km)</option>
+        <option value="in">inches (in)</option>
+        <option value="ft">feet (ft)</option>
+        <option value="yd">yards (yd)</option>
+        <option value="mi">miles (mi)</option>
+        </select>
+      </p>
+      <p>
+        <label for="i3-input">Tangential velocity (v) </label>
+        <input
+          type="number"
+          step="any"
+          id="i3-input"
+          class="inputs"
+          min="0"
+          autocomplete="off"
+          data-id="i3"
+          step="any"
+          data-name="Tangential velocity (v)"
+        />
+        <select 
+          class="selects"
+          id="i3-select"
+          data-type="speed"
+          data-prev="m/s"
+          data-id="i3"
+        >
+          <option value="m/s" selected>meters per second (m/s)</option>
+          <option value="km/h">kilometers per hour (km/h)</option>
+          <option value="ft/s">feet per second (ft/s)</option>
+          <option value="mph">miles per hour (mph)</option>
+          <option value="ft/min">feet per minute (ft/min)</option>
+          <option value="m/min">meters per minute (m/min)</option>
+        </select>
+      </p>
+      
+      <button id="calcBtn">Calculate</button>
+      <button id="resetBtn">Reset</button>
+      <hr>
+      <div>
+        <h3>Result:</h3>
+        <h3 id="calcResults">Result will appear here...</h3>
+      </div>
+    <script>
+      /*************** ELEMENTS ***************/
+      const containersEl = document.querySelectorAll('.containers')
+      const inputs = document.querySelectorAll('.inputs')
+      const selects = document.querySelectorAll('.selects')
+
+      const calcBtnEl = document.getElementById('calcBtn');
+      const resetBtnEl = document.getElementById('resetBtn');
+      const calcResultsEl = document.getElementById('calcResults')
+
+      /*************** GLOBAL VARIABLES ***************/
+      const UNITS = {
+        angularFrequency: {
+          rpm: 9.5492965855137,
+          "rad/s": 1,
+          Hz: 0.1591549430919,
+        },
+        mass: {
+          g: 1e3,
+          dag: 1e2,
+          kg: 1,
+          gr: 15432.35835294143,
+          dr: 564.3833911932867,
+          oz: 35.27396194958042,
+          lb: 2.204622621848776,
+          st: 0.15747304441776971,
+        },
+        time: {
+          sec: 1,
+          min: 0.016666666666666666,
+          hrs: 0.0002777777777777778,
+          days: 0.000011574074074074075,
+          wks: 0.0000016534391534391535,
+          mos: 3.8025705376834745e-7,
+          yrs: 3.1688087814028954e-8,
+        },
+        distance: {
+          mm: 1000,
+          cm: 100,
+          m: 1,
+          km: 0.001,
+          in: 39.37007874015748,
+          ft: 3.2808398950131235,
+          yd: 1.0936132983377078,
+          mi: 0.0006213711922373339,
+        },
+        speed: {
+          "m/s": 1,
+          "km/h": 3.6,
+          "ft/s": 3.280839895,
+          mph: 2.2369362921,
+          "ft/min": 196.8503937,
+          "m/min": 60,
+        },
+        angle: {
+          deg: 180 / Math.PI,
+          rad: 1,
+        },
+        acceleration: {
+          "m/s²": 1,
+          g: 0.10197162129779,
+        },
+        force: {
+          N: 1,
+          kN: 1e-3,
+          pdl: 7.23301146432317,
+          lbf: 0.22480894387096184,
+        },
+      };
+      /*************** FUNCTIONS ***************/
+      function toSIUnit(type, unit, value) {
+        return value / UNITS[type][unit];
+      }
+
+      function fromSIUnit(type, unit, value) {
+        return value * UNITS[type][unit];
+      }
+
+      function createElement() {
+        const newDiv = `
+            <p>
+              <label for="i41-span">Angular velocity (ω): &nbsp;</label>
+              <span
+                data-id="i41"
+                step="any"
+                id="i41-span"
+                class="spans"
+                data-name="Angular velocity (ω)"
+              ></span>
+              <select
+                class="selectsResult"
+                id="i41-select"
+                data-type="angularFrequency"
+                data-prev="rpm"
+                data-id="i41"
+              >
+                <option value="rpm" selected>rotations per minute (rpm)</option>
+                <option value="rad/s">radians per second (rad/s)</option>
+                <option value="Hz">hertz (Hz)</option>
+              </select>
+            </p>
+            <p>
+              <label for="i42-span">Force (F = mv²/r): &nbsp;</label>
+              <span
+                data-id="i42"
+                step="any"
+                id="i42-span"
+                class="spans"
+                data-name="Force (F = mv²/r)"
+              ></span>
+              <select
+                class="selectsResult"
+                id="i42-select"
+                data-type="force"
+                data-prev="N"
+                data-id="i42"
+              >
+                <option value="N" selected>newtons (N)</option>
+                <option value="kN">kilonewtons (kN)</option>
+                <option value="pdl">poundals (pdl)</option>
+                <option value="lbf">pounds-force (lbf)</option>
+              </select>
+            </p>
+            <h3>More centrifugal results:</h3>
+            <p>
+              <label for="i44-span">Centrifugal acceleration (a): &nbsp;</label>
+              <span
+                type="number"
+                step="any"
+                id="i44-span"
+                class="spans"
+                min="0"
+                autocomplete="off"
+                data-id="i44"
+                step="any"
+                data-name="Centrifugal acceleration (a)"
+              ></span>
+              <select 
+                class="selects"
+                id="i44-select"
+                data-type="acceleration"
+                data-prev="m/s²"
+                data-id="i44"
+              >
+                <option value="m/s²" selected>meters per second squared (m/s²)</option>
+                <option value="g">gravitational acc. on Earth (g)</option>
+              </select>
+            </p>
+        `
+        return newDiv
+      }
+
+      // related to caculation
+      function prepareUnit(...args) {
+        const resultArr = [];
+        for (id of args) {
+          const input = document.getElementById(`${id}-input`);
+          const select = document.getElementById(`${id}-select`);
+          const type = select.getAttribute("data-type");
+          let val = parseFloat(input.value);
+
+          val = isNaN(val) ? 0 : val;
+          let inUnit = select.value;
+
+          val = toSIUnit(type, inUnit, val);
+
+          resultArr.push(val);
+        }
+
+        return resultArr;
+      }
+
+      function setResult(resultObj) {
+        for (key of Object.keys(resultObj)) {
+          let val = resultObj[key].result;
+          let id = resultObj[key].type;
+
+          if (isNaN(val)) {
+           alert("Your input resulted in NAN.\n 0/0 \n Try again with valid input.");
+            return;
+          }
+          if (Math.abs(val) === Infinity) {
+            alert("Your input resulted in Infinity. \nDivision by zero. \nTry again with valid input.");
+            return;
+          }
+          const span = document.getElementById(`${id}-span`);
+          const select = document.getElementById(`${id}-select`);
+          const type = select.getAttribute("data-type");
+          let outUnit = select.value;
+          val = fromSIUnit(type, outUnit, val);
+          
+          span.textContent = parseFloat(val);
+        }
+      }
+
+      function calculateResult() {       
+        function calculateF() {
+          let [val1, val2, val3] = prepareUnit("i1", "i2", "i3");
+          let result = (val1 * (val3 ** 2)) / val2 
+          let av = val3 / val2
+          let ca = result / val1
+
+          return {
+            1: { result: result > 1 ? result.toFixed(4) * 1 : result, type: "i42" },
+            2: { result: av, type: "i41"},
+            3: { result: ca, type: "i44"}
+          };
+        }
+
+        return calculateF()
+      }
+
+      function validateInput(id) {
+        const input = document.getElementById(`${id}-input`);
+        const label = input.getAttribute("data-name").trim();
+        let value = parseFloat(input.value);
+        if (isNaN(value)) {
+          alert(`${label} value cannot be empty.`);
+          return false;
+        } 
+
+        if (value < 0) {
+          alert(`${label} value cannot be negative.`);
+          return false;
+        }
+
+        return true;
+      }
+
+      function handleResultsChange(e) {
+        let select = e.target;
+        let id = select.getAttribute("data-id");
+        let span = document.getElementById(`${id}-span`);
+
+        let prevUnit = select.getAttribute("data-prev");
+        let currentUnit = select.value;
+        select.setAttribute("data-prev", currentUnit);
+
+        if (span.textContent === "") {
+          return;
+        }
+
+        let type = select.getAttribute("data-type");
+
+        let value = parseFloat(span.textContent);
+        value = parseFloat(value);
+        if (isNaN(value)) value = 0.0;
+
+        let si = toSIUnit(type, prevUnit, value);
+        let result = fromSIUnit(type, currentUnit, si);
+        span.textContent = parseFloat(result).toFixed(5) * 1;
+      }
+
+      function calculateResults() {
+        for (el of ["i1", "i2", "i3"]) {
+          if (!validateInput(el)) return;
+        }
+        
+        try {
+          const resultElement = createElement()
+          calcResultsEl.innerHTML = resultElement
+
+          const newSelects = document.querySelectorAll(".selectsResult");
+
+          newSelects.forEach((select) => {
+            select.addEventListener("change", handleResultsChange);
+          });
+        
+          const result = calculateResult();
+          setResult(result)
+          
+
+        } catch(error) {
+          alert("An error ocurred. Try again with valid input.");
+          resetResult()
+          return;
+        }
+      }
+
+      function resetForm() {
+        selects.forEach((select, index) => {
+          if (index < 2) {
+            select.selectedIndex = '2'
+          } else {
+            select.selectedIndex = '0'
+          }
+        });
+
+        inputs.forEach((input) => {
+          input.value = ""
+        });
+
+        containersEl.forEach((container) => {
+          let idVal = container.id.slice(0, 2)     
+          if (idVal == "i1") {
+            container.style.display = 'block'
+          } else {
+            container.style.display = 'none'
+          }
+        })
+
+      }
+
+      function resetResult() {
+        calcResultsEl.innerHTML = "<p>Result will appear here...</p>";
+      } 
+
+      function resethandler() {
+        resetForm();
+        resetResult();
+      }
+
+      /*************** EVENTLISTINERS ***************/
+      inputs.forEach((el) => {
+        el.addEventListener("input", resetResult);
+      });
+
+      selects.forEach((el) => {
+        el.addEventListener("change", resetResult);
+      });
+
+      resetBtnEl.addEventListener("click", resethandler);
+      calcBtnEl.addEventListener("click", calculateResults);
+    </script>
+  </body>
+</html>

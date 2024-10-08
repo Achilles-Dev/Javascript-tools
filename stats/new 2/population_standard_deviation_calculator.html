@@ -82,8 +82,9 @@
             const xMeanSqtSum = xMeanSqtArray.reduce((a, b) => a + b, 0)
             const results = Math.sqrt(xMeanSqtSum / numbers.length)
             const minusVal = results.toFixed().toString().length
+            let toFixedNum = precision - minusVal > 100 ? 100 : precision - minusVal
             calcResultsEl.innerHTML = `<p>Total numbers: ${numbers.length}</p>
-                                      <p>Population standard deviation: ${results.toFixed(precision - minusVal) * 1}</p>
+                                      <p>Population standard deviation: ${results.toFixed(toFixedNum) }</p>
             `      
           } catch (error) {
             alert("Something Went Wrong!!!");

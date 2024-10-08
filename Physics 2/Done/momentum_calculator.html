@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Momentum Calculator</title>
+  </head>
+  <body>
+    <h1>Momentum Calculator</h1>
+      <p>
+        Calculate:
+        <select id="calcSelect">
+          <option value="one" selected>Momentum in one dimension</option>
+          <option value="two">Momentum in two or three dimensions</option>
+        </select>
+      </p>
+      <div id="oneContainer" class="containers">
+        <p>
+          <label for="i1-input">Mass (m)</label>
+          <input
+            type="number"
+            min="0"
+            autocomplete="off"
+            data-id="i1"
+            step="any"
+            id="i1-input"
+            class="inputs"
+            data-name="Mass (m)"
+          />
+          <select
+            class="selects"
+            id="i1-select"
+            data-type="mass"
+            data-prev="kn"
+            data-id="i1"
+          >
+            <option value="mg">mg</option>
+            <option value="g">g</option>
+            <option value="kg" selected>kg</option>
+            <option value="t">metric tons (t)</option>
+            <option value="oz">ounces (oz)</option>
+            <option value="lb">pounds (lb)</option>
+            <option value="US ton">US short tons (US ton)</option>
+            <option value="long ton">imperial tons (long ton)</option>
+          </select>
+        </p>
+        <p>
+          <label for="i2-input">Velocity (v)</label>
+          <input
+            type="number"
+            min="0"
+            autocomplete="off"
+            data-id="i2"
+            step="any"
+            id="i2-input"
+            class="inputs"
+            data-name="Velocity (v)"
+          />
+  
+          <select
+            class="selects"
+            id="i2-select"
+            data-type="speed"
+            data-prev="m/s"
+            data-id="i2"
+          >
+            <option value="m/s" selected>meters per second (m/s)</option>
+            <option value="km/h">kilometers per hour (km/h)</option>
+            <option value="ft/s">feet per second (ft/s)</option>
+            <option value="mph">miles per hour (mph)</option>
+            <option value="ft/min">feet per minute (ft/min)</option>
+          </select>
+        </p>
+      </div>
+      <div id="twoContainer" class="containers" style="display: none;">
+        <p>Leave the momentum in z-direction as zero if you want to consider a problem of two-dimensional vectors.</p>
+        <p>
+          <label for="i3-input">Momentum in x-direction</label>
+          <input
+            type="number"
+            min="0"
+            autocomplete="off"
+            data-id="i3"
+            step="any"
+            id="i3-input"
+            class="inputs"
+            data-name="Momentum in x-direction"
+          />
+          <select
+            class="selects"
+            id="i3-select"
+            data-type="momentum"
+            data-prev="kgms"
+            data-id="i3"
+          >
+            <option value="mNs">millinewton-seconds (mN⋅s)</option>
+            <option value="Ns">newton-seconds (N⋅s)</option>
+            <option value="knN">kilonewton-seconds (kN⋅s)</option>
+            <option value="MNs">meganewton-seconds (MN⋅s)</option>
+            <option value="kgms" selected>kilogram meters per second (kg⋅m/s)</option>
+            <option value="tkmh">ton kilometers per hour (t⋅km/h)</option>
+            <option value="lbfts">pound feet per second (lb⋅ft/s)</option>
+            <option value="tmh">ton miles per hour (t⋅mph)</option>
+            <option value="ustmh">US ton miles per hour (US t⋅mph)</option>
+            <option value="itmh">imperial ton miles per hour (long t⋅mph)</option>
+          </select>
+        </p>
+        <p>
+          <label for="i4-input">Momentum in y-direction</label>
+          <input
+            type="number"
+            min="0"
+            autocomplete="off"
+            data-id="i4"
+            step="any"
+            id="i4-input"
+            class="inputs"
+            data-name="Momentum in y-direction"
+          />
+  
+          <select
+            class="selects"
+            id="i4-select"
+            data-type="momentum"
+            data-prev="kgms"
+            data-id="i4"
+          >
+            <option value="mNs">millinewton-seconds (mN⋅s)</option>
+            <option value="Ns">newton-seconds (N⋅s)</option>
+            <option value="knN">kilonewton-seconds (kN⋅s)</option>
+            <option value="MNs">meganewton-seconds (MN⋅s)</option>
+            <option value="kgms" selected>kilogram meters per second (kg⋅m/s)</option>
+            <option value="tkmh">ton kilometers per hour (t⋅km/h)</option>
+            <option value="lbfts">pound feet per second (lb⋅ft/s)</option>
+            <option value="tmh">ton miles per hour (t⋅mph)</option>
+            <option value="ustmh">US ton miles per hour (US t⋅mph)</option>
+            <option value="itmh">imperial ton miles per hour (long t⋅mph)</option>
+          </select>
+        </p>
+        <p>
+          <label for="i5-input">Momentum in z-direction</label>
+          <input
+            type="number"
+            min="0"
+            autocomplete="off"
+            data-id="i5"
+            step="any"
+            id="i5-input"
+            class="inputs"
+            data-name="Momentum in z-direction"
+          />
+          <select
+            class="selects"
+            id="i5-select"
+            data-type="momentum"
+            data-prev="kgms"
+            data-id="i5"
+          >
+            <option value="mNs">millinewton-seconds (mN⋅s)</option>
+            <option value="Ns">newton-seconds (N⋅s)</option>
+            <option value="knN">kilonewton-seconds (kN⋅s)</option>
+            <option value="MNs">meganewton-seconds (MN⋅s)</option>
+            <option value="kgms" selected>kilogram meters per second (kg⋅m/s)</option>
+            <option value="tkmh">ton kilometers per hour (t⋅km/h)</option>
+            <option value="lbfts">pound feet per second (lb⋅ft/s)</option>
+            <option value="tmh">ton miles per hour (t⋅mph)</option>
+            <option value="ustmh">US ton miles per hour (US t⋅mph)</option>
+            <option value="itmh">imperial ton miles per hour (long t⋅mph)</option>
+          </select>
+        </p>
+      </div>
+
+      <button id="calcBtn">Calculate</button>
+      <button id="resetBtn">Reset</button>
+      <hr>
+      <div>
+        <h3>Result:</h3>
+        <h3 id="calcResults">Result will appear here...</h3>
+      </div>
+
+    <script>
+      /*************** ELEMENTS ***************/
+      const calcSelectEl = document.getElementById("calcSelect");
+      const selects = document.querySelectorAll(".selects");
+      const inputs = document.querySelectorAll(".inputs");
+      const containtersEl = document.querySelectorAll(".containers");
+
+      const calcBtnEl = document.getElementById('calcBtn');
+      const resetBtnEl = document.getElementById('resetBtn');
+      const calcResultsEl = document.getElementById('calcResults')
+
+      /*************** GLOBAL VARIBLES ***************/
+      const UNITS = {
+        mass: {
+          mg: 1e6,
+          g: 1e3,
+          kg: 1,
+          t: 1e-3,
+          oz: 35.27396194958042,
+          lb: 2.204622621848776,
+          "US ton": 0.001102311310924388,
+          "long ton": 0.0009842065276110606,
+        },
+        speed: {
+          "m/s": 1,
+          "km/h": 3.6,
+          "ft/s": 3.2808398950131235,
+          mph: 2.2369362920544025,
+          "ft/min": 196.8503937007874,
+        },
+        momentum: {
+          "mNs": 1000,
+          "Ns": 1,
+          "knN": 0.001,
+          "MNs": 0.000001,
+          "kgms": 1,
+          "tkmh": 0.00396832072,
+          "lbfts": 7.230657989877,
+          "tmh": 0.00246580018,
+          "ustmh": 0.00246580018,
+          "itmh": 0.0022016073,
+        }
+      };
+
+      /*************** FUNCTIONS ***************/
+      function toSIUnit(type, unit, value) {
+        if (type === "temperature") {
+          return UNITS[type][unit](value, "+");
+        }
+        return value / UNITS[type][unit];
+      }
+
+      function fromSIUnit(type, unit, value) {
+        if (type === "temperature") {
+          return UNITS[type][unit](value, "-");
+        }
+        return value * UNITS[type][unit];
+      }
+
+      function handlecalcSelectChange(e) {
+        const value = e.target.value
+
+        containtersEl.forEach((container) => {
+          let idVal = container.id.slice(0, 3)
+          if (value == idVal) {
+            container.style.display = 'block'
+          } else {
+            container.style.display = 'none'
+          }
+        })
+        resetResult()
+      }
+
+
+      function createElement() {
+        const calcUnit = calcSelectEl.value
+        const newDiv = `
+            <p>
+              <label for="i6-span">Momentum (p): &nbsp; </label>
+              <span
+                data-id="i6"
+                step="any"
+                id="i6-span"
+                class="spans"
+                data-name="Wind correction angle"
+              ></span>
+
+              <select
+                class="selectsResult"
+                id="i6-select"
+                data-type="momentum"
+                data-prev="kgms"
+                data-id="i6"
+              >
+                <option value="mNs">millinewton-seconds (mN⋅s)</option>
+                <option value="Ns">newton-seconds (N⋅s)</option>
+                <option value="knN">kilonewton-seconds (kN⋅s)</option>
+                <option value="MNs">meganewton-seconds (MN⋅s)</option>
+                <option value="kgms" selected>kilogram meters per second (kg⋅m/s)</option>
+                <option value="tkmh">ton kilometers per hour (t⋅km/h)</option>
+                <option value="lbfts">pound feet per second (lb⋅ft/s)</option>
+                <option value="tmh">ton miles per hour (t⋅mph)</option>
+                <option value="ustmh">US ton miles per hour (US t⋅mph)</option>
+                <option value="itmh">imperial ton miles per hour (long t⋅mph)</option>
+              </select>
+            </p>
+        `
+        const newDiv2 = `
+          <p>
+            <label for="i6-span">Momentum magnitude: &nbsp; </label>
+            <span
+              data-id="i6"
+              step="any"
+              id="i6-span"
+              class="spans"
+              data-name="Wind correction angle"
+            ></span>
+
+            <select
+              class="selectsResult"
+              id="i6-select"
+              data-type="momentum"
+              data-prev="kgms"
+              data-id="i6"
+            >
+              <option value="mNs">millinewton-seconds (mN⋅s)</option>
+              <option value="Ns">newton-seconds (N⋅s)</option>
+              <option value="knN">kilonewton-seconds (kN⋅s)</option>
+              <option value="MNs">meganewton-seconds (MN⋅s)</option>
+              <option value="kgms" selected>kilogram meters per second (kg⋅m/s)</option>
+              <option value="tkmh">ton kilometers per hour (t⋅km/h)</option>
+              <option value="lbfts">pound feet per second (lb⋅ft/s)</option>
+              <option value="tmh">ton miles per hour (t⋅mph)</option>
+              <option value="ustmh">US ton miles per hour (US t⋅mph)</option>
+              <option value="itmh">imperial ton miles per hour (long t⋅mph)</option>
+            </select>
+          </p>
+        `
+        if (calcUnit === "one") {
+          return newDiv
+        } else {
+          return newDiv2
+        }
+      }
+
+      // related to caculation
+      function prepareUnit(...args) {
+        const resultArr = [];
+        for (id of args) {
+          const input = document.getElementById(`${id}-input`);
+          const select = document.getElementById(`${id}-select`);
+          const type = select.getAttribute("data-type");
+          let val = parseFloat(input.value);
+
+          val = isNaN(val) ? 0 : val;
+          let inUnit = select.value;
+
+          val = toSIUnit(type, inUnit, val);
+
+          resultArr.push(val);
+        }
+
+        return resultArr;
+      }
+
+      function setResult(resultObj) {
+        for (key of Object.keys(resultObj)) {
+          let val = resultObj[key].result;
+          let id = resultObj[key].type;
+
+          if (isNaN(val)) {
+           alert("Your input resulted in NAN.\n 0/0 \n Try again with valid input.");
+            return;
+          }
+          if (Math.abs(val) === Infinity) {
+            alert("Your input resulted in Infinity. \nDivision by zero. \nTry again with valid input.");
+            return;
+          }
+          const span = document.getElementById(`${id}-span`);
+          const select = document.getElementById(`${id}-select`);
+          const type = select.getAttribute("data-type");
+          let outUnit = select.value;
+          val = fromSIUnit(type, outUnit, val);
+
+          span.textContent = parseFloat(val);
+        }
+      }
+
+      function calculateResult(input) {       
+        function calculateI61() {
+          let [val1, val2] = prepareUnit("i1", "i2");
+          let result = val1 * val2
+          return {
+            1: { result: result.toFixed(5) * 1, type: "i6" },
+          };
+        }
+
+        function calculateI62() {
+          let [val1, val2, val3] = prepareUnit("i3", "i4", "i5");
+          let result = Math.sqrt((val1 ** 2) + (val2 ** 2) + (val3 ** 2));
+          return {
+            1: { result: result.toFixed(5) * 1, type: "i6" },
+          };
+        }
+
+        switch(input) {
+          case "one":
+            return calculateI61()
+          case "two":
+            return calculateI62()
+          default:
+          console.log("error in calculate result switch");
+        }
+      }
+
+      function validateInput(id) {
+        const input = document.getElementById(`${id}-input`);
+        const label = input.getAttribute("data-name").trim();
+        let value = parseFloat(input.value);
+        if (isNaN(value)) {
+          alert(`${label} value cannot be empty.`);
+          return false;
+        } 
+
+        if (value < 0) {
+          alert(`${label} value cannot be negative.`);
+          return false;
+        }
+
+        return true;
+      }
+
+      function handleResultsChange(e) {
+        let select = e.target;
+        let id = select.getAttribute("data-id");
+        let span = document.getElementById(`${id}-span`);
+
+        let prevUnit = select.getAttribute("data-prev");
+        let currentUnit = select.value;
+        select.setAttribute("data-prev", currentUnit);
+
+        if (span.textContent === "") {
+          return;
+        }
+
+        let type = select.getAttribute("data-type");
+
+        let value = parseFloat(span.textContent);
+        value = parseFloat(value);
+        if (isNaN(value)) value = 0.0;
+
+        let si = toSIUnit(type, prevUnit, value);
+        let result = fromSIUnit(type, currentUnit, si);
+        span.textContent = parseFloat(result).toFixed(5) * 1;
+      }
+
+      function calculateResults() {
+        const calcUnit = calcSelectEl.value
+        if (calcUnit === "one") {
+          for (el of ["i1", "i2"]) {
+            if (!validateInput(el)) return;
+          }
+        } else {
+          for (el of ["i3", "i4", "i5"]) {
+            if (!validateInput(el)) return;
+          }
+        }
+        
+        try {
+          const resultElement = createElement()
+          calcResultsEl.innerHTML = resultElement
+
+          const newSelects = document.querySelectorAll(".selectsResult");
+
+          newSelects.forEach((select) => {
+            select.addEventListener("change", handleResultsChange);
+          });
+        
+          const result = calculateResult(calcUnit);
+          setResult(result)
+
+        } catch(error) {
+          alert("An error ocurred. Try again with valid input.");
+          resetResult()
+          return;
+        }
+      }
+
+      function resetForm() {
+        selects.forEach((select, index) => {
+          select.selectedIndex = '4'
+        });
+
+        inputs.forEach((input) => {
+          input.value = ""
+        });
+
+        calcSelectEl.selectedIndex = '0'
+
+        containtersEl.forEach((container) => {
+          let idVal = container.id.slice(0, 3)
+          if (idVal === "one") {
+            container.style.display = 'block'
+          } else {
+            container.style.display = 'none'
+          }
+        })
+      }
+
+      function resetResult() {
+        calcResultsEl.innerHTML = "<p>Result will appear here...</p>";
+      } 
+
+      function resethandler() {
+        resetForm();
+        resetResult();
+      }
+
+      /*************** EVENT LISTINERS ***************/
+
+      selects.forEach((select) => {
+        select.addEventListener("change", resetResult);
+      });
+
+      inputs.forEach((input) => {
+        input.addEventListener("input", resetResult);
+      });
+
+      calcSelectEl.addEventListener("change", handlecalcSelectChange)
+
+      resetBtnEl.addEventListener("click", resethandler);
+      calcBtnEl.addEventListener("click", calculateResults);
+
+    </script>
+  </body>
+</html>

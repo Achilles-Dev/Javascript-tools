@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Angular Velocity Calculator</title>
+  </head>
+  <body>
+    <h1>Angular Velocity Calculator</h1>
+    <p>
+      Methods:
+      <select id="methodsUnit">
+        <option value="i1" selected>Angle difference</option>
+        <option value="i2">Radial velocity</option>
+      </select>
+    </p>
+    <div id="i1-containter" class="containers">
+      <p>
+        <label for="i1-input">Initial angle (α1)</label>
+        <input
+          type="number"
+          step="any"
+          id="i1-input"
+          class="inputs"
+          min="0"
+          autocomplete="off"
+          data-id="i1"
+          step="any"
+          data-name="Initial angle (α1)"
+        />
+        <select 
+          class="selects"
+          id="i1-select"
+          data-type="angle"
+          data-prev="deg"
+          data-id="i1"
+        >
+          <option value="deg" selected>degrees (deg)</option>
+          <option value="rad">radians (rad)</option>
+          <option value="gon">gradians (gon)</option>
+          <option value="tr">turns (tr)</option>
+          <option value="arcmin">minutes of arc (arcmin)</option>
+          <option value="arcsec">seconds of arc (arcsec)</option>
+          <option value="mrad">milliradians (mrad)</option>
+          <option value="μrad">microradians (μrad)</option>
+          <option value="πrad">radians (× π rad)</option>
+        </select>
+      </p>
+      <p>
+        <label for="i2-input">Final angle (α2) </label>
+        <input
+          type="number"
+          step="any"
+          id="i2-input"
+          class="inputs"
+          min="0"
+          autocomplete="off"
+          data-id="i2"
+          step="any"
+          data-name="Final angle (α2)"
+        />
+        <select 
+          class="selects"
+          id="i2-select"
+          data-type="angle"
+          data-prev="deg"
+          data-id="i2"
+        >
+          <option value="deg" selected>degrees (deg)</option>
+          <option value="rad">radians (rad)</option>
+          <option value="gon">gradians (gon)</option>
+          <option value="tr">turns (tr)</option>
+          <option value="arcmin">minutes of arc (arcmin)</option>
+          <option value="arcsec">seconds of arc (arcsec)</option>
+          <option value="mrad">milliradians (mrad)</option>
+          <option value="μrad">microradians (μrad)</option>
+          <option value="πrad">radians (× π rad)</option>
+        </select>
+      </p>
+      <p>
+        <label for="i3-input">Time (t) </label>
+        <input
+          type="number"
+          step="any"
+          id="i3-input"
+          class="inputs"
+          min="0"
+          autocomplete="off"
+          data-id="i3"
+          step="any"
+          data-name="Time (t)"
+        />
+        <select 
+          class="selects"
+          id="i3-select"
+          data-type="time"
+          data-prev="sec"
+          data-id="i3"
+        >
+          <option value="sec" selected>seconds (sec)</option>
+          <option value="min">minutes (min)</option>
+          <option value="hrs">hour (hrs)</option>
+          <option value="days">days (days)</option>
+          <option value="wks">weeks (wks)</option>
+          <option value="mos">months (mos)</option>
+          <option value="yrs">years (yrs)</option>
+        </select>
+      </p>
+    </div>
+    <div id="i2-container" class="containers" style="display: none;">
+      <p>
+        <label for="i11-input">Velocity (v) </label>
+        <input
+          type="number"
+          step="any"
+          id="i11-input"
+          class="inputs"
+          min="0"
+          autocomplete="off"
+          data-id="i11"
+          step="any"
+          data-name="Velocity (v)"
+        />
+        <select 
+          class="selects"
+          id="i11-select"
+          data-type="speed"
+          data-prev="m/s"
+          data-id="i11"
+        >
+        <option value="m/s" selected>meters per second (m/s)</option>
+        <option value="km/h">kilometers per hour (km/h)</option>
+        <option value="ft/s">feet per second (ft/s)</option>
+        <option value="mph">miles per hour (mph)</option>
+        <option value="kn">knots (kn)</option>
+        </select>
+      </p>
+
+      <p>
+        <label for="i12-input">Radius </label>
+        <input
+          type="number"
+          step="any"
+          id="i12-input"
+          class="inputs"
+          min="0"
+          autocomplete="off"
+          data-id="i12"
+          step="any"
+          data-name="Radius"
+        />
+        <select 
+          class="selects"
+          id="i12-select"
+          data-type="distance"
+          data-prev="m"
+          data-id="i12"
+        >
+        <option value="mm">millimeters (mm)</option>
+        <option value="cm">centimeters (cm)</option>
+        <option value="m" selected>meters (m)</option>
+        <option value="km">kilometers (km)</option>
+        <option value="in">inches (in)</option>
+        <option value="ft">feet (ft)</option>
+        <option value="yd">yards (yd)</option>
+        <option value="mi">miles (mi)</option>
+        </select>
+      </p>
+    </div>
+      
+      <button id="calcBtn">Calculate</button>
+      <button id="resetBtn">Reset</button>
+      <hr>
+      <div>
+        <h3>Result:</h3>
+        <h3 id="calcResults">Result will appear here...</h3>
+      </div>
+    <script>
+      /*************** ELEMENTS ***************/
+
+      const methodsUnitEl = document.getElementById("methodsUnit");
+      const containersEl = document.querySelectorAll('.containers')
+      const inputs = document.querySelectorAll('.inputs')
+      const selects = document.querySelectorAll('.selects')
+
+      const viSelect = document.getElementById("vi-select");
+      const vfSelect = document.getElementById("vf-select");
+      const aSelect = document.getElementById("a-select");
+
+      const calcBtnEl = document.getElementById('calcBtn');
+      const resetBtnEl = document.getElementById('resetBtn');
+      const calcResultsEl = document.getElementById('calcResults')
+
+      /*************** GLOBAL VARIABLES ***************/
+      const UNITS = {
+        angularFrequency: {
+          rpm: 9.5492965855137,
+          "rad/s": 1,
+          Hz: 0.1591549430919,
+        },
+        time: {
+          sec: 1,
+          min: 0.016666666666666666,
+          hrs: 0.0002777777777777778,
+          days: 0.000011574074074074075,
+          wks: 0.0000016534391534391535,
+          mos: 3.8025705376834745e-7,
+          yrs: 3.1688087814028954e-8,
+        },
+        distance: {
+          mm: 1000,
+          cm: 100,
+          m: 1,
+          km: 0.001,
+          in: 39.37007874015748,
+          ft: 3.2808398950131235,
+          yd: 1.0936132983377078,
+          mi: 0.0006213711922373339,
+        },
+        speed: {
+          "m/s": 1,
+          "km/h": 3.6,
+          "ft/s": 3.280839895,
+          mph: 2.2369362921,
+          kn: 1.9438444924,
+        },
+        angle: {
+          deg: 57.29577951308232,
+          rad: 1,
+          gon: 63.66197723675813,
+          tr: 0.15915494309189535,
+          arcmin: 3437.746770784939,
+          arcsec: 206264.80624709636,
+          mrad: 1000,
+          μrad: 1e6,
+          πrad: 0.3183098861837907,
+        },
+      };
+      /*************** FUNCTIONS ***************/
+      function toSIUnit(type, unit, value) {
+        return value / UNITS[type][unit];
+      }
+
+      function fromSIUnit(type, unit, value) {
+        return value * UNITS[type][unit];
+      }
+  
+      function handleMethodsUnitChange(e) {
+        const value = e.target.value
+        containersEl.forEach((container) => {
+          let idVal = container.id.slice(0, 2)     
+          if (idVal == value) {
+            container.style.display = 'block'
+          } else {
+            container.style.display = 'none'
+          }
+        })
+        
+        resetResult()
+      }  
+
+      function createElement() {
+        const newDiv = `
+            <p>
+              <label for="i41-span">Angular velocity (ω): &nbsp;</label>
+              <span
+                data-id="i41"
+                step="any"
+                id="i41-span"
+                class="spans"
+                data-name="Angular velocity (ω)"
+              ></span>
+              <select
+                class="selectsResult"
+                id="i41-select"
+                data-type="angularFrequency"
+                data-prev="rad/s"
+                data-id="i41"
+              >
+                <option value="rpm">rotations per minute (rpm)</option>
+                <option value="rad/s" selected>radians per second (rad/s)</option>
+                <option value="Hz">hertz (Hz)</option>
+              </select>
+            </p>
+        `
+        const newDiv2 = `
+            <p>
+              <label for="i42-span">Angle change (Δα): &nbsp;</label>
+              <span
+                data-id="i42"
+                step="any"
+                id="i42-span"
+                class="spans"
+                data-name="Angle change (Δα)"
+              ></span>
+              <select
+                class="selectsResult"
+                id="i42-select"
+                data-type="angle"
+                data-prev="deg"
+                data-id="i42"
+              >
+                <option value="deg" selected>degrees (deg)</option>
+                <option value="rad">radians (rad)</option>
+                <option value="gon">gradians (gon)</option>
+                <option value="tr">turns (tr)</option>
+                <option value="arcmin">minutes of arc (arcmin)</option>
+                <option value="arcsec">seconds of arc (arcsec)</option>
+                <option value="mrad">milliradians (mrad)</option>
+                <option value="μrad">microradians (μrad)</option>
+                <option value="πrad">radians (× π rad)</option>
+              </select>
+            </p>
+        `
+        const find = methodsUnitEl.value
+        if (find === "i1") {
+          return newDiv2 + newDiv
+        } else {
+          return newDiv
+        } 
+      }
+
+      // related to caculation
+      function prepareUnit(...args) {
+        const resultArr = [];
+        for (id of args) {
+          const input = document.getElementById(`${id}-input`);
+          const select = document.getElementById(`${id}-select`);
+          const type = select.getAttribute("data-type");
+          let val = parseFloat(input.value);
+
+          val = isNaN(val) ? 0 : val;
+          let inUnit = select.value;
+
+          val = toSIUnit(type, inUnit, val);
+
+          resultArr.push(val);
+        }
+
+        return resultArr;
+      }
+
+      function setResult(resultObj) {
+        for (key of Object.keys(resultObj)) {
+          let val = resultObj[key].result;
+          let id = resultObj[key].type;
+
+          if (isNaN(val)) {
+           alert("Your input resulted in NAN.\n 0/0 \n Try again with valid input.");
+            return;
+          }
+          if (Math.abs(val) === Infinity) {
+            alert("Your input resulted in Infinity. \nDivision by zero. \nTry again with valid input.");
+            return;
+          }
+          const span = document.getElementById(`${id}-span`);
+          const select = document.getElementById(`${id}-select`);
+          const type = select.getAttribute("data-type");
+          let outUnit = select.value;
+          val = fromSIUnit(type, outUnit, val);
+          val = val > 1 ? val.toFixed(4) * 1 : val
+          span.textContent = parseFloat(val);
+        }
+      }
+
+      function calculateResult(input) {       
+        function calculatei1() {
+          let [val1, val2, val3] = prepareUnit("i1", "i2", "i3");
+          val1 = fromSIUnit('angle', "rad", val1)
+          val2 = fromSIUnit('angle', "rad", val2)
+          let diff = val2 - val1
+          let result = diff / val3
+
+          return {
+            1: { result: result > 1 ? result.toFixed(4) * 1 : result, type: "i41" },
+            2: { result: diff, type: "i42"}
+          };
+        }
+
+        function calculatei2() {
+          let [val1, val2] = prepareUnit("i11", "i12");
+          let result = val1 / val2
+
+          return {
+            1: { result: result > 1 ? result.toFixed(4) * 1 : result, type: "i41" },
+          };
+        }
+
+        switch(input) {
+          case "i1":
+            return calculatei1()
+          case "i2":
+            return calculatei2()
+          default:
+          console.log("error in calculate result switch");
+        }
+      }
+
+      function validateInput(id) {
+        const input = document.getElementById(`${id}-input`);
+        const label = input.getAttribute("data-name").trim();
+        let value = parseFloat(input.value);
+        if (isNaN(value)) {
+          alert(`${label} value cannot be empty.`);
+          return false;
+        } 
+
+        if (value < 0) {
+          alert(`${label} value cannot be negative.`);
+          return false;
+        }
+
+        return true;
+      }
+
+      function handleResultsChange(e) {
+        let select = e.target;
+        let id = select.getAttribute("data-id");
+        let span = document.getElementById(`${id}-span`);
+
+        let prevUnit = select.getAttribute("data-prev");
+        let currentUnit = select.value;
+        select.setAttribute("data-prev", currentUnit);
+
+        if (span.textContent === "") {
+          return;
+        }
+
+        let type = select.getAttribute("data-type");
+
+        let value = parseFloat(span.textContent);
+        value = parseFloat(value);
+        if (isNaN(value)) value = 0.0;
+
+        let si = toSIUnit(type, prevUnit, value);
+        let result = fromSIUnit(type, currentUnit, si);
+        span.textContent = parseFloat(result).toFixed(5) * 1;
+      }
+
+      function calculateResults() {
+        const find = methodsUnitEl.value
+        if (find === "i1") {
+          for (el of ["i1", "i2", "i3"]) {
+            if (!validateInput(el)) return;
+          }
+        } else {
+          for (el of ["i11", "i12"]) {
+            if (!validateInput(el)) return;
+          }
+        }
+        
+        try {
+          const resultElement = createElement()
+          calcResultsEl.innerHTML = resultElement
+
+          const newSelects = document.querySelectorAll(".selectsResult");
+
+          newSelects.forEach((select) => {
+            select.addEventListener("change", handleResultsChange);
+          });
+        
+          const result = calculateResult(find);
+          setResult(result)
+          
+
+        } catch(error) {
+          alert("An error ocurred. Try again with valid input.");
+          resetResult()
+          return;
+        }
+      }
+
+      function resetForm() {
+        selects.forEach((select) => {
+          if (select.getAttribute("data-type") === "distance") {
+            select.selectedIndex = '2'
+          } else {
+            select.selectedIndex = '0'
+          }
+        });
+
+        inputs.forEach((input) => {
+          input.value = ""
+        });
+
+        methodsUnitEl.selectedIndex = "0"
+        containersEl.forEach((container) => {
+          let idVal = container.id.slice(0, 2)     
+          if (idVal == "i1") {
+            container.style.display = 'block'
+          } else {
+            container.style.display = 'none'
+          }
+        })
+
+      }
+
+      function resetResult() {
+        calcResultsEl.innerHTML = "<p>Result will appear here...</p>";
+      } 
+
+      function resethandler() {
+        resetForm();
+        resetResult();
+      }
+
+      /*************** EVENTLISTINERS ***************/
+      inputs.forEach((el) => {
+        el.addEventListener("input", resetResult);
+      });
+
+      selects.forEach((el) => {
+        el.addEventListener("change", resetResult);
+      });
+
+      methodsUnitEl.addEventListener("change", handleMethodsUnitChange)
+      resetBtnEl.addEventListener("click", resethandler);
+      calcBtnEl.addEventListener("click", calculateResults);
+    </script>
+  </body>
+</html>

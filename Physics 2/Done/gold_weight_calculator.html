@@ -1,0 +1,1007 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>dB Calculator</title>
+  </head>
+  <body>
+    <h1>dB Calculator</h1>
+      <p>
+        Shape:
+        <select id="shapeUnit">
+          <option value="st" selected>Sheet</option>
+          <option value="we">Wire</option>
+          <option value="te">Tube</option>
+          <option value="re">Rondelle</option>
+        </select>
+      </p>
+      <div>
+        <h3>Material</h3>
+        <p>
+          <label>Material:</label>
+          <select id="materialSelect">
+            <option value="333">Gold - 333</option>
+            <option value="585">Gold - 585</option>
+            <option value="750">Gold - 750</option>
+            <option value="917">Gold - 917</option>
+            <option value="fine">Gold - fine</option>
+            <option value="lead">Lead</option>
+            <option value="p950">Palladium - 950</option>
+            <option value="pl960">Platinum - 960</option>
+            <option value="r585">Rose - 585</option>
+            <option value="s925">Silver - 925</option>
+            <option value="s935">Silver - 935</option>
+            <option value="sFine">Silver - fine</option>
+            <option value="w750">White gold - 750</option>
+            <option value="">Enter a custom density</option>
+          </select>
+        </p>
+
+        <p>
+          <label for="i1-input">Density</label>
+          <input
+            type="number"
+            min="0"
+            autocomplete="off"
+            data-id="i1"
+            step="any"
+            id="i1-input"
+            class="inputs"
+            data-name="Density"
+            value="10800"
+            disabled
+          />
+          <select
+            class="selects"
+            id="i1-select"
+            data-type="density"
+            data-prev="kg/m³"
+            data-id="i1"
+          >
+          <option value="kg/m³" selected>kilograms per cubic meter (kg/m³)</option>
+            <option value="lb/ft³">pounds per cubic feet (lb/ft³)</option>
+            <option value="g/cm³">grams per cubic centimeter (g/cm³)</option>
+            <option value="kg/cm³">kilograms per cubic centimeter (kg/cm³)</option>
+          </select>
+          </select>
+        </p>
+        
+        <p>
+          <label for="i2-input">Wastage</label>
+          <input
+            type="number"
+            min="0"
+            autocomplete="off"
+            data-id="i2"
+            step="any"
+            id="i2-input"
+            class="inputs"
+            data-name="Wastage"
+            value="0"
+          /> %
+          <select
+            class="selects"
+            id="i2-select"
+            data-type="exp"
+            data-prev="exp"
+            data-id="i2"
+            style="display: none;"
+          >
+            <option value="exp"></option>
+          </select>
+
+        </p>
+      </div>
+
+      <div id="st-container" class="containers">
+        <h3>Sheet</h3>
+        <p>
+          <label for="i11-input">Length</label>
+          <input
+            type="number"
+            min="0"
+            autocomplete="off"
+            data-id="i11"
+            step="any"
+            id="i11-input"
+            class="inputs"
+            data-name="Length"
+          />
+          <select
+            class="selects"
+            id="i11-select"
+            data-type="distance"
+            data-prev="m"
+            data-id="i11"
+          >
+          <option value="mm">millimeters (mm)</option>
+          <option value="cm">centimeters (cm)</option>
+          <option value="m" selected>meters (m)</option>
+          <option value="in">inches (in)</option>
+          <option value="ft">feet (ft)</option>
+          <option value="yd">yards (yd)</option>
+          </select>
+        </p>
+
+        <p>
+          <label for="i12-input">Width</label>
+          <input
+            type="number"
+            min="0"
+            autocomplete="off"
+            data-id="i12"
+            step="any"
+            id="i12-input"
+            class="inputs"
+            data-name="Width"
+          />
+          <select
+            class="selects"
+            id="i12-select"
+            data-type="distance"
+            data-prev="m"
+            data-id="i12"
+          >
+            <option value="mm">millimeters (mm)</option>
+            <option value="cm">centimeters (cm)</option>
+            <option value="m" selected>meters (m)</option>
+            <option value="in">inches (in)</option>
+            <option value="ft">feet (ft)</option>
+            <option value="yd">yards (yd)</option>
+          </select>
+        </p>
+
+        <p>
+          <label for="i13-input">Thickness</label>
+          <input
+            type="number"
+            min="0"
+            autocomplete="off"
+            data-id="i13"
+            step="any"
+            id="i13-input"
+            class="inputs"
+            data-name="Sound wave pressure"
+          />
+          <select
+            class="selects"
+            id="i13-select"
+            data-type="distance"
+            data-prev="mm"
+            data-id="i13"
+          >
+            <option value="mm" selected>millimeters (mm)</option>
+            <option value="cm">centimeters (cm)</option>
+            <option value="m">meters (m)</option>
+            <option value="in">inches (in)</option>
+            <option value="ft">feet (ft)</option>
+            <option value="yd">yards (yd)</option>
+          </select>
+        </p>
+      </div>
+
+      <div id="we-container" class="containers" style="display: none;">
+        <h3>Wire</h3>
+        <p>
+          <label for="i21-input">Length </label>
+          <input
+            type="number"
+            min="0"
+            autocomplete="off"
+            data-id="i21"
+            step="any"
+            id="i21-input"
+            class="inputs"
+            data-name="Length"
+          />
+          <select
+            class="selects"
+            id="i21-select"
+            data-type="distance"
+            data-prev="m"
+            data-id="i21"
+          >
+            <option value="mm">millimeters (mm)</option>
+            <option value="cm">centimeters (cm)</option>
+            <option value="m" selected>meters (m)</option>
+            <option value="in">inches (in)</option>
+            <option value="ft">feet (ft)</option>
+            <option value="yd">yards (yd)</option>
+          </select>
+        </p>
+
+        <p>
+          <label for="i22-input">Radius</label>
+          <input
+            type="number"
+            min="0"
+            autocomplete="off"
+            data-id="i22"
+            step="any"
+            id="i22-input"
+            class="inputs"
+            data-name="Radius"
+          />
+          <select
+            class="selects"
+            id="i22-select"
+            data-type="distance"
+            data-prev="mm"
+            data-id="i22"
+          >
+            <option value="mm" selected>millimeters (mm)</option>
+            <option value="cm">centimeters (cm)</option>
+            <option value="m">meters (m)</option>
+            <option value="in">inches (in)</option>
+            <option value="ft">feet (ft)</option>
+            <option value="yd">yards (yd)</option>
+          </select>
+        </p>
+      </div>
+
+      <div id="te-container" class="containers" style="display: none;">
+        <h3>Tube</h3>
+        <p>
+          <label for="i31-input">Inner radius</label>
+          <input
+            type="number"
+            min="0"
+            autocomplete="off"
+            data-id="i31"
+            step="any"
+            id="i31-input"
+            class="inputs"
+            data-name="Inner radius"
+          />
+          <select
+            class="selects"
+            id="i31-select"
+            data-type="distance"
+            data-prev="mm"
+            data-id="i31"
+          >
+          <option value="mm" selected>millimeters (mm)</option>
+          <option value="cm">centimeters (cm)</option>
+          <option value="m">meters (m)</option>
+          <option value="in">inches (in)</option>
+          <option value="ft">feet (ft)</option>
+          <option value="yd">yards (yd)</option>
+          </select>
+        </p>
+
+        <p>
+          <label for="i32-input">Outer radius</label>
+          <input
+            type="number"
+            min="0"
+            autocomplete="off"
+            data-id="i32"
+            step="any"
+            id="i32-input"
+            class="inputs"
+            data-name="Outer radius"
+          />
+          <select
+            class="selects"
+            id="i32-select"
+            data-type="distance"
+            data-prev="mm"
+            data-id="i32"
+          >
+            <option value="mm" selected>millimeters (mm)</option>
+            <option value="cm">centimeters (cm)</option>
+            <option value="m">meters (m)</option>
+            <option value="in">inches (in)</option>
+            <option value="ft">feet (ft)</option>
+            <option value="yd">yards (yd)</option>
+          </select>
+        </p>
+
+        <p>
+          <label for="i33-input">Length</label>
+          <input
+            type="number"
+            min="0"
+            autocomplete="off"
+            data-id="i33"
+            step="any"
+            id="i33-input"
+            class="inputs"
+            data-name="Length"
+          />
+          <select
+            class="selects"
+            id="i33-select"
+            data-type="distance"
+            data-prev="m"
+            data-id="i33"
+          >
+            <option value="mm">millimeters (mm)</option>
+            <option value="cm">centimeters (cm)</option>
+            <option value="m" selected>meters (m)</option>
+            <option value="in">inches (in)</option>
+            <option value="ft">feet (ft)</option>
+            <option value="yd">yards (yd)</option>
+          </select>
+        </p>
+      </div>
+
+      <div id="re-container" class="containers" style="display: none;">
+        <h3>Rondelle</h3>
+        <p>
+          <label for="i41-input">Radius </label>
+          <input
+            type="number"
+            min="0"
+            autocomplete="off"
+            data-id="i41"
+            step="any"
+            id="i41-input"
+            class="inputs"
+            data-name="Radius"
+          />
+          <select
+            class="selects"
+            id="i41-select"
+            data-type="distance"
+            data-prev="m"
+            data-id="i41"
+          >
+            <option value="mm">millimeters (mm)</option>
+            <option value="cm">centimeters (cm)</option>
+            <option value="m" selected>meters (m)</option>
+            <option value="in">inches (in)</option>
+            <option value="ft">feet (ft)</option>
+            <option value="yd">yards (yd)</option>
+          </select>
+        </p>
+
+        <p>
+          <label for="i42-input">Thickness</label>
+          <input
+            type="number"
+            min="0"
+            autocomplete="off"
+            data-id="i42"
+            step="any"
+            id="i42-input"
+            class="inputs"
+            data-name="Thickness"
+          />
+          <select
+            class="selects"
+            id="i42-select"
+            data-type="distance"
+            data-prev="mm"
+            data-id="i42"
+          >
+            <option value="mm" selected>millimeters (mm)</option>
+            <option value="cm">centimeters (cm)</option>
+            <option value="m">meters (m)</option>
+            <option value="in">inches (in)</option>
+            <option value="ft">feet (ft)</option>
+            <option value="yd">yards (yd)</option>
+          </select>
+        </p>
+      </div>
+
+      <p>
+        <label for="i51-input">Cost per unit mass</label>
+          <input
+            type="number"
+            min="0"
+            autocomplete="off"
+            data-id="i51"
+            step="any"
+            id="i51-input"
+            class="inputs"
+            data-name="Cost per unit mass"
+          /> /
+        <select
+          class="selects"
+          id="i51-select"
+          data-type="mass"
+          data-prev="g"
+          data-id="i51"
+        >
+          <option value="mg">milligrams (mg)</option>
+          <option value="g" selected>grams (g)</option>
+          <option value="dag">decagrams (dag)</option>
+          <option value="kg">kilograms (kg)</option>
+          <option value="t">metric ton (t)</option>
+          <option value="dr">drachms (dr)</option>
+          <option value="oz">ounces (oz)</option>
+          <option value="lb">pounds (lb)</option>
+          <option value="oz t">troy ounces (oz t)</option>
+        </select>
+      </p>
+
+      <button id="calcBtn">Calculate</button>
+      <button id="resetBtn">Reset</button>
+      <hr>
+      <div>
+        <h3>Result:</h3>
+        <h3 id="calcResults">Result will appear here...</h3>
+      </div>
+
+    <script>
+      /*************** ELEMENTS ***************/
+      const shapeUnitEl = document.getElementById("shapeUnit");
+      const materialSelectEl = document.getElementById("materialSelect");
+      const selects = document.querySelectorAll(".selects");
+      const inputs = document.querySelectorAll(".inputs");
+      const containersEl = document.querySelectorAll(".containers");
+
+      const calcBtnEl = document.getElementById('calcBtn');
+      const resetBtnEl = document.getElementById('resetBtn');
+      const calcResultsEl = document.getElementById('calcResults')
+
+      /*************** GLOBAL VARIBLES ***************/
+      const UNITS = {
+        mass: {
+          mg: 1000000,
+          g: 1000,
+          kg: 1,
+          gr: 15432.35835294143,
+          oz: 35.27396194958041,
+          lb: 2.2046226218487757,
+          "oz t": 32.15074656862798,
+        },
+        distance: {
+          mm: 1e3,
+          cm: 1e2,
+          m: 1,
+          km: 1e-3,
+          in: 39.370078740157474,
+          ft: 3.2808398950131235,
+          yd: 1.0936132983377078,
+          mi: 0.0006213711922373339,
+          nmi: 0.0005399568034557235,
+        },
+        pressure: {
+          Pa: 1,
+          bar: 0.00001,
+          psi: 0.0001450377,
+          at: 0.0000101972,
+          atm: 0.0000098692,
+          Torr: 0.0075006168,
+          hPa: 0.01,
+          kPa: 0.001,
+          MPa: 0.000001,
+          GPa: 1e-9,
+          inHg: 0.0002953006,
+          mmHg: 0.0075006376,
+        },
+        power: {
+          mW: 1e3,
+          W: 1,
+          kW: 1e-3,
+          MW: 1e-6,
+          GW: 1e-9,
+          "BTU/h": 3.412141633,
+          "hp(l)": 0.00134102,
+        },
+        area: {
+          "mm²": 1000000,
+          "cm²": 10000,
+          "m²": 1,
+          "in²": 1550.003100006200012400024800049600099200198400396800793601587,
+          "ft²": 10.763910416709722308333505555900000688890266669422227733344,
+          "yd²": 1.195990046301080256481500617322222298765585185491358637038,
+        },
+        exp: {
+          exp: 1
+        },
+        density: {
+          "kg/m³": 1,
+          "lb/ft³": 0.06242796059999999,
+          "g/cm³": 0.001,
+          "kg/cm³": 0.000001,
+        },
+        volume: {
+          m3: 1,
+          mm3: 1000000000,
+          cm3: 1000000,
+          "cu in": 61023.744095,
+          "cu ft": 35.314666721,
+          "cu yd": 1.3079506193,
+        },
+      };
+
+      /*************** FUNCTIONS ***************/
+      function toSIUnit(type, unit, value) {
+        if (type === "temperature") {
+          return UNITS[type][unit](value, "+");
+        }
+        return value / UNITS[type][unit];
+      }
+
+      function fromSIUnit(type, unit, value) {
+        if (type === "temperature") {
+          return UNITS[type][unit](value, "-");
+        }
+        return value * UNITS[type][unit];
+      }
+
+      function handleShapeUnitChange(e) {
+        const value = e.target.value
+
+        containersEl.forEach((container) => {
+          let idVal = container.id.slice(0, 2)
+          if (value == idVal) {
+            container.style.display = 'block'
+          } else {
+            container.style.display = 'none'
+          }
+        })
+        resetResult()
+      }
+
+      function handleMaterialChange(e) {
+        const value = e.target.value
+        const densityEl = document.getElementById('i1-input')
+        const select = document.getElementById(`i1-select`);
+        const type = select.getAttribute("data-type");
+
+        let inUnit = select.value;
+
+        if (value === "333") {
+          let val = 10800
+          val = toSIUnit(type, inUnit, val);
+          densityEl.value = val
+          densityEl.disabled = true
+        } else if (value === "585") {
+          let val = 13500
+          val = toSIUnit(type, inUnit, val);
+          densityEl.value = val
+          densityEl.disabled = true
+        } else if (value === "750") {
+          let val = 13500
+          val = toSIUnit(type, inUnit, val);
+          densityEl.value = val
+          densityEl.disabled = true
+        } else if (value === "917") {
+          let val = 17600
+          val = toSIUnit(type, inUnit, val);
+          densityEl.value = val
+          densityEl.disabled = true
+        } else if (value === "fine") {
+          let val = 19300
+          val = toSIUnit(type, inUnit, val);
+          densityEl.value = val
+          densityEl.disabled = true
+        } else if (value === "lead") {
+          let val = 11350
+          val = toSIUnit(type, inUnit, val);
+          densityEl.value = val
+          densityEl.disabled = true
+        } else if (value === "p950") {
+          let val = 20000
+          val = toSIUnit(type, inUnit, val);
+          densityEl.value = val
+          densityEl.disabled = true
+        } else if (value === "pl960") {
+          let val = 20300
+          val = toSIUnit(type, inUnit, val);
+          densityEl.value = val
+          densityEl.disabled = true
+        } else if (value === "r585") {
+          let val = 12900
+          val = toSIUnit(type, inUnit, val);
+          densityEl.value = val
+          densityEl.disabled = true
+        } else if (value === "s925") {
+          let val = 10300
+          val = toSIUnit(type, inUnit, val);
+          densityEl.value = val
+          densityEl.disabled = true
+        } else if (value === "s935") {
+          let val = 10300
+          val = toSIUnit(type, inUnit, val);
+          densityEl.value = val
+          densityEl.disabled = true
+        } else if (value === "sFine") {
+          let val = 10500
+          val = toSIUnit(type, inUnit, val);
+          densityEl.value = val
+          densityEl.disabled = true
+        } else if (value === "w750") {
+          let val = 15700
+          val = toSIUnit(type, inUnit, val);
+          densityEl.value = val
+          densityEl.disabled = true
+        } else {
+          densityEl.value = ""
+          densityEl.disabled = false
+        }
+
+        resetResult()
+      }
+
+      function createElement() {
+        const newDiv = `
+            <p>
+              <label for="i8-span">Volume: &nbsp;</label>
+              <span
+                data-id="i8"
+                step="any"
+                id="i8-span"
+                class="spans"
+                data-name="Volume"
+              ></span>
+              <select
+                class="selectsResult"
+                id="i8-select"
+                data-type="volume"
+                data-prev="m3"
+                data-id="i8"
+              >
+                <option value="mm3">cubic millimeters (mm3)</option>
+                <option value="cm3">cubic centimeters (cm3)</option>
+                <option value="m3" selected>cubic meters (m3)</option>
+                <option value="cu in">cubic inches (cu in)</option>
+                <option value="cu ft">cubic feet (cu ft)</option>
+                <option value="cu yd">cubic yards (cu yd)</option>
+              </select>
+            </p>
+            <h3>Weight and cost</h3>
+            <p>
+              <label for="i6-span">Weight / Mass: &nbsp;</label>
+              <span
+                data-id="i6"
+                step="any"
+                id="i6-span"
+                class="spans"
+                data-name="Weight / Mass"
+              ></span>
+              <select
+                class="selectsResult"
+                id="i6-select"
+                data-type="mass"
+                data-prev="kg"
+                data-id="i6"
+              >
+                <option value="mg">milligrams (mg)</option>
+                <option value="g">grams (g)</option>
+                <option value="kg" selected>kilograms (kg)</option>
+                <option value="gr">grains (gr)</option>
+                <option value="oz">ounces (oz)</option>
+                <option value="lb">pounds (lb)</option>
+                <option value="oz t">troy ounces (oz t)</option>
+              </select>
+            </p>
+        `
+        const newDiv2 = `
+            <p>
+              <label for="i7-span">Cost: &nbsp;</label>
+              <span
+                data-id="i7"
+                step="any"
+                id="i7-span"
+                class="spans"
+                data-name="Cost"
+              ></span>
+              <select
+                class="selectsResult"
+                id="i7-select"
+                data-type="exp"
+                data-prev="exp"
+                data-id="i7"
+                style="display: none;"
+              >
+                <option value="exp" selected></option>
+              </select>
+            </p>
+        `
+        let cost = document.getElementById("i51-input").value
+        if (!isNaN(cost)) {
+          return newDiv + newDiv2
+        }
+        return newDiv
+        
+      }
+
+      // related to caculation
+      function prepareUnit(...args) {
+        const resultArr = [];
+        for (id of args) {
+          const input = document.getElementById(`${id}-input`);
+          const select = document.getElementById(`${id}-select`);
+          const type = select.getAttribute("data-type");
+          let val = parseFloat(input.value);
+
+          val = isNaN(val) ? 0 : val;
+          let inUnit = select.value;
+
+          val = toSIUnit(type, inUnit, val);
+          
+          resultArr.push(val);
+        }
+
+        return resultArr;
+      }
+
+      function setResult(resultObj) {
+        for (key of Object.keys(resultObj)) {
+          let val = resultObj[key].result;
+          let id = resultObj[key].type;
+
+          if (isNaN(val)) {
+           alert("Your input resulted in NAN.\n 0/0 \n Try again with valid input.");
+            return;
+          }
+          if (Math.abs(val) === Infinity) {
+            alert("Your input resulted in Infinity. \nDivision by zero. \nTry again with valid input.");
+            return;
+          }
+          const span = document.getElementById(`${id}-span`);
+          const select = document.getElementById(`${id}-select`);
+          const type = select.getAttribute("data-type");
+          let outUnit = select.value;
+          val = fromSIUnit(type, outUnit, val);
+
+          span.textContent = parseFloat(val);
+        }
+      }
+
+      function calculateResult(input) {  
+        let [density, wastage] = prepareUnit("i1", "i2")
+        let cost = document.getElementById("i51-input").value
+
+        if (!isNaN(cost)) {
+          const select = document.getElementById(`i51-select`);
+          let inUnit = select.value;
+          cost = fromSIUnit("mass", inUnit, cost)
+        }
+
+        function calculateST() {
+          let [val1, val2, val3] = prepareUnit("i11", "i12", "i13");
+          val3 = fromSIUnit('distance', 'm', val3)
+          let volume = val1 * val2 * val3
+          let mass = (density * volume) * (1 - (wastage / 100))
+          let result = {
+            1: { result: mass > 1 ? mass.toFixed(4) * 1 : mass, type: "i6" },
+            3: { result: volume > 1 ? volume.toFixed(4) * 1 : volume, type: "i8" },
+          }
+          if (!isNaN(cost)) {
+            let totalCost = mass * cost
+            return {
+              ...result,
+              2: { result: totalCost > 1 ? totalCost.toFixed() : totalCost, type: "i7" }
+            }
+          }
+          return {
+            ...result
+          };
+        }
+
+        function calculateWE() {
+          let [val1, val2] = prepareUnit("i21", "i22");
+          let volume = Math.PI *  val1 * (val2 ** 2) 
+          let mass = (density * volume) * (1 - (wastage / 100))
+          let result = {
+            1: { result: mass > 1 ? mass.toFixed(4) * 1 : mass, type: "i6" },
+            3: { result: volume > 1 ? volume.toFixed(4) * 1 : volume, type: "i8" },
+          }
+          if (!isNaN(cost)) {
+            let totalCost = mass * cost
+            return {
+              ...result,
+              2: { result: totalCost > 1 ? totalCost.toFixed() : totalCost, type: "i7" }
+            }
+          }
+          return {
+            ...result
+          };
+        }
+
+        function calculateTE() {
+          let [val1, val2, val3] = prepareUnit("i31", "i32", "i33");
+          let volume = Math.PI * (((val2 ** 2) - (val1 ** 2))) * val3
+          let mass = (density * volume) * (1 - (wastage / 100))
+          let result = {
+            1: { result: mass > 1 ? mass.toFixed(4) * 1 : mass, type: "i6" },
+            3: { result: volume > 1 ? volume.toFixed(4) * 1 : volume, type: "i8" },
+          }
+          if (!isNaN(cost)) {
+            let totalCost = mass * cost
+            return {
+              ...result,
+              2: { result: totalCost > 1 ? totalCost.toFixed(): totalCost, type: "i7" }
+            }
+          }
+          return {
+            ...result
+          };
+        }
+
+        function calculateRE() {
+          let [val1, val2] = prepareUnit("i41", "i42");
+          let volume = Math.PI * (val1 ** 2) * val2
+          let mass = (density * volume) * (1 - (wastage / 100))
+          let result = {
+            1: { result: mass > 1 ? mass.toFixed(4) * 1 : mass, type: "i6" },
+            3: { result: volume > 1 ? volume.toFixed(4) * 1 : volume, type: "i8" },
+          }
+          if (!isNaN(cost)) {
+            let totalCost = mass * cost
+            return {
+              ...result,
+              2: { result: totalCost > 1 ? totalCost.toFixed() : totalCost, type: "i7" }
+            }
+          }
+          return {
+            ...result
+          };
+        }
+
+        switch(input) {
+          case "st":
+            return calculateST()
+          case "we":
+            return calculateWE()
+          case "te":
+            return calculateTE()
+          case "re":
+            return calculateRE()
+          default:
+          console.log("error in calculate result switch");
+        }
+      }
+
+      function validateInput(id) {
+        const input = document.getElementById(`${id}-input`);
+        const label = input.getAttribute("data-name").trim();
+        let value = parseFloat(input.value);
+        if (isNaN(value)) {
+          alert(`${label} value cannot be empty.`);
+          return false;
+        } 
+
+        if (id === 'i32' || id === "i31") {
+           const outer = parseFloat(document.getElementById(`i32-input`).value)
+           const inner = parseFloat(document.getElementById(`i31-input`).value)
+           if (!isNaN(outer) && !isNaN(inner)) {
+            if (outer <= inner) {
+              alert(`Outer radius should be larger than inner radius. .`);
+              return false;
+            }
+           }
+        }
+
+        if (value < 0) {
+          alert(`${label} value cannot be negative.`);
+          return false;
+        }
+
+        return true;
+      }
+
+      function handleResultsChange(e) {
+        let select = e.target;
+        let id = select.getAttribute("data-id");
+        let span = document.getElementById(`${id}-span`);
+
+        let prevUnit = select.getAttribute("data-prev");
+        let currentUnit = select.value;
+        select.setAttribute("data-prev", currentUnit);
+
+        if (span.textContent === "") {
+          return;
+        }
+
+        let type = select.getAttribute("data-type");
+
+        let value = parseFloat(span.textContent);
+        value = parseFloat(value);
+        if (isNaN(value)) value = 0.0;
+
+        let si = toSIUnit(type, prevUnit, value);
+        let result = fromSIUnit(type, currentUnit, si);
+        span.textContent = parseFloat(result).toFixed(5) * 1;
+      }
+
+      function calculateResults() {
+        const shapeUnit = shapeUnitEl.value
+        if (!validateInput("i1")) return;
+
+        if (shapeUnit === "st") {
+          for (el of ["i11", "i12", "i13"]) {
+            if (!validateInput(el)) return;
+          }
+        } else if (shapeUnit === "we") {
+          for (el of ["i21", "i22"]) {
+            if (!validateInput(el)) return;
+          }
+        } else if (shapeUnit === "te") {
+          for (el of ["i31", "i32", "i33"]) {
+            if (!validateInput(el)) return;
+          }
+        } else {
+          for (el of ["i41", "i42"]) {
+            if (!validateInput(el)) return;
+          }
+        }
+        
+        try {
+          const resultElement = createElement()
+          calcResultsEl.innerHTML = resultElement
+
+          const newSelects = document.querySelectorAll(".selectsResult");
+
+          newSelects.forEach((select) => {
+            select.addEventListener("change", handleResultsChange);
+          });
+          const result = calculateResult(shapeUnit);
+          setResult(result)
+
+        } catch(error) {
+          alert("An error ocurred. Try again with valid input.");
+          resetResult()
+          return;
+        }
+      }
+
+      function resetForm() {
+        selects.forEach((select) => {
+          if (select.getAttribute("data-prev") === "m") {
+            select.selectedIndex = '2'
+          } else if (select.getAttribute("data-prev") === "g") {
+            select.selectedIndex = '1'
+          } else {
+            select.selectedIndex = '0'
+          }
+        });
+
+        inputs.forEach((input) => {
+          if (input.getAttribute("data-name") === "Density") {
+            input.value = "10800"
+          } else if (input.getAttribute("data-name") === "Wastage") {
+            input.value = "0"
+          } else {
+            input.value = ""
+          }
+        });
+
+        shapeUnitEl.selectedIndex = '0'
+        materialSelectEl.selectedIndex = "0"
+
+        containersEl.forEach((container) => {
+          let idVal = container.id.slice(0, 2)
+          if (idVal === "st") {
+            container.style.display = 'block'
+          } else {
+            container.style.display = 'none'
+          }
+        })
+      }
+
+      function resetResult() {
+        calcResultsEl.innerHTML = "<p>Result will appear here...</p>";
+      } 
+
+      function resethandler() {
+        resetForm();
+        resetResult();
+      }
+
+      /*************** EVENT LISTINERS ***************/
+
+      selects.forEach((select) => {
+        select.addEventListener("change", resetResult);
+      });
+
+      inputs.forEach((input) => {
+        input.addEventListener("input", resetResult);
+      });
+
+      shapeUnitEl.addEventListener("change", handleShapeUnitChange)
+      materialSelectEl.addEventListener("change", handleMaterialChange)
+
+      resetBtnEl.addEventListener("click", resethandler);
+      calcBtnEl.addEventListener("click", calculateResults);
+
+    </script>
+  </body>
+</html>

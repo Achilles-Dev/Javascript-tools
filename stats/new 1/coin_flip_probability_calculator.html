@@ -114,12 +114,12 @@
 
         try {
           const results = calculateProbOfSuccess(flipsNum, numOfHeads, headsProbs, numOfHeadsSelect);
-
+          console.log((1 / results).toFixed() * 1)
           calcResultsEl.innerHTML = `
             <p>Probability of success</p>
-            <p>Probability: ${results.toFixed(5) * 1}</p>
-            <p>Chance of success: ${(results * 100).toFixed(3) * 1}%</p>
-            <p>Probability of 1 in ${(1 / results).toFixed(3) * 1} flips</p>
+            <p>Probability: ${results > 1 ? results.toFixed(5) * 1 : results}</p>
+            <p>Chance of success: ${(results * 100) > 1 ? (results * 100).toFixed(3) * 1: (results * 100)}%</p>
+            <p>Probability of 1 in ${(1 / results) > 1 ? (1 / results).toFixed() * 1 : (1 / results)} flips</p>
             
           `;
         } catch (error) {

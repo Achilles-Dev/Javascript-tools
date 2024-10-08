@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Reynolds Number Calculator</title>
+</head>
+<body>
+    <h1>Reynolds Number Calculator</h1>
+    <p>Easily calculate the Reynolds Number (Re) of a gas or liquid given its kinematic viscosity or dynamic viscosity and density, <br />
+      its velocity and characteristic length. Multiple metric and imperial measurement units are supported by the Reynolds Number calculator.
+    </p>
+    <p>
+      Solve via:
+      <select id="calcSelect">
+        <option value="dvd" selected>Dynamic viscosity & density</option>
+        <option value="kiv">Kinematic viscosity</option>
+      </select>
+    </p>
+    <div id="dvdContainer" class="containers">
+      <p>
+        Dynamic viscosity:
+        <input type="number" id="dynamicVal">
+        <select name="viscosity" id="dynamicSelect">
+          <option value="kgms" selected>kg/m·s</option>
+          <option value="nsm2">N·s/m2</option>
+          <option value="pas">Pa·s</option>
+          <option value="cp">cP</option>
+        </select>
+      </p>
+      <p>
+        Density: 
+        <input type="number" id="densityVal">
+        <select name="density" id="densitySelect">
+          <option value="g/m³">g/m3</option>
+          <option value="g/cm³">g/cm3</option>
+          <option value="kg/m³" selected>kg/m3</option>
+          <option value="kg/cm³">kg/cm3</option>
+          <option value="ozin³">oz/cu in</option>
+          <option value="lbft³">lb/cu ft</option>
+          <option value="lbyd³">lb/cu yd</option>
+          <option value="g/litre">g/litre</option>
+        </select>
+      </p>
+    </div>
+    <p id="kivContainer" class="containers" style="display: none;">
+      Kinematic viscosity: 
+      <input type="number" id="kinViscVal">
+      <select id="kinViscSelect" name="kinematicV">
+        <option value="m2s" selected>m2/s</option>
+        <option value="st">Stokes</option>
+        <option value="cst">cSt</option>
+      </select>
+    </p>
+    <p>
+      Flow velocity: 
+      <input type="number" id="flowVVal">
+      <select id="flowVSelect" name="speed" >
+        <option value="ms" selected>m/s</option>
+        <option value="kms">km/s</option>
+        <option value="mps">miles/s</option>
+        <option value="kmh">km/h</option>
+        <option value="mph">miles/h</option>
+        <option value="ins">in/s</option>
+        <option value="fts">ft/s</option>
+        <option value="yds">yd/s</option>
+        <option value="knots">knots</option>
+      </select>
+    </p>
+    <p>
+      Characteristic length: 
+      <input type="number" id="charLenVal">
+      <select id="charLenSelect" name="charLength">
+        <option value="nm">nm</option>
+        <option value="μm">μm</option>
+        <option value="mm">mm</option>
+        <option value="cm">cm</option>
+        <option value="m" selected>m</option>
+        <option value="km">km</option>
+        <option value="in">in</option>
+        <option value="ft">ft</option>
+        <option value="yd">yd</option>
+        <option value="mi">mi</option>
+      </select>
+    </p>
+    
+    <button id="calcBtn">Calculate</button>
+    <button id="resetBtn">Reset</button>
+    <hr>
+    <div>
+      <h3>Result:</h3>
+      <h3 id="calcResults">Result will appear here...</h3>
+    </div>
+
+    <script>
+      // Get required elements from the HTML
+      const calcSelectEl = document.getElementById("calcSelect");
+      const dynamicValEl = document.getElementById("dynamicVal");
+      const densityValEl = document.getElementById("densityVal");
+      const kinViscValEl = document.getElementById("kinViscVal");
+      const flowVValEl = document.getElementById("flowVVal");
+      const charLenValEl = document.getElementById("charLenVal");
+
+      const dynamicSelectEl = document.getElementById("dynamicSelect");
+      const densitySelectEl = document.getElementById("densitySelect");
+      const kinViscSelectEl = document.getElementById("kinViscSelect");
+      const flowVSelectEl = document.getElementById("flowVSelect");
+      const charLenSelectEl = document.getElementById("charLenSelect");
+
+      const containtersEl = document.querySelectorAll(".containers");
+
+      const calcBtnEl = document.getElementById('calcBtn');
+      const resetBtnEl = document.getElementById('resetBtn');
+      const calcResultsEl = document.getElementById('calcResults') 
+
+      const UNITS = {
+        density: {
+          "g/m³": 1000,
+          "g/cm³": 0.001,
+          "kg/m³": 1,
+          "kg/cm³": 0.000001,
+          "ozin³": 0.000578037,
+          "lbft³": 0.0624279606,
+          "lbyd³": 1.6855549356,
+          "g/litre": 1,
+        },
+        viscosity: {
+          "kgms": 1,
+          "nsm2": 1,
+          "pas": 1,
+          "cp": 10
+        },
+        kViscosity: {
+          "m2s": 1,
+          "st": 1e4,
+          "cst": 1e2,
+        },
+        speed: {
+          "mph": 2.2369362920544,
+          "kmh": 3.6,
+          "mps": 0.000621371,
+          "kms": 0.001,
+          "ms": 1,
+          "ins": 39.37007874015748,
+          "yds": 1.09361,
+          "fts": 3.28084,
+          knots: 1.94384,
+        },
+        distance: {
+          nm: 999999999.9999999,
+          μm: 1000000,
+          mm: 1000,
+          cm: 100,
+          m: 1,
+          km: 0.001,
+          in: 39.37007874015748,
+          ft: 3.2808398950131235,
+          yd: 1.0936132983377078,
+          mi: 0.0006213711922373339,
+        },
+      }
+
+      /*************** FUNCTIONS ***************/
+      function toSIUnit(type, unit, value) {
+        return value / UNITS[type][unit];
+      }
+
+      function fromSIUnit(type, unit, value) {
+        return value * UNITS[type][unit];
+      }
+
+      function handlecalcSelectChange(e) {
+        const value = e.target.value
+
+        containtersEl.forEach((container) => {
+          let idVal = container.id.slice(0, 3)
+          if (value == idVal) {
+            container.style.display = 'block'
+          } else {
+            container.style.display = 'none'
+          }
+        })
+      }
+
+      function prepareUnits() {
+        let dy = parseFloat(dynamicValEl.value) ?? 0;
+        let de = parseFloat(densityValEl.value) ?? 0;
+        let kv = parseFloat(kinViscValEl.value) ?? 0;
+        let fv = parseFloat(flowVValEl.value) ?? 0;
+        let cl = parseFloat(charLenValEl.value) ?? 0;
+
+        let dyUnit = dynamicSelectEl.value;
+        let deUnit = densitySelectEl.value;
+        let kvUnit = kinViscSelectEl.value;
+        let fvUnit = flowVSelectEl.value;
+        let clUnit = charLenSelectEl.value;
+
+        dy = toSIUnit("viscosity", dyUnit, dy);
+        de = toSIUnit("density", deUnit, de);
+        kv = toSIUnit("kViscosity", kvUnit, kv);
+        fv = toSIUnit("speed", fvUnit, fv);
+        cl = toSIUnit("distance", clUnit, cl);
+
+
+        return { dy, de, kv , fv, cl};
+      }
+
+      function calculateResult(input) {
+        const calculateDVD = () => {
+          const { dy, de, fv, cl } = prepareUnits();
+          let result = (de * fv * cl) / dy
+          return {
+            result: result.toFixed(4) * 1,
+            type: "dvd",
+            name: "Reynolds Number",
+          };
+        };
+
+        const calculateKIV = () => {
+          const { fv, kv, cl } = prepareUnits();
+          let result = (fv * cl) / kv
+          return {
+            result: result.toFixed(4) * 1,
+            type: "kiv",
+            name: `Reynolds Number`,
+          };
+        };
+    
+        switch (input) {
+          case "dvd":
+            return calculateDVD();
+          case "kiv":
+            return calculateKIV();
+          default:
+            console.log("error in calculate result switch");
+        }
+      }
+
+      function calculateResults() {
+        const calcUnit = calcSelectEl.value
+
+        try {
+          const { result, type, name, unit } = calculateResult(calcUnit);
+          if (isNaN(result)) {
+            alert("Your input resulted in NAN.\n 0/0 \n Try again with valid input.");
+            resetResult()
+            return;
+          }
+          if (Math.abs(result) === Infinity) {
+            alert(
+              "Your input resulted in Infinity. \nDivision by zero. \nTry again with valid input."
+            );
+            resetResult()
+            return;
+          }
+          
+          calcResultsEl.innerHTML = `${name} = ${result.toFixed(12) * 1}`;          
+        } catch (error) {
+          console.log(error);
+          alert("An error ocurred. Try again with valid input.");
+          resetResult()
+          return;
+        }
+      }
+
+      function resetForm() {
+        dynamicValEl.value = ""
+        densityValEl.value = ""
+        kinViscValEl.value = ""
+        flowVValEl.value = ""
+        charLenValEl.value = ""
+
+        calcSelectEl.selectedIndex = '0'
+        dynamicSelectEl.selectedIndex = '0'
+        densitySelectEl.selectedIndex = '2'
+        kinViscSelectEl.selectedIndex = '0'
+        flowVSelectEl.selectedIndex = '0'
+        charLenSelectEl.selectedIndex = '4'
+
+        containtersEl.forEach((container) => {
+          let idVal = container.id.slice(0, 3)
+          if (idVal === 'dvd') {
+            container.style.display = 'block'
+          } else {
+            container.style.display = 'none'
+          }
+        })
+      }
+
+      function resetResult() {
+        calcResultsEl.innerHTML = "<p>Result will appear here...</p>";
+      } 
+
+      function resethandler() {
+        resetForm();
+        resetResult();
+      }
+
+      /*************** EVENTLISTINERS ***************/
+      [dynamicValEl, densityValEl, kinViscValEl, flowVValEl, charLenValEl].forEach((el) => {
+        el.addEventListener("input", resetResult);
+      }); 
+            
+      [dynamicSelectEl, densitySelectEl, kinViscSelectEl, flowVSelectEl, charLenSelectEl].forEach((el) => {
+        el.addEventListener("change", resetResult);
+      }); 
+
+      calcSelectEl.addEventListener("change", handlecalcSelectChange)
+
+      resetBtnEl.addEventListener("click", resethandler);
+      calcBtnEl.addEventListener("click", calculateResults);
+
+    </script>
+</body>
+</html>

@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Angular Velocity Calculator</title>
+</head>
+<body>
+    <h1>Angular Velocity Calculator</h1>
+    <p>Easily calculate the angular velocity of an object in circular motion. Input supports metric and imperial measurement units, <br />
+      radians and degrees. The angular speed calculator can also be used to solve for linear velocity and radius. <br />
+      Can also convert angular speed to linear speed and vice versa.
+    </p>
+    <p>
+      Calculate:
+      <select id="calcSelect">
+        <option value="avt" selected>Angular Velocity (via Time to Turn Angle)</option>
+        <option value="avl">Angular Velocity (via Linear Velocity)</option>
+        <option value="liv">Linear Velocity</option>
+        <option value="par">Path Radius</option>
+      </select>
+    </p>
+    <div id="avtContainer" class="containers">
+      <p>
+        Angle turned:
+        <input type="number" id="angTVal">
+        <select id="angTSelect" name="angleTurned">
+          <option value="deg" selected>degrees</option>
+          <option value="rad">radians</option>
+        </select>
+      </p>
+      <p>
+        Time taken: 
+        <input type="number" id="timeTVal">
+        <select id="timeTSelect" name="timeTaken">
+          <option value="ms">mseconds</option>
+          <option value="s" selected>seconds</option>
+          <option value="m">minutes</option>
+          <option value="h">hours</option>
+          <option value="days">days</option>
+          <option value="wks">weeks</option>
+          <option value="years">years</option>
+        </select>
+      </p>
+    </div>
+    <p id="parContainer" class="containers" style="display: none;">
+      Linear velocity: 
+      <input type="number" id="linVelVal">
+      <select id="linVelSelect" name="linearVel">
+        <option value="mph">miles/h</option>
+        <option value="kmh">km/h</option>
+        <option value="mps">miles/s</option>
+        <option value="kms">km/s</option>
+        <option value="ms" selected>m/s</option>
+        <option value="ins">in/s</option>
+        <option value="yds">yd/s</option>
+        <option value="fts">ft/s</option>
+        <option value="knots">knots</option>
+      </select>
+    </p>
+    <p id="livContainer" class="containers" style="display: none;">
+      Path radius: 
+      <input type="number" id="pathRadVal">
+      <select id="pathRadSelect" name="pathRadius">
+        <option value="mm">mm</option>
+        <option value="cm">cm</option>
+        <option value="dm">dm</option>
+        <option value="m" selected>m</option>
+        <option value="km">km</option>
+        <option value="in">in</option>
+        <option value="ft">ft</option>
+        <option value="yd">yd</option>
+        <option value="mi">mi</option>
+      </select>
+    </p>
+    <p id="bthContainer" class="containers" style="display: none;">
+      Angular velocity: 
+      <input type="number" id="angVelVal">
+      <select id="angVelSelect" name="angularVel">
+        <option value="radps" selected>Radians/s</option>
+        <option value="radpm">Radians/m</option>
+        <option value="radph">Radians/h</option>
+        <option value="degps">Degrees/s</option>
+        <option value="degpm">Degrees/m</option>
+        <option value="degph">Degrees/h</option>
+        <option value="revps">Rev/s (Hz)</option>
+        <option value="revpm">Rev/m (rpm)</option>
+        <option value="revph">Rev/h (rph)</option>
+        <option value="revpdays">Rev/day</option>
+        <option value="revpwks">Rev/week</option>
+        <option value="revpyears">Rev/year</option>
+      </select>
+    </p>
+
+    <p id="botContainer" class="containers">
+      Output in: 
+      <select id="outputSelect" name="output">
+				<option value="rad" id="Radians" selected>Radians</option>
+				<option value="deg" id="Degrees">Degrees</option>
+				<option value="rev" id="Revolutions">Revolutions</option>
+			</select>
+      <select id="outputSelect2" name="output2">
+				<option value="s" id="second" selected>per second</option>
+				<option value="m" id="minute">per minute</option>
+				<option value="h" id="hour">per hour</option>
+				<option value="days" id="day">per day</option>
+				<option value="wks" id="week">per week</option>
+				<option value="years" id="year">per year</option>
+			</select>
+    </p>
+
+    <button id="calcBtn">Calculate</button>
+    <button id="resetBtn">Reset</button>
+    <hr>
+    <div>
+      <h3>Result:</h3>
+      <h3 id="calcResults">Result will appear here...</h3>
+    </div>
+
+    <script>
+      // Get required elements from the HTML
+      const calcSelectEl = document.getElementById("calcSelect");
+      const angTValEl = document.getElementById("angTVal");
+      const timeTValEl = document.getElementById("timeTVal");
+      const linVelValEl = document.getElementById("linVelVal");
+      const pathRadValEl = document.getElementById("pathRadVal");
+      const angVelValEl = document.getElementById("angVelVal");
+
+      const angTSelectEl = document.getElementById("angTSelect");
+      const timeTSelectEl = document.getElementById("timeTSelect");
+      const linVelSelectEl = document.getElementById("linVelSelect");
+      const pathRadSelectEl = document.getElementById("pathRadSelect");
+      const angVelSelectEl = document.getElementById("angVelSelect");
+      const outputSelectEl = document.getElementById("outputSelect");
+      const outputSelect2El = document.getElementById("outputSelect2");
+
+      const containtersEl = document.querySelectorAll(".containers");
+
+      const calcBtnEl = document.getElementById('calcBtn');
+      const resetBtnEl = document.getElementById('resetBtn');
+      const calcResultsEl = document.getElementById('calcResults') 
+
+      const UNITS = {
+        time: {
+          ms: 1000,
+          s: 1,
+          m: 0.01666666666,
+          h: 0.0002777777777777778,
+          days: 0.000011574074074074073,
+          wks: 0.0000016534391534391535,
+          mos: 3.8025705376834734e-7,
+          yrs: 3.1688087814028954e-8,
+        },
+        angle: {
+          deg: 1,
+          rad: 0.0174532925199433,
+          rev: 0.00277778
+        },
+        angle2: {
+          deg: 57.2957795130823,
+          rad:  1,
+          rev: 0.1591549431
+        },
+
+        speed: {
+          "ms": 1,
+          "fts": 3.280839895,
+          "kms": 0.001,
+          "kmh": 3.6,
+          "mps": 0.000621371,
+          "mph": 2.2369362920544,
+          "ins": 39.37007874015748,
+          "yds": 1.0936132983,
+          knots: 1.9438444924,
+        },
+        distance: {
+          m: 1,
+          mm: 1000,
+          cm: 100,
+          dm: 10,
+          km: 0.001,
+          in: 39.37007874015748,
+          ft: 3.2808398950131235,
+          yd: 1.0936132983377078,
+          mi: 0.0006213711922373339,
+        },
+        aVelocity: {
+          "radps": 1,
+          "radpm": 60,
+          "radph": 3600,
+          "radpdays": 86400,
+          "radpwks": 604800,
+          "radpyears": 3.154e+7,
+          "degps": 57.295779513082,
+          "degpm": 3437.7467707849,
+          "degph": 206264.8062471,
+          "degpdays": 4.95e+6,
+          "degpwks": 3.465e+7,
+          "degpyears": 1.807e+9,
+          "revps": 0.1591549430919,
+          "revpm": 9.5492965855137,
+          "revph": 572.95779513082,
+          "revpdays": 13750.98708314,
+          "revpwks": 96256.9,
+          "revpyears": 5.019e+6,
+        }
+      }
+
+      /*************** FUNCTIONS ***************/
+      function toSIUnit(type, unit, value) {
+        return value / UNITS[type][unit];
+      }
+
+      function fromSIUnit(type, unit, value) {
+        return value * UNITS[type][unit];
+      }
+
+      function handlecalcSelectChange(e) {
+        const value = e.target.value
+
+        containtersEl.forEach((container) => {
+          let idVal = container.id.slice(0, 3)
+          if (value == idVal) {
+            container.style.display = 'block'
+          } else if (idVal === 'bot' && (value == 'avt' || value === 'avl')) {
+            container.style.display = 'block'
+          } else if ((idVal === 'liv' || idVal === 'par') && (value === 'avl')) {
+            container.style.display = 'block'
+          } else if (idVal === 'bth' && (value == 'liv' || value === 'par')) {
+            container.style.display = 'block'
+          } else {
+            container.style.display = 'none'
+          }
+        })
+
+        resetResult()
+      }
+
+      function createElements(resultObj) {
+        const elementNodes = Object.keys(resultObj).map((key) => {
+          //create elements to put the results in
+          const div = document.createElement("div");
+          const span = document.createElement("span");
+          const span2 = document.createElement("span");
+
+          // give the elements id
+          div.setAttribute("class", `result-container`);
+          span.setAttribute("class", `result-title`);
+          span2.setAttribute("class", `result-value`);
+
+          // put the values in the elements
+
+          span.textContent = resultObj[key]["title"];
+          span2.textContent = resultObj[key]["value"];
+
+          // appened them to an element that contians them
+          div.append(span, span2);
+
+          // return that element
+          return div;
+        });
+
+        return elementNodes;
+      }
+
+      function prepareUnits() {
+        let at = parseFloat(angTValEl.value) ?? 0;
+        let tt = parseFloat(timeTValEl.value) ?? 0;
+        let lv = parseFloat(linVelValEl.value) ?? 0;
+        let pr = parseFloat(pathRadValEl.value) ?? 0;
+        let av = parseFloat(angVelValEl.value) ?? 0;
+        
+
+        let atUnit = angTSelectEl.value;
+        let ttUnit = timeTSelectEl.value;
+        let lvUnit = linVelSelectEl.value;
+        let prUnit = pathRadSelectEl.value;
+        let avUnit = angVelSelectEl.value;
+
+        at = toSIUnit("angle", atUnit, at);
+        tt = toSIUnit("time", ttUnit, tt);
+        lv = toSIUnit("speed", lvUnit, lv);
+        pr = toSIUnit("distance", prUnit, pr);
+        av = toSIUnit("aVelocity", avUnit, av);
+        if (calcSelectEl.value == "avl") {
+          at = toSIUnit("angle", atUnit, lv);
+          tt = toSIUnit("time", ttUnit, tt);
+        }
+
+        return { at, tt, lv , pr, av};
+      }
+
+      function calculateResult(input) {
+        const output1 = outputSelectEl.value
+        const output2 = outputSelect2El.value
+        const calculateAVT = () => {
+          const { at, tt } = prepareUnits();
+          let at1 = fromSIUnit("angle", output1, at);
+          let tt1 = fromSIUnit("time", output2, tt);
+          let result = at1 / tt1
+          return {
+            result: result.toFixed(6) * 1,
+            type: "aVelocity",
+
+            name: "Angular Velocity",
+          };
+        };
+        const calculateAVL = () => {
+          const { lv , pr } = prepareUnits();
+          let lv1 = fromSIUnit("angle2", output1, lv);
+          let pr1 = fromSIUnit("time", output2, pr);
+          let result = lv1 / pr1
+          return {
+            result: result.toFixed(6) * 1,
+            type: "aVelocity",
+            name: `Angular Velocity`,
+          };
+        };
+        const calculateLIV = () => {
+          const { pr, av} = prepareUnits();
+          let result = av * pr
+          return {
+            result: result.toFixed(6) * 1,
+            type: "speed",
+            name: "Linear Velocity",
+          };
+        };
+
+        const calculatePAR = () => {
+          const { lv, av } = prepareUnits();
+          let result = lv / av
+          return {
+            result: result.toFixed(6) * 1,
+            type: "distance",
+            name: "Path Radius",
+          };
+        };
+
+
+        switch (input) {
+          case "avt":
+            return calculateAVT();
+          case "avl":
+            return calculateAVL();
+          case "liv":
+            return calculateLIV();
+          case "par":
+            return calculatePAR();
+          default:
+            console.log("error in calculate result switch");
+        }
+      }
+
+      function prepareResults(result, type, name) {
+        let resultObj = {};
+        Object.keys(UNITS[type]).forEach((key) => {
+          let ans = fromSIUnit(type, key, result);
+
+          resultObj[key] = {
+            title: `${name} (${key}): `,
+            value: ` ${ans.toFixed(6) * 1} ${key}`,
+          };
+        });
+        return resultObj;
+      }
+
+      function calculateResults() {
+        const calcVal = calcSelectEl.value
+
+        try {
+          const { result, type, name } = calculateResult(calcVal);
+
+          if (isNaN(result)) {
+            alert("Your input resulted in NAN.\n 0/0 \n Try again with valid input.");
+            resetResult()
+            return;
+          }
+          if (Math.abs(result) === Infinity) {
+            alert(
+              "Your input resulted in Infinity. \nDivision by zero. \nTry again with valid input."
+            );
+            resetResult()
+            return;
+          }
+          if (calcVal === 'avt' || calcVal === 'avl') {
+            let unit1 = outputSelectEl.options[outputSelectEl.selectedIndex].id
+            let unit2 = outputSelect2El.options[outputSelect2El.selectedIndex].id
+            calcResultsEl.innerHTML = `${name} = ${result} ${unit1} / ${unit2}`;
+          } else {
+            const resultObj = prepareResults(result, type, name);
+            const elementNodes = createElements(resultObj);
+            calcResultsEl.innerHTML = "";
+
+            elementNodes.forEach((element) => {
+              calcResultsEl.append(element);
+            });
+          }
+        
+        } catch (error) {
+          alert("Something Went Wrong!!!");
+          resethandler()
+        }
+      }
+
+      function resetForm() {
+        angTValEl.value = ""
+        timeTValEl.value = ""
+        linVelValEl.value = ""
+        pathRadValEl.value = ""
+        angVelValEl.value = ""
+
+        angTSelectEl.selectedIndex = "0"
+        timeTSelectEl.selectedIndex = "1"
+        linVelSelectEl.selectedIndex = "4"
+        pathRadSelectEl.selectedIndex = "3"
+        angVelSelectEl.selectedIndex = "0"
+        outputSelectEl.selectedIndex = "0"
+        outputSelect2El.selectedIndex = "0"
+        calcSelectEl.selectedIndex = "0"
+
+        const calcUnit = calcSelectEl.value
+        containtersEl.forEach((container) => {
+          let idVal = container.id.slice(0, 3)
+          if (calcUnit == idVal) {
+            container.style.display = 'block'
+          } else if (idVal === 'bot' && (calcUnit == 'avt' || calcUnit === 'avl')) {
+            container.style.display = 'block'
+          } else if ((idVal === 'liv' || calcUnit === 'par') && (calcUnit === 'avl')) {
+            container.style.display = 'block'
+          } else if (idVal === 'bth' && (calcUnit == 'liv' || calcUnit === 'par')) {
+            container.style.display = 'block'
+          } else {
+            container.style.display = 'none'
+          }
+        })
+      }
+
+      function resetResult() {
+        calcResultsEl.innerHTML = "<p>Result will appear here...</p>";
+      } 
+
+      function resethandler() {
+        resetForm();
+        resetResult();
+      }
+
+      /*************** EVENTLISTINERS ***************/
+      [angTValEl, timeTValEl, linVelValEl, pathRadValEl, angVelValEl].forEach((el) => {
+        el.addEventListener("input", resetResult);
+      }); 
+            
+      [angTSelectEl, timeTSelectEl, linVelSelectEl, pathRadSelectEl, angVelSelectEl, outputSelectEl, outputSelect2El].forEach((el) => {
+        el.addEventListener("change", resetResult);
+      }); 
+
+      calcSelectEl.addEventListener("change", handlecalcSelectChange)
+
+      resetBtnEl.addEventListener("click", resethandler);
+      calcBtnEl.addEventListener("click", calculateResults);
+
+    </script>
+</body>
+</html>

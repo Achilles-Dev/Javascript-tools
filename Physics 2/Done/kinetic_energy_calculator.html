@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Kinetic Energy Calculator</title>
+</head>
+<body>
+    <h1>Kinetic Energy Calculator</h1>
+    <p>Easily calculate the kinetic energy of an object in motion such as a bullet or an arrow. Metric and imperial <br /> 
+      measurement units with output in Joules (J, kJ, MJ), Watt-hours (Wh, kWh), calories (Cal, kCal), and foot-pounds <br />
+      (ft-lbs). The calculator can also be used to solve for mass or velocity.
+    </p>
+    <p>
+      Calculate:
+      <select id="calcSelect">
+        <option value="en" selected>Kinetic Energy</option>
+        <option value="ma">Mass</option>
+        <option value="ve">Velocity</option>
+      </select>
+    </p>
+    <p id="enContainer" class="containers" style="display: none;">
+      Kinetic energy :
+      <input type="number" id="energyVal">
+      <select id="energySelect" name="energy" >
+        <option value="J" selected>J</option>
+        <option value="kJ">kJ</option>
+        <option value="MJ">MJ</option>
+        <option value="Wh">Wh</option>
+        <option value="kWh">kWh</option>
+        <option value="kCal">kCal</option>
+        <option value="ft-lbs">ft-lbs</option>
+      </select>
+    </p>
+    <p id="maContainer" class="containers">
+      Body mass: 
+      <input type="number" id="massVal">
+      <select id="massSelect" name="mass">
+        <option value="mg">mg</option>
+        <option value="g">g</option>
+        <option value="kg" selected>kg</option>
+        <option value="t">tonne</option>
+        <option value="oz">oz</option>
+        <option value="lb">lb</option>
+        <option value="ton">ton</option>
+      </select>
+    </p>
+    <p id="veContainer" class="containers">
+      Velocity: 
+      <input type="number" id="velocityVal">
+      <select id="velocitySelect" name="speed">
+        <option value="mph">miles/h</option>
+        <option value="kmh">km/h</option>
+        <option value="mps">miles/s</option>
+        <option value="kms">km/s</option>
+        <option value="ms" selected>m/s</option>
+        <option value="ins">in/s</option>
+        <option value="yds">yd/s</option>
+        <option value="fts">ft/s</option>
+        <option value="knots">knots</option>
+      </select>
+    </p>
+
+    <button id="calcBtn">Calculate</button>
+    <button id="resetBtn">Reset</button>
+    <hr>
+    <div>
+      <h3>Result:</h3>
+      <h3 id="calcResults">Result will appear here...</h3>
+    </div>
+
+    <script>
+      // Get required elements from the HTML
+      const calcSelectEl = document.getElementById("calcSelect");
+      const energyValEl = document.getElementById("energyVal");
+      const massValEl = document.getElementById("massVal");
+      const velocityValEl = document.getElementById("velocityVal");
+
+      const energySelectEl = document.getElementById("energySelect");
+      const massSelectEl = document.getElementById("massSelect");
+      const velocitySelectEl = document.getElementById("velocitySelect");
+      const containtersEl = document.querySelectorAll(".containers");
+
+      const calcBtnEl = document.getElementById('calcBtn');
+      const resetBtnEl = document.getElementById('resetBtn');
+      const calcResultsEl = document.getElementById('calcResults') 
+
+      const UNITS = {
+        mass: {
+          mg: 1e6,
+          g: 1000,
+          kg: 1,
+          t: 0.001,
+          oz: 35.274,
+          lb: 2.20462,
+          ton: 0.00110231,
+          "US ton": 0.00110231,
+          "Long ton": 0.000984207,
+        },
+        speed: {
+          ms: 1,
+          kmh: 3.6,
+          fts: 3.28084,
+          mph: 2.23694,
+          kms: 0,
+          mps: 0,
+          ins: 0,
+          yds: 0,
+          knots: 1.94384,
+        },
+        energy: {
+          J: 1,
+          kJ: 0.001,
+          MJ: 1e-6,
+          Wh: 0.000277778,
+          kWh: 0.000000277778,
+          "ft-lbs": 0.737562,
+          kcal: 0.000239006,
+        },
+      }
+
+      /*************** FUNCTIONS ***************/
+      function toSIUnit(type, unit, value) {
+        return value / UNITS[type][unit];
+      }
+
+      function fromSIUnit(type, unit, value) {
+        return value * UNITS[type][unit];
+      }
+
+      function handlecalcSelectChange(e) {
+        const value = e.target.value
+
+        containtersEl.forEach((container) => {
+          let idVal = container.id.slice(0, 2)
+          if (value == idVal) {
+            container.style.display = 'none'
+          } else {
+            container.style.display = 'block'
+          }
+        })
+      }
+
+      function createElements(resultObj) {
+        const elementNodes = Object.keys(resultObj).map((key) => {
+          //create elements to put the results in
+          const div = document.createElement("div");
+          const span = document.createElement("span");
+          const span2 = document.createElement("span");
+
+          // give the elements id
+          div.setAttribute("class", `result-container`);
+          span.setAttribute("class", `result-title`);
+          span2.setAttribute("class", `result-value`);
+
+          // put the values in the elements
+
+          span.textContent = resultObj[key]["title"];
+          span2.textContent = resultObj[key]["value"];
+
+          // appened them to an element that contians them
+          div.append(span, span2);
+
+          // return that element
+          return div;
+        });
+
+        return elementNodes;
+      }
+
+      function prepareUnits() {
+        let k = parseFloat(energyValEl.value) ?? 0;
+        let m = parseFloat(massValEl.value) ?? 0;
+        let v = parseFloat(velocityValEl.value) ?? 0;
+
+        let uUnit = energySelectEl.value;
+        let kUnit = massSelectEl.value;
+        let xUnit = velocitySelectEl.value;
+
+        k = toSIUnit("energy", uUnit, k);
+        m = toSIUnit("mass", kUnit, m);
+        v = toSIUnit("speed", xUnit, v);
+
+        return { k, m, v };
+      }
+
+      function prepareResults(result, type, name) {
+        let resultObj = {};
+        Object.keys(UNITS[type]).forEach((key) => {
+          let ans = fromSIUnit(type, key, result);
+
+          resultObj[key] = {
+            title: `${name} (${key}): `,
+            value: ` ${ans} ${key}`,
+          };
+        });
+        return resultObj;
+      }
+
+      function calculateResult(input) {
+        const calculateV = () => {
+          const { m, k } = prepareUnits();
+
+          return {
+            result: Math.sqrt((2 * k) / m),
+            type: "speed",
+            name: `Velocity`,
+          };
+        };
+        const calculateK = () => {
+          const { m, v } = prepareUnits();
+          return {
+            result: 0.5 * m * v * v,
+            type: "energy",
+            name: "Kinetic energy",
+          };
+        };
+        const calculateM = () => {
+          const { k, v } = prepareUnits();
+          return {
+            result: (2 * k) / (v * v),
+            type: "mass",
+            name: "Mass",
+          };
+        };
+
+        switch (input) {
+          case "ve":
+            return calculateV();
+          case "ma":
+            return calculateM();
+          case "en":
+            return calculateK();
+          default:
+            console.log("error in calculate result switch");
+        }
+      }
+
+      function calculateResults() {
+        const calcVal = calcSelectEl.value
+
+          try {
+            const { result, type, name } = calculateResult(calcVal);
+
+          if (isNaN(result)) {
+            alert("Your input resulted in NAN.\n 0/0 \n Try again with valid input.");
+            resetResult()
+            return;
+          }
+          if (Math.abs(result) === Infinity) {
+            alert(
+              "Your input resulted in Infinity. \nDivision by zero. \nTry again with valid input."
+            );
+            resetResult()
+            return;
+          }
+            
+          const resultObj = prepareResults(result, type, name);
+          const elementNodes = createElements(resultObj);
+          calcResultsEl.innerHTML = "";
+
+          elementNodes.forEach((element) => {
+            calcResultsEl.append(element);
+          });
+            // calcResultsEl.innerHTML = `<p> Percent error: ${results.toFixed(2) * 1}%</p>`
+          } catch (error) {
+            alert("Something Went Wrong!!!");
+            resethandler()
+          }
+      }
+
+      function resetForm() {
+        [energyValEl, massValEl, velocityValEl].forEach((input) => {
+          input.value = ""
+        });
+        energySelectEl.selectedIndex = '0'
+        massSelectEl.selectedIndex = '2'
+        velocitySelectEl.selectedIndex = '4'
+        calcSelectEl.selectedIndex = '0'
+        containtersEl.forEach((container) => {
+          let idVal = container.id.slice(0, 2)
+          if (idVal == 'en') {
+            container.style.display = 'none'
+          } else {
+            container.style.display = 'block'
+          }
+        })
+      }
+
+      function resetResult() {
+        calcResultsEl.innerHTML = "<p>Result will appear here...</p>";
+      } 
+
+      function resethandler() {
+        resetForm();
+        resetResult();
+      }
+
+      /*************** EVENTLISTINERS ***************/
+      [energyValEl, massValEl, velocityValEl].forEach((el) => {
+        el.addEventListener("input", resetResult);
+      }); 
+            
+      [energySelectEl, massSelectEl, velocitySelectEl].forEach((el) => {
+        el.addEventListener("change", resetResult);
+      }); 
+
+      calcSelectEl.addEventListener("change", handlecalcSelectChange)
+
+      resetBtnEl.addEventListener("click", resethandler);
+      calcBtnEl.addEventListener("click", calculateResults);
+
+    </script>
+</body>
+</html>
