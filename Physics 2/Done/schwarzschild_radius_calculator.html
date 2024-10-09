@@ -3,12 +3,12 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Stress Calculator</title>
+    <title>Schwarzschild Radius Calculator</title>
   </head>
   <body>
-    <h1>Stress Calculator</h1>    
+    <h1>Schwarzschild Radius Calculator</h1>    
       <p>
-        <label for="i1-input">Area (A) </label>
+        <label for="i1-input">Mass </label>
         <input
           type="number"
           min="0"
@@ -17,50 +17,23 @@
           id="i1-input"
           class="inputs"
           step="any"
-          data-name="Area (A)"
+          data-name="Mass"
         />
         <select
           class="selects"
           id="i1-select"
-          data-type="area"
-          data-prev="m²"
+          data-type="mass"
+          data-prev="Suns"
           data-id="i1"
         >
-          <option value="mm²">square millimeters (mm²)</option>
-          <option value="cm²">square centimeters (cm²)</option>
-          <option value="dm²">square decimeters (dm²)</option>
-          <option value="m²" selected>square meters (m²)</option>
-          <option value="in²">square inches (in²)</option>
-          <option value="ft²">square feet (ft²)</option>
-          <option value="yd²">square yards (yd²)</option> 
-        </select>
-      </p>
-      <p>
-        <label for="i2-input">Force (F): </label>
-        <input
-          type="number"
-          min="0"
-          autocomplete="off"
-          data-id="i2"
-          id="i2-input"
-          class="inputs"
-          step="any"
-          data-name="Force (F)"
-        />
-        <select
-          class="selects"
-          id="i2-select"
-          data-type="force"
-          data-prev="N"
-          data-id="i2"
-        >
-          <option value="N" selected>newtons (N)</option>
-          <option value="kN">kilonewtons (kN)</option>
-          <option value="MN">meganewtons (MN)</option>
-          <option value="GN">giganewtons (GN)</option>
-          <option value="TN">teranewtons (TN)</option>
-          <option value="lbf">pounds-force (lbf)</option>
-          <option value="kip">kips (kip)</option>
+          <option value="kg">kilograms (kg)</option>
+          <option value="t">metric tons (t)</option>
+          <option value="lb">pounds (lb)</option>
+          <option value="st">stones (st)</option>
+          <option value="US ton">US short tons (US ton)</option>
+          <option value="long ton">imperial tons (long ton)</option>
+          <option value="Earths">masses of the Earth (Earths)</option>
+          <option value="Suns" selected>masses of the Sun (Suns)</option>
         </select>
       </p>
 
@@ -82,33 +55,36 @@
 
       /*************** GLOBAL VARIBLES ***************/
       const UNITS = {
-        area: {
-          "mm²": 1000000,
-          "cm²": 10000,
-          "dm²": 100,
-          "m²": 1,
-          "in²": 1550.003100006200012400024800049600099200198400396800793601587,
-          "ft²": 10.763910416709722308333505555900000688890266669422227733344,
-          "yd²": 1.195990046301080256481500617322222298765585185491358637038,
+        acceleration: {
+          "m/s²": 1,
+          g: 0.10197162129779,
         },
-        force: {
-          N: 1,
-          kN: 1e-3,
-          MN: 1e-6,
-          GN: 1e-9,
-          TN: 1e-12,
-          lbf: 0.2248089438709618,
-          kip: 0.00022480894387096178,
+        distance: {
+          nm: 1000000000000,
+          μm: 1000000000,
+          mm: 1000000,
+          cm: 100000,
+          m: 1000,
+          km: 1,
+          in: 39370.07874,
+          ft: 3280.839895,
+          yd: 1093.6132983,
+          mi: 0.6213711922,
+          nmi: 0.5399568035,
+          "R⊕": 1.569612305760477e-7,
+          "R☉": 1.4374011786689664e-9,
+          au: 0.0000014368,
+          pcs: 3.2407557442395566e-17,
         },
-        pressure: {
-          Pa: 1,
-          bar: 0.00001,
-          psi: 0.0001450377,
-          ksi: 1.450377377E-7,
-          kPa: 0.001,
-          MPa: 0.000001,
-          GPa: 1e-9,
-          "lb/ft²": 0.0208854342,
+        mass: {
+          kg: 1,
+          t: 0.001,
+          lb: 2.2046226218487757,
+          st: 0.1574730444177697,
+          "US ton": 0.001102311310924388,
+          "long ton": 0.0009842065276110606,
+          Earths: 1.6744248350691536e-25,
+          Suns: 5.027652086475616e-31,
         },
       };
       /*************** FUNCTIONS ***************/
@@ -123,29 +99,54 @@
       function createElement() {
         const newDiv = `
             <p>
-              <label for="i11-span">Stress (σ): &nbsp; </label>
+              <label for="i11-span">Schwarzschild radius: &nbsp; </label>
               <span
                 data-id="i11"
                 step="any"
                 id="i11-span"
                 class="spans"
-                data-name="Stress (σ)"
+                data-name="Schwarzschild radius"
               ></span>
               <select
                 class="selectsResult"
                 id="i11-select"
-                data-type="pressure"
-                data-prev="MPa"
+                data-type="distance"
+                data-prev="km"
                 data-id="i11"
               >
-                <option value="Pa">pascals (Pa)</option>
-                <option value="bar">bars (bar)</option>
-                <option value="psi">pounds per square inch (psi)</option>
-                <option value="ksi">kilopounds per square inch (ksi)</option>
-                <option value="kPa">kilopascals (kPa)</option>
-                <option value="MPa" selected>megapascals (MPa)</option>
-                <option value="GPa">gigapascals (GPa)</option>
-                <option value="lb/ft²">pounds per square foot (lb/ft²)</option>
+                <option value="mm">millimeters (mm)</option>
+                <option value="cm">centimeters (cm)</option>
+                <option value="m">meters (m)</option>
+                <option value="km" selected>kilometers (km)</option>
+                <option value="in">inches (in)</option>
+                <option value="ft">feet (ft)</option>
+                <option value="yd">yards (yd)</option>
+                <option value="mi">miles (mi)</option>
+                <option value="nmi">nautical miles (nmi)</option>
+                <option value="R⊕">Earth radii (R⊕)</option>
+                <option value="R☉">Sun radii (R☉)</option>
+                <option value="au">astronomical unit (au)</option>
+                <option value="pcs">parsecs (pcs)</option>
+              </select>
+            </p>
+            <p>
+              <label for="i12-span">Gravitational field: &nbsp; </label>
+              <span
+                data-id="i12"
+                step="any"
+                id="i12-span"
+                class="spans"
+                data-name="Gravitational field"
+              ></span>
+              <select
+                class="selectsResult"
+                id="i12-select"
+                data-type="acceleration"
+                data-prev="MPa"
+                data-id="m/s²"
+              >
+                <option value="m/s²" selected>m/s²</option>
+                <option value="g"> gravitational acc. on Earth (g)</option>
               </select>
             </p>
         `
@@ -196,13 +197,18 @@
         }
       }
 
-      function calculateResult() {             
+      function calculateResult() {   
+        const G = 6.67430e-11
+        const C = 2.99e8     
         function calculateRes() {
-          let [val1, val2] = prepareUnit("i1", "i2");
-
-          let result = val2 / val1
+          let [val1] = prepareUnit("i1");
+          val1 = fromSIUnit('mass', "Suns", val1)
+          let result = 2 * ((G * (1.989e30) * val1) / (C ** 2))
+          let result2 = (G * (1.989e30)) * val1 / (result ** 2)
+          result = toSIUnit("distance", "m", result)
           return {
             1: { result: Math.abs(result) > 1 ? result.toFixed(3) * 1 : result, type: "i11" },
+            2: { result: Math.abs(result2) > 1 ? result2.toFixed(3) * 1 : result2, type: "i12" },
           };
         }
         return calculateRes()
@@ -250,7 +256,7 @@
       }
 
       function calculateResults() {
-        for (el of ["i1", "i2"]) {
+        for (el of ["i1"]) {
           if (!validateInput(el)) return;
         }
 
@@ -277,11 +283,7 @@
 
       function resetForm() {
         selects.forEach((select, index) => {
-          if (index < 1) {
-            select.selectedIndex = '3'
-          } else {
-            select.selectedIndex = '0'
-          }
+          select.selectedIndex = '7'
         });
 
         inputs.forEach((input, index) => {

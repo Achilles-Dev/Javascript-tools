@@ -3,12 +3,26 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Stress Calculator</title>
+    <title>Wing Loading Calculator</title>
   </head>
   <body>
-    <h1>Stress Calculator</h1>    
+    <h1>Wing Loading Calculator</h1>    
       <p>
-        <label for="i1-input">Area (A) </label>
+        Aircraft
+        <select id="craftSelect">
+          <option value="airbus">Airbus A380</option>
+          <option value="boe747">Boeing 747</option>
+          <option value="genD">General Dynamics F-16</option>
+          <option value="mikG21">Mikoyan Gurevich MiG 21</option>
+          <option value="mikG29">Mikoyan Gurevich MiG 29</option>
+          <option value="boeFA">Boeing F/A-18E/F</option>
+          <option value="lockM">Lockheed Martin F-22</option>
+          <option value="SukS30">Sukhoi Su-30</option>
+          <option value="custom" selected>Enter custom aircraft details</option>
+        </select>
+      </p>
+      <p>
+        <label for="i1-input">Wing area (S) </label>
         <input
           type="number"
           min="0"
@@ -17,13 +31,13 @@
           id="i1-input"
           class="inputs"
           step="any"
-          data-name="Area (A)"
+          data-name="Wing area (S)"
         />
         <select
           class="selects"
           id="i1-select"
           data-type="area"
-          data-prev="m²"
+          data-prev="m"
           data-id="i1"
         >
           <option value="mm²">square millimeters (mm²)</option>
@@ -32,11 +46,10 @@
           <option value="m²" selected>square meters (m²)</option>
           <option value="in²">square inches (in²)</option>
           <option value="ft²">square feet (ft²)</option>
-          <option value="yd²">square yards (yd²)</option> 
         </select>
       </p>
       <p>
-        <label for="i2-input">Force (F): </label>
+        <label for="i2-input">Weight (W) </label>
         <input
           type="number"
           min="0"
@@ -45,22 +58,20 @@
           id="i2-input"
           class="inputs"
           step="any"
-          data-name="Force (F)"
+          data-name="Weight (W)"
         />
         <select
           class="selects"
           id="i2-select"
-          data-type="force"
-          data-prev="N"
+          data-type="mass"
+          data-prev="kg"
           data-id="i2"
         >
-          <option value="N" selected>newtons (N)</option>
-          <option value="kN">kilonewtons (kN)</option>
-          <option value="MN">meganewtons (MN)</option>
-          <option value="GN">giganewtons (GN)</option>
-          <option value="TN">teranewtons (TN)</option>
-          <option value="lbf">pounds-force (lbf)</option>
-          <option value="kip">kips (kip)</option>
+          <option value="g">grams (g)</option>
+          <option value="kg" selected>kilograms (kg)</option>
+          <option value="t">metric tons (t)</option>
+          <option value="lb">pounds (lb)</option>
+          <option value="long ton">imperial tons (long ton)</option>
         </select>
       </p>
 
@@ -75,6 +86,7 @@
       /*************** ELEMENTS ***************/
       const inputs = document.querySelectorAll(".inputs");
       const selects = document.querySelectorAll(".selects");
+      const craftSelectEl = document.getElementById('craftSelect')
 
       const calcBtnEl = document.getElementById('calcBtn');
       const resetBtnEl = document.getElementById('resetBtn');
@@ -89,26 +101,22 @@
           "m²": 1,
           "in²": 1550.003100006200012400024800049600099200198400396800793601587,
           "ft²": 10.763910416709722308333505555900000688890266669422227733344,
-          "yd²": 1.195990046301080256481500617322222298765585185491358637038,
         },
-        force: {
-          N: 1,
-          kN: 1e-3,
-          MN: 1e-6,
-          GN: 1e-9,
-          TN: 1e-12,
-          lbf: 0.2248089438709618,
-          kip: 0.00022480894387096178,
+        mass: {
+          g: 1000,
+          kg: 1,
+          t: 0.001,
+          lb: 2.2046226218487757,
+          "long ton": 0.0009842065276110606,
         },
-        pressure: {
-          Pa: 1,
-          bar: 0.00001,
-          psi: 0.0001450377,
-          ksi: 1.450377377E-7,
-          kPa: 0.001,
-          MPa: 0.000001,
-          GPa: 1e-9,
-          "lb/ft²": 0.0208854342,
+        wloading: {
+          "kg/m²": 1,
+          "lb/in²": 0.0014223343,
+          "lb/ft²": 0.2048161436,
+        },
+        density: {
+          "kg/m³": 1,
+          "lb/cu ft": 0.0624279606,
         },
       };
       /*************** FUNCTIONS ***************/
@@ -120,32 +128,80 @@
         return value * UNITS[type][unit];
       }
 
+      function handleCraftSelectChange(e) {
+        const value = e.target.value
+
+        inputs.forEach((input, index) => {
+          if (value !== "custom") {
+          input.disabled = true
+          } else {
+            input.disabled = false
+          }
+          if (value === "airbus") {
+            input.value = index === 0 ? "845" : "575000"
+          } else if (value === "boe747") {
+            input.value = index === 0 ? "511" : "333000"
+          } else if (value === "genD") {
+            input.value = index === 0 ? "28" : "19187"
+          } else if (value === "mikG21") {
+            input.value = index === 0 ? "23" : "10400"
+          } else if (value === "mikG29") {
+            input.value = index === 0 ? "38" : "14900"
+          } else if (value === "boeFA") {
+            input.value = index === 0 ? "46.5" : "21320"
+          } else if (value === "lockM") {
+            input.value = index === 0 ? "78.04" : "29410"
+          } else if (value === "SukS30") {
+            input.value = index === 0 ? "62" : "24900"
+          } else {
+            input.value = ""
+          }
+        })
+
+        resetResult()
+      }
+
       function createElement() {
         const newDiv = `
             <p>
-              <label for="i11-span">Stress (σ): &nbsp; </label>
+              <label for="i11-span">Wing loading (WL): &nbsp; </label>
               <span
                 data-id="i11"
                 step="any"
                 id="i11-span"
                 class="spans"
-                data-name="Stress (σ)"
+                data-name="Wing loading (WL)"
               ></span>
               <select
                 class="selectsResult"
                 id="i11-select"
-                data-type="pressure"
-                data-prev="MPa"
+                data-type="wloading"
+                data-prev="kg/m²"
                 data-id="i11"
               >
-                <option value="Pa">pascals (Pa)</option>
-                <option value="bar">bars (bar)</option>
-                <option value="psi">pounds per square inch (psi)</option>
-                <option value="ksi">kilopounds per square inch (ksi)</option>
-                <option value="kPa">kilopascals (kPa)</option>
-                <option value="MPa" selected>megapascals (MPa)</option>
-                <option value="GPa">gigapascals (GPa)</option>
-                <option value="lb/ft²">pounds per square foot (lb/ft²)</option>
+                <option value="kg/m²" selected>kilograms per square meter (kg/m²)</option>
+                <option value="lb/in²">pounds per square inch (lb/in²)</option>
+                <option value="lb/ft²">pounds per square feet (lb/ft²)</option>
+              </select>
+            </p>
+            <p>
+              <label for="i12-span">Wing cube loading (WCL): &nbsp; </label>
+              <span
+                data-id="i12"
+                step="any"
+                id="i12-span"
+                class="spans"
+                data-name="Wing cube loading (WCL)"
+              ></span>
+              <select
+                class="selectsResult"
+                id="i12-select"
+                data-type="density"
+                data-prev="kg/m³"
+                data-id="i12"
+              >
+                <option value="kg/m³" selected>kilograms per cubic meter (kg/m³)</option>
+                <option value="lb/cu ft">pounds per cubic feet (lb/cu ft)</option>
               </select>
             </p>
         `
@@ -196,13 +252,14 @@
         }
       }
 
-      function calculateResult() {             
+      function calculateResult() {     
         function calculateRes() {
           let [val1, val2] = prepareUnit("i1", "i2");
-
           let result = val2 / val1
+          let result2 = val2 / (val1 ** 1.5)
           return {
             1: { result: Math.abs(result) > 1 ? result.toFixed(3) * 1 : result, type: "i11" },
+            2: { result: Math.abs(result2) > 1 ? result2.toFixed(3) * 1 : result2, type: "i12" },
           };
         }
         return calculateRes()
@@ -277,11 +334,7 @@
 
       function resetForm() {
         selects.forEach((select, index) => {
-          if (index < 1) {
-            select.selectedIndex = '3'
-          } else {
-            select.selectedIndex = '0'
-          }
+          select.selectedIndex = '7'
         });
 
         inputs.forEach((input, index) => {
@@ -306,6 +359,8 @@
       inputs.forEach((input) => {
         input.addEventListener("input", resetResult);
       });
+
+      craftSelectEl.addEventListener("change", handleCraftSelectChange)
 
       resetBtnEl.addEventListener("click", resethandler);
       calcBtnEl.addEventListener("click", calculateResults);
