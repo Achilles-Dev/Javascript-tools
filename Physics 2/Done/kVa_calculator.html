@@ -3,12 +3,27 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Spring Rate Calculator</title>
+    <title>kVA Calculator</title>
   </head>
   <body>
-    <h1>Spring Rate Calculator</h1>    
+    <h1>kVA Calculator</h1> 
       <p>
-        <label for="i1-input">Shear modulus (G) </label>
+        Load distribution:
+        <select id="loadSelect">
+          <option value="single" selected>Single phase</option>
+          <option value="three">3-phase</option>
+        </select>
+      </p>   
+      <p id="threeSelect" style="display: none;">
+        Voltage type:
+        <select id="typeSelect">
+          <option value="llv" selected>Line-to-line voltage</option>
+          <option value="lnv">Line-to-neutral voltage</option>
+        </select>
+      </p>   
+      
+      <p>
+        <label for="i1-input">Voltage (V): </label>
         <input
           type="number"
           min="0"
@@ -17,28 +32,24 @@
           id="i1-input"
           class="inputs"
           step="any"
-          data-name="Shear modulus (G)"
+          data-name="Voltage (V)"
         />
         <select
           class="selects"
           id="i1-select"
-          data-type="pressure"
-          data-prev="Pa"
+          data-type="voltage"
+          data-prev="V"
           data-id="i1"
         >
-        <option value="Pa" selected>pascals (Pa)</option>
-        <option value="kgf/mm²">kilograms-force per square nillimeters (kgf/mm²)</option>
-        <option value="bar">bars (bar)</option>
-        <option value="psi">pounds per square inch (psi)</option>
-        <option value="ksi">kilopounds per square inch (ksi)</option>
-        <option value="hPa">hectopascals (hPa)</option>
-        <option value="lb/ft²">pounds per square foot (lb/ft²)</option>
-        <option value="t/m²">tons per square meter (t/m²)</option>
+        <option value="mV">millivolts (mV)</option>
+        <option value="V" selected>volts (V)</option>
+        <option value="kV">kilovolts (kV)</option>
+        <option value="MV">megavolts (MV)</option>
         </select>
       </p>
 
       <p>
-        <label for="i2-input">Wire diameter: </label>
+        <label for="i2-input">Current (I): </label>
         <input
           type="number"
           min="0"
@@ -47,25 +58,23 @@
           id="i2-input"
           class="inputs"
           step="any"
-          data-name="Wire diameter"
+          data-name="Current (I)"
         />
         <select
           class="selects"
           id="i2-select"
-          data-type="distance"
-          data-prev="mm"
+          data-type="current"
+          data-prev="A"
           data-id="i2"
         >
-          <option value="mm" selected>millimeters (mm)</option>
-          <option value="cm">centimeters (cm)</option>
-          <option value="m">meters (m)</option>
-          <option value="in">inches (in)</option>
-          <option value="ft">feet (ft)</option>
+          <option value="A" selected>amperes</option>
+          <option value="mA">milliamperes</option>
+          <option value="μA">microamperes</option>
         </select>
       </p>
 
-      <p>
-        <label for="i3-input">External diameter </label>
+      <p id="amInput" style="display: none;">
+        <label for="i3-input">Power factor: </label>
         <input
           type="number"
           min="0"
@@ -74,55 +83,27 @@
           id="i3-input"
           class="inputs"
           step="any"
-          data-name="External diameter"
+          data-name="Power factor"
         />
         <select
           class="selects"
           id="i3-select"
-          data-type="distance"
-          data-prev="mm"
-          data-id="i3"
-        >
-          <option value="mm" selected>millimeters (mm)</option>
-          <option value="cm">centimeters (cm)</option>
-          <option value="m">meters (m)</option>
-          <option value="in">inches (in)</option>
-          <option value="ft">feet (ft)</option>
-        </select>
-      </p>
-
-      <p>
-        <label for="i4-input">Active coils: </label>
-        <input
-          type="number"
-          min="0"
-          autocomplete="off"
-          data-id="i4"
-          id="i4-input"
-          class="inputs"
-          step="any"
-          data-name="Active coils"
-        /> coils
-        <select
-          class="selects"
-          id="i4-select"
           data-type="exp"
           data-prev="exp"
-          data-id="i4"
+          data-id="i3"
           style="display: none;"
         >
-          <option value="exp" selected></option>
+          <option value="exp"></option>
         </select>
       </p>
 
       <p>
-        Spring ends:
-        <select id="endsSelect">
-          <option value="closed">Closed and squared/ground</option>
-          <option value="double">Double closed</option>
-          <option value="open" selected>Open</option>
+        Mode:
+        <select id="modeSelect">
+          <option value="am">Advanced</option>
+          <option value="sm" selected>Simple</option>
         </select>
-      </p>
+      </p>   
 
       <button id="calcBtn">Calculate</button>
       <button id="resetBtn">Reset</button>
@@ -135,7 +116,11 @@
       /*************** ELEMENTS ***************/
       const inputs = document.querySelectorAll(".inputs");
       const selects = document.querySelectorAll(".selects");
-      const endsSelectEl = document.getElementById("endsSelect")
+      const loadSelectEl = document.getElementById("loadSelect")
+      const typeSelectEl = document.getElementById("typeSelect")
+      const modeSelectEl = document.getElementById("modeSelect")
+      const threeSelectEl = document.getElementById("threeSelect")
+      const amInputEl = document.getElementById("amInput")
 
       const calcBtnEl = document.getElementById('calcBtn');
       const resetBtnEl = document.getElementById('resetBtn');
@@ -143,28 +128,23 @@
 
       /*************** GLOBAL VARIBLES ***************/
       const UNITS = {
-        force: {
-          "N/m": 1,
-          "N/cm": 0.01,
-          "N/mm": 0.001,
-          "lbf/in": 0.00571,
+        current: {
+          μA: 1e6,
+          mA: 1e3,
+          A: 1,
         },
-        pressure: {
-          Pa: 1,
-          "kgf/mm²": 1,
-          bar: 0.00001,
-          psi: 0.0001450377,
-          ksi: 1.450377377E-7,
-          hPa: 0.01,
-          "lb/ft²": 0.0208854342,
-          "t/m²": 1
+        voltage: {
+          mV: 1e3,
+          V: 1,
+          kV: 1e-3,
+          MV: 1e-6,
         },
-        distance: {
-          mm: 1,
-          cm: 0.1,
-          m: 0.001,
-          in: 0.0393700787,
-          ft: 0.0032808399,
+        power: {
+          W: 1000,
+          kW: 1,
+          MW: 0.001,
+          GW: 0.000001,
+          "hpl": 1.341,
         },
         exp: {
           exp: 1
@@ -179,75 +159,71 @@
         return value * UNITS[type][unit];
       }
 
+      function handleLoadSelectChange(e) {
+        const value = e.target.value
+        threeSelectEl.style.display = value === "three" ? "block" : "none"
+
+        resetResult()
+      }
+
+      function handleModeSelectChange(e) {
+        const value = e.target.value
+        amInputEl.style.display = value === "am" ? "block" : "none"
+
+        resetResult()
+      }
+
       function createElement() {
         const newDiv = `
             <p>
-              <label for="i11-span">Internal diameter: &nbsp; </label>
+              <label for="i11-span">Apparent power (S): &nbsp; </label>
               <span
                 data-id="i11"
                 step="any"
                 id="i11-span"
                 class="spans"
-                data-name="Internal diameter"
+                data-name="Apparent power (S)"
               ></span>
               <select
                 class="selectsResult"
                 id="i11-select"
-                data-type="distance"
-                data-prev="mm"
-                data-id="i11"
-              >
-                 <option value="mm" selected>millimeters (mm)</option>
-                  <option value="cm">centimeters (cm)</option>
-                  <option value="m">meters (m)</option>
-                  <option value="in">inches (in)</option>
-                  <option value="ft">feet (ft)</option>
-              </select>
-            </p>
-            <p>
-              <label for="i12-span">Total coils: &nbsp; </label>
-              <span
-                data-id="i12"
-                step="any"
-                id="i12-span"
-                class="spans"
-                data-name="Total coils"
-              ></span>
-              <select
-                class="selectsResult"
-                id="i12-select"
                 data-type="exp"
                 data-prev="exp"
-                data-id="i12"
+                data-id="i11"
                 style="display: none;"
               >
                 <option value="exp"></option>
               </select>
             </p>
-
+        `
+        const newDiv2 = `
             <p>
-              <label for="i13-span">Spring rate: &nbsp; </label>
+              <label for="i12-span">Real power (P): &nbsp; </label>
               <span
-                data-id="i13"
+                data-id="i12"
                 step="any"
-                id="i13-span"
+                id="i12-span"
                 class="spans"
-                data-name="Spring rate"
-              ></span>
+                data-name="Real power (P)"
+              ></span> kVA
               <select
                 class="selectsResult"
-                id="i13-select"
-                data-type="force"
-                data-prev="N/m"
-                data-id="i13"
+                id="i12-select"
+                data-type="power"
+                data-prev="kW"
+                data-id="i12"
               >
-                <option value="N/m" selected>newtons per meter (N/m)</option>
-                <option value="N/cm">newtons per centimeter (N/cm)</option>
-                <option value="N/mm">newtons per millimeter (N/mm)</option>
-                <option value="lbf/in">pound-force per inch (lbf/in)</option>
+                <option value="W">watts</option>
+                <option value="kW" selected>kilowatts</option>
+                <option value="MW">megawatts</option>
+                <option value="GW">gigawatts</option>
+                <option value="hpl">mechanic horsepowers (hp(l))</option>
               </select>
             </p>
         `
+        if (modeSelectEl.value === "am") {
+          return newDiv + newDiv2
+        }
         return newDiv
         
       }
@@ -289,27 +265,32 @@
           const type = select.getAttribute("data-type");
           let outUnit = select.value;
           val = fromSIUnit(type, outUnit, val);
-
-          span.textContent = parseFloat(val);
+          val = parseFloat(val)
+          span.textContent = Math.abs(val) > 1 ? val.toFixed(4) * 1 : Math.abs(val) > 0.00001 ? val.toFixed(5) * 1 : val ;
         }
       }
 
       function calculateResult() {             
         function calculateRes() {
-          let [val1, val2, val3, val4] = prepareUnit("i1", "i2", "i3", "i4");
-          let intDiam = val3 - (val2 * 2)
-          let totCoil = val4
-          if (endsSelectEl.value === "closed") {
-            totCoil += 2
-          } else if (endsSelectEl.value === "double") {
-            totCoil += 4
+          let [val1, val2] = prepareUnit("i1", "i2");
+          let power = val2 * (val1 / 1000)
+          if (loadSelectEl.value === "three") {
+            if (typeSelectEl.value === "llv") {
+              power = Math.sqrt(3) * val2 * (val1 / 1000)
+            } else {
+              power = 3 * val2 * (val1 / 1000)
+            }
           }
-          let result = (val1 * (val2 ** 4)) / (8 * ((val3 - val2) ** 3) * val4)
-          result = fromSIUnit("distance", "m", result)
+          if (modeSelectEl.value === "am") {
+            let [val3] = prepareUnit("i3");
+            let rPower = power * val3
+            return {
+              1: { result: power, type: "i11" },
+              2: { result: rPower, type: "i12" },
+            };
+          }
           return {
-            1: { result: Math.abs(intDiam) > 1 ? intDiam.toFixed(3) * 1 : intDiam, type: "i11" },
-            2: { result: Math.abs(totCoil) > 1 ? totCoil.toFixed(3) * 1 : totCoil, type: "i12" },
-            3: { result: Math.abs(result) > 1 ? result.toFixed(3) * 1 : result, type: "i13" },
+            1: { result: power, type: "i11" },
           };
         }
         return calculateRes()
@@ -324,18 +305,13 @@
           return false;
         }
 
-        if (label === "External diameter") {
-          const input2 = document.getElementById(`i2-input`);
-          let value2 = parseFloat(input2.value)
-          if (value < (value2 * 2  + 1)) {
-            alert('External diameter should be greater than 2 * diameter')
-            return false
-          }
-
+        if (id === "i3" && (value > 1 || value < 0) ) {
+          alert(`The power factor can only have a value from 0 to 1.`);
+          return false;
         }
 
-        if (value <= 0) {
-          alert(`${label} value cannot be negative or zero.`);
+        if (value < 0) {
+          alert(`${label} value cannot be negative.`);
           return false;
         }
 
@@ -367,11 +343,13 @@
       }
 
       function calculateResults() {
-        for (el of ["i1", "i2", "i3", "i4"]) {
+        for (el of ["i1", "i2"]) {
           if (!validateInput(el)) return;
         }
+        if (modeSelectEl.value === "am") {
+          if (!validateInput("i3")) return;
+        }
         
-
         try {
           const resultElement = createElement()
           
@@ -382,7 +360,7 @@
           newSelects.forEach((select) => {
             select.addEventListener("change", handleResultsChange);
           });
-
+          
           const result = calculateResult();
           setResult(result)
 
@@ -395,15 +373,21 @@
 
       function resetForm() {
         selects.forEach((select, index) => {
-          select.selectedIndex = '0'
+          if (index === 0) {
+            select.selectedIndex = '1'
+          } else {
+            select.selectedIndex = '0'
+          } 
         });
 
         inputs.forEach((input, index) => {
           input.value = ""
         });
 
-        endsSelectEl.selectedIndex = "2"
-        
+        loadSelectEl.selectedIndex = "0"
+        modeSelectEl.selectedIndex ="1"
+        threeSelectEl.style.display = "none"
+        amInputEl.style.display = "none"
       }
 
       function resetResult() {
@@ -422,6 +406,8 @@
       inputs.forEach((input) => {
         input.addEventListener("input", resetResult);
       });
+      loadSelectEl.addEventListener("change", handleLoadSelectChange)
+      modeSelectEl.addEventListener("change", handleModeSelectChange)
 
       resetBtnEl.addEventListener("click", resethandler);
       calcBtnEl.addEventListener("click", calculateResults);
