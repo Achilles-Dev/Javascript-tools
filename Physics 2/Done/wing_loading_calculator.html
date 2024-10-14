@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Wing Loading Calculator</title>
+  </head>
+  <body>
+    <h1>Wing Loading Calculator</h1>    
+      <p>
+        Aircraft
+        <select id="craftSelect">
+          <option value="airbus">Airbus A380</option>
+          <option value="boe747">Boeing 747</option>
+          <option value="genD">General Dynamics F-16</option>
+          <option value="mikG21">Mikoyan Gurevich MiG 21</option>
+          <option value="mikG29">Mikoyan Gurevich MiG 29</option>
+          <option value="boeFA">Boeing F/A-18E/F</option>
+          <option value="lockM">Lockheed Martin F-22</option>
+          <option value="SukS30">Sukhoi Su-30</option>
+          <option value="custom" selected>Enter custom aircraft details</option>
+        </select>
+      </p>
+      <p>
+        <label for="i1-input">Wing area (S) </label>
+        <input
+          type="number"
+          min="0"
+          autocomplete="off"
+          data-id="i1"
+          id="i1-input"
+          class="inputs"
+          step="any"
+          data-name="Wing area (S)"
+        />
+        <select
+          class="selects"
+          id="i1-select"
+          data-type="area"
+          data-prev="m"
+          data-id="i1"
+        >
+          <option value="mm²">square millimeters (mm²)</option>
+          <option value="cm²">square centimeters (cm²)</option>
+          <option value="dm²">square decimeters (dm²)</option>
+          <option value="m²" selected>square meters (m²)</option>
+          <option value="in²">square inches (in²)</option>
+          <option value="ft²">square feet (ft²)</option>
+        </select>
+      </p>
+      <p>
+        <label for="i2-input">Weight (W) </label>
+        <input
+          type="number"
+          min="0"
+          autocomplete="off"
+          data-id="i2"
+          id="i2-input"
+          class="inputs"
+          step="any"
+          data-name="Weight (W)"
+        />
+        <select
+          class="selects"
+          id="i2-select"
+          data-type="mass"
+          data-prev="kg"
+          data-id="i2"
+        >
+          <option value="g">grams (g)</option>
+          <option value="kg" selected>kilograms (kg)</option>
+          <option value="t">metric tons (t)</option>
+          <option value="lb">pounds (lb)</option>
+          <option value="long ton">imperial tons (long ton)</option>
+        </select>
+      </p>
+
+      <button id="calcBtn">Calculate</button>
+      <button id="resetBtn">Reset</button>
+      <hr>
+      <div>
+        <h3>Result:</h3>
+        <h3 id="calcResults">Result will appear here...</h3>
+      </div>
+    <script>
+      /*************** ELEMENTS ***************/
+      const inputs = document.querySelectorAll(".inputs");
+      const selects = document.querySelectorAll(".selects");
+      const craftSelectEl = document.getElementById('craftSelect')
+
+      const calcBtnEl = document.getElementById('calcBtn');
+      const resetBtnEl = document.getElementById('resetBtn');
+      const calcResultsEl = document.getElementById('calcResults')
+
+      /*************** GLOBAL VARIBLES ***************/
+      const UNITS = {
+        area: {
+          "mm²": 1000000,
+          "cm²": 10000,
+          "dm²": 100,
+          "m²": 1,
+          "in²": 1550.003100006200012400024800049600099200198400396800793601587,
+          "ft²": 10.763910416709722308333505555900000688890266669422227733344,
+        },
+        mass: {
+          g: 1000,
+          kg: 1,
+          t: 0.001,
+          lb: 2.2046226218487757,
+          "long ton": 0.0009842065276110606,
+        },
+        wloading: {
+          "kg/m²": 1,
+          "lb/in²": 0.0014223343,
+          "lb/ft²": 0.2048161436,
+        },
+        density: {
+          "kg/m³": 1,
+          "lb/cu ft": 0.0624279606,
+        },
+      };
+      /*************** FUNCTIONS ***************/
+      function toSIUnit(type, unit, value) {
+        return value / UNITS[type][unit];
+      }
+
+      function fromSIUnit(type, unit, value) {
+        return value * UNITS[type][unit];
+      }
+
+      function handleCraftSelectChange(e) {
+        const value = e.target.value
+
+        inputs.forEach((input, index) => {
+          if (value !== "custom") {
+          input.disabled = true
+          } else {
+            input.disabled = false
+          }
+          if (value === "airbus") {
+            input.value = index === 0 ? "845" : "575000"
+          } else if (value === "boe747") {
+            input.value = index === 0 ? "511" : "333000"
+          } else if (value === "genD") {
+            input.value = index === 0 ? "28" : "19187"
+          } else if (value === "mikG21") {
+            input.value = index === 0 ? "23" : "10400"
+          } else if (value === "mikG29") {
+            input.value = index === 0 ? "38" : "14900"
+          } else if (value === "boeFA") {
+            input.value = index === 0 ? "46.5" : "21320"
+          } else if (value === "lockM") {
+            input.value = index === 0 ? "78.04" : "29410"
+          } else if (value === "SukS30") {
+            input.value = index === 0 ? "62" : "24900"
+          } else {
+            input.value = ""
+          }
+        })
+
+        resetResult()
+      }
+
+      function createElement() {
+        const newDiv = `
+            <p>
+              <label for="i11-span">Wing loading (WL): &nbsp; </label>
+              <span
+                data-id="i11"
+                step="any"
+                id="i11-span"
+                class="spans"
+                data-name="Wing loading (WL)"
+              ></span>
+              <select
+                class="selectsResult"
+                id="i11-select"
+                data-type="wloading"
+                data-prev="kg/m²"
+                data-id="i11"
+              >
+                <option value="kg/m²" selected>kilograms per square meter (kg/m²)</option>
+                <option value="lb/in²">pounds per square inch (lb/in²)</option>
+                <option value="lb/ft²">pounds per square feet (lb/ft²)</option>
+              </select>
+            </p>
+            <p>
+              <label for="i12-span">Wing cube loading (WCL): &nbsp; </label>
+              <span
+                data-id="i12"
+                step="any"
+                id="i12-span"
+                class="spans"
+                data-name="Wing cube loading (WCL)"
+              ></span>
+              <select
+                class="selectsResult"
+                id="i12-select"
+                data-type="density"
+                data-prev="kg/m³"
+                data-id="i12"
+              >
+                <option value="kg/m³" selected>kilograms per cubic meter (kg/m³)</option>
+                <option value="lb/cu ft">pounds per cubic feet (lb/cu ft)</option>
+              </select>
+            </p>
+        `
+        return newDiv
+        
+      }
+      
+      // related to caculation
+      function prepareUnit(...args) {
+        const resultArr = [];
+        for (id of args) {
+          const input = document.getElementById(`${id}-input`);
+          const select = document.getElementById(`${id}-select`);
+          const type = select.getAttribute("data-type");
+          let val = parseFloat(input.value);
+
+          val = isNaN(val) ? 0 : val;
+          let inUnit = select.value;
+
+          val = toSIUnit(type, inUnit, val);
+
+          resultArr.push(val);
+        }
+
+        return resultArr;
+      }
+
+      function setResult(resultObj) {
+        for (key of Object.keys(resultObj)) {
+          let val = resultObj[key].result;
+          let id = resultObj[key].type;
+
+          if (isNaN(val)) {
+           alert("Your input resulted in NAN.\n 0/0 \n Try again with valid input.");
+            return;
+          }
+          if (Math.abs(val) === Infinity) {
+            alert("Your input resulted in Infinity. \nDivision by zero. \nTry again with valid input.");
+            return;
+          }
+          const span = document.getElementById(`${id}-span`);
+          const select = document.getElementById(`${id}-select`);
+          const type = select.getAttribute("data-type");
+          let outUnit = select.value;
+          val = fromSIUnit(type, outUnit, val);
+
+          span.textContent = parseFloat(val);
+        }
+      }
+
+      function calculateResult() {     
+        function calculateRes() {
+          let [val1, val2] = prepareUnit("i1", "i2");
+          let result = val2 / val1
+          let result2 = val2 / (val1 ** 1.5)
+          return {
+            1: { result: Math.abs(result) > 1 ? result.toFixed(3) * 1 : result, type: "i11" },
+            2: { result: Math.abs(result2) > 1 ? result2.toFixed(3) * 1 : result2, type: "i12" },
+          };
+        }
+        return calculateRes()
+      }
+
+      function validateInput(id) {
+        const input = document.getElementById(`${id}-input`);
+        const label = input.getAttribute("data-name").trim();
+        let value = parseFloat(input.value);
+        if (isNaN(value)) {
+          alert(`${label} value cannot be empty.`);
+          return false;
+        }
+
+        if (value < 0) {
+          alert(`${label} value cannot be negative.`);
+          return false;
+        }
+
+        return true;
+      }
+
+      function handleResultsChange(e) {
+        let select = e.target;
+        let id = select.getAttribute("data-id");
+        let span = document.getElementById(`${id}-span`);
+
+        let prevUnit = select.getAttribute("data-prev");
+        let currentUnit = select.value;
+        select.setAttribute("data-prev", currentUnit);
+
+        if (span.textContent === "") {
+          return;
+        }
+
+        let type = select.getAttribute("data-type");
+
+        let value = parseFloat(span.textContent);
+        value = parseFloat(value);
+        if (isNaN(value)) value = 0.0;
+
+        let si = toSIUnit(type, prevUnit, value);
+        let result = fromSIUnit(type, currentUnit, si);
+        span.textContent = parseFloat(result).toFixed(5) * 1;
+      }
+
+      function calculateResults() {
+        for (el of ["i1", "i2"]) {
+          if (!validateInput(el)) return;
+        }
+
+        try {
+          const resultElement = createElement()
+          
+          calcResultsEl.innerHTML = resultElement
+
+          const newSelects = document.querySelectorAll(".selectsResult");
+
+          newSelects.forEach((select) => {
+            select.addEventListener("change", handleResultsChange);
+          });
+
+          const result = calculateResult();
+          setResult(result)
+
+        } catch(error) {
+          alert("An error ocurred. Try again with valid input.");
+          resetResult()
+          return;
+        }
+      }
+
+      function resetForm() {
+        selects.forEach((select, index) => {
+          select.selectedIndex = '7'
+        });
+
+        inputs.forEach((input, index) => {
+          input.value = ""
+        });
+        
+      }
+
+      function resetResult() {
+        calcResultsEl.innerHTML = "<p>Result will appear here...</p>";
+      } 
+
+      function resethandler() {
+        resetForm();
+        resetResult();
+      }
+
+      /*************** EVENT LISTINERS ***************/
+      selects.forEach((select) => {
+        select.addEventListener("change", resetResult);
+      });
+      inputs.forEach((input) => {
+        input.addEventListener("input", resetResult);
+      });
+
+      craftSelectEl.addEventListener("change", handleCraftSelectChange)
+
+      resetBtnEl.addEventListener("click", resethandler);
+      calcBtnEl.addEventListener("click", calculateResults);
+
+    </script>
+  </body>
+</html>

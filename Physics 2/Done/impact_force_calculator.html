@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Impact Force Calculator</title>
+</head>
+<body>
+    <h1>Impact Force Calculator</h1>
+    <p>Easily calculate the kinetic energy of an object in motion such as a bullet or an arrow. Metric and imperial <br /> 
+      measurement units with output in Joules (J, kJ, MJ), Watt-hours (Wh, kWh), calories (Cal, kCal), and foot-pounds <br />
+      (ft-lbs). The calculator can also be used to solve for mass or velocity.
+    </p>
+    <p>
+      Calculate:
+      <select id="calcSelect">
+        <option value="imf" selected>Impact Force</option>
+        <option value="mas">Mass</option>
+        <option value="vel">Velocity</option>
+        <option value="cdi">Collision distance</option>
+        <option value="cdu">Collision duration</option>
+      </select>
+    </p>
+    <p id="imfContainer" class="containers" style="display: none;">
+      Impact force:
+      <input type="number" id="impForceVal">
+      <select id="impForceSelect" name="force">
+        <option value="N" selected>N</option>
+        <option value="kN">kN</option>
+        <option value="MN">MN</option>
+        <option value="GN">GN</option>
+        <option value="lbf">lbf</option>
+      </select>
+    </p>
+    <p id="masContainer" class="containers">
+      Body mass: 
+      <input type="number" id="massVal">
+      <select id="massSelect" name="mass">
+        <option value="mg">mg</option>
+        <option value="g">g</option>
+        <option value="kg" selected>kg</option>
+        <option value="tonne">tonne</option>
+        <option value="oz">oz</option>
+        <option value="lb">lb</option>
+        <option value="ton">ton</option>
+      </select>
+    </p>
+    <p id="velContainer" class="containers">
+      Impact velocity: 
+      <input type="number" id="velocityVal">
+      <select id="velocitySelect" name="speed">
+        <option value="mph">miles/h</option>
+        <option value="kmh">km/h</option>
+        <option value="mps">miles/s</option>
+        <option value="kms">km/s</option>
+        <option value="ms" selected>m/s</option>
+        <option value="ins">in/s</option>
+        <option value="yds">yd/s</option>
+        <option value="fts">ft/s</option>
+        <option value="knots">knots</option>
+      </select>
+    </p>
+    <p id="cdiContainer" class="containers">
+      Collision distance:
+      <input type="number" id="collDistVal">
+      <select id="collDistSelect" name="distance">
+        <option value="mm">mm</option>
+        <option value="cm">cm</option>
+        <option value="m" selected>m</option>
+        <option value="in">in</option>
+        <option value="ft">ft</option>
+        <option value="yd">yd</option>
+      </select>
+    </p>
+    <p id="cduContainer" class="containers">
+      Collision duration:
+      <input type="number" id="collDuraVal">
+      <select id="collDuraSelect" name="duration">
+        <option value="msec">msec</option>
+        <option value="sec" selected>sec</option>
+        <option value="min">min</option>
+      </select>
+    </p>
+
+    <button id="calcBtn">Calculate</button>
+    <button id="resetBtn">Reset</button>
+    <hr>
+    <div>
+      <h3>Result:</h3>
+      <h3 id="calcResults">Result will appear here...</h3>
+    </div>
+
+    <script>
+      // Get required elements from the HTML
+      const calcSelectEl = document.getElementById("calcSelect");
+      const impForceValEl = document.getElementById("impForceVal");
+      const massValEl = document.getElementById("massVal");
+      const velocityValEl = document.getElementById("velocityVal");
+      const collDistValEl = document.getElementById("collDistVal");
+      const collDuraValEl = document.getElementById("collDuraVal");
+
+      const impForceSelectEl = document.getElementById("impForceSelect");
+      const massSelectEl = document.getElementById("massSelect");
+      const velocitySelectEl = document.getElementById("velocitySelect");
+      const collDistSelectEl = document.getElementById("collDistSelect");
+      const collDuraSelectEl = document.getElementById("collDuraSelect");
+      const containtersEl = document.querySelectorAll(".containers");
+
+      const calcBtnEl = document.getElementById('calcBtn');
+      const resetBtnEl = document.getElementById('resetBtn');
+      const calcResultsEl = document.getElementById('calcResults') 
+
+      const UNITS = {
+        force: {
+          N: 1,
+          kN: 1e-3,
+          MN: 1e-6,
+          GN: 1e-9,
+          lbf: 0.22480894387096184,
+        },
+        mass: {
+          mg: 1e6,
+          g: 1000,
+          kg: 1,
+          tonne: 0.001,
+          oz: 35.274,
+          lb: 2.20462,
+          ton: 0.00110231,
+        },
+        speed: {
+          ms: 1,
+          kmh: 3.6,
+          fts: 3.28084,
+          mph: 2.23694,
+          kms: 1e-3,
+          mps: 0.0006213711922373339,
+          ins: 39.37007874015748,
+          yds: 1.09361329833771,
+          knots: 1.94384,
+        },
+        time: {
+          ms: 1000,
+          sec: 1,
+          min: 0.016666666666666666,
+        },
+        distance: {
+          mm: 1e3,
+          cm: 1e2,
+          m: 1,
+          in: 39.37007874015748,
+          ft: 3.2808398950131235,
+          yd: 1.0936132983377078,
+        },
+      }
+
+      /*************** FUNCTIONS ***************/
+      function toSIUnit(type, unit, value) {
+        return value / UNITS[type][unit];
+      }
+
+      function fromSIUnit(type, unit, value) {
+        return value * UNITS[type][unit];
+      }
+
+      function handlecalcSelectChange(e) {
+        const value = e.target.value
+
+        containtersEl.forEach((container) => {
+          let idVal = container.id.slice(0, 3)
+          if (value == idVal) {
+            container.style.display = 'none'
+          } else {
+            container.style.display = 'block'
+          }
+        })
+      }
+
+      function createElements(resultObj) {
+        const elementNodes = Object.keys(resultObj).map((key) => {
+          //create elements to put the results in
+          const div = document.createElement("div");
+          const span = document.createElement("span");
+          const span2 = document.createElement("span");
+
+          // give the elements id
+          div.setAttribute("class", `result-container`);
+          span.setAttribute("class", `result-title`);
+          span2.setAttribute("class", `result-value`);
+
+          // put the values in the elements
+
+          span.textContent = resultObj[key]["title"];
+          span2.textContent = resultObj[key]["value"];
+
+          // appened them to an element that contians them
+          div.append(span, span2);
+
+          // return that element
+          return div;
+        });
+
+        return elementNodes;
+      }
+
+      function prepareUnits() {
+        let imf = parseFloat(impForceValEl.value) ?? 0;
+        let m = parseFloat(massValEl.value) ?? 0;
+        let v = parseFloat(velocityValEl.value) ?? 0;
+        let cdi = parseFloat(collDistValEl.value) ?? 0;
+        let cdu = parseFloat(collDuraValEl.value) ?? 0;
+
+        let imfUnit = impForceSelectEl.value;
+        let mUnit = massSelectEl.value;
+        let vUnit = velocitySelectEl.value;
+        let cdiUnit = collDistSelectEl.value;
+        let cduUnit = collDuraSelectEl.value;
+
+        imf = toSIUnit("force", imfUnit, imf);
+        m = toSIUnit("mass", mUnit, m);
+        v = toSIUnit("speed", vUnit, v);
+        cdi = toSIUnit("distance", cdiUnit, cdi);
+        cdu = toSIUnit("time", cduUnit, cdu);
+       
+        return { imf, m, v, cdi, cdu };
+      }
+
+      function prepareResults(result, type, name) {
+        let resultObj = {};
+        Object.keys(UNITS[type]).forEach((key) => {
+          let ans = fromSIUnit(type, key, result);
+
+          resultObj[key] = {
+            title: `${name} (${key}): `,
+            value: ` ${ans.toFixed(3) * 1} ${key}`,
+          };
+        });
+        return resultObj;
+      }
+
+      function calculateResult(input) {
+        const calculateIF = () => {
+          const { m, v, cdi, cdu } = prepareUnits();
+          let result;
+          if (isNaN(cdi)) {
+            result = (m * v) / cdu
+          } else {
+            result = (0.5 * m * (v ** 2)) / cdi
+          }
+          return {
+            result,
+            type: "force",
+            name: `Average Impact Force`,
+          };
+        };
+        const calculateM = () => {
+          const { imf, v, cdi, cdu} = prepareUnits();
+          let result;
+          if (isNaN(cdi)) {
+            result =  (cdu * imf) / v
+          } else {
+            result = (cdi * imf) / (0.5 * (v ** 2))
+          }
+          return {
+            result,
+            type: "mass",
+            name: "Mass",
+          };
+        };
+        const calculateV = () => {
+          const { imf, m, cdi, cdu} = prepareUnits();
+          let result;
+          if (isNaN(cdi)) {
+            result =  (cdu * imf) / m
+          } else {
+            result = Math.sqrt((cdi * imf) / (0.5 * m))
+          }
+          return {
+            result,
+            type: "speed",
+            name: "Velocity on impact",
+          };
+        };
+        const calculateCDI = () => {
+          const { imf, v, m, cdu} = prepareUnits();
+          let result;
+          if (isNaN(imf)) {
+            let myImf = (m * v) / cdu
+            result =  (0.5 * m * (v ** 2)) / myImf
+          } else {
+            result = (0.5 * m * (v ** 2)) / imf
+          }
+          return {
+            result,
+            type: "distance",
+            name: "Collision distance",
+          };
+        };
+        const calculateCDU = () => {
+          const { imf, v, m, cdi} = prepareUnits();
+          let result;
+          if (isNaN(imf)) {
+            let myImf = (0.5 * m * (v ** 2)) / cdi
+            result =  (m * v) / myImf
+          } else {
+            result = (m * v) / imf
+          }
+          return {
+            result: (2 * k) / (v * v),
+            type: "time",
+            name: "Collision duration",
+          };
+        };
+
+        switch (input) {
+          case "imf":
+            return calculateIF();
+          case "mas":
+            return calculateM();
+          case "vel":
+            return calculateV();
+          case "cdi":
+            return calculateCDI();
+          case "cdu":
+            return calculateCDU();
+          default:
+            console.log("error in calculate result switch");
+        }
+      }
+
+      function calculateResults() {
+        const calcVal = calcSelectEl.value
+
+          try {
+            const { result, type, name } = calculateResult(calcVal);
+
+            if (isNaN(result)) {
+              alert("Your input resulted in NAN.\n 0/0 \n Try again with valid input.");
+              resetResult()
+              return;
+            }
+            if (Math.abs(result) === Infinity) {
+              alert(
+                "Your input resulted in Infinity. \nDivision by zero. \nTry again with valid input."
+              );
+              resetResult()
+              return;
+            }
+            const resultObj = prepareResults(result, type, name);
+            const elementNodes = createElements(resultObj);
+            calcResultsEl.innerHTML = "";
+
+            elementNodes.forEach((element) => {
+              calcResultsEl.append(element);
+            });
+          } catch (error) {
+            alert("Something Went Wrong!!!");
+            resethandler()
+          }
+      }
+
+      function resetForm() {
+        [impForceValEl, massValEl, velocityValEl, collDistValEl, collDuraValEl].forEach((input) => {
+          input.value = ""
+        });
+        impForceSelectEl.selectedIndex = '0'
+        massSelectEl.selectedIndex = '2'
+        velocitySelectEl.selectedIndex = '4'
+        collDistSelectEl.selectedIndex = '2'
+        collDuraSelectEl.selectedIndex = '1'
+
+        calcSelectEl.selectedIndex = '0'
+
+        containtersEl.forEach((container) => {
+          let idVal = container.id.slice(0, 3)
+          if (idVal == 'imf') {
+            container.style.display = 'none'
+          } else {
+            container.style.display = 'block'
+          }
+        })
+      }
+
+      function resetResult() {
+        calcResultsEl.innerHTML = "<p>Result will appear here...</p>";
+      } 
+
+      function resethandler() {
+        resetForm();
+        resetResult();
+      }
+
+      /*************** EVENTLISTINERS ***************/
+      [impForceValEl, massValEl, velocityValEl, collDistValEl, collDuraValEl].forEach((el) => {
+        el.addEventListener("input", resetResult);
+      }); 
+            
+      [impForceSelectEl, massSelectEl, velocitySelectEl, collDistSelectEl, collDuraSelectEl].forEach((el) => {
+        el.addEventListener("change", resetResult);
+      }); 
+
+      calcSelectEl.addEventListener("change", handlecalcSelectChange)
+
+      resetBtnEl.addEventListener("click", resethandler);
+      calcBtnEl.addEventListener("click", calculateResults);
+
+    </script>
+</body>
+</html>

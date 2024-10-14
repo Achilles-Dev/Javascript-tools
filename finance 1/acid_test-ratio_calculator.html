@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Acid Test Ratio Calculator</title>
+</head>
+<body>
+    <h1>Acid Test Ratio Calculator</h1>
+    <p>
+      Cash:
+      <input type="number" id="cash">
+    </p>
+    <p>
+      Accounts receivable:
+      <input type="number" id="accReceive">
+    </p>
+    <p>
+      Short-term investments:
+      <input type="number" id="stInvest" >
+    </p>
+    <p>
+      Current Liabilities::
+      <input type="number" id="currLiab">
+    </p>
+
+    <button id="calcBtn">Calculate</button>
+    <button id="resetBtn">Reset</button>
+    <hr>
+    <div>
+      <h3>Result:</h3>
+      <h3 id="calcResults">Result will appear here...</h3>
+    </div>
+
+    <script>
+      // Get required elements from the HTML
+      const cashEl = document.getElementById("cash");
+      const accReceiveEl = document.getElementById("accReceive");
+      const stInvestEl = document.getElementById("stInvest");
+      const currLiabEl = document.getElementById("currLiab");
+
+      const calcBtnEl = document.getElementById('calcBtn');
+      const resetBtnEl = document.getElementById('resetBtn');
+      const calcResultsEl = document.getElementById('calcResults') 
+
+      function createElement() {
+        const newDiv = `
+            <p>
+              <label for="i11-span">Acid Test Ratio: &nbsp;</label>
+              <span
+                data-id="i11"
+                step="any"
+                id="i11-span"
+                class="spans"
+                data-name="Acid Test Ratio"
+              ></span>
+            </p>
+        `
+        return newDiv
+      }
+
+      function setResult(resultObj) {
+        for (key of Object.keys(resultObj)) {
+          let val = resultObj[key].result;
+          let id = resultObj[key].type;
+
+          if (isNaN(val)) {
+           alert("Your input resulted in NAN.\n 0/0 \n Try again with valid input.");
+            return;
+          }
+          if (Math.abs(val) === Infinity) {
+            alert("Your input resulted in Infinity. \nDivision by zero. \nTry again with valid input.");
+            return;
+          }
+          const span = document.getElementById(`${id}-span`);
+          span.textContent = `${parseFloat(val)} : 1`;
+        }
+      }
+
+
+      function calculateResults() {
+          // Retrieve input values
+          const cash = parseFloat(cashEl.value);
+          const accReceive = parseFloat(accReceiveEl.value);
+          const stInvest = parseFloat(stInvestEl.value);
+          const currLiab = parseFloat(currLiabEl.value)
+
+          if (isNaN(cash) || cash <= 0.001 || isNaN(accReceive) || accReceive <= 0.001 || 
+            isNaN(stInvest) || stInvest <= 0.001 || isNaN(currLiab) || currLiab <= 0.001 ) {
+            alert("Please Enter All Details.");
+            return;
+          }
+
+          try {
+            const resultElement = createElement()
+            calcResultsEl.innerHTML = resultElement
+            
+            const acidTest = (cash + accReceive + stInvest) / currLiab
+
+            const results = {
+              1: { result: Math.abs(acidTest) > 1 ? acidTest.toFixed(2) : acidTest.toPrecision(2), type: "i11" },
+            }
+            setResult(results)
+
+          } catch (error) {
+            alert("Something Went Wrong!!!");
+            resetResult()
+            return;
+          }
+      }
+
+      function resetForm() {
+        cashEl.value = ""
+        accReceiveEl.value = ""
+        stInvestEl.value = ""
+        currLiabEl.value = ""
+      }
+
+      function resetResult() {
+        calcResultsEl.innerHTML = "<p>Result will appear here...</p>";
+      } 
+
+      function resethandler() {
+        resetForm();
+        resetResult();
+      }
+
+      resetBtnEl.addEventListener("click", resethandler);
+      calcBtnEl.addEventListener("click", calculateResults);
+
+      [cashEl, accReceiveEl, stInvestEl, currLiabEl].forEach((el) => {
+        el.addEventListener("input", resetResult);
+      });  
+    </script>
+</body>
+</html>

@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Terminal Velocity Calculator</title>
+</head>
+<body>
+    <h1>Terminal Velocity Calculator</h1>
+    <p>EEasily calculate the terminal velocity of a human or object falling through air with this calculator. Required inputs are: <br />
+      the mass of the falling object/body, the drag coefficient and the projected area, as well as the air density and gravitational acceleration.
+    </p>
+    <p>
+      Mass:
+      <input type="number" id="massVal">
+      <select name="mass" id="massSelect">
+        <option value="mg">mg</option>
+        <option value="g">g</option>
+        <option value="kg" selected>kg</option>
+        <option value="tonne">tonne</option>
+        <option value="oz">oz</option>
+        <option value="lb">lb</option>
+        <option value="ton">ton</option>
+      </select>
+    </p>
+    <p>
+      Cross-section area: 
+      <input type="number" id="crossSecVal">
+      <select name="crossSection" id="crossSecSelect">
+        <option value="mm²">mm2</option>
+        <option value="cm²">cm2</option>
+        <option value="m²" selected>m2</option>
+        <option value="in²">in2</option>
+        <option value="ft²">ft2</option>
+        <option value="ft²">yd2</option>
+      </select>
+    </p>
+    <p>
+      Drag Coefficient: 
+      <input type="number" id="dragCoeVal" value="0.294">
+    </p>
+    <p>
+      Air density: 
+      <input type="number" id="airDenVal" value="1.225">
+      <select id="airDenSelect" name="airDensity" >
+        <option value="g/m³">g/m3</option>
+        <option value="g/cm³">g/cm3</option>
+        <option value="kg/m³" selected>kg/m3</option>
+        <option value="kg/cm³">kg/cm3</option>
+        <option value="ozin³">oz/cu in</option>
+        <option value="lbft³">lb/cu ft</option>
+        <option value="lbyd³">lb/cu yd</option>
+        <option value="g/litre">g/litre</option>
+      </select>
+    </p>
+    <p>
+      Gravity: 
+      <input type="number" id="gravityVal" value="1">
+      <select id="gravitySelect" name="gravity">
+        <option value="ms2">m/s2</option>
+        <option value="g" selected>g</option>
+      </select>
+    </p>
+    
+    <button id="calcBtn">Calculate</button>
+    <button id="resetBtn">Reset</button>
+    <hr>
+    <div>
+      <h3>Result:</h3>
+      <h3 id="calcResults">Result will appear here...</h3>
+    </div>
+
+    <script>
+      // Get required elements from the HTML
+      const massValEl = document.getElementById("massVal");
+      const crossSecValEl = document.getElementById("crossSecVal");
+      const dragCoeValEl = document.getElementById("dragCoeVal");
+      const airDenValEl = document.getElementById("airDenVal");
+      const gravityValEl = document.getElementById("gravityVal");
+
+      const massSelectEl = document.getElementById("massSelect");
+      const crossSecSelectEl = document.getElementById("crossSecSelect");
+      const airDenSelectEl = document.getElementById("airDenSelect");
+      const gravitySelectEl = document.getElementById("gravitySelect");
+
+      const calcBtnEl = document.getElementById('calcBtn');
+      const resetBtnEl = document.getElementById('resetBtn');
+      const calcResultsEl = document.getElementById('calcResults') 
+
+      const UNITS = {
+        density: {
+          "g/m³": 1000,
+          "g/cm³": 0.001,
+          "kg/m³": 1,
+          "kg/cm³": 0.000001,
+          "ozin³": 0.000578037,
+          "lbft³": 0.0624279606,
+          "lbyd³": 1.6855549356,
+          "g/litre": 1,
+        },
+        area: {
+          "mm²": 1000000,
+          "cm²": 10000,
+          "m²": 1,
+          "in²": 1550.003100006200012400024800049600099200198400396800793601587,
+          "ft²": 10.763910416709722308333505555900000688890266669422227733344,
+          "ft²": 1.195990046301080256481500617322222298765585185491358637038,
+        },
+        mass: {
+          mg: 1000000.0,
+          g: 1000,
+          kg: 1,
+          tonne: 0.001,
+          oz: 35.273962,
+          lbs: 2.2046,
+          ton: 0.00110231,
+        },
+        gravity: {
+          "g": 0.1019716212978,
+          "ms2": 1
+        },
+        speed: {
+          "miles/h": 2.2369362920544,
+          "km/h": 3.6,
+          "m/s": 1,
+          "ft/s": 3.280839895,
+        },
+      }
+
+      /*************** FUNCTIONS ***************/
+      function toSIUnit(type, unit, value) {
+        return value / UNITS[type][unit];
+      }
+
+      function fromSIUnit(type, unit, value) {
+        return value * UNITS[type][unit];
+      }
+
+      function prepareUnits() {
+        let iq = parseFloat(iniQtyValEl.value) ?? 0;
+        let rq = parseFloat(remQtyValEl.value) ?? 0;
+        let te = parseFloat(timeValEl.value) ?? 0;
+        let hl = parseFloat(document.getElementById('halfLifeVal').value) ?? 0;
+
+        let teUnit = timeSelectEl.value;
+        let hlUnit = document.getElementById('halfLifeSelect').value;
+
+        te = toSIUnit("time", teUnit, te);
+        hl = toSIUnit("time", hlUnit, hl);
+
+        return { iq, rq, te , hl};
+      }
+
+      function prepareUnits() {
+        let ma = parseFloat(massValEl.value) ?? 0;
+        let cs = parseFloat(crossSecValEl.value) ?? 0;
+        let dc = parseFloat(dragCoeValEl.value) ?? 0;
+        let ad = parseFloat(airDenValEl.value) ?? 0;
+        let gr = parseFloat(gravityValEl.value) ?? 0;
+
+        let maUnit = massSelectEl.value;
+        let csUnit = crossSecSelectEl.value;
+        let adUnit = airDenSelectEl.value;
+        let grUnit = gravitySelectEl.value;
+
+        ma = toSIUnit("mass", maUnit, ma);
+        cs = toSIUnit("area", csUnit, cs);
+        ad = toSIUnit("density", adUnit, ad);
+        gr = toSIUnit("gravity", grUnit, gr);
+
+        return { ma, cs, dc , ad, gr};
+      }
+
+      function calculateResult() {
+        const { ma, cs, dc, ad, gr } = prepareUnits();
+        let result = Math.sqrt((2 * ma * gr) / (ad * cs * dc))
+        const kmh = fromSIUnit('speed', 'km/h', result)
+        const fts = fromSIUnit('speed', 'ft/s', result)
+        const mph = fromSIUnit('speed', 'miles/h', result)
+        return {
+          result: result.toFixed(4) * 1,
+          kmh: kmh.toFixed(4) * 1,
+          fts: fts.toFixed(4) * 1,
+          mph: mph.toFixed(4) * 1,
+          type: "velocity",
+          name: "Terminal Velocity (metric)",
+        };
+      }
+
+      function calculateResults() {
+        try {
+          const { result, type, name, kmh, fts, mph } = calculateResult();
+          if (isNaN(result)) {
+            alert("Your input resulted in NAN.\n 0/0 \n Try again with valid input.");
+            resetResult()
+            return;
+          }
+          if (Math.abs(result) === Infinity) {
+            alert(
+              "Your input resulted in Infinity. \nDivision by zero. \nTry again with valid input."
+            );
+            resetResult()
+            return;
+          }
+          
+          calcResultsEl.innerHTML = `<p>${name} = ${result} m/s (${kmh} km/h)</p>
+                                    <p>Terminal Velocity (imp): ${fts} ft/s (${mph} mph) </p>
+          `;          
+        } catch (error) {
+          console.log(error);
+          alert("An error ocurred. Try again with valid input.");
+          resetResult()
+          return;
+        }
+      }
+
+      function resetForm() {
+        massValEl.value = ""
+        crossSecValEl.value = ""
+        dragCoeValEl.value = "0.294"
+        airDenValEl.value = "1.225"
+        gravityValEl.value = "1"
+
+        massSelectEl.selectedIndex = "2"
+        crossSecSelectEl.selectedIndex = "2"
+        airDenSelectEl.selectedIndex = "2"
+        gravitySelectEl.selectedIndex = "1"
+      }
+
+      function resetResult() {
+        calcResultsEl.innerHTML = "<p>Result will appear here...</p>";
+      } 
+
+      function resethandler() {
+        resetForm();
+        resetResult();
+      }
+
+      /*************** EVENTLISTINERS ***************/
+      [massValEl, crossSecValEl, dragCoeValEl, airDenValEl, gravityValEl].forEach((el) => {
+        el.addEventListener("input", resetResult);
+      }); 
+            
+      [massSelectEl, crossSecSelectEl, airDenSelectEl, gravitySelectEl].forEach((el) => {
+        el.addEventListener("change", resetResult);
+      }); 
+
+      resetBtnEl.addEventListener("click", resethandler);
+      calcBtnEl.addEventListener("click", calculateResults);
+
+    </script>
+</body>
+</html>
