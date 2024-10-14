@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>APR Calculator</title>
+</head>
+<body>
+    <h1>APR Calculator</h1>
+    <h3>Calculate the annual percentage rate (APR).</h3>
+    <p>
+      Loan amount:
+      <input type="number" id="loanAmt" value="100000">
+    </p>
+    <p>
+      Extra cost:
+      <input type="number" id="extCost" value="5000">
+      <br />
+      <span>Application fee, processing fee, bond fee etc</span>
+    </p>
+    <p>
+      Annual interest rate:
+      <input type="number" id="annIntRate" value="7.0">%
+    </p>
+    <p>
+      No. of months:
+      <input type="number" id="noOfMths" value="360">
+    </p>
+
+
+    <button id="calcBtn">Calculate</button>
+    <button id="resetBtn">Reset</button>
+    <hr>
+    <div>
+      <h3>Result:</h3>
+      <h3 id="calcResults">Result will appear here...</h3>
+    </div>
+
+    <script>
+      // Get required elements from the HTML
+      const loanAmtEl = document.getElementById("loanAmt");
+      const extCostEl = document.getElementById("extCost");
+      const annIntRateEl = document.getElementById("annIntRate");
+      const noOfMthsEl = document.getElementById("noOfMths")
+
+      const calcBtnEl = document.getElementById('calcBtn');
+      const resetBtnEl = document.getElementById('resetBtn');
+      const calcResultsEl = document.getElementById('calcResults') 
+
+      function createElement() {
+        const newDiv = `
+            <p>
+              <label for="i11-span">APR: &nbsp;</label>
+              <span
+                data-id="i11"
+                step="any"
+                id="i11-span"
+                class="spans"
+                data-name="APR"
+              ></span>
+            </p>
+        `
+        return newDiv
+      }
+
+      function setResult(resultObj) {
+        for (key of Object.keys(resultObj)) {
+          let val = resultObj[key].result;
+          let id = resultObj[key].type;
+
+          if (isNaN(val)) {
+           alert("Your input resulted in NAN.\n 0/0 \n Try again with valid input.");
+            return;
+          }
+          if (Math.abs(val) === Infinity) {
+            alert("Your input resulted in Infinity. \nDivision by zero. \nTry again with valid input.");
+            return;
+          }
+          const span = document.getElementById(`${id}-span`);
+          span.textContent = `${parseFloat(val)} %`;
+        }
+      }
+
+      function calculateResults() {
+          // Retrieve input values
+          const loanAmt = parseFloat(loanAmtEl.value);
+          const extCost = parseFloat(extCostEl.value);
+          const annIntRate = parseFloat(annIntRateEl.value);
+          const noOfMths = parseFloat(noOfMthsEl.value);
+
+          if (isNaN(loanAmt) || loanAmt <= 0 || isNaN(extCost)  || isNaN(annIntRate) || isNaN(noOfMths) || noOfMths <= 0) {
+            alert("Please Enter All Details.");
+            return;
+          }
+
+          try {
+            const resultElement = createElement()
+            calcResultsEl.innerHTML = resultElement 
+
+            const interest = loanAmt * (annIntRate / 100) * (noOfMths / 12)
+            
+            const apr = (((extCost + interest) / loanAmt) / (noOfMths / 12)) * 100
+            console.log(((extCost + interest) / loanAmt))
+            const results = {
+              1: { result: Math.abs(apr) > 1 ? apr.toFixed(2) : apr.toPrecision(2), type: "i11" },
+            }
+            setResult(results)
+
+          } catch (error) {
+            alert("Something Went Wrong!!!");
+            resetResult()
+            return;
+          }
+      }
+
+      function resetForm() {
+        loanAmtEl.value = "100000"
+        extCostEl.value = "5000"
+        annIntRateEl.value = "7.0"
+        noOfMthsEl.value = "360"
+      }
+
+      function resetResult() {
+        calcResultsEl.innerHTML = "<p>Result will appear here...</p>";
+      } 
+
+      function resethandler() {
+        resetForm();
+        resetResult();
+      }
+
+      resetBtnEl.addEventListener("click", resethandler);
+      calcBtnEl.addEventListener("click", calculateResults);
+
+      [loanAmtEl, extCostEl, annIntRateEl, noOfMthsEl].forEach((el) => {
+        el.addEventListener("input", resetResult);
+      });  
+    </script>
+</body>
+</html>

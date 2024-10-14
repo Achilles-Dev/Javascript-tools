@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Amortization Calculator</title>
+</head>
+<body>
+    <h1>Amortization Calculator</h1>
+    <h3>Calculate monthly mortgage payments.</h3>
+    <p>
+      Loan amount:
+      <input type="number" id="loanAmt" value="100000">
+    </p>
+    <p>
+      Annual interest rate: 
+      <input type="number" id="annIntRate" value="7">%
+    </p>
+    <p>
+      Loan term:
+      <select id="loanTerm">
+        <option value="1">1 year</option>
+        <option value="2">2 years</option>
+        <option value="3">3 years</option>
+        <option value="4">4 years</option>
+        <option value="5">5 years</option>
+        <option value="6">6 years</option>
+        <option value="7">7 years</option>
+        <option value="8">8 years</option>
+        <option value="9">9 years</option>
+        <option value="10">10 years</option>
+        <option value="11">11 years</option>
+        <option value="12">12 years</option>
+        <option value="13">13 years</option>
+        <option value="14">14 years</option>
+        <option value="15">15 years</option>
+        <option value="16">16 years</option>
+        <option value="17">17 years</option>
+        <option value="18">18 years</option>
+        <option value="19">19 years</option>
+        <option value="20" selected>20 years</option>
+        <option value="21">12 years</option>
+        <option value="22">22 years</option>
+        <option value="23">23 years</option>
+        <option value="24">24 years</option>
+        <option value="25">25 years</option>
+        <option value="26">26 years</option>
+        <option value="27">27 years</option>
+        <option value="28">28 years</option>
+        <option value="29">29 years</option>
+        <option value="30">30 years</option>
+        <option value="31">31 years</option>
+        <option value="32">32 years</option>
+        <option value="33">33 years</option>
+        <option value="34">34 years</option>
+        <option value="35">35 years</option>
+        <option value="36">36 years</option>
+        <option value="37">37 years</option>
+        <option value="38">38 years</option>
+        <option value="39">39 years</option>
+        <option value="40">40 years</option>
+        <option value="41">41 years</option>
+        <option value="42">42 years</option>
+        <option value="43">43 years</option>
+        <option value="44">44 years</option>
+        <option value="45">45 years</option>
+        <option value="46">46 years</option>
+        <option value="47">47 years</option>
+        <option value="48">48 years</option>
+        <option value="49">49 years</option>
+        <option value="50">50 years</option>
+        <option value="51">51 years</option>
+        <option value="52">52 years</option>
+        <option value="53">53 years</option>
+        <option value="54">54 years</option>
+        <option value="55">55 years</option>
+        <option value="56">56 years</option>
+        <option value="57">57 years</option>
+        <option value="58">58 years</option>
+        <option value="59">59 years</option>
+        <option value="60">60 years</option>
+        <option value="61">61 years</option>
+        <option value="62">62 years</option>
+        <option value="63">63 years</option>
+        <option value="64">64 years</option>
+        <option value="65">65 years</option>
+        <option value="66">66 years</option>
+        <option value="67">67 years</option>
+        <option value="68">68 years</option>
+        <option value="69">69 years</option>
+        <option value="70">70 years</option>
+        <option value="71">71 years</option>
+        <option value="72">72 years</option>
+        <option value="73">73 years</option>
+        <option value="74">74 years</option>
+        <option value="75">75 years</option>
+        <option value="76">76 years</option>
+        <option value="77">77 years</option>
+        <option value="78">78 years</option>
+        <option value="79">79 years</option>
+        <option value="80">80 years</option>
+        <option value="81">81 years</option>
+        <option value="82">82 years</option>
+        <option value="83">83 years</option>
+        <option value="84">84 years</option>
+        <option value="85">85 years</option>
+        <option value="86">86 years</option>
+        <option value="87">87 years</option>
+        <option value="88">88 years</option>
+        <option value="89">89 years</option>
+        <option value="90">90 years</option>
+        <option value="91">91 years</option>
+        <option value="92">92 years</option>
+        <option value="93">93 years</option>
+        <option value="94">94 years</option>
+        <option value="95">95 years</option>
+        <option value="96">96 years</option>
+        <option value="97">97 years</option>
+        <option value="98">98 years</option>
+        <option value="99">99 years</option>
+        <option value="100">100 years</option>
+      </select> 
+    </p>
+    <p>
+      Start month:
+      <select id="startMth">
+        <option value="Jan" selected>January</option>
+        <option value="Feb">February</option>
+        <option value="Mar">March</option>
+        <option value="Apr">April</option>
+        <option value="May">May</option>
+        <option value="Jun">June</option>
+        <option value="Jul">July</option>
+        <option value="Aug">August</option>
+        <option value="Sep">September</option>
+        <option value="Oct">October</option>
+        <option value="Nov">November</option>
+        <option value="Dec">December</option>
+      </select> 
+    </p>
+    <p>
+      Start year:
+      <select id="startYr">
+        <option value="1980">1980</option>
+        <option value="1981">1981</option>
+        <option value="1982">1982</option>
+        <option value="1983">1983</option>
+        <option value="1984">1984</option>
+        <option value="1985">1985</option>
+        <option value="1986">1986</option>
+        <option value="1987">1987</option>
+        <option value="1988">1988</option>
+        <option value="1989">1989</option>
+        <option value="1990">1990</option>
+        <option value="1991">1991</option>
+        <option value="1992">1992</option>
+        <option value="1993">1993</option>
+        <option value="1994">1994</option>
+        <option value="1995">1995</option>
+        <option value="1996">1996</option>
+        <option value="1997">1997</option>
+        <option value="1998">1998</option>
+        <option value="1999">1999</option>
+        <option value="2000">2000</option>
+        <option value="2001">2001</option>
+        <option value="2002">2002</option>
+        <option value="2003">2003</option>
+        <option value="2004">2004</option>
+        <option value="2005">2005</option>
+        <option value="2006">2006</option>
+        <option value="2007">2007</option>
+        <option value="2008">2008</option>
+        <option value="2009">2009</option>
+        <option value="2010">2010</option>
+        <option value="2011">2011</option>
+        <option value="2012">2012</option>
+        <option value="2013">2013</option>
+        <option value="2014">2014</option>
+        <option value="2015">2015</option>
+        <option value="2016">2016</option>
+        <option value="2017">2017</option>
+        <option value="2018">2018</option>
+        <option value="2019">2019</option>
+        <option value="2020">2020</option>
+        <option value="2021">2021</option>
+        <option value="2022">2022</option>
+        <option value="2023">2023</option>
+        <option value="2024" selected>2024</option>
+        <option value="2025">2025</option>
+        <option value="2026">2026</option>
+        <option value="2027">2027</option>
+        <option value="2028">2028</option>
+        <option value="2029">2029</option>
+        <option value="2030">2030</option>
+        <option value="2031">2031</option>
+        <option value="2032">2032</option>
+        <option value="2033">2033</option>
+        <option value="2034">2034</option>
+        <option value="2035">2035</option>
+        <option value="2036">2036</option>
+        <option value="2037">2037</option>
+        <option value="2038">2038</option>
+        <option value="2039">2039</option>
+        <option value="2040">2040</option>
+        <option value="2041">2041</option>
+        <option value="2042">2042</option>
+        <option value="2043">2043</option>
+        <option value="2044">2044</option>
+        <option value="2045">2045</option>
+        <option value="2046">2046</option>
+        <option value="2047">2047</option>
+        <option value="2048">2048</option>
+        <option value="2049">2049</option>
+        <option value="2050">2050</option>
+        
+      </select> 
+    </p>
+
+    <button id="calcBtn">Calculate</button>
+    <button id="resetBtn">Reset</button>
+    <hr>
+    <div>
+      <h3>Result:</h3>
+      <h3 id="calcResults">Result will appear here...</h3>
+    </div>
+
+    <script>
+      // Get required elements from the HTML
+      const loanAmtEl = document.getElementById("loanAmt");
+      const annIntRateEl = document.getElementById("annIntRate");
+      const loanTermEl = document.getElementById("loanTerm");
+      const startMthEl = document.getElementById("startMth");
+      const startYrEl = document.getElementById("startYr");
+
+      const calcBtnEl = document.getElementById('calcBtn');
+      const resetBtnEl = document.getElementById('resetBtn');
+      const calcResultsEl = document.getElementById('calcResults') 
+
+      function createElement() {
+        const newDiv = `
+            <table style="border: 1px solid black; border-collapse: collapse;">
+              <thead>
+              <tr>
+                <th style="border: 1px solid black; border-collapse: collapse; padding: 8px;">Monthly Loan Payments</th>
+                <th style="border: 1px solid black; border-collapse: collapse; padding: 8px;">Annual Loan Payments</th>
+                <th style="border: 1px solid black; border-collapse: collapse; padding: 8px;">Total Interest Paid</th>
+                <th style="border: 1px solid black; border-collapse: collapse; padding: 8px;">Sum of All Payments</th>
+                <th style="border: 1px solid black; border-collapse: collapse; padding: 8px;">Pay-off Date</th>
+              </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td style="border: 1px solid black; border-collapse: collapse; padding: 8px;" id="i11"></td>
+                  <td style="border: 1px solid black; border-collapse: collapse; padding: 8px;" id="i12"></td>
+                  <td style="border: 1px solid black; border-collapse: collapse; padding: 8px;" id="i13"></td>
+                  <td style="border: 1px solid black; border-collapse: collapse; padding: 8px;" id="i14"></td>
+                  <td style="border: 1px solid black; border-collapse: collapse; padding: 8px;" id="i15"></td>
+                </tr>
+              </tbody>
+            </table>
+        `
+        return newDiv
+      }
+
+      function setResult(resultObj) {
+        for (key of Object.keys(resultObj)) {
+          let val = resultObj[key].result;
+          let id = resultObj[key].type;
+
+          if (isNaN(val)) {
+           alert("Your input resulted in NAN.\n 0/0 \n Try again with valid input.");
+            return;
+          }
+          if (Math.abs(val) === Infinity) {
+            alert("Your input resulted in Infinity. \nDivision by zero. \nTry again with valid input.");
+            return;
+          }
+          const td = document.getElementById(`${id}`);
+          if (id === "i15") {
+            const startMth = startMthEl.value;
+            td.textContent = `${startMth} ${parseFloat(val)}`;
+          } else {
+            td.textContent = `${parseFloat(val)}`;
+          } 
+        }
+      }
+
+      function calculateResults() {
+          // Retrieve input values
+          const loanAmt = parseFloat(loanAmtEl.value);
+          const annIntRate = parseFloat(annIntRateEl.value);
+          const loanTerm = parseFloat(loanTermEl.value);
+          const startMth = startMthEl.value;
+          const startYr = parseFloat(startYrEl.value);
+
+          if (isNaN(loanAmt) || loanAmt < 1 || isNaN(annIntRate) || isNaN(loanTerm) || isNaN(startYr)) {
+            alert("Please Enter All Details.");
+            return;
+          } else if (loanTerm < annIntRate  ) {
+            alert("Expected life of the item should be greater than current age of the item.");
+            return;
+          }
+
+          try {
+            const resultElement = createElement()
+            calcResultsEl.innerHTML = resultElement 
+            const totTerm = startYr * 12
+            const mthLoanPay = (loanAmt * ((annIntRate / 100) / 12) * ((1 + ((annIntRate / 100) / 12)) ** totTerm)) / (((1 + ((annIntRate / 100) / 12)) ** totTerm) - 1)
+            console.log(startYr + loanTerm)
+
+            const results = {
+              1: { result: Math.abs(mthLoanPay) > 1 ? mthLoanPay.toFixed(2) : mthLoanPay.toPrecision(2), type: "i11" },
+              5: { result: `${startYr + loanTerm}`, type: "i15" },
+            }
+            setResult(results)
+
+          } catch (error) {
+            alert("Something Went Wrong!!!");
+            resetResult()
+            return;
+          }
+      }
+
+      function resetForm() {
+        loanAmtEl.value = ""
+        annIntRateEl.value = ""
+        loanTermEl.value = ""
+      }
+
+      function resetResult() {
+        calcResultsEl.innerHTML = "<p>Result will appear here...</p>";
+      } 
+
+      function resethandler() {
+        resetForm();
+        resetResult();
+      }
+
+      resetBtnEl.addEventListener("click", resethandler);
+      calcBtnEl.addEventListener("click", calculateResults);
+
+      [loanAmtEl, annIntRateEl, loanTermEl].forEach((el) => {
+        el.addEventListener("input", resetResult);
+      });  
+    </script>
+</body>
+</html>

@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Annual Income Calculator</title>
+</head>
+<body>
+    <h1>Annual Income Calculator</h1>
+    <p>
+      Working hours per week:
+      <input type="number" id="whPerWk" value="40">
+    </p>
+    <p>
+      Working weeks per year: 
+      <input type="number" id="wwPerYr" value="52">
+    </p>
+    <p>
+      Hourly wage:
+      <input type="number" id="hourWage">
+    </p>
+    <p>
+      Tax: 
+      <input type="number" id="tax" value="12">%
+    </p>
+
+    <button id="calcBtn">Calculate</button>
+    <button id="resetBtn">Reset</button>
+    <hr>
+    <div>
+      <h3>Result:</h3>
+      <h3 id="calcResults">Result will appear here...</h3>
+    </div>
+
+    <script>
+      // Get required elements from the HTML
+      const whPerWkEl = document.getElementById("whPerWk");
+      const wwPerYrEl = document.getElementById("wwPerYr");
+      const hourWageEl = document.getElementById("hourWage");
+      const taxEl = document.getElementById("tax");
+
+      const calcBtnEl = document.getElementById('calcBtn');
+      const resetBtnEl = document.getElementById('resetBtn');
+      const calcResultsEl = document.getElementById('calcResults') 
+
+      function createElement() {
+        const newDiv = `
+            <p>
+              <label for="i11-span">Annual income: &nbsp;</label>
+              <span
+                data-id="i11"
+                step="any"
+                id="i11-span"
+                class="spans"
+                data-name="Annual income"
+              ></span>
+            </p>
+            <p>
+              <label for="i12-span">Net hourly wage: &nbsp;</label>
+              <span
+                data-id="i12"
+                step="any"
+                id="i12-span"
+                class="spans"
+                data-name="Net hourly wage"
+              ></span>
+            </p>
+            <p>
+              <label for="i13-span">Net annual income: &nbsp;</label>
+              <span
+                data-id="i13"
+                step="any"
+                id="i13-span"
+                class="spans"
+                data-name="Net annual income"
+              ></span>
+            </p>
+        `
+        return newDiv
+      }
+
+      function setResult(resultObj) {
+        for (key of Object.keys(resultObj)) {
+          let val = resultObj[key].result;
+          let id = resultObj[key].type;
+
+          if (isNaN(val)) {
+           alert("Your input resulted in NAN.\n 0/0 \n Try again with valid input.");
+            return;
+          }
+          if (Math.abs(val) === Infinity) {
+            alert("Your input resulted in Infinity. \nDivision by zero. \nTry again with valid input.");
+            return;
+          }
+          const span = document.getElementById(`${id}-span`);
+          span.textContent = `$${parseFloat(val)}`;
+        }
+      }
+
+      function calculateResults() {
+          // Retrieve input values
+          const whPerWk = parseFloat(whPerWkEl.value);
+          const wwPerYr = parseFloat(wwPerYrEl.value);
+          const hourWage = parseFloat(hourWageEl.value);
+          const tax = parseFloat(taxEl.value);
+
+          if (isNaN(whPerWk) || whPerWk <= 0 || isNaN(wwPerYr) || wwPerYr <= 0 || isNaN(hourWage) || hourWage <= 0 ||
+            isNaN(tax) || tax <= 0
+          ) {
+            alert("Please Enter All Details.");
+            return;
+          }
+
+          try {
+            const resultElement = createElement()
+            calcResultsEl.innerHTML = resultElement 
+
+            const annualInc = whPerWk * wwPerYr * hourWage
+            const netHrWage = hourWage * (1 - (tax / 100))
+            const netAnnInc = netHrWage * whPerWk * wwPerYr
+
+            const results = {
+              1: { result: Math.abs(annualInc) > 1 ? annualInc.toFixed(2) : annualInc.toPrecision(2), type: "i11" },
+              2: { result: Math.abs(netHrWage) > 1 ? netHrWage.toFixed(2) : netHrWage.toPrecision(2), type: "i12" },
+              3: { result: Math.abs(netAnnInc) > 1 ? netAnnInc.toFixed(2) : netAnnInc.toPrecision(2), type: "i13" },
+            }
+            setResult(results)
+
+          } catch (error) {
+            alert("Something Went Wrong!!!");
+            resetResult()
+            return;
+          }
+      }
+
+      function resetForm() {
+        whPerWkEl.value = "40"
+        wwPerYrEl.value = "52"
+        hourWageEl.value = ""
+        taxEl.value = "12"
+      }
+
+      function resetResult() {
+        calcResultsEl.innerHTML = "<p>Result will appear here...</p>";
+      } 
+
+      function resethandler() {
+        resetForm();
+        resetResult();
+      }
+
+      resetBtnEl.addEventListener("click", resethandler);
+      calcBtnEl.addEventListener("click", calculateResults);
+
+      [whPerWkEl, wwPerYrEl, hourWageEl, taxEl].forEach((el) => {
+        el.addEventListener("input", resetResult);
+      });  
+    </script>
+</body>
+</html>
