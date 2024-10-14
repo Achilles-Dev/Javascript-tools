@@ -319,6 +319,31 @@
         return parseFloat(parseFloat(ans).toPrecision(to));
       }
 
+      function selectChangeHandler(e) {
+        let select = e.target;
+        let id = select.getAttribute("data-id");
+        let input = document.getElementById(`${id}-input`);
+        let prevUnit = select.getAttribute("data-prev");
+        let currentUnit = select.value;
+
+        select.setAttribute("data-prev", currentUnit);
+
+        if (input.value === "") {
+          return;
+        }
+
+        let type = select.getAttribute("data-type");
+
+        let value = input.value;
+        value = parseFloat(value);
+        if (isNaN(value)) value = 0.0;
+
+        let si = toSIUnit(type, prevUnit, value);
+        let result = fromSIUnit(type, currentUnit, si);
+        input.value = customPercision(result, 13);
+        resetResult()
+      }
+
       function input5Hanlder() {
         if (input5.value === "") {
           input6.value = ""
@@ -539,7 +564,11 @@
       input5.addEventListener("input", input5Hanlder);
 
       selects.forEach((select) => {
-        select.addEventListener("change", resetResult);
+        if (select.id === "i5-select" || select.id === "i6-select") {
+          select.addEventListener("change", selectChangeHandler);
+        } else {
+          select.addEventListener("change", resetResult);
+        }        
       });
       inputs.forEach((input) => {
         input.addEventListener("input", resetResult);

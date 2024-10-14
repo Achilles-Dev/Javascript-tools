@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>50/30/20 Rule Calculator</title>
+</head>
+<body>
+    <h1>50/30/20 Rule Calculator</h1>
+    <p>
+      Your monthly after-tax income:
+      <input type="number" id="income">
+    </p>
+    
+    <button id="calcBtn">Calculate</button>
+    <button id="resetBtn">Reset</button>
+    <hr>
+    <div>
+      <h3>Result:</h3>
+      <h3 id="calcResults">Result will appear here...</h3>
+    </div>
+
+    <script>
+      // Get required elements from the HTML
+      const incomeEl = document.getElementById("income");
+
+      const calcBtnEl = document.getElementById('calcBtn');
+      const resetBtnEl = document.getElementById('resetBtn');
+      const calcResultsEl = document.getElementById('calcResults') 
+
+      function createElement() {
+        const newDiv = `
+            <p>
+              <label for="i11-span">Necessities (50%): &nbsp;</label>
+              <span
+                data-id="i11"
+                step="any"
+                id="i11-span"
+                class="spans"
+                data-name="Necessities (50%)"
+              ></span>
+            </p>
+            <p>
+              <label for="i12-span">Wants (30%): &nbsp;</label>
+              <span
+                data-id="i12"
+                step="any"
+                id="i12-span"
+                class="spans"
+                data-name="Wants (30%)"
+              ></span>
+            </p>
+            <p>
+              <label for="i13-span">Savings (20%): &nbsp;</label>
+              <span
+                data-id="i13"
+                step="any"
+                id="i13-span"
+                class="spans"
+                data-name="Savings (20%)"
+              ></span>
+            </p>
+        `
+        return newDiv
+      }
+
+      function setResult(resultObj) {
+        for (key of Object.keys(resultObj)) {
+          let val = resultObj[key].result;
+          let id = resultObj[key].type;
+
+          if (isNaN(val)) {
+           alert("Your input resulted in NAN.\n 0/0 \n Try again with valid input.");
+            return;
+          }
+          if (Math.abs(val) === Infinity) {
+            alert("Your input resulted in Infinity. \nDivision by zero. \nTry again with valid input.");
+            return;
+          }
+          const span = document.getElementById(`${id}-span`);
+          span.textContent = parseFloat(val);
+        }
+      }
+
+
+      function calculateResults() {
+          // Retrieve input values
+          const income = parseFloat(incomeEl.value);
+
+          if (isNaN(income) || income < 0 ) {
+            alert("Please Enter All Details.");
+            return;
+          }
+
+          try {
+            const resultElement = createElement()
+            calcResultsEl.innerHTML = resultElement
+
+            const results = {
+              1: { result: Math.abs(income * 0.5) > 1 ? (income * 0.5).toFixed(2) : (income * 0.5).toPrecision(2), type: "i11" },
+              2: { result: Math.abs(income * 0.3) > 1 ? (income * 0.3).toFixed(2) : (income * 0.3).toPrecision(2) , type: "i12" },
+              3: { result: Math.abs(income * 0.2) > 1 ? (income * 0.2).toFixed(2) : (income * 0.2).toPrecision(2) , type: "i13" },
+            }
+            setResult(results)
+
+          } catch (error) {
+            alert("Something Went Wrong!!!");
+            resetResult()
+            return;
+          }
+      }
+
+      function resetForm() {
+        incomeEl.value = ""
+      }
+
+      function resetResult() {
+        calcResultsEl.innerHTML = "<p>Result will appear here...</p>";
+      } 
+
+      function resethandler() {
+        resetForm();
+        resetResult();
+      }
+
+      resetBtnEl.addEventListener("click", resethandler);
+      calcBtnEl.addEventListener("click", calculateResults);
+
+      [incomeEl].forEach((el) => {
+        el.addEventListener("input", resetResult);
+      });  
+    </script>
+</body>
+</html>

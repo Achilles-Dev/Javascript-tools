@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Mohr's Circle Calculator</title>
+  </head>
+  <body>
+    <h1>Mohr's Circle Calculator</h1>    
+      <p>
+        <label for="i1-input">Normal stress in the X direction (σxx) </label>
+        <input
+          type="number"
+          min="0"
+          autocomplete="off"
+          data-id="i1"
+          id="i1-input"
+          class="inputs"
+          step="any"
+          data-name="Normal stress in the X direction (σxx)"
+        />
+        <select
+          class="selects"
+          id="i1-select"
+          data-type="pressure"
+          data-prev="MPa"
+          data-id="i1"
+        >
+          <option value="Pa">pascals (Pa)</option>
+          <option value="psi">pounds per square inch (psi)</option>
+          <option value="MPa" selected>megapascals (MPa)</option>
+          <option value="GPa">gigapascals (GPa)</option>
+        </select>
+      </p>
+
+      <p>
+        <label for="i2-input">Normal stress in the Y direction (σyy): </label>
+        <input
+          type="number"
+          min="0"
+          autocomplete="off"
+          data-id="i2"
+          id="i2-input"
+          class="inputs"
+          step="any"
+          data-name="Normal stress in the Y direction (σyy)"
+        />
+        <select
+          class="selects"
+          id="i2-select"
+          data-type="pressure"
+          data-prev="MPa"
+          data-id="i2"
+        >
+          <option value="Pa">pascals (Pa)</option>
+          <option value="psi">pounds per square inch (psi)</option>
+          <option value="MPa" selected>megapascals (MPa)</option>
+          <option value="GPa">gigapascals (GPa)</option>
+        </select>
+      </p>
+
+      <p>
+        <label for="i3-input">Shear stress (τxy): </label>
+        <input
+          type="number"
+          min="0"
+          autocomplete="off"
+          data-id="i3"
+          id="i3-input"
+          class="inputs"
+          step="any"
+          data-name="Shear stress (τxy)"
+        />
+        <select
+          class="selects"
+          id="i3-select"
+          data-type="pressure"
+          data-prev="MPa"
+          data-id="i3"
+        >
+          <option value="Pa">pascals (Pa)</option>
+          <option value="psi">pounds per square inch (psi)</option>
+          <option value="MPa" selected>megapascals (MPa)</option>
+          <option value="GPa">gigapascals (GPa)</option>
+        </select>
+      </p>
+
+      <button id="calcBtn">Calculate</button>
+      <button id="resetBtn">Reset</button>
+      <hr>
+      <div>
+        <h3>Result:</h3>
+        <h3 id="calcResults">Result will appear here...</h3>
+      </div>
+    <script>
+      /*************** ELEMENTS ***************/
+      const inputs = document.querySelectorAll(".inputs");
+      const selects = document.querySelectorAll(".selects");
+
+      const calcBtnEl = document.getElementById('calcBtn');
+      const resetBtnEl = document.getElementById('resetBtn');
+      const calcResultsEl = document.getElementById('calcResults')
+
+      /*************** GLOBAL VARIBLES ***************/
+      const UNITS = {
+        pressure: {
+          Pa: 1,
+          psi: 0.0001450377,
+          MPa: 0.000001,
+          GPa: 1e-9,
+        },
+        distance: {
+          mm: 1,
+          cm: 0.1,
+          m: 0.001,
+          in: 0.0393700787,
+          ft: 0.0032808399,
+        },
+        angle: {
+          deg: 57.29577951308232,
+          rad: 1,
+          mrad: 1000,
+          μrad: 1e6,
+          πrad: 0.3183098861837907,
+        },
+        exp: {
+          exp: 1
+        }
+      };
+      /*************** FUNCTIONS ***************/
+      function toSIUnit(type, unit, value) {
+        return value / UNITS[type][unit];
+      }
+
+      function fromSIUnit(type, unit, value) {
+        return value * UNITS[type][unit];
+      }
+
+      function createElement() {
+        const newDiv = `
+            <p>
+              <label for="i11-span">Shear stress (τyx): &nbsp; </label>
+              <span
+                data-id="i11"
+                step="any"
+                id="i11-span"
+                class="spans"
+                data-name="Shear stress (τyx)"
+              ></span>
+              <select
+                class="selectsResult"
+                id="i11-select"
+                data-type="pressure"
+                data-prev="MPa"
+                data-id="i11"
+              >
+                <option value="Pa">pascals (Pa)</option>
+                <option value="psi">pounds per square inch (psi)</option>
+                <option value="MPa" selected>megapascals (MPa)</option>
+                <option value="GPa">gigapascals (GPa)</option>
+              </select>
+            </p>
+            <div>
+              <h3>Maximum principal stresses:</h3>
+              <p>
+                <label for="i12-span">Principal stress (σ1): &nbsp; </label>
+                <span
+                  data-id="i12"
+                  step="any"
+                  id="i12-span"
+                  class="spans"
+                  data-name="Principal stress (σ1)"
+                ></span>
+                <select
+                  class="selectsResult"
+                  id="i12-select"
+                  data-type="pressure"
+                  data-prev="MPa"
+                  data-id="i12"
+                >
+                  <option value="Pa">pascals (Pa)</option>
+                  <option value="psi">pounds per square inch (psi)</option>
+                  <option value="MPa" selected>megapascals (MPa)</option>
+                  <option value="GPa">gigapascals (GPa)</option>
+                </select>
+              </p>
+
+              <p>
+                <label for="i13-span">Principal stress (σ2): &nbsp; </label>
+                <span
+                  data-id="i13"
+                  step="any"
+                  id="i13-span"
+                  class="spans"
+                  data-name="Principal stress (σ2)"
+                ></span>
+                <select
+                  class="selectsResult"
+                  id="i13-select"
+                  data-type="pressure"
+                  data-prev="MPa"
+                  data-id="i13"
+                >
+                  <option value="Pa">pascals (Pa)</option>
+                  <option value="psi">pounds per square inch (psi)</option>
+                  <option value="MPa" selected>megapascals (MPa)</option>
+                  <option value="GPa">gigapascals (GPa)</option>
+                </select>
+              </p>
+            </div>
+            <div>
+               <h3>Other results:</h3>
+              <p>
+                <label for="i14-span">Maximum shear stress (τmax): &nbsp; </label>
+                <span
+                  data-id="i14"
+                  step="any"
+                  id="i14-span"
+                  class="spans"
+                  data-name="Maximum shear stress (τmax)"
+                ></span>
+                <select
+                  class="selectsResult"
+                  id="i14-select"
+                  data-type="pressure"
+                  data-prev="MPa"
+                  data-id="i14"
+                >
+                  <option value="Pa">pascals (Pa)</option>
+                  <option value="psi">pounds per square inch (psi)</option>
+                  <option value="MPa" selected>megapascals (MPa)</option>
+                  <option value="GPa">gigapascals (GPa)</option>
+                </select>
+              </p>
+              <p>
+                <label for="i16-span">Angle of orientation (θ): &nbsp; </label>
+                <span
+                  data-id="i16"
+                  step="any"
+                  id="i16-span"
+                  class="spans"
+                  data-name="Angle of orientation (θ)"
+                ></span>
+                <select
+                  class="selectsResult"
+                  id="i16-select"
+                  data-type="angle"
+                  data-prev="rad"
+                  data-id="i16"
+                >
+                  <option value="deg">degrees (deg)</option>
+                  <option value="rad" selected>radians (rad)</option>
+                  <option value="mrad">milliradians (mrad)</option>
+                  <option value="μrad">microradians (μrad)</option>
+                  <option value="πrad">radians (× π rad)</option>
+                </select>
+              </p>
+              <p>
+                <label for="i17-span">Mean stress (σm): &nbsp; </label>
+                <span
+                  data-id="i17"
+                  step="any"
+                  id="i17-span"
+                  class="spans"
+                  data-name="Mean stress (σm)"
+                ></span>
+                <select
+                  class="selectsResult"
+                  id="i17-select"
+                  data-type="pressure"
+                  data-prev="MPa"
+                  data-id="i17"
+                >
+                  <option value="Pa">pascals (Pa)</option>
+                  <option value="psi">pounds per square inch (psi)</option>
+                  <option value="MPa" selected>megapascals (MPa)</option>
+                  <option value="GPa">gigapascals (GPa)</option>
+                </select>
+              </p>
+            </div>
+        `
+        return newDiv
+        
+      }
+      
+      // related to caculation
+      function prepareUnit(...args) {
+        const resultArr = [];
+        for (id of args) {
+          const input = document.getElementById(`${id}-input`);
+          const select = document.getElementById(`${id}-select`);
+          const type = select.getAttribute("data-type");
+          let val = parseFloat(input.value);
+
+          val = isNaN(val) ? 0 : val;
+          let inUnit = select.value;
+
+          val = toSIUnit(type, inUnit, val);
+          resultArr.push(val);
+        }
+
+        return resultArr;
+      }
+
+      function setResult(resultObj) {
+        for (key of Object.keys(resultObj)) {
+          let val = resultObj[key].result;
+          let id = resultObj[key].type;
+
+          if (isNaN(val)) {
+           alert("Your input resulted in NAN.\n 0/0 \n Try again with valid input.");
+            return;
+          }
+          if (Math.abs(val) === Infinity) {
+            alert("Your input resulted in Infinity. \nDivision by zero. \nTry again with valid input.");
+            return;
+          }
+          const span = document.getElementById(`${id}-span`);
+          const select = document.getElementById(`${id}-select`);
+          const type = select.getAttribute("data-type");
+          let outUnit = select.value;
+          val = fromSIUnit(type, outUnit, val);
+          val = parseFloat(val)
+          span.textContent = Math.abs(val) > 1 ? val.toFixed(4) * 1 : val;
+        }
+      }
+
+      function calculateResult() {             
+        function calculateRes() {
+          let [val1, val2, val3] = prepareUnit("i1", "i2", "i3");
+          let ss = -1 * val3
+          let prinStRight = Math.sqrt((((val1 - val2) / 2) ** 2) + (val3 ** 2))
+          let prinStLeft = (val1 + val2) / 2
+          let prinSt1 = prinStLeft + prinStRight
+          let prinSt2 = prinStLeft - prinStRight
+          let ssMax = (prinSt1 - prinSt2) / 2
+          let meanS = (prinSt1 + prinSt2) / 2
+          let ornAng = Math.atan((2 * val3) / (val1 - val2)) / 2
+          
+          return {
+            1: { result: Math.abs(ss) > 1 ? ss.toFixed(3) * 1 : ss, type: "i11" },
+            2: { result: Math.abs(prinSt1) > 1 ? prinSt1.toFixed(3) * 1 : prinSt1, type: "i12" },
+            3: { result: Math.abs(prinSt2) > 1 ? prinSt2.toFixed(3) * 1 : prinSt2, type: "i13" },
+            4: { result: Math.abs(ssMax) > 1 ? ssMax.toFixed(3) * 1 : ssMax, type: "i14" },
+            6: { result: Math.abs(ornAng) > 1 ? ornAng.toFixed(3) * 1 : ornAng, type: "i16" },
+            7: { result: Math.abs(meanS) > 1 ? meanS.toFixed(3) * 1 : meanS, type: "i17" },
+          };
+        }
+        return calculateRes()
+      }
+
+      function validateInput(id) {
+        const input = document.getElementById(`${id}-input`);
+        const label = input.getAttribute("data-name").trim();
+        let value = parseFloat(input.value);
+        if (isNaN(value)) {
+          alert(`${label} value cannot be empty.`);
+          return false;
+        }
+
+
+        if (value < 0) {
+          alert(`${label} value cannot be negative.`);
+          return false;
+        }
+
+        return true;
+      }
+
+      function handleResultsChange(e) {
+        let select = e.target;
+        let id = select.getAttribute("data-id");
+        let span = document.getElementById(`${id}-span`);
+
+        let prevUnit = select.getAttribute("data-prev");
+        let currentUnit = select.value;
+        select.setAttribute("data-prev", currentUnit);
+
+        if (span.textContent === "") {
+          return;
+        }
+
+        let type = select.getAttribute("data-type");
+
+        let value = parseFloat(span.textContent);
+        value = parseFloat(value);
+        if (isNaN(value)) value = 0.0;
+
+        let si = toSIUnit(type, prevUnit, value);
+        let result = fromSIUnit(type, currentUnit, si);
+        span.textContent = parseFloat(result).toFixed(5) * 1;
+      }
+
+      function calculateResults() {
+        for (el of ["i1", "i2", "i3"]) {
+          if (!validateInput(el)) return;
+        }
+        
+
+        try {
+          const resultElement = createElement()
+          
+          calcResultsEl.innerHTML = resultElement
+
+          const newSelects = document.querySelectorAll(".selectsResult");
+
+          newSelects.forEach((select) => {
+            select.addEventListener("change", handleResultsChange);
+          });
+
+          const result = calculateResult();
+          setResult(result)
+
+        } catch(error) {
+          alert("An error ocurred. Try again with valid input.");
+          resetResult()
+          return;
+        }
+      }
+
+      function resetForm() {
+        selects.forEach((select, index) => {
+          select.selectedIndex = '2'
+        });
+
+        inputs.forEach((input, index) => {
+          input.value = ""
+        });
+        
+      }
+
+      function resetResult() {
+        calcResultsEl.innerHTML = "<p>Result will appear here...</p>";
+      } 
+
+      function resethandler() {
+        resetForm();
+        resetResult();
+      }
+
+      /*************** EVENT LISTINERS ***************/
+      selects.forEach((select) => {
+        select.addEventListener("change", resetResult);
+      });
+      inputs.forEach((input) => {
+        input.addEventListener("input", resetResult);
+      });
+
+      resetBtnEl.addEventListener("click", resethandler);
+      calcBtnEl.addEventListener("click", calculateResults);
+
+    </script>
+  </body>
+</html>

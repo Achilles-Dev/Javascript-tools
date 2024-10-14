@@ -114,7 +114,8 @@
               degOfFreed = sampSize1 + sampSize2 - 2
               pooledSD = Math.sqrt(((sampSize1 - 1) * (sampleSD1 ** 2) + (sampSize2 - 1) * (sampleSD2 ** 2)) / (sampSize1 + sampSize2 - 2))
               testStat = (meanSamp1 - meanSamp2) / (pooledSD * Math.sqrt((1 / sampSize1) + (1 / sampSize2)))
-              strdErr = Math.sqrt(((sampleSD1 ** 2) / sampSize1) + ((sampleSD2 ** 2) / sampSize2))
+              // strdErr = Math.sqrt(((sampleSD1 ** 2) / sampSize1) + ((sampleSD2 ** 2) / sampSize2))
+              strdErr = pooledSD * Math.sqrt((1 / sampSize1) + (1 / sampSize2))
             } else {
               degOfFreed = sampSize1 - 1
               testStat = (meanSamp1 - popMean) / (sampleSD1 / Math.sqrt(sampSize1))
