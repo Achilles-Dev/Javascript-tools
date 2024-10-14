@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Accounting Profit Calculator</title>
+</head>
+<body>
+    <h1>Accounting Profit Calculator</h1>
+    <p>
+      Total revenue:
+      <input type="number" id="totRevenue" value="100000">
+    </p>
+    <p>
+      Operation expenses: 
+      <input type="number" id="opExpenses" value="25000">
+    </p>
+    <p>
+      Interest: 
+      <input type="number" id="interest" value="12000">
+    </p>
+    <p>
+      Depreciation: 
+      <input type="number" id="depreciation" value="10000">
+    </p>
+    <p>
+      Taxes: 
+      <input type="number" id="taxes" value="15000">
+    </p>
+
+    <button id="calcBtn">Calculate</button>
+    <button id="resetBtn">Reset</button>
+    <hr>
+    <div>
+      <h3>Result:</h3>
+      <h3 id="calcResults">Result will appear here...</h3>
+    </div>
+
+    <script>
+      // Get required elements from the HTML
+      const totRevenueEl = document.getElementById("totRevenue");
+      const opExpensesEl = document.getElementById("opExpenses");
+      const interestEl = document.getElementById("interest");
+      const depreciationEl = document.getElementById("depreciation");
+      const taxesEl = document.getElementById("taxes");
+
+      const calcBtnEl = document.getElementById('calcBtn');
+      const resetBtnEl = document.getElementById('resetBtn');
+      const calcResultsEl = document.getElementById('calcResults') 
+
+      function createElement() {
+        const newDiv = `
+            <p>
+              <label for="i11-span">Total explicit costs: &nbsp;</label>
+              <span
+                data-id="i11"
+                step="any"
+                id="i11-span"
+                class="spans"
+                data-name="Total explicit costs"
+              ></span>
+            </p>
+            <p>
+              <label for="i12-span">Accounting profit: &nbsp;</label>
+              <span
+                data-id="i12"
+                step="any"
+                id="i12-span"
+                class="spans"
+                data-name="Accounting profit"
+              ></span>
+            </p>
+        `
+        return newDiv
+      }
+
+      function setResult(resultObj) {
+        for (key of Object.keys(resultObj)) {
+          let val = resultObj[key].result;
+          let id = resultObj[key].type;
+
+          if (isNaN(val)) {
+           alert("Your input resulted in NAN.\n 0/0 \n Try again with valid input.");
+            return;
+          }
+          if (Math.abs(val) === Infinity) {
+            alert("Your input resulted in Infinity. \nDivision by zero. \nTry again with valid input.");
+            return;
+          }
+          const span = document.getElementById(`${id}-span`);
+          span.textContent = parseFloat(val);
+        }
+      }
+
+
+      function calculateResults() {
+          // Retrieve input values
+          const totRevenue = parseFloat(totRevenueEl.value);
+          const opExpenses = parseFloat(opExpensesEl.value);
+          const interest = parseFloat(interestEl.value);
+          const depreciation = parseFloat(depreciationEl.value);
+          const taxes = parseFloat(taxesEl.value);
+
+          if (isNaN(totRevenue) || isNaN(opExpenses) || isNaN(interest) || isNaN(depreciation) || isNaN(taxes)) {
+            alert("Please Enter All Details.");
+            return;
+          }
+
+          try {
+            const resultElement = createElement()
+            calcResultsEl.innerHTML = resultElement
+            const expCosts = opExpenses + interest + depreciation + taxes
+            const accProfit = totRevenue - expCosts
+
+            const results = {
+              1: { result: Math.abs(expCosts) > 1 ? expCosts.toFixed(2) : expCosts.toPrecision(2), type: "i11" },
+              2: { result: Math.abs(accProfit) > 1 ? accProfit.toFixed(2) : accProfit.toPrecision(2) , type: "i12" },
+            }
+            setResult(results)
+
+          } catch (error) {
+            alert("Something Went Wrong!!!");
+            resetResult()
+            return;
+          }
+      }
+
+      function resetForm() {
+        totRevenueEl.value = "100000"
+        opExpensesEl.value = "25000"
+        interestEl.value = "12000"
+        depreciationEl.value = "10000"
+        taxesEl.value = "15000"
+      }
+
+      function resetResult() {
+        calcResultsEl.innerHTML = "<p>Result will appear here...</p>";
+      } 
+
+      function resethandler() {
+        resetForm();
+        resetResult();
+      }
+
+      resetBtnEl.addEventListener("click", resethandler);
+      calcBtnEl.addEventListener("click", calculateResults);
+
+      [totRevenueEl, opExpensesEl, interestEl, depreciationEl, taxesEl].forEach((el) => {
+        el.addEventListener("input", resetResult);
+      });  
+    </script>
+</body>
+</html>
