@@ -1,31 +1,20 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>APR Calculator</title>
+  <title>APY Calculator</title>
 </head>
 <body>
-    <h1>APR Calculator</h1>
-    <h3>Calculate the annual percentage rate (APR).</h3>
+    <h1>APY Calculator</h1>
+    <h3>Calculate the annual percentage yield (APY).</h3>
     <p>
-      Loan amount:
-      <input type="number" id="loanAmt" value="100000">
+      Nominal annual rate::
+      <input type="number" id="nomAnRate" > %
     </p>
     <p>
-      Extra cost:
-      <input type="number" id="extCost" value="5000">
-      <br />
-      <span>Application fee, processing fee, bond fee etc</span>
+      Compounding periods::
+      <input type="number" id="compPeriods">
     </p>
-    <p>
-      Annual interest rate:
-      <input type="number" id="annIntRate" value="7.0">%
-    </p>
-    <p>
-      No. of months:
-      <input type="number" id="noOfMths" value="360">
-    </p>
-
-
+    
     <button id="calcBtn">Calculate</button>
     <button id="resetBtn">Reset</button>
     <hr>
@@ -36,10 +25,8 @@
 
     <script>
       // Get required elements from the HTML
-      const loanAmtEl = document.getElementById("loanAmt");
-      const extCostEl = document.getElementById("extCost");
-      const annIntRateEl = document.getElementById("annIntRate");
-      const noOfMthsEl = document.getElementById("noOfMths")
+      const nomAnRateEl = document.getElementById("nomAnRate");
+      const compPeriodsEl = document.getElementById("compPeriods");
 
       const calcBtnEl = document.getElementById('calcBtn');
       const resetBtnEl = document.getElementById('resetBtn');
@@ -48,13 +35,13 @@
       function createElement() {
         const newDiv = `
             <p>
-              <label for="i11-span">APR: &nbsp;</label>
+              <label for="i11-span">APY: &nbsp;</label>
               <span
                 data-id="i11"
                 step="any"
                 id="i11-span"
                 class="spans"
-                data-name="APR"
+                data-name="APY"
               ></span>
             </p>
         `
@@ -81,16 +68,14 @@
 
       function calculateResults() {
           // Retrieve input values
-          const loanAmt = parseFloat(loanAmtEl.value);
-          const extCost = parseFloat(extCostEl.value);
-          const annIntRate = parseFloat(annIntRateEl.value);
-          const noOfMths = parseFloat(noOfMthsEl.value);
+          const nomAnRate = parseFloat(nomAnRateEl.value);
+          const compPeriods = parseFloat(compPeriodsEl.value);
 
-          if (isNaN(loanAmt) || loanAmt <= 0 || isNaN(extCost)  || isNaN(annIntRate) || isNaN(noOfMths) || noOfMths <= 0) {
+          if (isNaN(nomAnRate) || nomAnRate < 0 || isNaN(compPeriods)  || compPeriods <= 0) {
             alert("Please Enter All Details.");
             return;
-          } else if (annIntRate > 100) {
-            alert("Annual interest rate must be less than ro equal to 100");
+          } else if (nomAnRate > 100) {
+            alert("Nominal annual rate must be less than ro equal to 100");
             return;
           }
 
@@ -98,12 +83,10 @@
             const resultElement = createElement()
             calcResultsEl.innerHTML = resultElement 
 
-            const interest = loanAmt * (annIntRate / 100) * (noOfMths / 12)
-            
-            const apr = (((extCost + interest) / loanAmt) / (noOfMths / 12)) * 100
+            const apy = (((1 + ((nomAnRate / 100) / compPeriods)) ** compPeriods) - 1) * 100
 
             const results = {
-              1: { result: Math.abs(apr) > 1 ? apr.toFixed(2) : apr.toPrecision(2), type: "i11" },
+              1: { result: Math.abs(apy) > 1 ? apy.toFixed(3) : apy.toPrecision(3), type: "i11" },
             }
             setResult(results)
 
@@ -115,10 +98,8 @@
       }
 
       function resetForm() {
-        loanAmtEl.value = "100000"
-        extCostEl.value = "5000"
-        annIntRateEl.value = "7.0"
-        noOfMthsEl.value = "360"
+        nomAnRateEl.value = ""
+        compPeriodsEl.value = ""
       }
 
       function resetResult() {
@@ -133,7 +114,7 @@
       resetBtnEl.addEventListener("click", resethandler);
       calcBtnEl.addEventListener("click", calculateResults);
 
-      [loanAmtEl, extCostEl, annIntRateEl, noOfMthsEl].forEach((el) => {
+      [nomAnRateEl, compPeriodsEl].forEach((el) => {
         el.addEventListener("input", resetResult);
       });  
     </script>

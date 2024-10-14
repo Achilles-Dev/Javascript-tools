@@ -1,31 +1,20 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>APR Calculator</title>
+  <title>APY to APR Calculator</title>
 </head>
 <body>
-    <h1>APR Calculator</h1>
-    <h3>Calculate the annual percentage rate (APR).</h3>
+    <h1>APY to APR Calculator</h1>
+    <h3>Convert APY into APR.</h3>
     <p>
-      Loan amount:
-      <input type="number" id="loanAmt" value="100000">
+      APY (Annual Percentage Yield)::
+      <input type="number" id="annPerYield" value="7.0"> %
     </p>
     <p>
-      Extra cost:
-      <input type="number" id="extCost" value="5000">
-      <br />
-      <span>Application fee, processing fee, bond fee etc</span>
+      The number of periods:
+      <input type="number" id="numOfPeriods" value="12">
     </p>
-    <p>
-      Annual interest rate:
-      <input type="number" id="annIntRate" value="7.0">%
-    </p>
-    <p>
-      No. of months:
-      <input type="number" id="noOfMths" value="360">
-    </p>
-
-
+    
     <button id="calcBtn">Calculate</button>
     <button id="resetBtn">Reset</button>
     <hr>
@@ -36,10 +25,8 @@
 
     <script>
       // Get required elements from the HTML
-      const loanAmtEl = document.getElementById("loanAmt");
-      const extCostEl = document.getElementById("extCost");
-      const annIntRateEl = document.getElementById("annIntRate");
-      const noOfMthsEl = document.getElementById("noOfMths")
+      const annPerYieldEl = document.getElementById("annPerYield");
+      const numOfPeriodsEl = document.getElementById("numOfPeriods");
 
       const calcBtnEl = document.getElementById('calcBtn');
       const resetBtnEl = document.getElementById('resetBtn');
@@ -81,29 +68,24 @@
 
       function calculateResults() {
           // Retrieve input values
-          const loanAmt = parseFloat(loanAmtEl.value);
-          const extCost = parseFloat(extCostEl.value);
-          const annIntRate = parseFloat(annIntRateEl.value);
-          const noOfMths = parseFloat(noOfMthsEl.value);
+          const annPerYield = parseFloat(annPerYieldEl.value);
+          const numOfPeriods = parseFloat(numOfPeriodsEl.value);
 
-          if (isNaN(loanAmt) || loanAmt <= 0 || isNaN(extCost)  || isNaN(annIntRate) || isNaN(noOfMths) || noOfMths <= 0) {
+          if (isNaN(annPerYield) || annPerYield < 0 || isNaN(numOfPeriods)  || numOfPeriods <= 0) {
             alert("Please Enter All Details.");
             return;
-          } else if (annIntRate > 100) {
-            alert("Annual interest rate must be less than ro equal to 100");
+          } else if (annPerYield > 100) {
+            alert("APR (Annual Percentage Rate) must be less than ro equal to 100");
             return;
           }
 
           try {
             const resultElement = createElement()
             calcResultsEl.innerHTML = resultElement 
-
-            const interest = loanAmt * (annIntRate / 100) * (noOfMths / 12)
             
-            const apr = (((extCost + interest) / loanAmt) / (noOfMths / 12)) * 100
-
+            const apr = ((((annPerYield / 100) + 1) ** (1 / numOfPeriods)) - 1) * 100 * numOfPeriods
             const results = {
-              1: { result: Math.abs(apr) > 1 ? apr.toFixed(2) : apr.toPrecision(2), type: "i11" },
+              1: { result: Math.abs(apr) > 1 ? apr.toFixed(3) : apr.toPrecision(3), type: "i11" },
             }
             setResult(results)
 
@@ -115,10 +97,8 @@
       }
 
       function resetForm() {
-        loanAmtEl.value = "100000"
-        extCostEl.value = "5000"
-        annIntRateEl.value = "7.0"
-        noOfMthsEl.value = "360"
+        annPerYieldEl.value = "7.0"
+        numOfPeriodsEl.value = "12"
       }
 
       function resetResult() {
@@ -133,7 +113,7 @@
       resetBtnEl.addEventListener("click", resethandler);
       calcBtnEl.addEventListener("click", calculateResults);
 
-      [loanAmtEl, extCostEl, annIntRateEl, noOfMthsEl].forEach((el) => {
+      [annPerYieldEl, numOfPeriodsEl].forEach((el) => {
         el.addEventListener("input", resetResult);
       });  
     </script>

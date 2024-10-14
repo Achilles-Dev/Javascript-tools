@@ -1,31 +1,19 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>APR Calculator</title>
+  <title>Average Variable Cost Calculator</title>
 </head>
 <body>
-    <h1>APR Calculator</h1>
-    <h3>Calculate the annual percentage rate (APR).</h3>
+    <h1>Average Variable Cost Calculator</h1>
     <p>
-      Loan amount:
-      <input type="number" id="loanAmt" value="100000">
+      Variable Costs (VC):
+      <input type="number" id="varCost">
     </p>
     <p>
-      Extra cost:
-      <input type="number" id="extCost" value="5000">
-      <br />
-      <span>Application fee, processing fee, bond fee etc</span>
+      Total Output (Q):
+      <input type="number" id="totOutput">
     </p>
-    <p>
-      Annual interest rate:
-      <input type="number" id="annIntRate" value="7.0">%
-    </p>
-    <p>
-      No. of months:
-      <input type="number" id="noOfMths" value="360">
-    </p>
-
-
+   
     <button id="calcBtn">Calculate</button>
     <button id="resetBtn">Reset</button>
     <hr>
@@ -36,10 +24,8 @@
 
     <script>
       // Get required elements from the HTML
-      const loanAmtEl = document.getElementById("loanAmt");
-      const extCostEl = document.getElementById("extCost");
-      const annIntRateEl = document.getElementById("annIntRate");
-      const noOfMthsEl = document.getElementById("noOfMths")
+      const varCostEl = document.getElementById("varCost");
+      const totOutputEl = document.getElementById("totOutput");
 
       const calcBtnEl = document.getElementById('calcBtn');
       const resetBtnEl = document.getElementById('resetBtn');
@@ -48,13 +34,13 @@
       function createElement() {
         const newDiv = `
             <p>
-              <label for="i11-span">APR: &nbsp;</label>
+              <label for="i11-span">Average Variable Cost (AVC): &nbsp;</label>
               <span
                 data-id="i11"
                 step="any"
                 id="i11-span"
                 class="spans"
-                data-name="APR"
+                data-name="Average Variable Cost (AVC)"
               ></span>
             </p>
         `
@@ -75,22 +61,17 @@
             return;
           }
           const span = document.getElementById(`${id}-span`);
-          span.textContent = `${parseFloat(val)}%`;
+          span.textContent = `${parseFloat(val)}`;
         }
       }
 
       function calculateResults() {
           // Retrieve input values
-          const loanAmt = parseFloat(loanAmtEl.value);
-          const extCost = parseFloat(extCostEl.value);
-          const annIntRate = parseFloat(annIntRateEl.value);
-          const noOfMths = parseFloat(noOfMthsEl.value);
+          const varCost = parseFloat(varCostEl.value);
+          const totOutput = parseFloat(totOutputEl.value);
 
-          if (isNaN(loanAmt) || loanAmt <= 0 || isNaN(extCost)  || isNaN(annIntRate) || isNaN(noOfMths) || noOfMths <= 0) {
+          if (isNaN(varCost) || varCost < 0 || isNaN(totOutput) || totOutput < 0 ) {
             alert("Please Enter All Details.");
-            return;
-          } else if (annIntRate > 100) {
-            alert("Annual interest rate must be less than ro equal to 100");
             return;
           }
 
@@ -98,12 +79,10 @@
             const resultElement = createElement()
             calcResultsEl.innerHTML = resultElement 
 
-            const interest = loanAmt * (annIntRate / 100) * (noOfMths / 12)
-            
-            const apr = (((extCost + interest) / loanAmt) / (noOfMths / 12)) * 100
+            const avc = varCost / totOutput
 
             const results = {
-              1: { result: Math.abs(apr) > 1 ? apr.toFixed(2) : apr.toPrecision(2), type: "i11" },
+              1: { result: Math.abs(avc) > 1 ? avc.toFixed(2) : avc.toPrecision(2), type: "i11" },
             }
             setResult(results)
 
@@ -115,10 +94,8 @@
       }
 
       function resetForm() {
-        loanAmtEl.value = "100000"
-        extCostEl.value = "5000"
-        annIntRateEl.value = "7.0"
-        noOfMthsEl.value = "360"
+        varCostEl.value = ""
+        totOutputEl.value = ""
       }
 
       function resetResult() {
@@ -133,7 +110,7 @@
       resetBtnEl.addEventListener("click", resethandler);
       calcBtnEl.addEventListener("click", calculateResults);
 
-      [loanAmtEl, extCostEl, annIntRateEl, noOfMthsEl].forEach((el) => {
+      [varCostEl, totOutputEl].forEach((el) => {
         el.addEventListener("input", resetResult);
       });  
     </script>

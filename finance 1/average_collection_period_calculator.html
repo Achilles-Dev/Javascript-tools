@@ -1,30 +1,23 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>APR Calculator</title>
+  <title>Average Collection Period Calculator</title>
 </head>
 <body>
-    <h1>APR Calculator</h1>
-    <h3>Calculate the annual percentage rate (APR).</h3>
+    <h1>Average Collection Period Calculator</h1>
+    <h3>Calculate the average collection period.</h3>
     <p>
-      Loan amount:
-      <input type="number" id="loanAmt" value="100000">
+      Net credit sales:
+      <input type="number" id="netCreSales">
     </p>
     <p>
-      Extra cost:
-      <input type="number" id="extCost" value="5000">
-      <br />
-      <span>Application fee, processing fee, bond fee etc</span>
+      Average net receivables:
+      <input type="number" id="avgNetRec">
     </p>
     <p>
-      Annual interest rate:
-      <input type="number" id="annIntRate" value="7.0">%
+      Total amount of days in period:
+      <input type="number" id="totDays" value="365">
     </p>
-    <p>
-      No. of months:
-      <input type="number" id="noOfMths" value="360">
-    </p>
-
 
     <button id="calcBtn">Calculate</button>
     <button id="resetBtn">Reset</button>
@@ -36,10 +29,9 @@
 
     <script>
       // Get required elements from the HTML
-      const loanAmtEl = document.getElementById("loanAmt");
-      const extCostEl = document.getElementById("extCost");
-      const annIntRateEl = document.getElementById("annIntRate");
-      const noOfMthsEl = document.getElementById("noOfMths")
+      const netCreSalesEl = document.getElementById("netCreSales");
+      const avgNetRecEl = document.getElementById("avgNetRec");
+      const totDaysEl = document.getElementById("totDays");
 
       const calcBtnEl = document.getElementById('calcBtn');
       const resetBtnEl = document.getElementById('resetBtn');
@@ -48,13 +40,13 @@
       function createElement() {
         const newDiv = `
             <p>
-              <label for="i11-span">APR: &nbsp;</label>
+              <label for="i11-span">Average Collection Period: &nbsp;</label>
               <span
                 data-id="i11"
                 step="any"
                 id="i11-span"
                 class="spans"
-                data-name="APR"
+                data-name="Average Collection Period"
               ></span>
             </p>
         `
@@ -75,22 +67,18 @@
             return;
           }
           const span = document.getElementById(`${id}-span`);
-          span.textContent = `${parseFloat(val)}%`;
+          span.textContent = `${parseFloat(val)} days`;
         }
       }
 
       function calculateResults() {
           // Retrieve input values
-          const loanAmt = parseFloat(loanAmtEl.value);
-          const extCost = parseFloat(extCostEl.value);
-          const annIntRate = parseFloat(annIntRateEl.value);
-          const noOfMths = parseFloat(noOfMthsEl.value);
+          const netCreSales = parseFloat(netCreSalesEl.value);
+          const avgNetRec = parseFloat(avgNetRecEl.value);
+          const totDays = parseFloat(totDaysEl.value);
 
-          if (isNaN(loanAmt) || loanAmt <= 0 || isNaN(extCost)  || isNaN(annIntRate) || isNaN(noOfMths) || noOfMths <= 0) {
+          if (isNaN(netCreSales) || netCreSales < 0.001 || isNaN(avgNetRec) || avgNetRec < 0.001 || isNaN(totDays) || totDays < 1) {
             alert("Please Enter All Details.");
-            return;
-          } else if (annIntRate > 100) {
-            alert("Annual interest rate must be less than ro equal to 100");
             return;
           }
 
@@ -98,12 +86,10 @@
             const resultElement = createElement()
             calcResultsEl.innerHTML = resultElement 
 
-            const interest = loanAmt * (annIntRate / 100) * (noOfMths / 12)
-            
-            const apr = (((extCost + interest) / loanAmt) / (noOfMths / 12)) * 100
+            const acp = totDays * (avgNetRec / netCreSales)
 
             const results = {
-              1: { result: Math.abs(apr) > 1 ? apr.toFixed(2) : apr.toPrecision(2), type: "i11" },
+              1: { result: Math.abs(acp) > 1 ? acp.toFixed(2) : acp.toPrecision(2), type: "i11" },
             }
             setResult(results)
 
@@ -115,10 +101,9 @@
       }
 
       function resetForm() {
-        loanAmtEl.value = "100000"
-        extCostEl.value = "5000"
-        annIntRateEl.value = "7.0"
-        noOfMthsEl.value = "360"
+        netCreSalesEl.value = ""
+        avgNetRecEl.value = ""
+        totDaysEl.value = ""
       }
 
       function resetResult() {
@@ -133,7 +118,7 @@
       resetBtnEl.addEventListener("click", resethandler);
       calcBtnEl.addEventListener("click", calculateResults);
 
-      [loanAmtEl, extCostEl, annIntRateEl, noOfMthsEl].forEach((el) => {
+      [netCreSalesEl, avgNetRecEl, totDaysEl].forEach((el) => {
         el.addEventListener("input", resetResult);
       });  
     </script>
