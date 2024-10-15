@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Bond Calculator</title>
+</head>
+<body>
+    <h1>Bond Calculator</h1>
+    <p>
+      Calculate: 
+      <select id="calculateUnit">
+        <option value="price" selected>price</option>
+        <option value="faval">face value</option>
+        <option value="yield">yield</option>
+        <option value="timeM">time to maturity</option>
+        <option value="coupn">annual coupon</option>
+      </select>
+    </p>
+    <p style="display: none;" id="priceInputs" class="containers">
+      Price:
+      <input type="number" id="price">
+    </p>
+    <p id="faval" class="containers">
+      Face value:
+      <input type="number" id="faceVal">
+    </p>
+    <p id="yieldInputs" class="containers">
+      Yield:
+      <input type="number" id="yield">%
+    </p>
+    <p id="timeMInputs" class="containers">
+      Time to maturity:
+      <input type="number" id="matTime">years
+    </p>
+    <p id="coupnInputs" class="containers">
+      Annual coupon: 
+      <input type="number" id="annCoupon">
+      <select
+        class="selects"
+        id="annCouponSelect"
+      >
+        <option value="%" selected>%</option>
+        <option value="$">&dollar;</option>
+      </select>
+    </p>
+    
+    <p>
+      Coupon frequency:
+      <select
+      class="selects"
+      id="couponFreqSelect"
+    >
+      <option value="annual" selected>annually</option>
+      <option value="semiannual">semiannually</option>
+      <option value="quarter">quarterly</option>
+      <option value="month">monthly</option>
+    </select>
+    </p>
+
+    <button id="calcBtn">Calculate</button>
+    <button id="resetBtn">Reset</button>
+    <hr>
+    <div>
+      <h3>Result:</h3>
+      <h3 id="calcResults">Result will appear here...</h3>
+    </div>
+
+    <script>
+      // Get required elements from the HTML
+      const calculateUnitEl = document.getElementById("calculateUnit")
+      const priceEl = document.getElementById("price");
+      const annCouponEl = document.getElementById("annCoupon");
+      const faceValEl = document.getElementById("faceVal");
+      const annCouponSelectEl = document.getElementById("annCouponSelect");
+      const yieldEl = document.getElementById("yield");
+      const matTimeEl = document.getElementById("matTime");
+      const couponFreqSelectEl = document.getElementById("couponFreqSelect");
+      const containersEl = document.querySelectorAll(".containers")
+
+      const calcBtnEl = document.getElementById('calcBtn');
+      const resetBtnEl = document.getElementById('resetBtn');
+      const calcResultsEl = document.getElementById('calcResults') 
+
+      function handleCalculateUnitChange(e) {
+        const value = e.target.value
+
+        containersEl.forEach((container) => {
+          const idVal = container.id.slice(0, 5)
+          if (value === idVal) {
+            container.style.display = "none"
+          } else {
+            container.style.display = "block"
+          }
+        })
+
+        resetResult()
+      }
+
+      function createElement(name) {
+        const newDiv = `
+            <p>
+              <label for="i11-span">${name}: &nbsp;</label>
+              <span
+                data-id="i11"
+                step="any"
+                id="i11-span"
+                class="spans"
+              ></span>
+            </p>
+        `
+        return newDiv
+      }
+
+      function setResult(resultObj) {
+        for (key of Object.keys(resultObj)) {
+          let val = resultObj[key].result;
+          let id = resultObj[key].type;
+
+          if (isNaN(val)) {
+           alert("Your input resulted in NAN.\n 0/0 \n Try again with valid input.");
+            return;
+          }
+          if (Math.abs(val) === Infinity) {
+            alert("Your input resulted in Infinity. \nDivision by zero. \nTry again with valid input.");
+            return;
+          }
+          const span = document.getElementById(`${id}-span`);
+          span.textContent = `$${parseFloat(val)}`;
+        }
+      }
+
+      function calculateResults() {
+          // Retrieve input values
+          const annCouponSelect = annCouponSelectEl.value
+          const annCoupon = toSIUnit("time2", annCouponSelect, parseFloat(annCouponEl.value))
+          const price = parseFloat(priceEl.value)
+          const faceVal = parseFloat(faceValEl.value)
+          const yield = parseFloat(yieldEl.value)
+          const matTime = parseFloat(matTimeEl.value)
+          const intRate = parseFloat(intRateEl.value)
+          const calculateUnit = calculateUnitEl.value
+
+          if (isNaN(price) || price <= 0 || isNaN(faceVal) || faceVal <= 0 || isNaN(annCoupon) 
+            || annCoupon < 0 || isNaN(yield) || yield < 0 || isNaN(matTime) || matTime < 0 ||
+            isNaN(intRate) || intRate < 0
+          ) {
+            alert("Please Enter All Details.");
+            return;
+          }
+          
+          try {
+            let name = ""
+            if (calculateUnit === "price") {
+              name = "The price is"
+            } else if (calculateUnit === "faval") {
+              name = "The face value is"
+            } else if (calculateUnit === "yield") {
+              name = "The annual yield is"
+            } else if (calculateUnit === "timeN") {
+              name = "The time to maturity is"
+            } else if (calculateUnit === "faval") {
+              name = "The coupon is"
+            }
+
+            const resultElement = createElement(name)
+            calcResultsEl.innerHTML = resultElement 
+
+            const d1 = Math.log(price / faceVal) + (intRate)
+            const callPrice = price * annCoupon
+            const putPrice = 0
+
+            const results = {
+              1: { result: Math.abs(callPrice) > 1 ? callPrice.toFixed(2) : callPrice.toPrecision(2), type: "i11" },
+            }
+            setResult(results)
+
+          } catch (error) {
+            alert("Something Went Wrong!!!");
+            resetResult()
+            return;
+          }
+      }
+
+      function resetForm() {
+        priceEl.value = ""
+        annCouponEl.value = ""
+        faceValEl.value = ""
+        yieldEl.value = ""
+        matTimeEl.value = ""
+        intRateEl.value = ""
+        annCouponSelectEl.selectedIndex = "0"
+      }
+
+      function resetResult() {
+        calcResultsEl.innerHTML = "<p>Result will appear here...</p>";
+      } 
+
+      function resethandler() {
+        resetForm();
+        resetResult();
+      }
+
+      resetBtnEl.addEventListener("click", resethandler);
+      calcBtnEl.addEventListener("click", calculateResults);
+
+      [annCouponSelectEl, couponFreqSelectEl].forEach((el) => {
+        el.addEventListener("change", resetResult);
+      }); 
+
+      [priceEl, annCouponEl, faceValEl, yieldEl, matTimeEl].forEach((el) => {
+        el.addEventListener("input", resetResult);
+      });  
+
+      calculateUnitEl.addEventListener("change", handleCalculateUnitChange)
+
+    </script>
+</body>
+</html>

@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Balloon Payment Calculator</title>
+</head>
+<body>
+    <h1>Balloon Payment Calculator</h1>
+    <p>
+      Loan amount:
+      <input type="number" id="loanAmt" value="200000">
+    </p>
+    <p>
+      Amortization period: 
+      <input type="number" id="amortPrd" value="20">
+      <select id="amortPrdSelect">
+        <option value="mos">months (mos)</option>
+        <option value="yrs" selected>years (yrs)</option>
+      </select>
+    </p>
+    <p>
+      Balloon payment after:
+      <input type="number" id="balnPmtAft" value="5">
+      <select id="balnPmtAftSelect">
+        <option value="mos">months (mos)</option>
+        <option value="yrs" selected>years (yrs)</option>
+      </select>
+    </p>
+    <p>
+      Interest rate:
+      <input type="number" id="intRate" value="7">%
+    </p>
+
+    <button id="calcBtn">Calculate</button>
+    <button id="resetBtn">Reset</button>
+    <hr>
+    <div>
+      <h3>Result:</h3>
+      <h3 id="calcResults">Result will appear here...</h3>
+    </div>
+
+    <script>
+      // Get required elements from the HTML
+      const loanAmtEl = document.getElementById("loanAmt");
+      const amortPrdEl = document.getElementById("amortPrd");
+      const balnPmtAftEl = document.getElementById("balnPmtAft");
+      const amortPrdSelectEl = document.getElementById("amortPrdSelect");
+      const balnPmtAftSelectEl = document.getElementById("balnPmtAftSelect");
+      const intRateEl = document.getElementById("intRate")
+
+      const calcBtnEl = document.getElementById('calcBtn');
+      const resetBtnEl = document.getElementById('resetBtn');
+      const calcResultsEl = document.getElementById('calcResults') 
+
+      function createElement() {
+        const newDiv = `
+            <p>
+              Your fixed monthly payment is
+              $<span
+                data-id="i11"
+                step="any"
+                id="i11-span"
+                class="spans"
+              ></span>
+               in the first 
+               <span
+                data-id="i16"
+                step="any"
+                id="i16-span"
+                class="spans"
+              ></span>
+               years, and then your last balloon payment will be 
+              $<span
+                data-id="i12"
+                step="any"
+                id="i12-span"
+                class="spans"
+              ></span>.
+              Thus, your total repayment amount is $
+              <span
+                data-id="i13"
+                step="any"
+                id="i13-span"
+                class="spans"
+              ></span>
+              from which the total monthly payment is $
+              <span
+                data-id="i14"
+                step="any"
+                id="i14-span"
+                class="spans"
+              ></span>, including a total interest payment of $
+              <span
+                data-id="i15"
+                step="any"
+                id="i15-span"
+                class="spans"
+              ></span>.
+            </p>
+        `
+        return newDiv
+      }
+
+      function setResult(resultObj) {
+        for (key of Object.keys(resultObj)) {
+          let val = resultObj[key].result;
+          let id = resultObj[key].type;
+
+          if (isNaN(val)) {
+           alert("Your input resulted in NAN.\n 0/0 \n Try again with valid input.");
+            return;
+          }
+          if (Math.abs(val) === Infinity) {
+            alert("Your input resulted in Infinity. \nDivision by zero. \nTry again with valid input.");
+            return;
+          }
+          const span = document.getElementById(`${id}-span`);
+          span.textContent = `${parseFloat(val)}`;
+        }
+      }
+
+      function calculateResults() {
+          // Retrieve input values
+          const loanAmt = parseFloat(loanAmtEl.value);
+          const amortPrd = parseFloat(amortPrdEl.value);
+          const balnPmtAft = parseFloat(balnPmtAftEl.value);
+          const intRate = parseFloat(intRateEl.value)
+          const amortPrdSelect = amortPrdSelectEl.value
+          const balnPmtAftSelect = balnPmtAftSelectEl.value
+
+          if (isNaN(loanAmt) || loanAmt <= 0 || isNaN(amortPrd) || amortPrd <= 0 || 
+            isNaN(balnPmtAft) || balnPmtAft <= 0 || isNaN(intRate) || intRate <= 0) {
+            alert("Please Enter All Details.");
+            return;
+          } else if (intRate > 100  ) {
+            alert("The interest rate is too large!");
+            return;
+          }
+
+          try {
+            const resultElement = createElement()
+            calcResultsEl.innerHTML = resultElement 
+            let totalPeriods = 0;
+            if (amortPrdSelect === "mos") {
+              totalPeriods = amortPrd / 12
+            } else {
+              totalPeriods = amortPrd
+            }
+            let paymentAfter = balnPmtAft
+            if (balnPmtAftSelect === "mos") {
+              paymentAfter = balnPmtAft / 12
+            }
+            const monthlyPmt = (loanAmt * (intRate / 100) * ((1 + (intRate / 100)) ** totalPeriods)) / (((1 + (intRate / 100)) ** totalPeriods) - 1)
+
+            const results = {
+              1: { result: Math.abs(monthlyPmt) > 1 ? monthlyPmt.toFixed(2) : monthlyPmt.toPrecision(2), type: "i11" },
+              2: { result: Math.abs(monthlyPmt) > 1 ? monthlyPmt.toFixed(2) : monthlyPmt.toPrecision(2), type: "i12" },
+              3: { result: Math.abs(monthlyPmt) > 1 ? monthlyPmt.toFixed(2) : monthlyPmt.toPrecision(2), type: "i13" },
+              4: { result: Math.abs(monthlyPmt) > 1 ? monthlyPmt.toFixed(2) : monthlyPmt.toPrecision(2), type: "i14" },
+              5: { result: Math.abs(monthlyPmt) > 1 ? monthlyPmt.toFixed(2) : monthlyPmt.toPrecision(2), type: "i15" },
+              6: { result: Math.abs(paymentAfter) > 1 ? paymentAfter.toFixed(2) : paymentAfter.toPrecision(2), type: "i16" },
+            }
+            setResult(results)
+
+          } catch (error) {
+            alert("Something Went Wrong!!!");
+            resetResult()
+            return;
+          }
+      }
+
+      function resetForm() {
+        loanAmtEl.value = "200000"
+        amortPrdEl.value = "20"
+        balnPmtAftEl.value = "5"
+        intRateEl.value = "7"
+        amortPrdSelectEl.selectedIndex = "1"
+        balnPmtAftSelectEl.selectedIndex = "1"
+      }
+
+      function resetResult() {
+        calcResultsEl.innerHTML = "<p>Result will appear here...</p>";
+      } 
+
+      function resethandler() {
+        resetForm();
+        resetResult();
+      }
+
+      resetBtnEl.addEventListener("click", resethandler);
+      calcBtnEl.addEventListener("click", calculateResults);
+      [amortPrdSelectEl, balnPmtAftSelectEl].forEach((el) => {
+        el.addEventListener("change", resetResult);
+      }); 
+
+      [loanAmtEl, amortPrdEl, balnPmtAftEl, intRateEl].forEach((el) => {
+        el.addEventListener("input", resetResult);
+      });  
+    </script>
+</body>
+</html>

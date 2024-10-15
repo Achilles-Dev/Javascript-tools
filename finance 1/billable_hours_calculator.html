@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Billable Hours Calculator</title>
+</head>
+<body>
+    <h1>Billable Hours Calculator</h1>
+    <p>
+      Billable rate:
+      <input type="number" id="billRate">
+      <select
+        class="selects"
+        id="billRateSelect"
+        data-type="time1"
+      >
+        <option value="min">minute (min)</option>
+        <option value="hr" selected>hour (hr)</option>
+        <option value="day">day (day)</option>
+        <option value="wk">week (wk)</option>
+        <option value="mo">month (mo)</option>
+      </select>
+    </p>
+    <p>
+      Billable time: 
+      <input type="number" id="billTime">
+      <select
+        class="selects"
+        id="billTimeSelect"
+        data-type="time2"
+        data-prev="hrs"
+      >
+        <option value="hrs" selected>hours (hrs)</option>
+        <option value="days">days (days)</option>
+        <option value="wks">weeks (wks)</option>
+        <option value="mos">months (mos)</option>
+      </select>
+    </p>
+
+    <button id="calcBtn">Calculate</button>
+    <button id="resetBtn">Reset</button>
+    <hr>
+    <div>
+      <h3>Result:</h3>
+      <h3 id="calcResults">Result will appear here...</h3>
+    </div>
+
+    <script>
+      // Get required elements from the HTML
+      const billRateEl = document.getElementById("billRate");
+      const billTimeEl = document.getElementById("billTime");
+      const billRateSelectEl = document.getElementById("billRateSelect");
+      const billTimeSelectEl = document.getElementById("billTimeSelect");
+
+      const calcBtnEl = document.getElementById('calcBtn');
+      const resetBtnEl = document.getElementById('resetBtn');
+      const calcResultsEl = document.getElementById('calcResults') 
+
+      const UNITS = {
+        time1: {
+          min: 1 / 60,
+          hr: 1,
+          day: 24,
+          wk: 168,
+          mo: 730.485,
+        },
+        time2: {
+          hrs: 1,
+          days: 0.0416666667,
+          wks: 0.005952381,
+          mos: 0.001369863,
+        },
+      };
+
+      /*************** FUNCTIONS ***************/
+      function toSIUnit(type, unit, value) {
+        return value / UNITS[type][unit];
+      }
+
+      function fromSIUnit(type, unit, value) {
+        return value * UNITS[type][unit];
+      }
+
+      function createElement() {
+        const newDiv = `
+            <p>
+              <label for="i11-span">Billable value: &nbsp;</label>
+              <span
+                data-id="i11"
+                step="any"
+                id="i11-span"
+                class="spans"
+                data-name="Billable value"
+              ></span>
+            </p>
+        `
+        return newDiv
+      }
+
+      function setResult(resultObj) {
+        for (key of Object.keys(resultObj)) {
+          let val = resultObj[key].result;
+          let id = resultObj[key].type;
+
+          if (isNaN(val)) {
+           alert("Your input resulted in NAN.\n 0/0 \n Try again with valid input.");
+            return;
+          }
+          if (Math.abs(val) === Infinity) {
+            alert("Your input resulted in Infinity. \nDivision by zero. \nTry again with valid input.");
+            return;
+          }
+          const span = document.getElementById(`${id}-span`);
+          span.textContent = `$${parseFloat(val)}`;
+        }
+      }
+
+      function calculateResults() {
+          // Retrieve input values
+          const billRateSelect = billRateSelectEl.value
+          const billTimeSelect = billTimeSelectEl.value
+          const billRate = toSIUnit("time1", billRateSelect, parseFloat(billRateEl.value))
+          const billTime = toSIUnit("time2", billTimeSelect, parseFloat(billTimeEl.value))
+
+          if (isNaN(billRate) || billRate < 0 || isNaN(billTime) || billTime < 0 ) {
+            alert("Please Enter All Details.");
+            return;
+          } 
+          
+          try {
+            const resultElement = createElement()
+            calcResultsEl.innerHTML = resultElement 
+
+            const billVal = billRate * billTime
+
+            const results = {
+              1: { result: Math.abs(billVal) > 1 ? billVal.toFixed(2) : billVal.toPrecision(2), type: "i11" },
+            }
+            setResult(results)
+
+          } catch (error) {
+            alert("Something Went Wrong!!!");
+            resetResult()
+            return;
+          }
+      }
+
+      function resetForm() {
+        billRateEl.value = ""
+        billTimeEl.value = ""
+        billRateSelectEl.selectedIndex = "1"
+        billTimeSelectEl.selectedIndex = "0"
+      }
+
+      function resetResult() {
+        calcResultsEl.innerHTML = "<p>Result will appear here...</p>";
+      } 
+
+      function resethandler() {
+        resetForm();
+        resetResult();
+      }
+
+      resetBtnEl.addEventListener("click", resethandler);
+      calcBtnEl.addEventListener("click", calculateResults);
+
+      [billRateSelectEl, billTimeSelectEl].forEach((el) => {
+        el.addEventListener("change", resetResult);
+      }); 
+
+      [billRateEl, billTimeEl].forEach((el) => {
+        el.addEventListener("input", resetResult);
+      });  
+    </script>
+</body>
+</html>

@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Black Scholes Calculator</title>
+</head>
+<body>
+    <h1>Black Scholes Calculator</h1>
+    <p>
+      Current stock price:
+      <input type="number" id="currentStPrice">
+    </p>
+    <p>
+      Strike price:
+      <input type="number" id="strikePrice">
+    </p>
+    <p>
+      Time to maturity: 
+      <input type="number" id="matureTime">
+      <select
+        class="selects"
+        id="matureTimeSelect"
+        data-type="time2"
+        data-prev="hrs"
+      >
+        <option value="hrs" selected>hours (hrs)</option>
+        <option value="days">days (days)</option>
+        <option value="wks">weeks (wks)</option>
+        <option value="mos">months (mos)</option>
+      </select>
+    </p>
+    <p>
+      Dividend yield:
+      <input type="number" id="divYield">%
+    </p>
+    <p>
+      Volatility:
+      <input type="number" id="volatility">%
+    </p>
+    <p>
+      Risk-free interest rate:
+      <input type="number" id="intRate">%
+    </p>
+
+    <button id="calcBtn">Calculate</button>
+    <button id="resetBtn">Reset</button>
+    <hr>
+    <div>
+      <h3>Result:</h3>
+      <h3 id="calcResults">Result will appear here...</h3>
+    </div>
+
+    <script>
+      // Get required elements from the HTML
+      const currentStPriceEl = document.getElementById("currentStPrice");
+      const matureTimeEl = document.getElementById("matureTime");
+      const strikePriceEl = document.getElementById("strikePrice");
+      const matureTimeSelectEl = document.getElementById("matureTimeSelect");
+      const divYieldEl = document.getElementById("divYield");
+      const volatilityEl = document.getElementById("volatility");
+      const intRateEl = document.getElementById("intRate");
+
+      const calcBtnEl = document.getElementById('calcBtn');
+      const resetBtnEl = document.getElementById('resetBtn');
+      const calcResultsEl = document.getElementById('calcResults') 
+
+      const UNITS = {
+        time1: {
+          min: 1 / 60,
+          hr: 1,
+          day: 24,
+          wk: 168,
+          mo: 730.485,
+        },
+        time2: {
+          hrs: 1,
+          days: 0.0416666667,
+          wks: 0.005952381,
+          mos: 0.001369863,
+        },
+      };
+
+      /*************** FUNCTIONS ***************/
+      function toSIUnit(type, unit, value) {
+        return value / UNITS[type][unit];
+      }
+
+      function fromSIUnit(type, unit, value) {
+        return value * UNITS[type][unit];
+      }
+
+      function createElement() {
+        const newDiv = `
+            <p>
+              <label for="i11-span">Call option price: &nbsp;</label>
+              <span
+                data-id="i11"
+                step="any"
+                id="i11-span"
+                class="spans"
+                data-name="Call option price"
+              ></span>
+            </p>
+            <p>
+              <label for="i12-span">Put option price: &nbsp;</label>
+              <span
+                data-id="i12"
+                step="any"
+                id="i12-span"
+                class="spans"
+                data-name="Put option price"
+              ></span>
+            </p>
+        `
+        return newDiv
+      }
+
+      function setResult(resultObj) {
+        for (key of Object.keys(resultObj)) {
+          let val = resultObj[key].result;
+          let id = resultObj[key].type;
+
+          if (isNaN(val)) {
+           alert("Your input resulted in NAN.\n 0/0 \n Try again with valid input.");
+            return;
+          }
+          if (Math.abs(val) === Infinity) {
+            alert("Your input resulted in Infinity. \nDivision by zero. \nTry again with valid input.");
+            return;
+          }
+          const span = document.getElementById(`${id}-span`);
+          span.textContent = `$${parseFloat(val)}`;
+        }
+      }
+
+      function calculateResults() {
+          // Retrieve input values
+          const matureTimeSelect = matureTimeSelectEl.value
+          const matureTime = toSIUnit("time2", matureTimeSelect, parseFloat(matureTimeEl.value))
+          const currentStPrice = parseFloat(currentStPriceEl.value)
+          const strikePrice = parseFloat(strikePriceEl.value)
+          const divYield = parseFloat(divYieldEl.value)
+          const volatility = parseFloat(volatilityEl.value)
+          const intRate = parseFloat(intRateEl.value)
+
+          if (isNaN(currentStPrice) || currentStPrice <= 0 || isNaN(strikePrice) || strikePrice <= 0 || isNaN(matureTime) 
+            || matureTime < 0 || isNaN(divYield) || divYield < 0 || isNaN(volatility) || volatility < 0 ||
+            isNaN(intRate) || intRate < 0
+          ) {
+            alert("Please Enter All Details.");
+            return;
+          }
+          
+          try {
+            const resultElement = createElement()
+            calcResultsEl.innerHTML = resultElement 
+
+            const d1 = Math.log(currentStPrice / strikePrice) + (intRate)
+            const callPrice = currentStPrice * matureTime
+            const putPrice = 0
+
+            const results = {
+              1: { result: Math.abs(callPrice) > 1 ? callPrice.toFixed(2) : callPrice.toPrecision(2), type: "i11" },
+              1: { result: Math.abs(putPrice) > 1 ? putPrice.toFixed(2) : putPrice.toPrecision(2), type: "i11" },
+            }
+            setResult(results)
+
+          } catch (error) {
+            alert("Something Went Wrong!!!");
+            resetResult()
+            return;
+          }
+      }
+
+      function resetForm() {
+        currentStPriceEl.value = ""
+        matureTimeEl.value = ""
+        strikePriceEl.value = ""
+        divYieldEl.value = ""
+        volatilityEl.value = ""
+        intRateEl.value = ""
+        matureTimeSelectEl.selectedIndex = "0"
+      }
+
+      function resetResult() {
+        calcResultsEl.innerHTML = "<p>Result will appear here...</p>";
+      } 
+
+      function resethandler() {
+        resetForm();
+        resetResult();
+      }
+
+      resetBtnEl.addEventListener("click", resethandler);
+      calcBtnEl.addEventListener("click", calculateResults);
+
+      [matureTimeSelectEl].forEach((el) => {
+        el.addEventListener("change", resetResult);
+      }); 
+
+      [currentStPriceEl, matureTimeEl, strikePriceEl, divYieldEl, volatilityEl, intRateEl].forEach((el) => {
+        el.addEventListener("input", resetResult);
+      });  
+    </script>
+</body>
+</html>
