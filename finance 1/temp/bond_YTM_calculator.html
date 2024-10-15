@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Bond YTM Calculator</title>
+</head>
+<body>
+    <h1>Bond YTM Calculator</h1>
+    <p>
+      Face value: 
+      <input type="number" id="faceVal">
+    </p>
+    <p>
+      Bond price:
+      <input type="number" id="bondPrice">
+    </p>
+    <p>
+      Annual coupon rate:
+      <input type="number" id="couponRate">%
+    </p>
+    <p>
+      Coupon frequency:
+      <select
+      class="selects"
+      id="freqSelect"
+    >
+      <option value="1" selected>Annually</option>
+      <option value="0.5">Semi-annually</option>
+      <option value="0.25">Quarterly</option>
+      <option value="0.08333333333">Monthly</option>
+      <option value="0.0192307692308">Weekly</option>
+      <option value="0.0027397260274">Daily</option>
+    </select>
+    </p>
+    <p>
+      Years to maturity:
+      <input type="number" id="yearsMature">year(s)
+    </p>
+
+
+    <button id="calcBtn">Calculate</button>
+    <button id="resetBtn">Reset</button>
+    <hr>
+    <div>
+      <h3>Result:</h3>
+      <h3 id="calcResults">Result will appear here...</h3>
+    </div>
+
+    <script>
+      // Get required elements from the HTML
+      const bondPriceEl = document.getElementById("bondPrice");
+      const faceValEl = document.getElementById("faceVal");
+      const couponRateEl = document.getElementById("couponRate");
+      const yearsMatureEl = document.getElementById("yearsMature");
+      const freqSelectEl = document.getElementById("freqSelect");
+
+      const calcBtnEl = document.getElementById('calcBtn');
+      const resetBtnEl = document.getElementById('resetBtn');
+      const calcResultsEl = document.getElementById('calcResults') 
+
+      function createElement() {
+        const newDiv = `
+            <p>
+              <label for="i11-span">Yield to maturity (YTM): &nbsp;</label>
+              <span
+                data-id="i11"
+                step="any"
+                id="i11-span"
+                class="spans"
+              ></span>%
+            </p>
+        `
+        return newDiv
+      }
+
+      function setResult(resultObj) {
+        for (key of Object.keys(resultObj)) {
+          let val = resultObj[key].result;
+          let id = resultObj[key].type;
+
+          if (isNaN(val)) {
+           alert("Your input resulted in NAN.\n 0/0 \n Try again with valid input.");
+            return;
+          }
+          if (Math.abs(val) === Infinity) {
+            alert("Your input resulted in Infinity. \nDivision by zero. \nTry again with valid input.");
+            return;
+          }
+          const span = document.getElementById(`${id}-span`);
+          span.textContent = `${parseFloat(val)}`;
+        }
+      }
+
+      function calculateResults() {
+          // Retrieve input values
+          const bondPrice = parseFloat(bondPriceEl.value);
+          const faceVal = parseFloat(faceValEl.value);
+          const couponRate = parseFloat(couponRateEl.value);
+          const yearsMature = parseFloat(yearsMatureEl.value);
+
+          if (isNaN(bondPrice) || bondPrice < 0.01 || isNaN(faceVal) || faceVal < 0 || isNaN(couponRate) || couponRate < 0 ||
+            isNaN(yearsMature) || yearsMature < 1
+          ) {
+            alert("Please Enter All Details.");
+            return;
+          } else if (couponRate > 99) {
+            alert("Ensure this value is less than or equal to 99");
+            return;
+          }
+
+          try {
+            const resultElement = createElement()
+            calcResultsEl.innerHTML = resultElement 
+
+            const annualCoupon =  faceVal * (couponRate / 100)
+
+            const ytm = ((annualCoupon + ((faceVal - bondPrice) / (yearsMature))) / ((faceVal + bondPrice) / 2)) * 100
+
+            const results = {
+              1: { result: Math.abs(ytm) > 1 ? ytm.toFixed(4) : ytm.toPrecision(4), type: "i11" },
+            }
+            setResult(results)
+
+          } catch (error) {
+            alert("Something Went Wrong!!!");
+            resetResult()
+            return;
+          }
+      }
+
+      function resetForm() {
+        bondPriceEl.value = ""
+        faceValEl.value = ""
+        couponRateEl.value = ""
+        yearsMatureEl.value = ""
+      }
+
+      function resetResult() {
+        calcResultsEl.innerHTML = "<p>Result will appear here...</p>";
+      } 
+
+      function resethandler() {
+        resetForm();
+        resetResult();
+      }
+
+      resetBtnEl.addEventListener("click", resethandler);
+      calcBtnEl.addEventListener("click", calculateResults);
+      [bondPriceEl, faceValEl, couponRateEl, yearsMatureEl].forEach((el) => {
+        el.addEventListener("input", resetResult);
+      });  
+      freqSelectEl.addEventListener("change", resetResult)
+
+    </script>
+</body>
+</html>

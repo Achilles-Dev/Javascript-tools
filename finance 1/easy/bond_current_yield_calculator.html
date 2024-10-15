@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Bond Current Yield Calculator</title>
+</head>
+<body>
+    <h1>Bond Current Yield Calculator</h1>
+    <p>
+      Face value:
+      <input type="number" id="faceVal">
+    </p>
+    <p>
+      Frequency:
+      <select
+      class="selects"
+      id="freqSelect"
+    >
+      <option value="1" selected>Annually</option>
+      <option value="0.5">Semi-annually</option>
+      <option value="0.25">Quarterly</option>
+      <option value="0.08333333333">Monthly</option>
+      <option value="0.0192307692308">Weekly</option>
+    </select>
+    </p>
+    <p>
+      Coupon rate : 
+      <input type="number" id="couponRate">
+    </p>
+    <p>
+      Bond price:
+      <input type="number" id="bondPrice">
+    </p>
+
+    <button id="calcBtn">Calculate</button>
+    <button id="resetBtn">Reset</button>
+    <hr>
+    <div>
+      <h3>Result:</h3>
+      <h3 id="calcResults">Result will appear here...</h3>
+    </div>
+
+    <script>
+      // Get required elements from the HTML
+      const faceValEl = document.getElementById("faceVal");
+      const couponRateEl = document.getElementById("couponRate");
+      const bondPriceEl = document.getElementById("bondPrice");
+      const freqSelectEl = document.getElementById("freqSelect");
+
+      const calcBtnEl = document.getElementById('calcBtn');
+      const resetBtnEl = document.getElementById('resetBtn');
+      const calcResultsEl = document.getElementById('calcResults') 
+
+      function createElement() {
+        const newDiv = `
+            <p>
+              <label for="i11-span">Coupon per period: &nbsp;</label>
+              $<span
+                data-id="i11"
+                step="any"
+                id="i11-span"
+                class="spans"
+              ></span>
+            </p>
+            <p>
+              <label for="i12-span">Annual coupon: &nbsp;</label>
+              $<span
+                data-id="i12"
+                step="any"
+                id="i12-span"
+                class="spans"
+              ></span>
+            </p>
+            <p>
+              <label for="i13-span">Current yield: &nbsp;</label>
+              <span
+                data-id="i13"
+                step="any"
+                id="i13-span"
+                class="spans"
+              ></span>%
+            </p>
+        `
+        return newDiv
+      }
+
+      function setResult(resultObj) {
+        for (key of Object.keys(resultObj)) {
+          let val = resultObj[key].result;
+          let id = resultObj[key].type;
+
+          if (isNaN(val)) {
+           alert("Your input resulted in NAN.\n 0/0 \n Try again with valid input.");
+            return;
+          }
+          if (Math.abs(val) === Infinity) {
+            alert("Your input resulted in Infinity. \nDivision by zero. \nTry again with valid input.");
+            return;
+          }
+          const span = document.getElementById(`${id}-span`);
+          span.textContent = `${parseFloat(val)}`;
+        }
+      }
+
+      function calculateResults() {
+          // Retrieve input values
+          const faceVal = parseFloat(faceValEl.value);
+          const couponRate = parseFloat(couponRateEl.value);
+          const bondPrice = parseFloat(bondPriceEl.value);
+          const freqSelect = parseFloat(freqSelectEl.value)
+
+          if (isNaN(faceVal) || faceVal <= 0 || isNaN(couponRate) || isNaN(bondPrice) || bondPrice <= 0) {
+            alert("Please Enter All Details.");
+            return;
+          }
+
+          try {
+            const resultElement = createElement()
+            calcResultsEl.innerHTML = resultElement 
+
+            const couponFreq = freqSelect * faceVal * (couponRate / 100)
+            const annualCoupon = faceVal * (couponRate / 100)
+            const bondYield = (annualCoupon / bondPrice) * 100
+
+            const results = {
+              1: { result: Math.abs(couponFreq) > 1 ? couponFreq.toFixed(2) : couponFreq.toPrecision(2), type: "i11" },
+              2: { result: Math.abs(annualCoupon) > 1 ? annualCoupon.toFixed(2) : annualCoupon.toPrecision(2), type: "i12" },
+              3: { result: Math.abs(bondYield) > 1 ? bondYield.toFixed(2) : bondYield.toPrecision(2), type: "i13" },
+            }
+            setResult(results)
+
+          } catch (error) {
+            alert("Something Went Wrong!!!");
+            resetResult()
+            return;
+          }
+      }
+
+      function resetForm() {
+        faceValEl.value = ""
+        couponRateEl.value = ""
+        bondPriceEl.value = ""
+        freqSelectEl.selectedIndex = "0"
+      }
+
+      function resetResult() {
+        calcResultsEl.innerHTML = "<p>Result will appear here...</p>";
+      } 
+
+      function resethandler() {
+        resetForm();
+        resetResult();
+      }
+
+      resetBtnEl.addEventListener("click", resethandler);
+      calcBtnEl.addEventListener("click", calculateResults);
+       [faceValEl, couponRateEl, bondPriceEl].forEach((el) => {
+        el.addEventListener("input", resetResult);
+      });  
+      freqSelectEl.addEventListener("change", resetResult)
+
+    </script>
+</body>
+</html>
