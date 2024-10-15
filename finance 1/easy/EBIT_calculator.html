@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>EBIT Calculator</title>
+</head>
+<body>
+    <h1>EBIT Calculator</h1>
+    <h3>Calculate the earnings before interest and taxes..</h3>
+    <p>
+      Operating revenue (sales revenue):
+      <input type="number" id="optRevenue">
+    </p>
+    <p>
+      Operating expenses:
+      <input type="number" id="optExpense">
+      <span>Cost of goods sold, selling, general and administrative expenses, etc</span>
+    </p>
+    <p>
+      Non-operating income:
+      <input type="number" id="nonOptIncome">
+    </p>
+    
+
+    <button id="calcBtn">Calculate</button>
+    <button id="resetBtn">Reset</button>
+    <hr>
+    <div>
+      <h3>Result:</h3>
+      <h3 id="calcResults">Result will appear here...</h3>
+    </div>
+
+    <script>
+      // Get required elements from the HTML
+      const optRevenueEl = document.getElementById("optRevenue");
+      const optExpenseEl = document.getElementById("optExpense");
+      const nonOptIncomeEl = document.getElementById("nonOptIncome");
+
+      const calcBtnEl = document.getElementById('calcBtn');
+      const resetBtnEl = document.getElementById('resetBtn');
+      const calcResultsEl = document.getElementById('calcResults') 
+
+      function createElement() {
+        const newDiv = `
+            <p>
+              <label for="i11-span">EBIT: &nbsp;</label>
+              <span
+                data-id="i11"
+                step="any"
+                id="i11-span"
+                class="spans"
+              ></span>
+            </p>
+        `
+        return newDiv
+      }
+
+      function setResult(resultObj) {
+        for (key of Object.keys(resultObj)) {
+          let val = resultObj[key].result;
+          let id = resultObj[key].type;
+
+          if (isNaN(val)) {
+           alert("Your input resulted in NAN.\n 0/0 \n Try again with valid input.");
+            return;
+          }
+          if (Math.abs(val) === Infinity) {
+            alert("Your input resulted in Infinity. \nDivision by zero. \nTry again with valid input.");
+            return;
+          }
+          const span = document.getElementById(`${id}-span`);
+          span.textContent = `${parseFloat(val)}`;
+        }
+      }
+
+      function calculateResults() {
+          // Retrieve input values
+          const optRevenue = parseFloat(optRevenueEl.value);
+          const optExpense = parseFloat(optExpenseEl.value);
+          const nonOptIncome = parseFloat(nonOptIncomeEl.value);
+
+          if (isNaN(optRevenue) || optRevenue < 0 || isNaN(optExpense) || optExpense < 0 ||
+            isNaN(nonOptIncome) || nonOptIncome < 0
+          ) {
+            alert("Please Enter All Details.");
+            return;
+          } 
+
+          try {
+            const resultElement = createElement()
+            calcResultsEl.innerHTML = resultElement 
+
+            const EBIT = optRevenue - optExpense + nonOptIncome
+
+            const results = {
+              1: { result: Math.abs(EBIT) > 1 ? EBIT.toFixed(2) : EBIT.toPrecision(2), type: "i11" },
+            }
+            setResult(results)
+
+          } catch (error) {
+            alert("Something Went Wrong!!!");
+            resetResult()
+            return;
+          }
+      }
+
+      function resetForm() {
+        optRevenueEl.value = "100"
+        optExpenseEl.value = "10"
+        nonOptIncomeEl.value = "6.5"
+      }
+
+      function resetResult() {
+        calcResultsEl.innerHTML = "<p>Result will appear here...</p>";
+      } 
+
+      function resethandler() {
+        resetForm();
+        resetResult();
+      }
+
+      resetBtnEl.addEventListener("click", resethandler);
+      calcBtnEl.addEventListener("click", calculateResults);
+
+      [optRevenueEl, optExpenseEl, nonOptIncomeEl].forEach((el) => {
+        el.addEventListener("input", resetResult);
+      });  
+    </script>
+</body>
+</html>
