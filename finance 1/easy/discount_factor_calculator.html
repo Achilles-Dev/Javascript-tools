@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Discount Factor Calculator</title>
+</head>
+<body>
+    <h1>Discount Factor Calculator</h1>
+    <h3>Calculate the discount factor.</h3>
+    <p>
+      Discount Rate:
+      <input type="number" id="discRate" value="6">%
+    </p>
+    <p>
+      Number of Compounding Periods:
+      <input type="number" id="compoundPeriod">
+    </p>
+    
+
+    <button id="calcBtn">Calculate</button>
+    <button id="resetBtn">Reset</button>
+    <hr>
+    <div>
+      <h3>Result:</h3>
+      <h3 id="calcResults">Result will appear here...</h3>
+    </div>
+
+    <script>
+      // Get required elements from the HTML
+      const discRateEl = document.getElementById("discRate");
+      const compoundPeriodEl = document.getElementById("compoundPeriod");
+
+      const calcBtnEl = document.getElementById('calcBtn');
+      const resetBtnEl = document.getElementById('resetBtn');
+      const calcResultsEl = document.getElementById('calcResults') 
+
+      function createElement() {
+        const newDiv = `
+            <p>
+              <label for="i11-span">Discount Factor: &nbsp;</label>
+              <span
+                data-id="i11"
+                step="any"
+                id="i11-span"
+                class="spans"
+              ></span>
+            </p>
+        `
+        return newDiv
+      }
+
+      function setResult(resultObj) {
+        for (key of Object.keys(resultObj)) {
+          let val = resultObj[key].result;
+          let id = resultObj[key].type;
+
+          if (isNaN(val)) {
+           alert("Your input resulted in NAN.\n 0/0 \n Try again with valid input.");
+            return;
+          }
+          if (Math.abs(val) === Infinity) {
+            alert("Your input resulted in Infinity. \nDivision by zero. \nTry again with valid input.");
+            return;
+          }
+          const span = document.getElementById(`${id}-span`);
+          span.textContent = `${parseFloat(val)}`;
+        }
+      }
+
+      function calculateResults() {
+          // Retrieve input values
+          const discRate = parseFloat(discRateEl.value);
+          const compoundPeriod = parseFloat(compoundPeriodEl.value);
+
+          if (isNaN(discRate) || discRate < 1e-05 || isNaN(compoundPeriod) || compoundPeriod < 1 ) {
+            alert("Please Enter All Details.");
+            return;
+          } else if (discRate > 99) {
+            alert("Ensure this value is less than or equal to 99.");
+            return;
+          }
+
+          try {
+            const resultElement = createElement()
+            calcResultsEl.innerHTML = resultElement 
+
+            const DF = 1 / ((1 + (discRate / 100)) ** compoundPeriod)
+
+            const results = {
+              1: { result: Math.abs(DF) > 1 ? DF.toFixed(3) : DF.toPrecision(3), type: "i11" },
+            }
+            setResult(results)
+
+          } catch (error) {
+            alert("Something Went Wrong!!!");
+            resetResult()
+            return;
+          }
+      }
+
+      function resetForm() {
+        discRateEl.value = ""
+        compoundPeriodEl.value = ""
+      }
+
+      function resetResult() {
+        calcResultsEl.innerHTML = "<p>Result will appear here...</p>";
+      } 
+
+      function resethandler() {
+        resetForm();
+        resetResult();
+      }
+
+      resetBtnEl.addEventListener("click", resethandler);
+      calcBtnEl.addEventListener("click", calculateResults);
+
+      [discRateEl, compoundPeriodEl].forEach((el) => {
+        el.addEventListener("input", resetResult);
+      });  
+    </script>
+</body>
+</html>
