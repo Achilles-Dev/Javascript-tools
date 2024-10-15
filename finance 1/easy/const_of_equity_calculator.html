@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Cost of Equity Calculator</title>
+</head>
+<body>
+    <h1>Cost of Equity Calculator</h1>
+    <h3>Calculate the cost of equity using the dividend approach.</h3>
+    <p>
+      Next year's dividends per share ($):
+      <input type="number" id="dividPerShare">
+    </p>
+    <p>
+      Current market value of stock ($):
+      <input type="number" id="currMarktVal">
+    </p>
+    <p>
+      Growth rate of dividends:
+      <input type="number" id="growthRate">%
+    </p>
+    
+
+    <button id="calcBtn">Calculate</button>
+    <button id="resetBtn">Reset</button>
+    <hr>
+    <div>
+      <h3>Result:</h3>
+      <h3 id="calcResults">Result will appear here...</h3>
+    </div>
+
+    <script>
+      // Get required elements from the HTML
+      const dividPerShareEl = document.getElementById("dividPerShare");
+      const growthRateEl = document.getElementById("growthRate");
+      const currMarktValEl = document.getElementById("currMarktVal");
+
+      const calcBtnEl = document.getElementById('calcBtn');
+      const resetBtnEl = document.getElementById('resetBtn');
+      const calcResultsEl = document.getElementById('calcResults') 
+
+      function createElement() {
+        const newDiv = `
+            <p>
+              <label for="i11-span">Cost of Equity: &nbsp;</label>
+              <span
+                data-id="i11"
+                step="any"
+                id="i11-span"
+                class="spans"
+              ></span>%
+            </p>
+        `
+        return newDiv
+      }
+
+      function setResult(resultObj) {
+        for (key of Object.keys(resultObj)) {
+          let val = resultObj[key].result;
+          let id = resultObj[key].type;
+
+          if (isNaN(val)) {
+           alert("Your input resulted in NAN.\n 0/0 \n Try again with valid input.");
+            return;
+          }
+          if (Math.abs(val) === Infinity) {
+            alert("Your input resulted in Infinity. \nDivision by zero. \nTry again with valid input.");
+            return;
+          }
+          const span = document.getElementById(`${id}-span`);
+          span.textContent = `${parseFloat(val)}`;
+        }
+      }
+
+      function calculateResults() {
+          // Retrieve input values
+          const dividPerShare = parseFloat(dividPerShareEl.value);
+          const growthRate = parseFloat(growthRateEl.value);
+          const currMarktVal = parseFloat(currMarktValEl.value);
+
+          if (isNaN(dividPerShare) || dividPerShare < 0.001 || isNaN(growthRate) || growthRate < 0 ||
+            isNaN(currMarktVal) || currMarktVal < 0.001
+          ) {
+            alert("Please Enter All Details.");
+            return;
+          }
+
+          try {
+            const resultElement = createElement()
+            calcResultsEl.innerHTML = resultElement 
+
+            const coe = ((dividPerShare / currMarktVal) + (growthRate / 100)) * 100
+
+            const results = {
+              1: { result: Math.abs(coe) > 1 ? coe.toFixed(2) : coe.toPrecision(2), type: "i11" },
+            }
+            setResult(results)
+
+          } catch (error) {
+            alert("Something Went Wrong!!!");
+            resetResult()
+            return;
+          }
+      }
+
+      function resetForm() {
+        dividPerShareEl.value = ""
+        growthRateEl.value = ""
+        currMarktValEl.value = ""
+      }
+
+      function resetResult() {
+        calcResultsEl.innerHTML = "<p>Result will appear here...</p>";
+      } 
+
+      function resethandler() {
+        resetForm();
+        resetResult();
+      }
+
+      resetBtnEl.addEventListener("click", resethandler);
+      calcBtnEl.addEventListener("click", calculateResults);
+
+      [dividPerShareEl, growthRateEl, currMarktValEl].forEach((el) => {
+        el.addEventListener("input", resetResult);
+      });  
+    </script>
+</body>
+</html>
