@@ -1,22 +1,22 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Monthly Payment Mortgage Calculator</title>
+  <title>Present Value of Lump Sum Calculator</title>
 </head>
 <body>
-    <h1>Monthly Payment Mortgage Calculator</h1>
-    <h3>Calculate your monthly mortgage payment.</h3>
+    <h1>Present Value of Lump Sum Calculator</h1>
+    <h3>Calculate the present value of lump sum.</h3>
     <p>
-      Mortgage amount:
-      <input type="number" id="mortAmt" value="100000">
+      Future value of lump sum :
+      <input type="number" id="lumpSumVal">
     </p>
     <p>
-      Annual interest rate:
-      <input type="number" id="intRate" value="7">%
+      Interest rate per period:
+      <input type="number" id="intRate">%
     </p>
     <p>
-      Mortgage term:
-      <input type="number" id="mortTerm" value="20"> years
+      Number of compounding periods:
+      <input type="number" id="compPeriodNum">
     </p>
     
 
@@ -30,9 +30,9 @@
 
     <script>
       // Get required elements from the HTML
-      const mortAmtEl = document.getElementById("mortAmt");
+      const lumpSumValEl = document.getElementById("lumpSumVal");
       const intRateEl = document.getElementById("intRate");
-      const mortTermEl = document.getElementById("mortTerm");
+      const compPeriodNumEl = document.getElementById("compPeriodNum");
 
       const calcBtnEl = document.getElementById('calcBtn');
       const resetBtnEl = document.getElementById('resetBtn');
@@ -41,7 +41,7 @@
       function createElement() {
         const newDiv = `
             <p>
-              <label for="i11-span">Mortgage Monthly Payment (Principal & Interest Only): &nbsp;</label>
+              <label for="i11-span">Future Value of Lump Sum: &nbsp;</label>
               <span
                 data-id="i11"
                 step="any"
@@ -73,17 +73,17 @@
 
       function calculateResults() {
           // Retrieve input values
-          const mortAmt = parseFloat(mortAmtEl.value);
+          const lumpSumVal = parseFloat(lumpSumValEl.value);
           const intRate = parseFloat(intRateEl.value);
-          const mortTerm = parseFloat(mortTermEl.value);
+          const compPeriodNum = parseFloat(compPeriodNumEl.value);
 
-          if (isNaN(mortAmt)  || mortAmt < 1 || isNaN(intRate) || intRate < 1 ||
-            isNaN(mortTerm) || mortTerm < 1
+          if (isNaN(lumpSumVal)  || lumpSumVal < 0 || isNaN(intRate) || intRate < 0 ||
+            isNaN(compPeriodNum) || compPeriodNum < 0
           ) {
             alert("Please Enter All Details.");
             return;
-          } else if (intRate > 50) {
-            alert("Ensure this value is less than or equal to 50.");
+          } else if (intRate > 100 || compPeriodNum > 100) {
+            alert("Ensure this value is less than or equal to 100.");
             return;
           }
 
@@ -91,11 +91,10 @@
             const resultElement = createElement()
             calcResultsEl.innerHTML = resultElement 
 
-            
-            const MMP = (mortAmt * ((intRate / 12) / 100) * ((1 + ((intRate / 12) / 100)) ** (12 * mortTerm))) / (((1 + ((intRate / 12) / 100)) ** (12 * mortTerm)) - 1)
+            const PVLS = lumpSumVal / (((1 + (intRate / 100)) ** compPeriodNum))
 
             const results = {
-              1: { result: Math.abs(MMP) > 1 ? MMP.toFixed(2) : MMP.toPrecision(2), type: "i11" },
+              1: { result: Math.abs(PVLS) > 1 ? PVLS.toFixed(2) : PVLS.toPrecision(2), type: "i11" },
             }
             setResult(results)
 
@@ -107,9 +106,9 @@
       }
 
       function resetForm() {
-        mortAmtEl.value = "100000"
-        intRateEl.value = "7"
-        mortTermEl.value = "20"
+        lumpSumValEl.value = ""
+        intRateEl.value = ""
+        compPeriodNumEl.value = ""
       }
 
       function resetResult() {
@@ -124,7 +123,7 @@
       resetBtnEl.addEventListener("click", resethandler);
       calcBtnEl.addEventListener("click", calculateResults);
 
-      [mortAmtEl, intRateEl, mortTermEl].forEach((el) => {
+      [lumpSumValEl, intRateEl, compPeriodNumEl].forEach((el) => {
         el.addEventListener("input", resetResult);
       });  
     </script>

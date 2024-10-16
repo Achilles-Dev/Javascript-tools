@@ -1,24 +1,18 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Monthly Payment Mortgage Calculator</title>
+  <title>Percent Off Calculator</title>
 </head>
 <body>
-    <h1>Monthly Payment Mortgage Calculator</h1>
-    <h3>Calculate your monthly mortgage payment.</h3>
+    <h1>Percent Off Calculator</h1>
     <p>
-      Mortgage amount:
-      <input type="number" id="mortAmt" value="100000">
+      Original Price:
+      <input type="number" id="price">
     </p>
     <p>
-      Annual interest rate:
-      <input type="number" id="intRate" value="7">%
+      Percent Off:
+      <input type="number" id="percentOff">%
     </p>
-    <p>
-      Mortgage term:
-      <input type="number" id="mortTerm" value="20"> years
-    </p>
-    
 
     <button id="calcBtn">Calculate</button>
     <button id="resetBtn">Reset</button>
@@ -30,9 +24,8 @@
 
     <script>
       // Get required elements from the HTML
-      const mortAmtEl = document.getElementById("mortAmt");
-      const intRateEl = document.getElementById("intRate");
-      const mortTermEl = document.getElementById("mortTerm");
+      const priceEl = document.getElementById("price");
+      const percentOffEl = document.getElementById("percentOff");
 
       const calcBtnEl = document.getElementById('calcBtn');
       const resetBtnEl = document.getElementById('resetBtn');
@@ -41,7 +34,7 @@
       function createElement() {
         const newDiv = `
             <p>
-              <label for="i11-span">Mortgage Monthly Payment (Principal & Interest Only): &nbsp;</label>
+              <label for="i11-span">Sale price: &nbsp;</label>
               <span
                 data-id="i11"
                 step="any"
@@ -49,6 +42,16 @@
                 class="spans"
               ></span>
             </p>
+            <p>
+              <label for="i12-span">You save: &nbsp;</label>
+              <span
+                data-id="i12"
+                step="any"
+                id="i12-span"
+                class="spans"
+              ></span>
+            </p>
+            
         `
         return newDiv
       }
@@ -73,17 +76,14 @@
 
       function calculateResults() {
           // Retrieve input values
-          const mortAmt = parseFloat(mortAmtEl.value);
-          const intRate = parseFloat(intRateEl.value);
-          const mortTerm = parseFloat(mortTermEl.value);
+          const price = parseFloat(priceEl.value);
+          const percentOff = parseFloat(percentOffEl.value);
 
-          if (isNaN(mortAmt)  || mortAmt < 1 || isNaN(intRate) || intRate < 1 ||
-            isNaN(mortTerm) || mortTerm < 1
-          ) {
+          if (isNaN(price) || price < 0 || isNaN(percentOff) || percentOff < 0 ) {
             alert("Please Enter All Details.");
             return;
-          } else if (intRate > 50) {
-            alert("Ensure this value is less than or equal to 50.");
+          }  else if (percentOff > 100) {
+            alert("Ensure this value is less than or equal to 100.");
             return;
           }
 
@@ -91,11 +91,12 @@
             const resultElement = createElement()
             calcResultsEl.innerHTML = resultElement 
 
+            const salePrice = price * (1 - (percentOff / 100))
+            const savings = price - salePrice
             
-            const MMP = (mortAmt * ((intRate / 12) / 100) * ((1 + ((intRate / 12) / 100)) ** (12 * mortTerm))) / (((1 + ((intRate / 12) / 100)) ** (12 * mortTerm)) - 1)
-
             const results = {
-              1: { result: Math.abs(MMP) > 1 ? MMP.toFixed(2) : MMP.toPrecision(2), type: "i11" },
+              1: { result: Math.abs(salePrice) > 1 ? salePrice.toFixed(2) : salePrice.toPrecision(2), type: "i11" },
+              2: { result: Math.abs(savings) > 1 ? savings.toFixed(2) : savings.toPrecision(2), type: "i12" },
             }
             setResult(results)
 
@@ -107,9 +108,8 @@
       }
 
       function resetForm() {
-        mortAmtEl.value = "100000"
-        intRateEl.value = "7"
-        mortTermEl.value = "20"
+        priceEl.value = ""
+        percentOffEl.value = ""
       }
 
       function resetResult() {
@@ -124,7 +124,7 @@
       resetBtnEl.addEventListener("click", resethandler);
       calcBtnEl.addEventListener("click", calculateResults);
 
-      [mortAmtEl, intRateEl, mortTermEl].forEach((el) => {
+      [priceEl, percentOffEl].forEach((el) => {
         el.addEventListener("input", resetResult);
       });  
     </script>

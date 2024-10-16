@@ -1,24 +1,19 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Monthly Payment Mortgage Calculator</title>
+  <title>P/E Ratio Calculator</title>
 </head>
 <body>
-    <h1>Monthly Payment Mortgage Calculator</h1>
-    <h3>Calculate your monthly mortgage payment.</h3>
+    <h1>P/E Ratio Calculator</h1>
+    <h3>Calculate the P/E ratio.</h3>
     <p>
-      Mortgage amount:
-      <input type="number" id="mortAmt" value="100000">
+      Price per Share:
+      <input type="number" id="price">
     </p>
     <p>
-      Annual interest rate:
-      <input type="number" id="intRate" value="7">%
+      Annual Earnings per Share:
+      <input type="number" id="earnings">
     </p>
-    <p>
-      Mortgage term:
-      <input type="number" id="mortTerm" value="20"> years
-    </p>
-    
 
     <button id="calcBtn">Calculate</button>
     <button id="resetBtn">Reset</button>
@@ -30,9 +25,8 @@
 
     <script>
       // Get required elements from the HTML
-      const mortAmtEl = document.getElementById("mortAmt");
-      const intRateEl = document.getElementById("intRate");
-      const mortTermEl = document.getElementById("mortTerm");
+      const priceEl = document.getElementById("price");
+      const earningsEl = document.getElementById("earnings");
 
       const calcBtnEl = document.getElementById('calcBtn');
       const resetBtnEl = document.getElementById('resetBtn');
@@ -41,7 +35,7 @@
       function createElement() {
         const newDiv = `
             <p>
-              <label for="i11-span">Mortgage Monthly Payment (Principal & Interest Only): &nbsp;</label>
+              <label for="i11-span">P/E Ratio: &nbsp;</label>
               <span
                 data-id="i11"
                 step="any"
@@ -49,6 +43,7 @@
                 class="spans"
               ></span>
             </p>
+            
         `
         return newDiv
       }
@@ -73,29 +68,22 @@
 
       function calculateResults() {
           // Retrieve input values
-          const mortAmt = parseFloat(mortAmtEl.value);
-          const intRate = parseFloat(intRateEl.value);
-          const mortTerm = parseFloat(mortTermEl.value);
+          const price = parseFloat(priceEl.value);
+          const earnings = parseFloat(earningsEl.value);
 
-          if (isNaN(mortAmt)  || mortAmt < 1 || isNaN(intRate) || intRate < 1 ||
-            isNaN(mortTerm) || mortTerm < 1
-          ) {
+          if (isNaN(price) || price < 0.001 || isNaN(earnings) || earnings < 0.001 ) {
             alert("Please Enter All Details.");
             return;
-          } else if (intRate > 50) {
-            alert("Ensure this value is less than or equal to 50.");
-            return;
-          }
+          } 
 
           try {
             const resultElement = createElement()
             calcResultsEl.innerHTML = resultElement 
 
+            const PERatio = price / earnings
             
-            const MMP = (mortAmt * ((intRate / 12) / 100) * ((1 + ((intRate / 12) / 100)) ** (12 * mortTerm))) / (((1 + ((intRate / 12) / 100)) ** (12 * mortTerm)) - 1)
-
             const results = {
-              1: { result: Math.abs(MMP) > 1 ? MMP.toFixed(2) : MMP.toPrecision(2), type: "i11" },
+              1: { result: Math.abs(PERatio) > 1 ? PERatio.toFixed(2) : PERatio.toPrecision(2), type: "i11" },
             }
             setResult(results)
 
@@ -107,9 +95,8 @@
       }
 
       function resetForm() {
-        mortAmtEl.value = "100000"
-        intRateEl.value = "7"
-        mortTermEl.value = "20"
+        priceEl.value = ""
+        earningsEl.value = ""
       }
 
       function resetResult() {
@@ -124,7 +111,7 @@
       resetBtnEl.addEventListener("click", resethandler);
       calcBtnEl.addEventListener("click", calculateResults);
 
-      [mortAmtEl, intRateEl, mortTermEl].forEach((el) => {
+      [priceEl, earningsEl].forEach((el) => {
         el.addEventListener("input", resetResult);
       });  
     </script>
