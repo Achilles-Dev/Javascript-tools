@@ -1,19 +1,18 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Effective Interest Rate Calculator</title>
+  <title>Equity Ratio Calculator</title>
 </head>
 <body>
-    <h1>Effective Interest Rate Calculator</h1>
-    <h3>Calculate the effective annual interest rate.</h3>
+    <h1>Equity Ratio Calculator</h1>
+    <h3>Calculate the equity ratio.</h3>
     <p>
-      Nominal annual interest rate:
-      <input type="number" id="annIntRate" value="7.5">%
+      Total owner's equity:
+      <input type="number" id="ownerEquity">
     </p>
     <p>
-      Number of compounding periods per year:
-      <input type="number" id="compPeriodNum">
-      <span>Leave blank if the compounding is continuous</span>
+      Stockholders' equity:
+      <input type="number" id="stockEquity">
     </p>
 
     <button id="calcBtn">Calculate</button>
@@ -26,8 +25,8 @@
 
     <script>
       // Get required elements from the HTML
-      const annIntRateEl = document.getElementById("annIntRate");
-      const compPeriodNumEl = document.getElementById("compPeriodNum");
+      const ownerEquityEl = document.getElementById("ownerEquity");
+      const stockEquityEl = document.getElementById("stockEquity");
 
       const calcBtnEl = document.getElementById('calcBtn');
       const resetBtnEl = document.getElementById('resetBtn');
@@ -36,7 +35,7 @@
       function createElement() {
         const newDiv = `
             <p>
-              <label for="i11-span">Effective Interest Rate: &nbsp;</label>
+              <label for="i11-span">Equity Ratio: &nbsp;</label>
               <span
                 data-id="i11"
                 step="any"
@@ -68,14 +67,11 @@
 
       function calculateResults() {
           // Retrieve input values
-          const annIntRate = parseFloat(annIntRateEl.value);
-          const compPeriodNum = parseFloat(compPeriodNumEl.value);
+          const ownerEquity = parseFloat(ownerEquityEl.value);
+          const stockEquity = parseFloat(stockEquityEl.value);
 
-          if (isNaN(annIntRate) || annIntRate < 1e-05 || (!isNaN(compPeriodNum) && compPeriodNum < 1) ) {
+          if (isNaN(ownerEquity) || ownerEquity < 0.001 || isNaN(stockEquity) || stockEquity < 0.001 ) {
             alert("Please Enter All Details.");
-            return;
-          } else if (annIntRate > 99) {
-            alert("Ensure this value is less than or equal to 99.");
             return;
           }
 
@@ -83,13 +79,10 @@
             const resultElement = createElement()
             calcResultsEl.innerHTML = resultElement 
 
-            let EIR = (((1 + ((annIntRate / 100) / compPeriodNum)) ** compPeriodNum) - 1) * 100
-            if (isNaN(compPeriodNum)) {
-              EIR = (((2.71828183) ** (annIntRate / 100)) - 1) * 100
-            }
+            const ER = (ownerEquity / stockEquity) * 100
 
             const results = {
-              1: { result: Math.abs(EIR) > 1 ? EIR.toFixed(3) : EIR.toPrecision(3), type: "i11" },
+              1: { result: Math.abs(ER) > 1 ? ER.toFixed(3) : ER.toPrecision(3), type: "i11" },
             }
             setResult(results)
 
@@ -101,8 +94,8 @@
       }
 
       function resetForm() {
-        annIntRateEl.value = "7.5"
-        compPeriodNumEl.value = ""
+        ownerEquityEl.value = ""
+        stockEquityEl.value = ""
       }
 
       function resetResult() {
@@ -117,7 +110,7 @@
       resetBtnEl.addEventListener("click", resethandler);
       calcBtnEl.addEventListener("click", calculateResults);
 
-      [annIntRateEl, compPeriodNumEl].forEach((el) => {
+      [ownerEquityEl, stockEquityEl].forEach((el) => {
         el.addEventListener("input", resetResult);
       });  
     </script>

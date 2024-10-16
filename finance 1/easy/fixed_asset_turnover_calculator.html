@@ -1,19 +1,18 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Effective Interest Rate Calculator</title>
+  <title>Fixed Asset Turnover Calculator</title>
 </head>
 <body>
-    <h1>Effective Interest Rate Calculator</h1>
-    <h3>Calculate the effective annual interest rate.</h3>
+    <h1>Fixed Asset Turnover Calculator</h1>
+    <h3>Calculate the fixed asset turnover ratio.</h3>
     <p>
-      Nominal annual interest rate:
-      <input type="number" id="annIntRate" value="7.5">%
+      Net Sales:
+      <input type="number" id="netSales">
     </p>
     <p>
-      Number of compounding periods per year:
-      <input type="number" id="compPeriodNum">
-      <span>Leave blank if the compounding is continuous</span>
+      Average Net Fixed Assets:
+      <input type="number" id="netFixedAssets">
     </p>
 
     <button id="calcBtn">Calculate</button>
@@ -26,8 +25,8 @@
 
     <script>
       // Get required elements from the HTML
-      const annIntRateEl = document.getElementById("annIntRate");
-      const compPeriodNumEl = document.getElementById("compPeriodNum");
+      const netSalesEl = document.getElementById("netSales");
+      const netFixedAssetsEl = document.getElementById("netFixedAssets");
 
       const calcBtnEl = document.getElementById('calcBtn');
       const resetBtnEl = document.getElementById('resetBtn');
@@ -36,13 +35,13 @@
       function createElement() {
         const newDiv = `
             <p>
-              <label for="i11-span">Effective Interest Rate: &nbsp;</label>
+              <label for="i11-span">Equity Ratio: &nbsp;</label>
               <span
                 data-id="i11"
                 step="any"
                 id="i11-span"
                 class="spans"
-              ></span>%
+              ></span>
             </p>
         `
         return newDiv
@@ -68,14 +67,11 @@
 
       function calculateResults() {
           // Retrieve input values
-          const annIntRate = parseFloat(annIntRateEl.value);
-          const compPeriodNum = parseFloat(compPeriodNumEl.value);
+          const netSales = parseFloat(netSalesEl.value);
+          const netFixedAssets = parseFloat(netFixedAssetsEl.value);
 
-          if (isNaN(annIntRate) || annIntRate < 1e-05 || (!isNaN(compPeriodNum) && compPeriodNum < 1) ) {
+          if (isNaN(netSales) || netSales < 0.001 || isNaN(netFixedAssets) || netFixedAssets < 0.001 ) {
             alert("Please Enter All Details.");
-            return;
-          } else if (annIntRate > 99) {
-            alert("Ensure this value is less than or equal to 99.");
             return;
           }
 
@@ -83,13 +79,10 @@
             const resultElement = createElement()
             calcResultsEl.innerHTML = resultElement 
 
-            let EIR = (((1 + ((annIntRate / 100) / compPeriodNum)) ** compPeriodNum) - 1) * 100
-            if (isNaN(compPeriodNum)) {
-              EIR = (((2.71828183) ** (annIntRate / 100)) - 1) * 100
-            }
+            const FATO = (netSales / netFixedAssets)
 
             const results = {
-              1: { result: Math.abs(EIR) > 1 ? EIR.toFixed(3) : EIR.toPrecision(3), type: "i11" },
+              1: { result: Math.abs(FATO) > 1 ? FATO.toFixed(2) : FATO.toPrecision(2), type: "i11" },
             }
             setResult(results)
 
@@ -101,8 +94,8 @@
       }
 
       function resetForm() {
-        annIntRateEl.value = "7.5"
-        compPeriodNumEl.value = ""
+        netSalesEl.value = ""
+        netFixedAssetsEl.value = ""
       }
 
       function resetResult() {
@@ -117,7 +110,7 @@
       resetBtnEl.addEventListener("click", resethandler);
       calcBtnEl.addEventListener("click", calculateResults);
 
-      [annIntRateEl, compPeriodNumEl].forEach((el) => {
+      [netSalesEl, netFixedAssetsEl].forEach((el) => {
         el.addEventListener("input", resetResult);
       });  
     </script>

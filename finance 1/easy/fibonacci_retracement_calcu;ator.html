@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Fibonacci Retracement Calculator</title>
+</head>
+<body>
+    <h1>Equity Ratio Calculator</h1>
+    <h3>Calculate the fibonacci retracement levels.</h3>
+    <p>
+      Start point:
+      <input type="number" id="startPoint">
+    </p>
+    <p>
+      End point:
+      <input type="number" id="endPoint">
+    </p>
+
+    <button id="calcBtn">Calculate</button>
+    <button id="resetBtn">Reset</button>
+    <hr>
+    <div>
+      <h3>Result:</h3>
+      <h3 id="calcResults">Result will appear here...</h3>
+    </div>
+
+    <script>
+      // Get required elements from the HTML
+      const startPointEl = document.getElementById("startPoint");
+      const endPointEl = document.getElementById("endPoint");
+
+      const calcBtnEl = document.getElementById('calcBtn');
+      const resetBtnEl = document.getElementById('resetBtn');
+      const calcResultsEl = document.getElementById('calcResults') 
+
+      function createElement() {
+        let startFirst = false
+        if (parseFloat(startPointEl.value) > parseFloat(endPointEl.value)) {
+          startFirst = true
+        }
+        const newDiv = `
+            <p>
+              <label for="i11-span">${startFirst ? "Start Point" : "End Point"}: &nbsp;</label>
+              <span
+                data-id="i11"
+                step="any"
+                id="i11-span"
+                class="spans"
+              ></span>
+            </p>
+            <p>
+              <label for="i12-span">${startFirst ? "78.6%" : "23.6%"}: &nbsp;</label>
+              <span
+                data-id="i12"
+                step="any"
+                id="i12-span"
+                class="spans"
+              ></span>
+            </p>
+            <p>
+              <label for="i13-span">${startFirst ? "61.8%" : "38.2%"}: &nbsp;</label>
+              <span
+                data-id="i13"
+                step="any"
+                id="i13-span"
+                class="spans"
+              ></span>
+            </p>
+            <p>
+              <label for="i14-span">50.0%: &nbsp;</label>
+              <span
+                data-id="i14"
+                step="any"
+                id="i14-span"
+                class="spans"
+              ></span>
+            </p>
+            <p>
+              <label for="i15-span">${startFirst ? "38.2%" : "61.8%"}: &nbsp;</label>
+              <span
+                data-id="i15"
+                step="any"
+                id="i15-span"
+                class="spans"
+              ></span>
+            </p>
+            <p>
+              <label for="i16-span">${startFirst ? "23.6%" : "78.6%"}: &nbsp;</label>
+              <span
+                data-id="i16"
+                step="any"
+                id="i16-span"
+                class="spans"
+              ></span>
+            </p>
+            <p>
+              <label for="i17-span">${startFirst ? "End Point" : "Start Point"}: &nbsp;</label>
+              <span
+                data-id="i17"
+                step="any"
+                id="i17-span"
+                class="spans"
+              ></span>
+            </p>
+        `
+        return newDiv
+      }
+
+      function setResult(resultObj) {
+        for (key of Object.keys(resultObj)) {
+          let val = resultObj[key].result;
+          let id = resultObj[key].type;
+
+          if (isNaN(val)) {
+           alert("Your input resulted in NAN.\n 0/0 \n Try again with valid input.");
+            return;
+          }
+          if (Math.abs(val) === Infinity) {
+            alert("Your input resulted in Infinity. \nDivision by zero. \nTry again with valid input.");
+            return;
+          }
+          const span = document.getElementById(`${id}-span`);
+          span.textContent = `${parseFloat(val).toFixed(4) * 1}`;
+        }
+      }
+
+      function calculateResults() {
+          // Retrieve input values
+          const startPoint = parseFloat(startPointEl.value);
+          const endPoint = parseFloat(endPointEl.value);
+
+          if (isNaN(startPoint) || startPoint < 0 || isNaN(endPoint) || endPoint < 0 ) {
+            alert("Please Enter All Details.");
+            return;
+          }
+
+          try {
+            const resultElement = createElement()
+            calcResultsEl.innerHTML = resultElement 
+
+            if (startPoint > endPoint) {
+              const results = {
+                1: { result: startPoint, type: "i11" },
+                2: { result: ((78.6 / 100) * (startPoint - endPoint) + endPoint), type: "i12" },
+                3: { result: ((61.8 / 100) * (startPoint - endPoint) + endPoint), type: "i13" },
+                4: { result: ((50 / 100) * (startPoint - endPoint) + endPoint), type: "i14" },
+                5: { result: ((38.2 / 100) * (startPoint - endPoint) + endPoint), type: "i15" },
+                6: { result: ((23.6 / 100) * (startPoint - endPoint) + endPoint), type: "i16" },
+                7: { result: endPoint, type: "i17" },
+              }
+              setResult(results)
+            } else {
+              const results = {
+                1: { result: endPoint, type: "i11" },
+                2: { result: endPoint - ((23.6 / 100) * (endPoint - startPoint)), type: "i12" },
+                3: { result: endPoint - ((38.2 / 100) * (endPoint - startPoint)), type: "i13" },
+                4: { result: endPoint - ((50 / 100) * (endPoint - startPoint)), type: "i14" },
+                5: { result: endPoint - ((61.8 / 100) * (endPoint - startPoint)), type: "i15" },
+                6: { result: endPoint - ((78.6 / 100) * (endPoint - startPoint)), type: "i16" },
+                7: { result: startPoint, type: "i17" },
+              }
+              setResult(results)
+            }
+
+          } catch (error) {
+            alert("Something Went Wrong!!!");
+            resetResult()
+            return;
+          }
+      }
+
+      function resetForm() {
+        startPointEl.value = ""
+        endPointEl.value = ""
+      }
+
+      function resetResult() {
+        calcResultsEl.innerHTML = "<p>Result will appear here...</p>";
+      } 
+
+      function resethandler() {
+        resetForm();
+        resetResult();
+      }
+
+      resetBtnEl.addEventListener("click", resethandler);
+      calcBtnEl.addEventListener("click", calculateResults);
+
+      [startPointEl, endPointEl].forEach((el) => {
+        el.addEventListener("input", resetResult);
+      });  
+    </script>
+</body>
+</html>
