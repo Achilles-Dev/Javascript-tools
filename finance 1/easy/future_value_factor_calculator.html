@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Future Value Factor Calculator</title>
+</head>
+<body>
+    <h1>Future Value Factor Calculator</h1>
+    <h3>Calculate the future value factor.</h3>
+    <p>
+      Interest rate per period:
+      <input type="number" id="intRate">%
+    </p>
+    <p>
+      Number of period:
+      <input type="number" id="periodNum">
+    </p>
+
+    <button id="calcBtn">Calculate</button>
+    <button id="resetBtn">Reset</button>
+    <hr>
+    <div>
+      <h3>Result:</h3>
+      <h3 id="calcResults">Result will appear here...</h3>
+    </div>
+
+    <script>
+      // Get required elements from the HTML
+      const intRateEl = document.getElementById("intRate");
+      const periodNumEl = document.getElementById("periodNum");
+
+      const calcBtnEl = document.getElementById('calcBtn');
+      const resetBtnEl = document.getElementById('resetBtn');
+      const calcResultsEl = document.getElementById('calcResults') 
+
+      function createElement() {
+        const newDiv = `
+            <p>
+              <label for="i11-span">Future Value Factor: &nbsp;</label>
+              <span
+                data-id="i11"
+                step="any"
+                id="i11-span"
+                class="spans"
+              ></span>
+            </p>
+        `
+        return newDiv
+      }
+
+      function setResult(resultObj) {
+        for (key of Object.keys(resultObj)) {
+          let val = resultObj[key].result;
+          let id = resultObj[key].type;
+
+          if (isNaN(val)) {
+           alert("Your input resulted in NAN.\n 0/0 \n Try again with valid input.");
+            return;
+          }
+          if (Math.abs(val) === Infinity) {
+            alert("Your input resulted in Infinity. \nDivision by zero. \nTry again with valid input.");
+            return;
+          }
+          const span = document.getElementById(`${id}-span`);
+          span.textContent = `${parseFloat(val)}`;
+        }
+      }
+
+      function calculateResults() {
+          // Retrieve input values
+          const intRate = parseFloat(intRateEl.value);
+          const periodNum = parseFloat(periodNumEl.value);
+
+          if (isNaN(intRate) || intRate < 0 || isNaN(periodNum) || periodNum < 0 ) {
+            alert("Please Enter All Details.");
+            return;
+          } else if (intRate > 100) {
+            alert("Ensure this value is less than or equal to 100.");
+            return;
+          }
+
+          try {
+            const resultElement = createElement()
+            calcResultsEl.innerHTML = resultElement 
+
+            const FVF = ((1 + (intRate / 100)) ** periodNum)
+
+            const results = {
+              1: { result: Math.abs(FVF) > 1 ? FVF.toFixed(4) : FVF.toPrecision(4), type: "i11" },
+            }
+            setResult(results)
+
+          } catch (error) {
+            alert("Something Went Wrong!!!");
+            resetResult()
+            return;
+          }
+      }
+
+      function resetForm() {
+        intRateEl.value = ""
+        periodNumEl.value = ""
+      }
+
+      function resetResult() {
+        calcResultsEl.innerHTML = "<p>Result will appear here...</p>";
+      } 
+
+      function resethandler() {
+        resetForm();
+        resetResult();
+      }
+
+      resetBtnEl.addEventListener("click", resethandler);
+      calcBtnEl.addEventListener("click", calculateResults);
+
+      [intRateEl, periodNumEl].forEach((el) => {
+        el.addEventListener("input", resetResult);
+      });  
+    </script>
+</body>
+</html>
