@@ -1,24 +1,19 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Future Value of Annuity Calculator</title>
+  <title>Gross Profit Margin Calculator</title>
 </head>
 <body>
-    <h1>Future Value of Annuity Calculator</h1>
-    <h3>Calculate the future value of an annuity.</h3>
+    <h1>Gross Profit Margin Calculator</h1>
+    <h3>Calculate the gross profit margin ratio.</h3>
     <p>
-      Amount of equal payments:
-      <input type="number" id="paymntAmt">
+      Sales (Total revenue):
+      <input type="number" id="sales">
     </p>
     <p>
-      Interest rate per period:
-      <input type="number" id="intRate">%
+      Cost of goods sold:
+      <input type="number" id="goodsCost">
     </p>
-    <p>
-      Number of periods:
-      <input type="number" id="periodNum">
-    </p>
-    
 
     <button id="calcBtn">Calculate</button>
     <button id="resetBtn">Reset</button>
@@ -30,9 +25,8 @@
 
     <script>
       // Get required elements from the HTML
-      const paymntAmtEl = document.getElementById("paymntAmt");
-      const intRateEl = document.getElementById("intRate");
-      const periodNumEl = document.getElementById("periodNum");
+      const salesEl = document.getElementById("sales");
+      const goodsCostEl = document.getElementById("goodsCost");
 
       const calcBtnEl = document.getElementById('calcBtn');
       const resetBtnEl = document.getElementById('resetBtn');
@@ -41,13 +35,22 @@
       function createElement() {
         const newDiv = `
             <p>
-              <label for="i11-span">Future Value of Annuity: &nbsp;</label>
+              <label for="i11-span">Gross Profit: &nbsp;</label>
               <span
                 data-id="i11"
                 step="any"
                 id="i11-span"
                 class="spans"
               ></span>
+            </p>
+            <p>
+              <label for="i12-span">Gross Profit Margin: &nbsp;</label>
+              <span
+                data-id="i12"
+                step="any"
+                id="i12-span"
+                class="spans"
+              ></span>%
             </p>
         `
         return newDiv
@@ -73,17 +76,11 @@
 
       function calculateResults() {
           // Retrieve input values
-          const paymntAmt = parseFloat(paymntAmtEl.value);
-          const intRate = parseFloat(intRateEl.value);
-          const periodNum = parseFloat(periodNumEl.value);
+          const sales = parseFloat(salesEl.value);
+          const goodsCost = parseFloat(goodsCostEl.value);
 
-          if (isNaN(paymntAmt)  || paymntAmt < 0 || isNaN(intRate) || intRate < 0.01 ||
-            isNaN(periodNum) || periodNum < 0
-          ) {
+          if (isNaN(sales) || sales < 0.0001 || isNaN(goodsCost) || goodsCost < 0.0001 ) {
             alert("Please Enter All Details.");
-            return;
-          } else if (intRate > 100) {
-            alert("Ensure this value is less than or equal to 100.");
             return;
           }
 
@@ -91,10 +88,12 @@
             const resultElement = createElement()
             calcResultsEl.innerHTML = resultElement 
 
-            const FVA = paymntAmt * (((1 + (intRate / 100)) ** periodNum) - 1) / (intRate / 100)
+            const GP = sales - goodsCost
+            const GPM = (GP / sales ) * 100
 
             const results = {
-              1: { result: Math.abs(FVA) > 1 ? FVA.toFixed(2) : FVA.toPrecision(2), type: "i11" },
+              1: { result: Math.abs(GP) > 1 ? GP.toFixed(2) : GP.toPrecision(2), type: "i11" },
+              2: { result: Math.abs(GPM) > 1 ? GPM.toFixed(2) : GPM.toPrecision(2), type: "i12" },
             }
             setResult(results)
 
@@ -106,9 +105,8 @@
       }
 
       function resetForm() {
-        paymntAmtEl.value = ""
-        intRateEl.value = ""
-        periodNumEl.value = ""
+        salesEl.value = ""
+        goodsCostEl.value = ""
       }
 
       function resetResult() {
@@ -123,7 +121,7 @@
       resetBtnEl.addEventListener("click", resethandler);
       calcBtnEl.addEventListener("click", calculateResults);
 
-      [paymntAmtEl, intRateEl, periodNumEl].forEach((el) => {
+      [salesEl, goodsCostEl].forEach((el) => {
         el.addEventListener("input", resetResult);
       });  
     </script>

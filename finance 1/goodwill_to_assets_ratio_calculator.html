@@ -1,24 +1,19 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Future Value of Annuity Calculator</title>
+  <title>Goodwill to Assets Ratio Calculator</title>
 </head>
 <body>
-    <h1>Future Value of Annuity Calculator</h1>
-    <h3>Calculate the future value of an annuity.</h3>
+    <h1>Goodwill to Assets Ratio Calculator</h1>
+    <h3>Calculate the goodwill to assets ratio.</h3>
     <p>
-      Amount of equal payments:
-      <input type="number" id="paymntAmt">
+      Unamortized Goodwill:
+      <input type="number" id="goodwill">
     </p>
     <p>
-      Interest rate per period:
-      <input type="number" id="intRate">%
+      Total Assets:
+      <input type="number" id="totAsset">
     </p>
-    <p>
-      Number of periods:
-      <input type="number" id="periodNum">
-    </p>
-    
 
     <button id="calcBtn">Calculate</button>
     <button id="resetBtn">Reset</button>
@@ -30,9 +25,8 @@
 
     <script>
       // Get required elements from the HTML
-      const paymntAmtEl = document.getElementById("paymntAmt");
-      const intRateEl = document.getElementById("intRate");
-      const periodNumEl = document.getElementById("periodNum");
+      const goodwillEl = document.getElementById("goodwill");
+      const totAssetEl = document.getElementById("totAsset");
 
       const calcBtnEl = document.getElementById('calcBtn');
       const resetBtnEl = document.getElementById('resetBtn');
@@ -41,13 +35,13 @@
       function createElement() {
         const newDiv = `
             <p>
-              <label for="i11-span">Future Value of Annuity: &nbsp;</label>
+              <label for="i11-span">Goodwill to Assets Ratio: &nbsp;</label>
               <span
                 data-id="i11"
                 step="any"
                 id="i11-span"
                 class="spans"
-              ></span>
+              ></span>%
             </p>
         `
         return newDiv
@@ -73,17 +67,11 @@
 
       function calculateResults() {
           // Retrieve input values
-          const paymntAmt = parseFloat(paymntAmtEl.value);
-          const intRate = parseFloat(intRateEl.value);
-          const periodNum = parseFloat(periodNumEl.value);
+          const goodwill = parseFloat(goodwillEl.value);
+          const totAsset = parseFloat(totAssetEl.value);
 
-          if (isNaN(paymntAmt)  || paymntAmt < 0 || isNaN(intRate) || intRate < 0.01 ||
-            isNaN(periodNum) || periodNum < 0
-          ) {
+          if (isNaN(goodwill) || goodwill < 0 || isNaN(totAsset) || totAsset < 0.001 ) {
             alert("Please Enter All Details.");
-            return;
-          } else if (intRate > 100) {
-            alert("Ensure this value is less than or equal to 100.");
             return;
           }
 
@@ -91,10 +79,10 @@
             const resultElement = createElement()
             calcResultsEl.innerHTML = resultElement 
 
-            const FVA = paymntAmt * (((1 + (intRate / 100)) ** periodNum) - 1) / (intRate / 100)
+            const GTAR = (goodwill / totAsset) * 100
 
             const results = {
-              1: { result: Math.abs(FVA) > 1 ? FVA.toFixed(2) : FVA.toPrecision(2), type: "i11" },
+              1: { result: Math.abs(GTAR) > 1 ? GTAR.toFixed(2) : GTAR.toPrecision(2), type: "i11" },
             }
             setResult(results)
 
@@ -106,9 +94,8 @@
       }
 
       function resetForm() {
-        paymntAmtEl.value = ""
-        intRateEl.value = ""
-        periodNumEl.value = ""
+        goodwillEl.value = ""
+        totAssetEl.value = ""
       }
 
       function resetResult() {
@@ -123,7 +110,7 @@
       resetBtnEl.addEventListener("click", resethandler);
       calcBtnEl.addEventListener("click", calculateResults);
 
-      [paymntAmtEl, intRateEl, periodNumEl].forEach((el) => {
+      [goodwillEl, totAssetEl].forEach((el) => {
         el.addEventListener("input", resetResult);
       });  
     </script>

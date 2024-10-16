@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Future Value of Annuity Calculator</title>
+  <title>Future Value of Annuity Due Calculator</title>
 </head>
 <body>
-    <h1>Future Value of Annuity Calculator</h1>
+    <h1>Future Value of Annuity Due Calculator</h1>
     <h3>Calculate the future value of an annuity.</h3>
     <p>
       Amount of equal payments:
@@ -41,7 +41,7 @@
       function createElement() {
         const newDiv = `
             <p>
-              <label for="i11-span">Future Value of Annuity: &nbsp;</label>
+              <label for="i11-span">Future Value Annuity Due: &nbsp;</label>
               <span
                 data-id="i11"
                 step="any"
@@ -91,10 +91,10 @@
             const resultElement = createElement()
             calcResultsEl.innerHTML = resultElement 
 
-            const FVA = paymntAmt * (((1 + (intRate / 100)) ** periodNum) - 1) / (intRate / 100)
+            const FVAD = (paymntAmt / (intRate / 100)) * (((1 + (intRate / 100)) ** periodNum) - 1) * (1 + (intRate / 100))
 
             const results = {
-              1: { result: Math.abs(FVA) > 1 ? FVA.toFixed(2) : FVA.toPrecision(2), type: "i11" },
+              1: { result: Math.abs(FVAD) > 1 ? FVAD.toFixed(2) : FVAD.toPrecision(2), type: "i11" },
             }
             setResult(results)
 

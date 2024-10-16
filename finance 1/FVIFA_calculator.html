@@ -1,24 +1,19 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Future Value of Annuity Calculator</title>
+  <title>FVIFA Calculator</title>
 </head>
 <body>
-    <h1>Future Value of Annuity Calculator</h1>
-    <h3>Calculate the future value of an annuity.</h3>
-    <p>
-      Amount of equal payments:
-      <input type="number" id="paymntAmt">
-    </p>
+    <h1>FVIFA Calculator</h1>
+    <h3>Calculate the future value interest factor of annuity.</h3>
     <p>
       Interest rate per period:
       <input type="number" id="intRate">%
     </p>
     <p>
-      Number of periods:
+      Number of period:
       <input type="number" id="periodNum">
     </p>
-    
 
     <button id="calcBtn">Calculate</button>
     <button id="resetBtn">Reset</button>
@@ -30,7 +25,6 @@
 
     <script>
       // Get required elements from the HTML
-      const paymntAmtEl = document.getElementById("paymntAmt");
       const intRateEl = document.getElementById("intRate");
       const periodNumEl = document.getElementById("periodNum");
 
@@ -41,7 +35,7 @@
       function createElement() {
         const newDiv = `
             <p>
-              <label for="i11-span">Future Value of Annuity: &nbsp;</label>
+              <label for="i11-span">FVIFA: &nbsp;</label>
               <span
                 data-id="i11"
                 step="any"
@@ -73,13 +67,10 @@
 
       function calculateResults() {
           // Retrieve input values
-          const paymntAmt = parseFloat(paymntAmtEl.value);
           const intRate = parseFloat(intRateEl.value);
           const periodNum = parseFloat(periodNumEl.value);
 
-          if (isNaN(paymntAmt)  || paymntAmt < 0 || isNaN(intRate) || intRate < 0.01 ||
-            isNaN(periodNum) || periodNum < 0
-          ) {
+          if (isNaN(intRate) || intRate < 0.01 || isNaN(periodNum) || periodNum < 0 ) {
             alert("Please Enter All Details.");
             return;
           } else if (intRate > 100) {
@@ -91,10 +82,10 @@
             const resultElement = createElement()
             calcResultsEl.innerHTML = resultElement 
 
-            const FVA = paymntAmt * (((1 + (intRate / 100)) ** periodNum) - 1) / (intRate / 100)
+            const FVIFA = (((1 + (intRate / 100)) ** periodNum) - 1) / (intRate / 100)
 
             const results = {
-              1: { result: Math.abs(FVA) > 1 ? FVA.toFixed(2) : FVA.toPrecision(2), type: "i11" },
+              1: { result: FVIFA.toPrecision(10), type: "i11" },
             }
             setResult(results)
 
@@ -106,7 +97,6 @@
       }
 
       function resetForm() {
-        paymntAmtEl.value = ""
         intRateEl.value = ""
         periodNumEl.value = ""
       }
@@ -123,7 +113,7 @@
       resetBtnEl.addEventListener("click", resethandler);
       calcBtnEl.addEventListener("click", calculateResults);
 
-      [paymntAmtEl, intRateEl, periodNumEl].forEach((el) => {
+      [intRateEl, periodNumEl].forEach((el) => {
         el.addEventListener("input", resetResult);
       });  
     </script>
