@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>EMI Calculator</title>
+</head>
+<body>
+    <h1>EMI Calculator</h1>
+    <h3>Calculate the equated monthly installment(EMI).</h3>
+    <p>
+      Loan Amount ($):
+      <input type="number" id="loanAmt" value="100000">
+    </p>
+    <p>
+      Annual Interest Rate:
+      <input type="number" id="annIntRate" value="5">%
+    </p>
+    <p>
+      Loan Tenure:
+      <input type="number" id="loanTenure" value="24"> months
+    </p>
+    
+
+    <button id="calcBtn">Calculate</button>
+    <button id="resetBtn">Reset</button>
+    <hr>
+    <div>
+      <h3>Result:</h3>
+      <h3 id="calcResults">Result will appear here...</h3>
+    </div>
+
+    <script>
+      // Get required elements from the HTML
+      const loanAmtEl = document.getElementById("loanAmt");
+      const annIntRateEl = document.getElementById("annIntRate");
+      const loanTenureEl = document.getElementById("loanTenure");
+
+      const calcBtnEl = document.getElementById('calcBtn');
+      const resetBtnEl = document.getElementById('resetBtn');
+      const calcResultsEl = document.getElementById('calcResults') 
+
+      function createElement() {
+        const newDiv = `
+            <p>
+              <label for="i11-span">Equated Monthly Installment: &nbsp;</label>
+              <span
+                data-id="i11"
+                step="any"
+                id="i11-span"
+                class="spans"
+              ></span>
+            </p>
+        `
+        return newDiv
+      }
+
+      function setResult(resultObj) {
+        for (key of Object.keys(resultObj)) {
+          let val = resultObj[key].result;
+          let id = resultObj[key].type;
+
+          if (isNaN(val)) {
+           alert("Your input resulted in NAN.\n 0/0 \n Try again with valid input.");
+            return;
+          }
+          if (Math.abs(val) === Infinity) {
+            alert("Your input resulted in Infinity. \nDivision by zero. \nTry again with valid input.");
+            return;
+          }
+          const span = document.getElementById(`${id}-span`);
+          span.textContent = `$${parseFloat(val)}`;
+        }
+      }
+
+      function calculateResults() {
+          // Retrieve input values
+          const loanAmt = parseFloat(loanAmtEl.value);
+          const annIntRate = parseFloat(annIntRateEl.value);
+          const loanTenure = parseFloat(loanTenureEl.value);
+
+          if (isNaN(loanAmt) || loanAmt < 0 || isNaN(annIntRate) || annIntRate < 0.01 ||
+            isNaN(loanTenure) || loanTenure < 1
+          ) {
+            alert("Please Enter All Details.");
+            return;
+          }  else if (annIntRate > 100) {
+            alert("Ensure this value is less than or equal to 100.");
+            return;
+          }
+
+          try {
+            const resultElement = createElement()
+            calcResultsEl.innerHTML = resultElement 
+
+            const EMI = loanAmt * ((((annIntRate / 12) / 100) * ((1 + ((annIntRate / 12) / 100))  ** loanTenure)) / 
+                        (((1 + ((annIntRate / 12) / 100))  ** loanTenure) - 1))
+
+            const results = {
+              1: { result: Math.abs(EMI) > 1 ? EMI.toFixed(2) : EMI.toPrecision(2), type: "i11" },
+            }
+            setResult(results)
+
+          } catch (error) {
+            alert("Something Went Wrong!!!");
+            resetResult()
+            return;
+          }
+      }
+
+      function resetForm() {
+        loanAmtEl.value = "100000"
+        annIntRateEl.value = "5"
+        loanTenureEl.value = "24"
+      }
+
+      function resetResult() {
+        calcResultsEl.innerHTML = "<p>Result will appear here...</p>";
+      } 
+
+      function resethandler() {
+        resetForm();
+        resetResult();
+      }
+
+      resetBtnEl.addEventListener("click", resethandler);
+      calcBtnEl.addEventListener("click", calculateResults);
+
+      [loanAmtEl, annIntRateEl, loanTenureEl].forEach((el) => {
+        el.addEventListener("input", resetResult);
+      });  
+    </script>
+</body>
+</html>
