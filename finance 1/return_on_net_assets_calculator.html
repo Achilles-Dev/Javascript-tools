@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Return On Net Assets Calculator</title>
+</head>
+<body>
+    <h1>Return On Net Assets Calculator</h1>
+    <h3>CCalculate the return on net assets (RONA).</h3>
+    <p>
+      Net Income:
+      <input type="number" id="netIncome">
+    </p>
+    <p>
+      Fixed Assets:
+      <input type="number" id="assets">
+    </p>
+    <p>
+      Working Capital:
+      <input type="number" id="capital">
+    </p>
+    
+
+    <button id="calcBtn">Calculate</button>
+    <button id="resetBtn">Reset</button>
+    <hr>
+    <div>
+      <h3>Result:</h3>
+      <h3 id="calcResults">Result will appear here...</h3>
+    </div>
+
+    <script>
+      // Get required elements from the HTML
+      const netIncomeEl = document.getElementById("netIncome");
+      const assetsEl = document.getElementById("assets");
+      const capitalEl = document.getElementById("capital");
+
+      const calcBtnEl = document.getElementById('calcBtn');
+      const resetBtnEl = document.getElementById('resetBtn');
+      const calcResultsEl = document.getElementById('calcResults') 
+
+      function createElement() {
+        const newDiv = `
+            <p>
+              <label for="i11-span">Return On Net Assets: &nbsp;</label>
+              <span
+                data-id="i11"
+                step="any"
+                id="i11-span"
+                class="spans"
+              ></span>%
+            </p>
+        `
+        return newDiv
+      }
+
+      function setResult(resultObj) {
+        for (key of Object.keys(resultObj)) {
+          let val = resultObj[key].result;
+          let id = resultObj[key].type;
+
+          if (isNaN(val)) {
+           alert("Your input resulted in NAN.\n 0/0 \n Try again with valid input.");
+            return;
+          }
+          if (Math.abs(val) === Infinity) {
+            alert("Your input resulted in Infinity. \nDivision by zero. \nTry again with valid input.");
+            return;
+          }
+          const span = document.getElementById(`${id}-span`);
+          span.textContent = `${parseFloat(val)}`;
+        }
+      }
+
+      function calculateResults() {
+          // Retrieve input values
+          const netIncome = parseFloat(netIncomeEl.value);
+          const assets = parseFloat(assetsEl.value);
+          const capital = parseFloat(capitalEl.value);
+
+          if (isNaN(netIncome)  || netIncome < 0 || isNaN(assets) || assets < 0 ||
+            isNaN(capital) || capital < 0
+          ) {
+            alert("Please Enter All Details.");
+            return;
+          } 
+
+          try {
+            const resultElement = createElement()
+            calcResultsEl.innerHTML = resultElement 
+
+            const RONA = (netIncome / (assets + capital)) * 100
+
+            const results = {
+              1: { result: Math.abs(RONA) > 1 ? RONA.toFixed(2) : RONA.toPrecision(2), type: "i11" },
+            }
+            setResult(results)
+
+          } catch (error) {
+            alert("Something Went Wrong!!!");
+            resetResult()
+            return;
+          }
+      }
+
+      function resetForm() {
+        netIncomeEl.value = ""
+        assetsEl.value = ""
+        capitalEl.value = ""
+      }
+
+      function resetResult() {
+        calcResultsEl.innerHTML = "<p>Result will appear here...</p>";
+      } 
+
+      function resethandler() {
+        resetForm();
+        resetResult();
+      }
+
+      resetBtnEl.addEventListener("click", resethandler);
+      calcBtnEl.addEventListener("click", calculateResults);
+
+      [netIncomeEl, assetsEl, capitalEl].forEach((el) => {
+        el.addEventListener("input", resetResult);
+      });  
+    </script>
+</body>
+</html>
