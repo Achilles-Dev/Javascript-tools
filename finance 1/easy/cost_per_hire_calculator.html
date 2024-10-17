@@ -1,28 +1,39 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Bond Yield to Maturity Calculator</title>
+  <title>Cost Per Hire Calculator</title>
 </head>
 <body>
-    <h1>Bond Yield to Maturity Calculator</h1>
-    <h3>Calculate the bond yield to maturity.</h3>
+    <h1>Cost Per Hire Calculator</h1>
     <p>
-      Current bond price:
-      <input type="number" id="currBondVal" value="900">
+      Advertising Costs, AD:
+      <input type="number" id="advertCost" value="0">
     </p>
     <p>
-      Bond par value: 
-      <input type="number" id="bondParVal" value="1000">
+      Employee Referral Costs, ER:
+      <input type="number" id="referCost" value="0">
     </p>
     <p>
-      Bond coupon rate:
-      <input type="number" id="couponRate" value="4">%
+      Agency Fees, AF:
+      <input type="number" id="agentFee" value="0">
     </p>
     <p>
-      Years until maturity:
-      <input type="number" id="yearsMature" value="5">
+      Relocation Costs, Relo:
+      <input type="number" id="reloCost" value="0">
     </p>
-
+    <p>
+      Travel Costs, T:
+      <input type="number" id="travelCost" value="0">
+    </p>
+    <p>
+      Recruiters Time, RC:
+      <input type="number" id="recruitTime" value="0">
+    </p>
+    <p>
+      Administrative Costs (%):
+      <input type="number" id="adminCost" value="10">
+    </p>
+    
 
     <button id="calcBtn">Calculate</button>
     <button id="resetBtn">Reset</button>
@@ -34,10 +45,13 @@
 
     <script>
       // Get required elements from the HTML
-      const currBondValEl = document.getElementById("currBondVal");
-      const bondParValEl = document.getElementById("bondParVal");
-      const couponRateEl = document.getElementById("couponRate");
-      const yearsMatureEl = document.getElementById("yearsMature");
+      const advertCostEl = document.getElementById("advertCost");
+      const referCostEl = document.getElementById("referCost");
+      const agentFeeEl = document.getElementById("agentFee");
+      const reloCostEl = document.getElementById("reloCost");
+      const travelCostEl = document.getElementById("travelCost");
+      const recruitTimeEl = document.getElementById("recruitTime");
+      const adminCostEl = document.getElementById("adminCost");
 
       const calcBtnEl = document.getElementById('calcBtn');
       const resetBtnEl = document.getElementById('resetBtn');
@@ -46,13 +60,13 @@
       function createElement() {
         const newDiv = `
             <p>
-              <label for="i11-span">Current Bond Yield: &nbsp;</label>
+              <label for="i11-span">Cost Per Hire (CPH): &nbsp;</label>
               <span
                 data-id="i11"
                 step="any"
                 id="i11-span"
                 class="spans"
-              ></span>%
+              ></span>
             </p>
         `
         return newDiv
@@ -78,31 +92,23 @@
 
       function calculateResults() {
           // Retrieve input values
-          const currBondVal = parseFloat(currBondValEl.value);
-          const bondParVal = parseFloat(bondParValEl.value);
-          const couponRate = parseFloat(couponRateEl.value);
-          const yearsMature = parseFloat(yearsMatureEl.value);
-
-          if (isNaN(currBondVal) || currBondVal < 0.01 || isNaN(bondParVal) || bondParVal < 0 || isNaN(couponRate) || couponRate < 0 ||
-            isNaN(yearsMature) || yearsMature < 1
-          ) {
-            alert("Please Enter All Details.");
-            return;
-          } else if (couponRate > 99) {
-            alert("Ensure this value is less than or equal to 99");
-            return;
-          }
+          const advertCost = parseFloat(advertCostEl.value);
+          const referCost = parseFloat(referCostEl.value);
+          const agentFee = parseFloat(agentFeeEl.value);
+          const reloCost = parseFloat(reloCostEl.value);
+          const travelCost = parseFloat(travelCostEl.value);
+          const recruitTime = parseFloat(recruitTimeEl.value);
+          const adminCost = parseFloat(adminCostEl.value);
 
           try {
             const resultElement = createElement()
             calcResultsEl.innerHTML = resultElement 
 
-            const annualCoupon = bondParVal * (couponRate / 100)
-
-            const ytm = ((annualCoupon + ((bondParVal - currBondVal) / (yearsMature))) / ((bondParVal + currBondVal) / 2)) * 100
-
+            let CPH = advertCost + referCost + agentFee + reloCost + travelCost + recruitTime
+            CPH +=(CPH * (adminCost / 100)) 
+            
             const results = {
-              1: { result: Math.abs(ytm) > 1 ? ytm.toFixed(4) : ytm.toPrecision(4), type: "i11" },
+              1: { result: Math.abs(CPH) > 1 ? CPH.toFixed(2) : CPH.toPrecision(2), type: "i11" },
             }
             setResult(results)
 
@@ -114,10 +120,13 @@
       }
 
       function resetForm() {
-        currBondValEl.value = ""
-        bondParValEl.value = ""
-        couponRateEl.value = ""
-        yearsMatureEl.value = ""
+        advertCostEl.value = "0"
+        referCostEl.value = "0"
+        agentFeeEl.value = "0"
+        reloCostEl.value = "0"
+        travelCostEl.value = "0"
+        recruitTimeEl.value = "0"
+        adminCostEl.value = "10"
       }
 
       function resetResult() {
@@ -131,10 +140,11 @@
 
       resetBtnEl.addEventListener("click", resethandler);
       calcBtnEl.addEventListener("click", calculateResults);
-      [currBondValEl, bondParValEl, couponRateEl, yearsMatureEl].forEach((el) => {
+
+      [advertCostEl, referCostEl, agentFeeEl, reloCostEl, 
+      travelCostEl, recruitTimeEl, adminCostEl].forEach((el) => {
         el.addEventListener("input", resetResult);
       });  
-
     </script>
 </body>
 </html>

@@ -1,41 +1,22 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Bond YTM Calculator</title>
+  <title>Conversion Rate Calculator</title>
 </head>
 <body>
-    <h1>Bond YTM Calculator</h1>
+    <h1>Conversion Rate Calculator</h1>
+    <h3>Use this calculator to easily calculate the conversion rate or event rate of a given process: marketing or sales conversions, <br />
+      conversion of visitors to customers, and different types of website or app conversion rates. Includes a conversion rate formula <br />
+      with explanation.
+    </h3>
     <p>
-      Face value: 
-      <input type="number" id="faceVal">
+      Visitors:
+      <input type="number" id="visitors" value="1000">
     </p>
     <p>
-      Bond price:
-      <input type="number" id="bondPrice">
+      Events:
+      <input type="number" id="events" value="20">
     </p>
-    <p>
-      Annual coupon rate:
-      <input type="number" id="couponRate">%
-    </p>
-    <p>
-      Coupon frequency:
-      <select
-      class="selects"
-      id="freqSelect"
-    >
-      <option value="1" selected>Annually</option>
-      <option value="0.5">Semi-annually</option>
-      <option value="0.25">Quarterly</option>
-      <option value="0.08333333333">Monthly</option>
-      <option value="0.0192307692308">Weekly</option>
-      <option value="0.0027397260274">Daily</option>
-    </select>
-    </p>
-    <p>
-      Years to maturity:
-      <input type="number" id="yearsMature">year(s)
-    </p>
-
 
     <button id="calcBtn">Calculate</button>
     <button id="resetBtn">Reset</button>
@@ -47,11 +28,8 @@
 
     <script>
       // Get required elements from the HTML
-      const bondPriceEl = document.getElementById("bondPrice");
-      const faceValEl = document.getElementById("faceVal");
-      const couponRateEl = document.getElementById("couponRate");
-      const yearsMatureEl = document.getElementById("yearsMature");
-      const freqSelectEl = document.getElementById("freqSelect");
+      const visitorsEl = document.getElementById("visitors");
+      const eventsEl = document.getElementById("events");
 
       const calcBtnEl = document.getElementById('calcBtn');
       const resetBtnEl = document.getElementById('resetBtn');
@@ -60,13 +38,22 @@
       function createElement() {
         const newDiv = `
             <p>
-              <label for="i11-span">Yield to maturity (YTM): &nbsp;</label>
+              <label for="i11-span">Conversion Rate (%): &nbsp;</label>
               <span
                 data-id="i11"
                 step="any"
                 id="i11-span"
                 class="spans"
               ></span>%
+            </p>
+            <p>
+              <label for="i12-span">Conversion Rate	: &nbsp;</label>
+              <span
+                data-id="i12"
+                step="any"
+                id="i12-span"
+                class="spans"
+              ></span>
             </p>
         `
         return newDiv
@@ -92,18 +79,11 @@
 
       function calculateResults() {
           // Retrieve input values
-          const bondPrice = parseFloat(bondPriceEl.value);
-          const faceVal = parseFloat(faceValEl.value);
-          const couponRate = parseFloat(couponRateEl.value);
-          const yearsMature = parseFloat(yearsMatureEl.value);
+          const visitors = parseFloat(visitorsEl.value);
+          const events = parseFloat(eventsEl.value);
 
-          if (isNaN(bondPrice) || bondPrice < 0.01 || isNaN(faceVal) || faceVal < 0 || isNaN(couponRate) || couponRate < 0 ||
-            isNaN(yearsMature) || yearsMature < 1
-          ) {
+          if (isNaN(visitors) || visitors < 10 || isNaN(events) || events < 1 ) {
             alert("Please Enter All Details.");
-            return;
-          } else if (couponRate > 99) {
-            alert("Ensure this value is less than or equal to 99");
             return;
           }
 
@@ -111,12 +91,11 @@
             const resultElement = createElement()
             calcResultsEl.innerHTML = resultElement 
 
-            const annualCoupon =  faceVal * (couponRate / 100)
-
-            const ytm = ((annualCoupon + ((faceVal - bondPrice) / (yearsMature))) / ((faceVal + bondPrice) / 2)) * 100
-
+            const CR = (events / visitors)
+            
             const results = {
-              1: { result: Math.abs(ytm) > 1 ? ytm.toFixed(4) : ytm.toPrecision(4), type: "i11" },
+              1: { result: Math.abs(CR * 100) > 1 ? (CR * 100).toFixed(2) : (CR * 100).toPrecision(2), type: "i11" },
+              2: { result: Math.abs(CR) > 1 ? CR.toFixed(2) : CR.toPrecision(2), type: "i12" },
             }
             setResult(results)
 
@@ -128,10 +107,8 @@
       }
 
       function resetForm() {
-        bondPriceEl.value = ""
-        faceValEl.value = ""
-        couponRateEl.value = ""
-        yearsMatureEl.value = ""
+        visitorsEl.value = "1000"
+        eventsEl.value = "20"
       }
 
       function resetResult() {
@@ -145,11 +122,10 @@
 
       resetBtnEl.addEventListener("click", resethandler);
       calcBtnEl.addEventListener("click", calculateResults);
-      [bondPriceEl, faceValEl, couponRateEl, yearsMatureEl].forEach((el) => {
+
+      [visitorsEl, eventsEl].forEach((el) => {
         el.addEventListener("input", resetResult);
       });  
-      freqSelectEl.addEventListener("change", resetResult)
-
     </script>
 </body>
 </html>

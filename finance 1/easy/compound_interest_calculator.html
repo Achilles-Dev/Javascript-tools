@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Compound Interest Calculator</title>
+</head>
+<body>
+    <h1>Compound Interest Calculator</h1>
+    <h3>Calculate the compound interest.</h3>
+    <p>
+      Principal:
+      <input type="number" id="principal" value="10000">
+    </p>
+    <p>
+      Annual interest rate: 
+      <input type="number" id="intRate" value="7">%
+    </p>
+    <p>
+      Years:
+      <input type="number" id="years" value="20">
+    </p>
+    <p>
+      Frequency of compounding:
+      <select id="freqSelect">
+        <option value="continuous">Compound continuously</option>
+        <option value="day">Compound Daily</option>
+        <option value="month">Compound Monthly</option>
+        <option value="quarter">Compound Quarterly</option>
+        <option value="semiannual">Compound Semi-annually</option>
+        <option value="annual" selected>Compound Annually</option>
+      </select>
+    </p>
+
+
+    <button id="calcBtn">Calculate</button>
+    <button id="resetBtn">Reset</button>
+    <hr>
+    <div>
+      <h3>Result:</h3>
+      <h3 id="calcResults">Result will appear here...</h3>
+    </div>
+
+    <script>
+      // Get required elements from the HTML
+      const principalEl = document.getElementById("principal");
+      const yearsEl = document.getElementById("years");
+      const intRateEl = document.getElementById("intRate");
+      const freqSelectEl = document.getElementById("freqSelect");
+
+      const calcBtnEl = document.getElementById('calcBtn');
+      const resetBtnEl = document.getElementById('resetBtn');
+      const calcResultsEl = document.getElementById('calcResults') 
+
+      function createElement() {
+        const newDiv = `
+            <p>
+              <label for="i11-span">Total Interest Earned: &nbsp;</label>
+              <span
+                data-id="i11"
+                step="any"
+                id="i11-span"
+                class="spans"
+              ></span>
+            </p>
+            <p>
+              <label for="i12-span">Final amount: &nbsp;</label>
+              <span
+                data-id="i12"
+                step="any"
+                id="i12-span"
+                class="spans"
+              ></span>
+            </p>
+        `
+        return newDiv
+      }
+
+      function setResult(resultObj) {
+        for (key of Object.keys(resultObj)) {
+          let val = resultObj[key].result;
+          let id = resultObj[key].type;
+
+          if (isNaN(val)) {
+           alert("Your input resulted in NAN.\n 0/0 \n Try again with valid input.");
+            return;
+          }
+          if (Math.abs(val) === Infinity) {
+            alert("Your input resulted in Infinity. \nDivision by zero. \nTry again with valid input.");
+            return;
+          }
+          const span = document.getElementById(`${id}-span`);
+          span.textContent = `${parseFloat(val)}`;
+        }
+      }
+
+      function calculateResults() {
+          // Retrieve input values
+          const principal = parseFloat(principalEl.value);
+          const years = parseFloat(yearsEl.value);
+          const intRate = parseFloat(intRateEl.value);
+          const freqSelect = freqSelectEl.value;
+
+          if (isNaN(principal) || principal < 0 || isNaN(years) || years < 1 || isNaN(intRate) || intRate < 0) {
+            alert("Please Enter All Details.");
+            return;
+          } else if (intRate > 99) {
+            alert("Ensure this value is less than or equal to 99");
+            return;
+          }
+
+          try {
+            const resultElement = createElement()
+            calcResultsEl.innerHTML = resultElement 
+
+            let compPeriod = 1
+            let CI = 0
+
+            if (freqSelect === "continuous") {
+              CI = principal * ((2.718281828) ** ((intRate / 100) * years))
+            } else if (freqSelect === "day") {
+              compPeriod = 365
+              CI = principal * ((1 +((intRate / 100) / compPeriod)) ** (compPeriod * years))
+            } else if (freqSelect === "month") {
+              compPeriod = 12
+              CI = principal * ((1 +((intRate / 100) / compPeriod)) ** (compPeriod * years))
+            } else if (freqSelect === "quarter") {
+              compPeriod = 4
+              CI = principal * ((1 +((intRate / 100) / compPeriod)) ** (compPeriod * years))
+            } else if (freqSelect === "semiannual") {
+              compPeriod = 2
+              CI = principal * ((1 +((intRate / 100) / compPeriod)) ** (compPeriod * years))
+            } else {
+              CI = principal * ((1 +((intRate / 100) / compPeriod)) ** (compPeriod * years))
+            }
+
+            const totInterest = CI - principal
+
+            const results = {
+              1: { result: Math.abs(totInterest) > 1 ? totInterest.toFixed(2) : totInterest.toPrecision(2), type: "i11" },
+              2: { result: Math.abs(CI) > 1 ? CI.toFixed(2) : CI.toPrecision(2), type: "i12" },
+            }
+            setResult(results)
+
+          } catch (error) {
+            alert("Something Went Wrong!!!");
+            resetResult()
+            return;
+          }
+      }
+
+      function resetForm() {
+        principalEl.value = "900"
+        yearsEl.value = "1000"
+        intRateEl.value = "4"
+        freqSelectEl.value = "5"
+      }
+
+      function resetResult() {
+        calcResultsEl.innerHTML = "<p>Result will appear here...</p>";
+      } 
+
+      function resethandler() {
+        resetForm();
+        resetResult();
+      }
+
+      resetBtnEl.addEventListener("click", resethandler);
+      calcBtnEl.addEventListener("click", calculateResults);
+      [principalEl, yearsEl, intRateEl].forEach((el) => {
+        el.addEventListener("input", resetResult);
+      });  
+      freqSelectEl.addEventListener("change", resetResult)
+
+    </script>
+</body>
+</html>

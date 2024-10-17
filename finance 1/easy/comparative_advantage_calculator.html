@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Comparative Advantage Calculator</title>
+</head>
+<body>
+    <h1>Comparative Advantage Calculator</h1>
+    <p>Country X:</p>
+    <p>
+      Output per unit labor for good A:
+      <input type="number" id="outputAX">
+    </p>
+    <p>
+      Output per unit labor for good B:
+      <input type="number" id="outputBX">
+    </p>
+
+    <p>Country Y:</p>
+    <p>
+      Output per unit labor for good A:
+      <input type="number" id="outputAY">
+    </p>
+    <p>
+      Output per unit labor for good B:
+      <input type="number" id="outputBY">
+    </p>
+    
+
+    <button id="calcBtn">Calculate</button>
+    <button id="resetBtn">Reset</button>
+    <hr>
+    <div>
+      <h3>Result:</h3>
+      <h3 id="calcResults">Result will appear here...</h3>
+    </div>
+
+    <script>
+      // Get required elements from the HTML
+      const outputAXEl = document.getElementById("outputAX");
+      const outputBXEl = document.getElementById("outputBX");
+      const outputAYEl = document.getElementById("outputAY");
+      const outputBYEl = document.getElementById("outputBY");
+
+      const calcBtnEl = document.getElementById('calcBtn');
+      const resetBtnEl = document.getElementById('resetBtn');
+      const calcResultsEl = document.getElementById('calcResults') 
+
+      function createElement() {
+        const newDiv = `
+            <p>Country X:</p>
+            <p>
+              <label for="i11-span">Comparative advantage for good A: &nbsp;</label>
+              <span
+                data-id="i11"
+                step="any"
+                id="i11-span"
+                class="spans"
+              ></span> good B
+            </p>
+            <p>
+              <label for="i12-span">Comparative advantage for good B: &nbsp;</label>
+              <span
+                data-id="i12"
+                step="any"
+                id="i12-span"
+                class="spans"
+              ></span> good A
+            </p>
+            <p>Country Y:</p>
+            <p>
+              <label for="i13-span">Comparative advantage for good A: &nbsp;</label>
+              <span
+                data-id="i13"
+                step="any"
+                id="i13-span"
+                class="spans"
+              ></span> good B
+            </p>
+            <p>
+              <label for="i14-span">Comparative advantage for good B: &nbsp;</label>
+              <span
+                data-id="i14"
+                step="any"
+                id="i14-span"
+                class="spans"
+              ></span> good A
+            </p>
+        `
+        return newDiv
+      }
+
+      function setResult(resultObj) {
+        for (key of Object.keys(resultObj)) {
+          let val = resultObj[key].result;
+          let id = resultObj[key].type;
+
+          if (isNaN(val)) {
+           alert("Your input resulted in NAN.\n 0/0 \n Try again with valid input.");
+            return;
+          }
+          if (Math.abs(val) === Infinity) {
+            alert("Your input resulted in Infinity. \nDivision by zero. \nTry again with valid input.");
+            return;
+          }
+          const span = document.getElementById(`${id}-span`);
+          span.textContent = `${parseFloat(val)}`;
+        }
+      }
+
+      function calculateResults() {
+          // Retrieve input values
+          const outputAX = parseFloat(outputAXEl.value);
+          const outputBX = parseFloat(outputBXEl.value);
+          const outputAY = parseFloat(outputAYEl.value);
+          const outputBY = parseFloat(outputBYEl.value);
+
+          if (isNaN(outputAX)  || outputAX < 1 || isNaN(outputBX) || outputBX < 1 ||
+            isNaN(outputAY) || outputAY < 1 || isNaN(outputBY) || outputBY < 1
+          ) {
+            alert("Please Enter All Details.");
+            return;
+          }
+
+          try {
+            const resultElement = createElement()
+            calcResultsEl.innerHTML = resultElement 
+
+            const CAAX = outputBX / outputAX
+            const CABX = outputAX / outputBX
+            const CAAY = outputBY / outputAY
+            const CABY = outputAY / outputBY
+            
+
+            const results = {
+              1: { result: Math.abs(CAAX) > 1 ? CAAX.toFixed(2) : CAAX.toPrecision(2), type: "i11" },
+              2: { result: Math.abs(CABX) > 1 ? CABX.toFixed(2) : CABX.toPrecision(2), type: "i12" },
+              3: { result: Math.abs(CAAY) > 1 ? CAAY.toFixed(2) : CAAY.toPrecision(2), type: "i13" },
+              4: { result: Math.abs(CABY) > 1 ? CABY.toFixed(2) : CABY.toPrecision(2), type: "i14" },
+            }
+            setResult(results)
+
+          } catch (error) {
+            alert("Something Went Wrong!!!");
+            resetResult()
+            return;
+          }
+      }
+
+      function resetForm() {
+        outputAXEl.value = ""
+        outputBXEl.value = ""
+        outputAYEl.value = ""
+        outputBYEl.value = ""
+      }
+
+      function resetResult() {
+        calcResultsEl.innerHTML = "<p>Result will appear here...</p>";
+      } 
+
+      function resethandler() {
+        resetForm();
+        resetResult();
+      }
+
+      resetBtnEl.addEventListener("click", resethandler);
+      calcBtnEl.addEventListener("click", calculateResults);
+
+      [outputAXEl, outputBXEl, outputAYEl, outputBYEl].forEach((el) => {
+        el.addEventListener("input", resetResult);
+      });  
+    </script>
+</body>
+</html>

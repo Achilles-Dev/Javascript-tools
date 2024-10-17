@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>CAPM Calculator</title>
+</head>
+<body>
+    <h1>CAPM Calculator</h1>
+    <p>
+      Calculate: 
+      <select id="calculateUnit">
+        <option value="erpc" selected>Expected return on the capital asset (E(Ri))</option>
+        <option value="rfri">Risk free rate of interest (Rf)</option>
+        <option value="ermt">Expected return of the market (E(Rm))</option>
+        <option value="bcat">Beta for capital asset (βi)</option>
+      </select>
+    </p>
+    <p style="display: none;" id="erpcInputs" class="containers">
+      Expected return on the capital asset (E(Ri)):
+      <input type="number" id="capAssetreturn">%
+    </p>
+    <p id="rfriInputs" class="containers">
+      Risk free rate of interest (Rf):
+      <input type="number" id="intRate">%
+    </p>
+    <p id="ermtInputs" class="containers">
+      Expected return of the market (E(Rm)):
+      <input type="number" id="marktReturn">%
+    </p>
+    <p id="bcatInputs" class="containers">
+      Beta for capital asset (βi):
+      <input type="number" id="betaCapAsset">
+    </p>
+
+    <button id="calcBtn">Calculate</button>
+    <button id="resetBtn">Reset</button>
+    <hr>
+    <div>
+      <h3>Result:</h3>
+      <h3 id="calcResults">Result will appear here...</h3>
+    </div>
+
+    <script>
+      // Get required elements from the HTML
+      const calculateUnitEl = document.getElementById("calculateUnit")
+      const capAssetreturnEl = document.getElementById("capAssetreturn");
+      const intRateEl = document.getElementById("intRate");
+      const marktReturnEl = document.getElementById("marktReturn");
+      const betaCapAssetEl = document.getElementById("betaCapAsset");
+
+      const containersEl = document.querySelectorAll(".containers")
+
+      const calcBtnEl = document.getElementById('calcBtn');
+      const resetBtnEl = document.getElementById('resetBtn');
+      const calcResultsEl = document.getElementById('calcResults') 
+
+      function handleCalculateUnitChange(e) {
+        const value = e.target.value
+
+        containersEl.forEach((container) => {
+          const idVal = container.id.slice(0, 4)
+          if (value === idVal) {
+            container.style.display = "none"
+          } else {
+            container.style.display = "block"
+          }
+        })
+
+        resetResult()
+      }
+
+      function createElement(name) {
+        const newDiv = `
+            <p>
+              <label for="i11-span">${name}: &nbsp;</label>
+              <span
+                data-id="i11"
+                step="any"
+                id="i11-span"
+                class="spans"
+              ></span>
+            </p>
+        `
+        return newDiv
+      }
+
+      function setResult(resultObj) {
+        for (key of Object.keys(resultObj)) {
+          let val = resultObj[key].result;
+          let id = resultObj[key].type;
+
+          if (isNaN(val)) {
+           alert("Your input resulted in NAN.\n 0/0 \n Try again with valid input.");
+            return;
+          }
+          if (Math.abs(val) === Infinity) {
+            alert("Your input resulted in Infinity. \nDivision by zero. \nTry again with valid input.");
+            return;
+          }
+          const span = document.getElementById(`${id}-span`);
+          span.textContent = `${parseFloat(val)}`;
+        }
+      }
+
+      function calculateResults() {
+          // Retrieve input values
+          const capAssetreturn = parseFloat(capAssetreturnEl.value)
+          const intRate = parseFloat(intRateEl.value)
+          const marktReturn = parseFloat(marktReturnEl.value)
+          const betaCapAsset = parseFloat(betaCapAssetEl.value)
+          const calculateUnit = calculateUnitEl.value
+          
+          if ((capAssetreturnEl.checkVisibility() === true && (isNaN(capAssetreturn) || capAssetreturn <= 0)) || 
+              (intRateEl.checkVisibility() === true && (isNaN(intRate) || intRate <= 0 )) || 
+              (marktReturnEl.checkVisibility() === true && (isNaN(marktReturn) || marktReturn < 0 )) || 
+              ( betaCapAssetEl.checkVisibility() === true && (isNaN(betaCapAsset) || betaCapAsset < 0 ))
+          ) {
+            alert("Please Enter All Details.");
+            return;
+          }
+          
+          try {
+            let name = ""
+            let result = 0
+            if (calculateUnit === "erpc") {
+              name = "Expected return on the capital asset (E(Ri))"
+              result = intRate + (betaCapAsset * (marktReturn - intRate))
+            } else if (calculateUnit === "rfri") {
+              name = "Risk free rate of interest (Rf)"
+              result = (capAssetreturn - (betaCapAsset * marktReturn)) / ( 1 - betaCapAsset)
+            } else if (calculateUnit === "ermt") {
+              name = "Expected return of the market (E(Rm))"
+              result =  intRate + ((capAssetreturn - intRate) / betaCapAsset ) 
+            } else if (calculateUnit === "bcat") {
+              name = "Beta for capital asset (βi)"
+              result = (capAssetreturn - intRate) / (marktReturn - intRate)
+            }
+
+            const resultElement = createElement(name)
+            calcResultsEl.innerHTML = resultElement 
+
+            const results = {
+              1: { result: Math.abs(result) > 1 ? result.toFixed(10) : result.toPrecision(10), type: "i11" },
+            }
+            setResult(results)
+
+          } catch (error) {
+            alert("Something Went Wrong!!!");
+            resetResult()
+            return;
+          }
+      }
+
+      function resetForm() {
+        capAssetreturnEl.value = ""
+        intRateEl.value = ""
+        marktReturnEl.value = ""
+        betaCapAssetEl.value = ""
+
+        calculateUnitEl.selectedIndex = "0"
+
+        containersEl.forEach((container) => {
+          const idVal = container.id.slice(0, 4)
+          if (idVal === "erpc") {
+            container.style.display = "none"
+          } else {
+            container.style.display = "block"
+          }
+        })
+      }
+
+      function resetResult() {
+        calcResultsEl.innerHTML = "<p>Result will appear here...</p>";
+      } 
+
+      function resethandler() {
+        resetForm();
+        resetResult();
+      }
+
+      resetBtnEl.addEventListener("click", resethandler);
+      calcBtnEl.addEventListener("click", calculateResults);
+
+      [capAssetreturnEl, intRateEl, marktReturnEl, betaCapAssetEl].forEach((el) => {
+        el.addEventListener("input", resetResult);
+      });  
+
+      calculateUnitEl.addEventListener("change", handleCalculateUnitChange)
+
+    </script>
+</body>
+</html>

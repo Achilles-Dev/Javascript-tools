@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Cash on Cash Return Calculator</title>
+</head>
+<body>
+    <h1>Cash on Cash Return Calculator</h1>
+    <h3>Calculate the cash on cash return for an investment using the calculator below.</h3>
+    <p>
+      Total Cash Invested:
+      <input type="number" id="cashInvested">
+    </p>
+    <p>Income:</p>
+    <p>
+      Rent Income:
+      <input type="number" id="rentIncome">
+      <select id="rentIncomeSelect">
+        <option value="12">per month</option>
+        <option value="1" selected>per year</option>
+      </select>
+    </p>
+    <p>
+      Other Income:
+      <input type="number" id="otherIncome">
+      <select id="otherIncomeSelect">
+        <option value="12">per month</option>
+        <option value="1" selected>per year</option>
+      </select>
+    </p>
+    <p>Expenses:</p>
+    <p>
+      Operating Expenses::
+      <input type="number" id="optExpense">
+      <select id="optExpenseSelect">
+        <option value="12">per month</option>
+        <option value="1" selected>per year</option>
+      </select>
+    </p>
+    <p>
+      Mortgage Payments::
+      <input type="number" id="mortPayment">
+      <select id="mortPaymentSelect">
+        <option value="12">per month</option>
+        <option value="1" selected>per year</option>
+      </select>
+    </p>
+
+
+    <button id="calcBtn">Calculate</button>
+    <button id="resetBtn">Reset</button>
+    <hr>
+    <div>
+      <h3>Result:</h3>
+      <h3 id="calcResults">Result will appear here...</h3>
+    </div>
+
+    <script>
+      // Get required elements from the HTML
+      const cashInvestedEl = document.getElementById("cashInvested");
+      const rentIncomeEl = document.getElementById("rentIncome");
+      const otherIncomeEl = document.getElementById("otherIncome");
+      const optExpenseEl = document.getElementById("optExpense");
+      const mortPaymentEl = document.getElementById("mortPayment");
+
+      const rentIncomeSelectEl = document.getElementById("rentIncomeSelect");
+      const otherIncomeSelectEl = document.getElementById("otherIncomeSelect");
+      const optExpenseSelectEl = document.getElementById("optExpenseSelect");
+      const mortPaymentSelectEl = document.getElementById("mortPaymentSelect");
+
+      const calcBtnEl = document.getElementById('calcBtn');
+      const resetBtnEl = document.getElementById('resetBtn');
+      const calcResultsEl = document.getElementById('calcResults') 
+
+      function createElement() {
+        const newDiv = `
+            <p>
+              <label for="i11-span">Cash on Cash Return: &nbsp;</label>
+              <span
+                data-id="i11"
+                step="any"
+                id="i11-span"
+                class="spans"
+              ></span>%
+            </p>
+        `
+        return newDiv
+      }
+
+      function setResult(resultObj) {
+        for (key of Object.keys(resultObj)) {
+          let val = resultObj[key].result;
+          let id = resultObj[key].type;
+
+          if (isNaN(val)) {
+           alert("Your input resulted in NAN.\n 0/0 \n Try again with valid input.");
+            return;
+          }
+          if (Math.abs(val) === Infinity) {
+            alert("Your input resulted in Infinity. \nDivision by zero. \nTry again with valid input.");
+            return;
+          }
+          const span = document.getElementById(`${id}-span`);
+          span.textContent = `${parseFloat(val)}`;
+        }
+      }
+
+      function calculateResults() {
+          // Retrieve input values
+          const cashInvested = parseFloat(cashInvestedEl.value);
+          const rentIncome = parseFloat(rentIncomeEl.value);
+          const otherIncome = parseFloat(otherIncomeEl.value)
+          const optExpense = parseFloat(optExpenseEl.value);
+          const mortPayment = parseFloat(mortPaymentEl.value);
+
+          const rentIncomeSelect = parseFloat(rentIncomeSelectEl.value);
+          const otherIncomeSelect = parseFloat(otherIncomeSelectEl.value)
+          const optExpenseSelect = parseFloat(optExpenseSelectEl.value);
+          const mortPaymentSelect = parseFloat(mortPaymentSelectEl.value);
+
+          if (isNaN(cashInvested) || cashInvested < 1 || isNaN(rentIncome) || rentIncome < 0 || isNaN(optExpense) || optExpense < 0 ||
+            isNaN(mortPayment) || mortPayment < 0 || isNaN(otherIncome) || otherIncome < 0 
+          ) {
+            alert("Please Enter All Details.");
+            return;
+          }
+
+          try {
+            const resultElement = createElement()
+            calcResultsEl.innerHTML = resultElement 
+
+            const cf = ((rentIncome * rentIncomeSelect) + (otherIncome * otherIncomeSelect)) - 
+                        ((optExpense * optExpenseSelect) + (mortPayment * mortPaymentSelect))
+            const cocr = (cf / cashInvested) * 100
+
+            const results = {
+              1: { result: Math.abs(cocr) > 1 ? cocr.toFixed(2) : cocr.toPrecision(2), type: "i11" },
+            }
+            setResult(results)
+
+          } catch (error) {
+            alert("Something Went Wrong!!!");
+            resetResult()
+            return;
+          }
+      }
+
+      function resetForm() {
+        cashInvestedEl.value = ""
+        rentIncomeEl.value = ""
+        otherIncomeEl.value = ""
+        optExpenseEl.value = ""
+        mortPaymentEl.value = ""
+
+        rentIncomeSelectEl.selectedIndex = "1"
+        otherIncomeSelectEl.selectedIndex = "1"
+        optExpenseSelectEl.selectedIndex = "1"
+        mortPaymentSelectEl.selectedIndex = "1"
+      }
+
+      function resetResult() {
+        calcResultsEl.innerHTML = "<p>Result will appear here...</p>";
+      } 
+
+      function resethandler() {
+        resetForm();
+        resetResult();
+      }
+      [rentIncomeSelectEl, otherIncomeSelectEl, optExpenseSelectEl, mortPaymentSelectEl].forEach((el) => {
+        el.addEventListener("change", resetResult);
+      }); 
+      
+      [cashInvestedEl, rentIncomeEl, otherIncomeEl, optExpenseEl, mortPaymentEl].forEach((el) => {
+        el.addEventListener("input", resetResult);
+      }); 
+
+      resetBtnEl.addEventListener("click", resethandler);
+      calcBtnEl.addEventListener("click", calculateResults); 
+
+    </script>
+</body>
+</html>

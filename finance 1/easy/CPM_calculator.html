@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>CPM Calculator</title>
+</head>
+<body>
+    <h1>CPM Calculator</h1>
+    <p>
+      I pay:
+      <input type="number" id="firstPay">
+    </p>
+    <p>
+      I have:
+      <input type="number" id="firstImps">impressions
+    </p>
+    <p>Second campaign</p>
+    <p>
+      I pay:
+      <input type="number" id="secondPay">
+    </p>
+    <p>
+      I have:
+      <input type="number" id="secondImps">impressions
+    </p>
+    
+
+    <button id="calcBtn">Calculate</button>
+    <button id="resetBtn">Reset</button>
+    <hr>
+    <div>
+      <h3>Result:</h3>
+      <h3 id="calcResults">Result will appear here...</h3>
+    </div>
+
+    <script>
+      // Get required elements from the HTML
+      const firstPayEl = document.getElementById("firstPay");
+      const firstImpsEl = document.getElementById("firstImps");
+      const secondPayEl = document.getElementById("secondPay");
+      const secondImpsEl = document.getElementById("secondImps");
+
+      const calcBtnEl = document.getElementById('calcBtn');
+      const resetBtnEl = document.getElementById('resetBtn');
+      const calcResultsEl = document.getElementById('calcResults') 
+
+      function createElement() {
+        const newDiv = `
+            <p>
+              <label for="i11-span">CPM (Cost per mille (1000)) 1: &nbsp;</label>
+              <span
+                data-id="i11"
+                step="any"
+                id="i11-span"
+                class="spans"
+              ></span>
+            </p>
+            <p>
+              <label for="i12-span">CPM (Cost per mille (1000)) 2: &nbsp;</label>
+              <span
+                data-id="i12"
+                step="any"
+                id="i12-span"
+                class="spans"
+              ></span>
+            </p>
+            <p>
+              <span
+                data-id="i13"
+                step="any"
+                id="i13-span"
+                class="spans"
+              ></span>
+            </p>
+        `
+        return newDiv
+      }
+
+      function setResult(resultObj) {
+        for (key of Object.keys(resultObj)) {
+          let val = resultObj[key].result;
+          let id = resultObj[key].type;
+
+          if (id === "i13") {
+            const span = document.getElementById(`${id}-span`);
+            span.textContent = val
+            return
+          } else {
+            if (isNaN(val)) {
+              alert("Your input resulted in NAN.\n 0/0 \n Try again with valid input.");
+              return;
+            }
+            if (Math.abs(val) === Infinity) {
+              alert("Your input resulted in Infinity. \nDivision by zero. \nTry again with valid input.");
+              return;
+            }
+            const span = document.getElementById(`${id}-span`);
+            span.textContent = `${parseFloat(val)}`; 
+          }
+        }
+      }
+
+      function calculateResults() {
+          // Retrieve input values
+          const firstPay = parseFloat(firstPayEl.value);
+          const firstImps = parseFloat(firstImpsEl.value);
+          const secondPay = parseFloat(secondPayEl.value);
+          const secondImps = parseFloat(secondImpsEl.value);
+
+          if (isNaN(firstPay)  || firstPay < 0.01 || isNaN(firstImps) || firstImps < 0 ||
+            isNaN(secondPay) || secondPay < 0 || isNaN(secondImps) || secondImps < 0
+          ) {
+            alert("Please Enter All Details.");
+            return;
+          }
+
+          try {
+            const resultElement = createElement()
+            calcResultsEl.innerHTML = resultElement 
+
+            const CPM1 = (firstPay / firstImps) * 1000
+            const CPM2 = (secondPay / secondImps) * 1000
+            let result = ''
+            if (CPM1 > CPM2) {
+              result = "Campaign 2 is less expensive."
+            } else if (CPM1 < CPM2) {
+              result = "Campaign 1 is less expensive."
+            } else {
+              result = "The campaigns cost the same."
+            }
+
+            const results = {
+              1: { result: Math.abs(CPM1) > 1 ? CPM1.toFixed(2) : CPM1.toPrecision(2), type: "i11" },
+              2: { result: Math.abs(CPM2) > 1 ? CPM2.toFixed(2) : CPM2.toPrecision(2), type: "i12" },
+              3: { result: result, type: "i13" },
+            }
+            setResult(results)
+
+          } catch (error) {
+            alert("Something Went Wrong!!!");
+            resetResult()
+            return;
+          }
+      }
+
+      function resetForm() {
+        firstPayEl.value = ""
+        firstImpsEl.value = ""
+        secondPayEl.value = ""
+        secondImpsEl.value = ""
+      }
+
+      function resetResult() {
+        calcResultsEl.innerHTML = "<p>Result will appear here...</p>";
+      } 
+
+      function resethandler() {
+        resetForm();
+        resetResult();
+      }
+
+      resetBtnEl.addEventListener("click", resethandler);
+      calcBtnEl.addEventListener("click", calculateResults);
+
+      [firstPayEl, firstImpsEl, secondPayEl, secondImpsEl].forEach((el) => {
+        el.addEventListener("input", resetResult);
+      });  
+    </script>
+</body>
+</html>
