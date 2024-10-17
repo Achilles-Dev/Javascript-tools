@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>ROCE Calculator</title>
+</head>
+<body>
+    <h1>ROCE Calculator</h1>
+    <h3>Calculate the return on capital employed ratio.</h3>
+    <p>
+      EBIT:
+      <input type="number" id="ebit">
+    </p>
+    <p>
+      Total Assets:
+      <input type="number" id="assets">
+    </p>
+    <p>
+      Current Liabilities:
+      <input type="number" id="liabilities">
+    </p>
+    
+
+    <button id="calcBtn">Calculate</button>
+    <button id="resetBtn">Reset</button>
+    <hr>
+    <div>
+      <h3>Result:</h3>
+      <h3 id="calcResults">Result will appear here...</h3>
+    </div>
+
+    <script>
+      // Get required elements from the HTML
+      const ebitEl = document.getElementById("ebit");
+      const assetsEl = document.getElementById("assets");
+      const liabilitiesEl = document.getElementById("liabilities");
+
+      const calcBtnEl = document.getElementById('calcBtn');
+      const resetBtnEl = document.getElementById('resetBtn');
+      const calcResultsEl = document.getElementById('calcResults') 
+
+      function createElement() {
+        const newDiv = `
+            <p>
+              <label for="i11-span">Capital Employed: &nbsp;</label>
+              <span
+                data-id="i11"
+                step="any"
+                id="i11-span"
+                class="spans"
+              ></span>%
+            </p>
+        `
+        return newDiv
+      }
+
+      function setResult(resultObj) {
+        for (key of Object.keys(resultObj)) {
+          let val = resultObj[key].result;
+          let id = resultObj[key].type;
+
+          if (isNaN(val)) {
+           alert("Your input resulted in NAN.\n 0/0 \n Try again with valid input.");
+            return;
+          }
+          if (Math.abs(val) === Infinity) {
+            alert("Your input resulted in Infinity. \nDivision by zero. \nTry again with valid input.");
+            return;
+          }
+          const span = document.getElementById(`${id}-span`);
+          span.textContent = `${parseFloat(val)}`;
+        }
+      }
+
+      function calculateResults() {
+          // Retrieve input values
+          const ebit = parseFloat(ebitEl.value);
+          const assets = parseFloat(assetsEl.value);
+          const liabilities = parseFloat(liabilitiesEl.value);
+
+          if (isNaN(ebit)  || ebit < 0.001 || isNaN(assets) || assets < 0.001 ||
+            isNaN(liabilities) || liabilities < 0.001
+          ) {
+            alert("Please Enter All Details.");
+            return;
+          } 
+
+          try {
+            const resultElement = createElement()
+            calcResultsEl.innerHTML = resultElement 
+
+            const ROCE = (ebit / (assets - liabilities)) * 100
+
+            const results = {
+              1: { result: Math.abs(ROCE) > 1 ? ROCE.toFixed(2) : ROCE.toPrecision(2), type: "i11" },
+            }
+            setResult(results)
+
+          } catch (error) {
+            alert("Something Went Wrong!!!");
+            resetResult()
+            return;
+          }
+      }
+
+      function resetForm() {
+        ebitEl.value = ""
+        assetsEl.value = ""
+        liabilitiesEl.value = ""
+      }
+
+      function resetResult() {
+        calcResultsEl.innerHTML = "<p>Result will appear here...</p>";
+      } 
+
+      function resethandler() {
+        resetForm();
+        resetResult();
+      }
+
+      resetBtnEl.addEventListener("click", resethandler);
+      calcBtnEl.addEventListener("click", calculateResults);
+
+      [ebitEl, assetsEl, liabilitiesEl].forEach((el) => {
+        el.addEventListener("input", resetResult);
+      });  
+    </script>
+</body>
+</html>

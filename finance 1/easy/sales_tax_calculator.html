@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Sales Tax Calculator</title>
+</head>
+<body>
+    <h1>Sales Tax Calculator</h1>
+    <h3>Calculate the amount of sales tax.</h3>
+    <p>
+      Cost/Price:
+      <input type="number" id="cost" value="100">
+    </p>
+    <p>
+      Sales Tax:
+      <input type="number" id="salesTax" value="8.25">%
+    </p>
+
+    <button id="calcBtn">Calculate</button>
+    <button id="resetBtn">Reset</button>
+    <hr>
+    <div>
+      <h3>Result:</h3>
+      <h3 id="calcResults">Result will appear here...</h3>
+    </div>
+
+    <script>
+      // Get required elements from the HTML
+      const costEl = document.getElementById("cost");
+      const salesTaxEl = document.getElementById("salesTax");
+
+      const calcBtnEl = document.getElementById('calcBtn');
+      const resetBtnEl = document.getElementById('resetBtn');
+      const calcResultsEl = document.getElementById('calcResults') 
+
+      function createElement() {
+        const newDiv = `
+            <p>
+              <label for="i11-span">Total Tax: &nbsp;</label>
+              <span
+                data-id="i11"
+                step="any"
+                id="i11-span"
+                class="spans"
+              ></span>
+            </p>
+            <p>
+              <label for="i12-span">Total Cost: &nbsp;</label>
+              <span
+                data-id="i12"
+                step="any"
+                id="i12-span"
+                class="spans"
+              ></span>
+            </p>
+        `
+        return newDiv
+      }
+
+      function setResult(resultObj) {
+        for (key of Object.keys(resultObj)) {
+          let val = resultObj[key].result;
+          let id = resultObj[key].type;
+
+          if (isNaN(val)) {
+           alert("Your input resulted in NAN.\n 0/0 \n Try again with valid input.");
+            return;
+          }
+          if (Math.abs(val) === Infinity) {
+            alert("Your input resulted in Infinity. \nDivision by zero. \nTry again with valid input.");
+            return;
+          }
+          const span = document.getElementById(`${id}-span`);
+          span.textContent = `${parseFloat(val)}`;
+        }
+      }
+
+      function calculateResults() {
+          // Retrieve input values
+          const cost = parseFloat(costEl.value);
+          const salesTax = parseFloat(salesTaxEl.value);
+
+          if (isNaN(cost) || cost < 0 || isNaN(salesTax) || salesTax < 0 ) {
+            alert("Please Enter All Details.");
+            return;
+          } else if (salesTax > 100) {
+            alert("Ensure this value is less than or equal to 100.");
+            return;
+          }
+
+          try {
+            const resultElement = createElement()
+            calcResultsEl.innerHTML = resultElement 
+
+            const totalTax = (salesTax / 100) * cost
+            const totalCost = ( 1 + (salesTax / 100)) * cost
+
+            const results = {
+              1: { result: Math.abs(totalTax) > 1 ? totalTax.toFixed(3) : totalTax.toPrecision(3), type: "i11" },
+              2: { result: Math.abs(totalCost) > 1 ? totalCost.toFixed(3) : totalCost.toPrecision(3), type: "i12" },
+            }
+            setResult(results)
+
+          } catch (error) {
+            alert("Something Went Wrong!!!");
+            resetResult()
+            return;
+          }
+      }
+
+      function resetForm() {
+        costEl.value = "100"
+        salesTaxEl.value = "8.25"
+      }
+
+      function resetResult() {
+        calcResultsEl.innerHTML = "<p>Result will appear here...</p>";
+      } 
+
+      function resethandler() {
+        resetForm();
+        resetResult();
+      }
+
+      resetBtnEl.addEventListener("click", resethandler);
+      calcBtnEl.addEventListener("click", calculateResults);
+
+      [costEl, salesTaxEl].forEach((el) => {
+        el.addEventListener("input", resetResult);
+      });  
+    </script>
+</body>
+</html>

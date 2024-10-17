@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>VAT Calculator</title>
+</head>
+<body>
+    <h1>VAT Calculator</h1>
+    <h3>Calculate the amount of VAT.</h3>
+    <p>
+      Amount:
+      <input type="number" id="amount">
+    </p>
+    <p>
+      Inclusive of VAT?
+      <select id="VATSelect">
+        <option value="yes">Yes</option>
+        <option value="no" selected>No</option>
+      </select>
+    </p>
+    <p>
+      VAT Rate:
+      <input type="number" id="VATRate" value="17.5">%
+    </p>
+    
+    <button id="calcBtn">Calculate</button>
+    <button id="resetBtn">Reset</button>
+    <hr>
+    <div>
+      <h3>Result:</h3>
+      <h3 id="calcResults">Result will appear here...</h3>
+    </div>
+
+    <script>
+      // Get required elements from the HTML
+      const amountEl = document.getElementById("amount");
+      const VATSelectEl = document.getElementById("VATSelect");
+      const VATRateEl = document.getElementById("VATRate");
+
+      const calcBtnEl = document.getElementById('calcBtn');
+      const resetBtnEl = document.getElementById('resetBtn');
+      const calcResultsEl = document.getElementById('calcResults') 
+
+      function createElement() {
+        const newDiv = `
+            <p>
+              <label for="i11-span">Net amount (excluding VAT): &nbsp;</label>
+              <span
+                data-id="i11"
+                step="any"
+                id="i11-span"
+                class="spans"
+              ></span>
+            </p>
+            <p>
+              <label for="i12-span">VAT Rate: &nbsp;</label>
+              <span
+                data-id="i12"
+                step="any"
+                id="i12-span"
+                class="spans"
+              ></span>%
+            </p>
+            <p>
+              <label for="i13-span">VAT Amount: &nbsp;</label>
+              <span
+                data-id="i13"
+                step="any"
+                id="i13-span"
+                class="spans"
+              ></span>
+            </p>
+            <p>
+              <label for="i14-span">Gross Amount (including VAT): &nbsp;</label>
+              <span
+                data-id="i14"
+                step="any"
+                id="i14-span"
+                class="spans"
+              ></span>
+            </p>
+        `
+        return newDiv
+      }
+
+      function setResult(resultObj) {
+        for (key of Object.keys(resultObj)) {
+          let val = resultObj[key].result;
+          let id = resultObj[key].type;
+
+          if (isNaN(val)) {
+           alert("Your input resulted in NAN.\n 0/0 \n Try again with valid input.");
+            return;
+          }
+          if (Math.abs(val) === Infinity) {
+            alert("Your input resulted in Infinity. \nDivision by zero. \nTry again with valid input.");
+            return;
+          }
+          const span = document.getElementById(`${id}-span`);
+          span.textContent = `${parseFloat(val)}`;
+        }
+      }
+
+      function calculateResults() {
+          // Retrieve input values
+          const amount = parseFloat(amountEl.value);
+          const VATSelect = VATSelectEl.value;
+          const VATRate = parseFloat(VATRateEl.value);
+
+          if (isNaN(amount)  || amount < 0 ||
+            isNaN(VATRate) || VATRate < 1
+          ) {
+            alert("Please Enter All Details.");
+            return;
+          } 
+
+          try {
+            const resultElement = createElement()
+            calcResultsEl.innerHTML = resultElement 
+            let netAmt = amount
+            let grossAmt = amount
+            let VATAmt = (VATRate / 100) * amount
+            if (VATSelect === "yes") {
+              netAmt = (amount / (100 + VATRate)) * 100
+              VATAmt = amount - netAmt
+            } else if (VATSelect === "no") {
+              grossAmt = (1 + (VATRate / 100)) * amount
+            }
+
+            const results = {
+              1: { result: Math.abs(netAmt) > 1 ? netAmt.toFixed(2) : netAmt.toPrecision(2), type: "i11" },
+              2: { result: Math.abs(VATRate) > 1 ? VATRate.toFixed(3) : VATRate.toPrecision(3), type: "i12" },
+              3: { result: Math.abs(VATAmt) > 1 ? VATAmt.toFixed(2) : VATAmt.toPrecision(2), type: "i13" },
+              4: { result: Math.abs(grossAmt) > 1 ? grossAmt.toFixed(2) : grossAmt.toPrecision(2), type: "i14" },
+            }
+            setResult(results)
+
+          } catch (error) {
+            alert("Something Went Wrong!!!");
+            resetResult()
+            return;
+          }
+      }
+
+      function resetForm() {
+        amountEl.value = ""
+        VATSelectEl.value = ""
+        VATRateEl.value = "7.5"
+      }
+
+      function resetResult() {
+        calcResultsEl.innerHTML = "<p>Result will appear here...</p>";
+      } 
+
+      function resethandler() {
+        resetForm();
+        resetResult();
+      }
+
+      resetBtnEl.addEventListener("click", resethandler);
+      calcBtnEl.addEventListener("click", calculateResults);
+
+      [amountEl, VATSelectEl, VATRateEl].forEach((el) => {
+        el.addEventListener("input", resetResult);
+      });  
+    </script>
+</body>
+</html>
