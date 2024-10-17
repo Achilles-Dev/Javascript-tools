@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Profit Calculator</title>
+</head>
+<body>
+    <h1>Profit Calculator</h1>
+    <h3>Calculate the gross profit, original cost and more.</h3>
+    <p>
+      Sales (Total revenue):
+      <input type="number" id="sales">
+    </p>
+    <p>
+      Gross margin:
+      <input type="number" id="grossMargin" value="2">%
+    </p>
+
+    <button id="calcBtn">Calculate</button>
+    <button id="resetBtn">Reset</button>
+    <hr>
+    <div>
+      <h3>Result:</h3>
+      <h3 id="calcResults">Result will appear here...</h3>
+    </div>
+
+    <script>
+      // Get required elements from the HTML
+      const salesEl = document.getElementById("sales");
+      const grossMarginEl = document.getElementById("grossMargin");
+
+      const calcBtnEl = document.getElementById('calcBtn');
+      const resetBtnEl = document.getElementById('resetBtn');
+      const calcResultsEl = document.getElementById('calcResults') 
+
+      function createElement() {
+        const newDiv = `
+            <p>
+              <label for="i11-span">Gross Profit: &nbsp;</label>
+              <span
+                data-id="i11"
+                step="any"
+                id="i11-span"
+                class="spans"
+              ></span>
+            </p>
+            <p>
+              <label for="i12-span">Cost: &nbsp;</label>
+              <span
+                data-id="i12"
+                step="any"
+                id="i12-span"
+                class="spans"
+              ></span>
+            </p>
+            <p>
+              <label for="i13-span">Mark Up: &nbsp;</label>
+              <span
+                data-id="i13"
+                step="any"
+                id="i13-span"
+                class="spans"
+              ></span>%
+            </p>
+            
+        `
+        return newDiv
+      }
+
+      function setResult(resultObj) {
+        for (key of Object.keys(resultObj)) {
+          let val = resultObj[key].result;
+          let id = resultObj[key].type;
+
+          if (isNaN(val)) {
+           alert("Your input resulted in NAN.\n 0/0 \n Try again with valid input.");
+            return;
+          }
+          if (Math.abs(val) === Infinity) {
+            alert("Your input resulted in Infinity. \nDivision by zero. \nTry again with valid input.");
+            return;
+          }
+          const span = document.getElementById(`${id}-span`);
+          span.textContent = `${parseFloat(val)}`;
+        }
+      }
+
+      function calculateResults() {
+          // Retrieve input values
+          const sales = parseFloat(salesEl.value);
+          const grossMargin = parseFloat(grossMarginEl.value);
+
+          if (isNaN(sales) || sales < 0.0001 || isNaN(grossMargin) || grossMargin < 0 ) {
+            alert("Please Enter All Details.");
+            return;
+          } else if (grossMargin > 99.99) {
+            alert("Ensure this value is less than or equal to 99.99.");
+            return;
+          }
+
+          try {
+            const resultElement = createElement()
+            calcResultsEl.innerHTML = resultElement 
+
+            const profit = (grossMargin / 100) * sales
+            const cost = sales - profit
+            const markUp = (profit / cost) * 100
+            
+            const results = {
+              1: { result: Math.abs(profit) > 1 ? profit.toFixed(2) : profit.toPrecision(2), type: "i11" },
+              2: { result: Math.abs(cost) > 1 ? cost.toFixed(2) : cost.toPrecision(2), type: "i12" },
+              3: { result: Math.abs(markUp) > 1 ? markUp.toFixed(2) : markUp.toPrecision(2), type: "i13" },
+            }
+            setResult(results)
+
+          } catch (error) {
+            alert("Something Went Wrong!!!");
+            resetResult()
+            return;
+          }
+      }
+
+      function resetForm() {
+        salesEl.value = ""
+        grossMarginEl.value = ""
+      }
+
+      function resetResult() {
+        calcResultsEl.innerHTML = "<p>Result will appear here...</p>";
+      } 
+
+      function resethandler() {
+        resetForm();
+        resetResult();
+      }
+
+      resetBtnEl.addEventListener("click", resethandler);
+      calcBtnEl.addEventListener("click", calculateResults);
+
+      [salesEl, grossMarginEl].forEach((el) => {
+        el.addEventListener("input", resetResult);
+      });  
+    </script>
+</body>
+</html>
