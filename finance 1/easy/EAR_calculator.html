@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>EAR Calculator</title>
+</head>
+<body>
+    <h1>EAR Calculator</h1>
+    <p>
+      Annual interest rate: 
+      <input type="number" id="intRate">%
+    </p>
+    <p>
+      Compounding frequency:
+      <select
+      class="selects"
+      id="freqSelect"
+    >
+      <option value="1" selected>Annually</option>
+      <option value="2">Semi-annually</option>
+      <option value="4">Quarterly</option>
+      <option value="12">Monthly</option>
+      <option value="52">Weekly</option>
+      <option value="365">Daily</option>
+      <option value="0">Continuous</option>
+    </select>
+    </p>
+    <div id="amInputs" style="display: none;">
+      <p>Future value calculation</p>
+      <p>
+        Term:
+        <input type="number" id="term">
+      </p>
+      <p>
+        Initial balance:
+        <input type="number" id="initBalance">
+      </p>
+    </div>
+
+    <p>
+      Mode:
+      <select id="modeUnit">
+        <option value="am">Advanced</option>
+        <option value="sm" selected>Simple</option>
+      </select>
+    </p>
+
+    <button id="calcBtn">Calculate</button>
+    <button id="resetBtn">Reset</button>
+    <hr>
+    <div>
+      <h3>Result:</h3>
+      <h3 id="calcResults">Result will appear here...</h3>
+    </div>
+
+    <script>
+      // Get required elements from the HTML
+      const termEl = document.getElementById("term");
+      const intRateEl = document.getElementById("intRate");
+      const freqSelectEl = document.getElementById("freqSelect");
+      const modeUnitEl = document.getElementById("modeUnit");
+      const amInputsEl = document.getElementById("amInputs");
+      const initBalanceEl = document.getElementById("initBalance");
+
+      const calcBtnEl = document.getElementById('calcBtn');
+      const resetBtnEl = document.getElementById('resetBtn');
+      const calcResultsEl = document.getElementById('calcResults') 
+
+      function handleModeUnitChange(e) {
+        const value = e.target.value
+
+        amInputsEl.style.display = value === "am" ? "block" : "none"
+
+        resetResult()
+      }
+
+      function createElement() {
+        const newDiv = `
+            ${freqSelectEl.value == 0 ? 
+              `
+                <p>
+                  <label for="i12-span">Effective Annual Rate (EAR): &nbsp;</label>
+                  <span
+                    data-id="i12"
+                    step="any"
+                    id="i12-span"
+                    class="spans"
+                  ></span>%
+                </p>
+              `
+            
+            : `
+              <p>
+                <label for="i11-span">Periodic rate: &nbsp;</label>
+                <span
+                  data-id="i11"
+                  step="any"
+                  id="i11-span"
+                  class="spans"
+                ></span>%
+              </p>
+              <p>
+                <label for="i12-span">Effective Annual Rate (EAR): &nbsp;</label>
+                <span
+                  data-id="i12"
+                  step="any"
+                  id="i12-span"
+                  class="spans"
+                ></span>%
+              </p>
+            `
+            }
+        `
+        const newDiv2 = `
+             <p>
+              <label for="i13-span">Final balance: &nbsp;</label>
+              <span
+                data-id="i13"
+                step="any"
+                id="i13-span"
+                class="spans"
+              ></span>
+            </p>
+        `
+        if (modeUnitEl.value === "am") {
+          return newDiv + newDiv2
+        }
+        return newDiv
+      }
+
+      function setResult(resultObj) {
+        for (key of Object.keys(resultObj)) {
+          let val = resultObj[key].result;
+          let id = resultObj[key].type;
+
+          if (isNaN(val)) {
+           alert("Your input resulted in NAN.\n 0/0 \n Try again with valid input.");
+            return;
+          }
+          if (Math.abs(val) === Infinity) {
+            alert("Your input resulted in Infinity. \nDivision by zero. \nTry again with valid input.");
+            return;
+          }
+          const span = document.getElementById(`${id}-span`);
+          span.textContent = `${parseFloat(val)}`;
+        }
+      }
+
+      function calculateResults() {
+          // Retrieve input values
+          const intRate = parseFloat(intRateEl.value);
+          const freqSelect = parseFloat(freqSelectEl.value);
+          const term = parseFloat(termEl.value);
+          const initBalance = parseFloat(initBalanceEl.value);
+          const mode = modeUnitEl.value
+
+          if (isNaN(intRate)) {
+            alert("Please Enter All Details.");
+            return;
+          }
+
+          if ((isNaN(term) || isNaN(initBalance)) && mode === "am") {
+            alert("Please Enter All Details.");
+            return;
+          }
+
+          try {
+            const resultElement = createElement()
+            calcResultsEl.innerHTML = resultElement 
+            
+            let results = {}
+            let EAR = 0
+            if (freqSelect === 0) {
+              EAR = (((2.718281828) ** (intRate / 100)) - 1) * 100
+              results = {
+                2: { result: Math.abs(EAR) > 1 ? EAR.toFixed(4) : EAR.toPrecision(6), type: "i12" },
+              }
+            } else {
+              const PR = (intRate  / freqSelect)
+              EAR = (((1 + (PR / 100)) ** freqSelect) - 1) * 100
+              results = {
+                1: { result: Math.abs(PR) > 1 ? PR.toFixed(4) : PR.toPrecision(6), type: "i11" },
+                2: { result: Math.abs(EAR) > 1 ? EAR.toFixed(4) : EAR.toPrecision(6), type: "i12" },
+              }
+            }
+            
+            if (mode === "am") {
+              const FV = initBalance * ((1 + (EAR / 100)) ** term)
+              results = {
+                ...results,
+                3: { result: Math.abs(FV) > 1 ? FV.toFixed(2) : FV.toPrecision(4), type: "i13" },
+              }
+            }
+            setResult(results)
+
+          } catch (error) {
+            alert("Something Went Wrong!!!");
+            resetResult()
+            return;
+          }
+      }
+
+      function resetForm() {
+        termEl.value = ""
+        intRateEl.value = ""
+        initBalanceEl.value = ""
+        freqSelectEl.selectedIndex = "0"
+        modeUnitEl.selectedIndex = "1"
+        amInputsEl.style.display = "none"
+      }
+
+      function resetResult() {
+        calcResultsEl.innerHTML = "<p>Result will appear here...</p>";
+      } 
+
+      function resethandler() {
+        resetForm();
+        resetResult();
+      } 
+
+      resetBtnEl.addEventListener("click", resethandler);
+      calcBtnEl.addEventListener("click", calculateResults); 
+      [termEl, intRateEl].forEach((el) => {
+        el.addEventListener("input", resetResult);
+      });
+      freqSelectEl.addEventListener("change", resetResult)
+
+      modeUnitEl.addEventListener("change", handleModeUnitChange)
+
+    </script>
+</body>
+</html>

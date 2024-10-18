@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Customer Retention Rate Calculator</title>
+</head>
+<body>
+    <h1>Customer Retention Rate Calculator</h1>
+    <p>
+      Existing customers:
+      <input type="number" id="existCostumers">
+    </p>
+    <p>
+      New customers:
+      <input type="number" id="newCustomers">
+    </p>
+    <p>
+      Total customers:
+      <input type="number" id="totCustomers">
+    </p>
+
+    <button id="calcBtn">Calculate</button>
+    <button id="resetBtn">Reset</button>
+    <hr>
+    <div>
+      <h3>Result:</h3>
+      <h3 id="calcResults">Result will appear here...</h3>
+    </div>
+
+    <script>
+      // Get required elements from the HTML
+      const existCostumersEl = document.getElementById("existCostumers");
+      const totCustomersEl = document.getElementById("totCustomers");
+      const newCustomersEl = document.getElementById("newCustomers");
+
+      const calcBtnEl = document.getElementById('calcBtn');
+      const resetBtnEl = document.getElementById('resetBtn');
+      const calcResultsEl = document.getElementById('calcResults') 
+
+      function createElement() {
+        const newDiv = `
+            <p>
+              <label for="i11-span">Attrition rate: &nbsp;</label>
+              <span
+                data-id="i11"
+                step="any"
+                id="i11-span"
+                class="spans"
+              ></span>%
+            </p>
+            <p>
+              <label for="i12-span">Customer retention rate:	 &nbsp;</label>
+              <span
+                data-id="i12"
+                step="any"
+                id="i12-span"
+                class="spans"
+              ></span>%
+            </p>
+        `
+        return newDiv
+      }
+
+      function setResult(resultObj) {
+        for (key of Object.keys(resultObj)) {
+          let val = resultObj[key].result;
+          let id = resultObj[key].type;
+
+          if (isNaN(val)) {
+           alert("Your input resulted in NAN.\n 0/0 \n Try again with valid input.");
+            return;
+          }
+          if (Math.abs(val) === Infinity) {
+            alert("Your input resulted in Infinity. \nDivision by zero. \nTry again with valid input.");
+            return;
+          }
+          const span = document.getElementById(`${id}-span`);
+          span.textContent = `${parseFloat(val)}`;
+        }
+      }
+
+      function calculateResults() {
+          // Retrieve input values
+          const existCostumers = parseFloat(existCostumersEl.value);
+          const totCustomers = parseFloat(totCustomersEl.value);
+          const newCustomers = parseFloat(newCustomersEl.value);
+
+          if (isNaN(existCostumers) || existCostumers < 1 || isNaN(totCustomers) || totCustomers < 1 || isNaN(newCustomers) || newCustomers < 1) {
+            alert("Please Enter All Details.");
+            return;
+          } else if (totCustomers < newCustomers || totCustomers > (existCostumers + newCustomers)) {
+            alert("Total customers must be lower than the number of existing customers plus new customers.");
+            return;
+          }
+
+          try {
+            const resultElement = createElement()
+            calcResultsEl.innerHTML = resultElement 
+
+            const CRR = ((totCustomers - newCustomers) / existCostumers) * 100
+
+            const results = {
+              1: { result: Math.abs(100 - CRR) > 1 ? (100 - CRR).toFixed(3) : (100 - CRR).toPrecision(3), type: "i11" },
+              2: { result: Math.abs(CRR) > 1 ? CRR.toFixed(3) : CRR.toPrecision(3), type: "i12" },
+            }
+            setResult(results)
+
+          } catch (error) {
+            alert("Something Went Wrong!!!");
+            resetResult()
+            return;
+          }
+      }
+
+      function resetForm() {
+        existCostumersEl.value = ""
+        totCustomersEl.value = ""
+        newCustomersEl.value = ""
+      }
+
+      function resetResult() {
+        calcResultsEl.innerHTML = "<p>Result will appear here...</p>";
+      } 
+
+      function resethandler() {
+        resetForm();
+        resetResult();
+      }
+
+      resetBtnEl.addEventListener("click", resethandler);
+      calcBtnEl.addEventListener("click", calculateResults);
+      [existCostumersEl, totCustomersEl, newCustomersEl].forEach((el) => {
+        el.addEventListener("input", resetResult);
+      });  
+
+    </script>
+</body>
+</html>

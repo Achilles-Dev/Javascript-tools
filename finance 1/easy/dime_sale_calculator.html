@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Dime Sale Calculator</title>
+</head>
+<body>
+    <h1>Dime Sale Calculator</h1>
+    <p>
+      Starting Price ($):
+      <input type="number" id="startPrice" value="5">
+    </p>
+    <p>
+      Price Increment ($):
+      <input type="number" id="priceIncrease" value="0.1">
+    </p>
+    <p>
+      Price Cap ($):
+      <input type="number" id="priceCap" value="10">
+    </p>
+    <p>
+      Units Sold Before:
+      <input type="number" id="beforeSold" value="50">
+    </p>
+    <p>
+      Total Units Sold:
+      <input type="number" id="totalSold" value="200">
+    </p>
+    
+
+    <button id="calcBtn">Calculate</button>
+    <button id="resetBtn">Reset</button>
+    <hr>
+    <div>
+      <h3>Result:</h3>
+      <h3 id="calcResults">Result will appear here...</h3>
+    </div>
+
+    <script>
+      // Get required elements from the HTML
+      const startPriceEl = document.getElementById("startPrice");
+      const priceIncreaseEl = document.getElementById("priceIncrease");
+      const priceCapEl = document.getElementById("priceCap");
+      const beforeSoldEl = document.getElementById("beforeSold");
+      const totalSoldEl = document.getElementById("totalSold");
+
+      const calcBtnEl = document.getElementById('calcBtn');
+      const resetBtnEl = document.getElementById('resetBtn');
+      const calcResultsEl = document.getElementById('calcResults') 
+
+      function createElement() {
+        const newDiv = `
+            <p>
+              <label for="i11-span">Dime Sale Revenue: &nbsp;</label>
+              $<span
+                data-id="i11"
+                step="any"
+                id="i11-span"
+                class="spans"
+              ></span>
+            </p>
+            <p>
+              <label for="i12-span">Revenue Per Unit: &nbsp;</label>
+              $<span
+                data-id="i12"
+                step="any"
+                id="i12-span"
+                class="spans"
+              ></span>
+            </p>
+        `
+        return newDiv
+      }
+
+      function setResult(resultObj) {
+        for (key of Object.keys(resultObj)) {
+          let val = resultObj[key].result;
+          let id = resultObj[key].type;
+
+          if (isNaN(val)) {
+            alert("Your input resulted in NAN.\n 0/0 \n Try again with valid input.");
+            return;
+          }
+          if (Math.abs(val) === Infinity) {
+            alert("Your input resulted in Infinity. \nDivision by zero. \nTry again with valid input.");
+            return;
+          }
+          const span = document.getElementById(`${id}-span`);
+          span.textContent = `${parseFloat(val)}`; 
+        }
+      }
+
+      function calculateResults() {
+          // Retrieve input values
+          const startPrice = parseFloat(startPriceEl.value);
+          const priceIncrease = parseFloat(priceIncreaseEl.value);
+          const priceCap = parseFloat(priceCapEl.value);
+          const beforeSold = parseFloat(beforeSoldEl.value);
+          const totalSold = parseFloat(totalSoldEl.value);
+
+          if (isNaN(startPrice)  || startPrice < 0 || isNaN(priceIncrease) || priceIncrease < 0 ||
+            isNaN(priceCap) || priceCap < 0 || isNaN(beforeSold) || beforeSold < 0 ||
+            isNaN(totalSold) || totalSold < 1
+          ) {
+            alert("Please Enter All Details.");
+            return;
+          }
+
+          try {
+            const resultElement = createElement()
+            calcResultsEl.innerHTML = resultElement 
+            
+            let totalRevenue = startPrice * beforeSold;
+            let price = startPrice
+            for (let n = beforeSold + 1; n <= totalSold; n++) {
+              price += priceIncrease;
+              
+              if (price > priceCap) {
+                  price = priceCap;
+              }
+              totalRevenue += price;
+            }
+
+            const results = {
+              1: { result: Math.abs(totalRevenue) > 1 ? totalRevenue.toFixed(4) : totalRevenue.toPrecision(4), type: "i11" },
+              2: { result: Math.abs(totalRevenue / totalSold) > 1 ? (totalRevenue / totalSold).toFixed(4) : (totalRevenue / totalSold).toPrecision(4), type: "i12" },
+            }
+            setResult(results)
+
+          } catch (error) {
+            alert("Something Went Wrong!!!");
+            resetResult()
+            return;
+          }
+      }
+
+      function resetForm() {
+        startPriceEl.value = "5"
+        priceIncreaseEl.value = "0.1"
+        priceCapEl.value = "10"
+        beforeSoldEl.value = "50"
+        totalSoldEl.value = "200"
+      }
+
+      function resetResult() {
+        calcResultsEl.innerHTML = "<p>Result will appear here...</p>";
+      } 
+
+      function resethandler() {
+        resetForm();
+        resetResult();
+      }
+
+      resetBtnEl.addEventListener("click", resethandler);
+      calcBtnEl.addEventListener("click", calculateResults);
+
+      [startPriceEl, priceIncreaseEl, priceCapEl, beforeSoldEl, totalSoldEl].forEach((el) => {
+        el.addEventListener("input", resetResult);
+      });  
+    </script>
+</body>
+</html>

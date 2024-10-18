@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>BMR Calculator</title>
+  </head>
+  <body>
+    <h1>BMR Calculator</h1>
+    <p>The Basal Metabolic Rate (BMR) Calculator estimates your basal metabolic rate—the amount of energy expended while at rest in <br />
+      a neutrally temperate environment, and in a post-absorptive state (meaning that the digestive system is inactive, which <br />
+      requires about 12 hours of fasting).
+    </p>
+    <p>
+      Select Unit:
+      <select id="unitSelect">
+        <option value="usu" selected>US Units</option>
+        <option value="meu">Metric Units</option>
+      </select>
+      </p>
+        Age:
+        <input
+          type="number"
+          min="15"
+          step="any"
+          id="age"
+          max="80"
+        /> <span>ages 15 - 80</span>
+      </p> 
+
+      <p>
+        Gender:
+        <select id="genderSelect">
+          <option value="male">Male</option>
+          <option value="female" selected>Female</option>
+        </select>
+      </p>
+      <p>
+        Height:
+        <input
+          type="number"
+          step="any"
+          id="height"
+        />
+        <select id="heightSelect">
+          <option value="m">meters (m)</option>
+          <option value="cm">centimeters (cm)</option>
+          <option value="mm">millimeters (mm)</option>
+          <option value="yd">yards (yd)</option>
+          <option value="ft" selected>feet (ft)</option>
+          <option value="in">inches (in)</option>
+        </select>
+      </p>
+      <p>
+        Weight:
+        <input
+          type="number"
+          min="0"
+          step="any"
+          id="weight"
+        />
+        <select id="weightSelect">
+          <option value="kg">kilogram</option>
+          <option value="g">gram</option>
+          <option value="mg">milligram</option>                  
+          <option value="t">metric ton</option>
+          <option value="long ton">long ton</option>
+          <option value="US ton">short ton</option>
+          <option value="lb" selected>pounds (lb)</option>
+          <option value="oz">ounces (oz)</option>          
+          <option value="carr">carrat</option>
+        </select>
+      </p>
+      
+      <button id="calcBtn">Calculate</button>
+      <button id="resetBtn">Reset</button>
+      <hr>
+      <div>
+        <h3>Result:</h3>
+        <h3 id="calcResults">Result will appear here...</h3>
+      </div>
+    <script>
+      /*************** ELEMENTS ***************/
+
+      const unitSelectEl = document.getElementById("unitSelect");
+      const ageEl = document.getElementById("age");
+      const genderSelectEl = document.getElementById("genderSelect");
+      const heightEl = document.getElementById("height");
+      const weightEl = document.getElementById("weight");
+      const heightSelectEl = document.getElementById("heightSelect");
+      const weightSelectEl = document.getElementById("weightSelect");
+    
+      const calcBtnEl = document.getElementById('calcBtn');
+      const resetBtnEl = document.getElementById('resetBtn');
+      const calcResultsEl = document.getElementById('calcResults')
+
+      /*************** GLOBAL VARIABLES ***************/
+      const UNITS = {
+        mass: {
+          mg: 1000000,
+          g: 1000,
+          kg:  1,
+          t: 0.001,
+          oz: 35.27399072,
+          lb: 2.20462442,
+          "US ton": 0.00110231221,
+          "long ton": 0.0009842073304,
+          carr: 5000,
+        },
+         distance: {
+          'cm': 1,
+          'mm': 10,
+          'm': 0.01,
+          'in': 0.3937007874,
+          'yd': 0.01093613298,
+          'ft': 0.03280839895, 
+        },
+      };
+      /*************** FUNCTIONS ***************/
+      function toSIUnit(type, unit, value) {
+        return value / UNITS[type][unit];
+      }
+
+      function fromSIUnit(type, unit, value) {
+        return value * UNITS[type][unit];
+      }
+  
+      function handleUnitSelectChange(e) {
+        const value = e.target.value
+        heightSelectEl.selectedIndex = value === "usu" ? "4" : "1"
+        weightSelectEl.selectedIndex = value === "usu" ? "6" : "0"
+
+        resetResult()
+      }  
+
+      function createElement() {
+        const newDiv = `
+            <p>
+              <label for="i11-span">BMR: &nbsp;</label>
+              <span
+                data-id="i11"
+                step="any"
+                id="i11-span"
+                class="spans"
+              ></span> Calories/day
+            </p>
+            <div>
+              <h3>Daily calorie needs based on activity level:</h3>
+              <p>
+                <label for="i12-span">Sedentary: little or no exercise: &nbsp;</label>
+                <span
+                  data-id="i12"
+                  step="any"
+                  id="i12-span"
+                  class="spans"
+                ></span>
+              </p>
+              <p>
+                <label for="i13-span">Exercise 1-3 times/week: &nbsp;</label>
+                <span
+                  data-id="i13"
+                  step="any"
+                  id="i13-span"
+                  class="spans"
+                ></span>
+              </p>
+              <p>
+                <label for="i14-span">Exercise 4-5 times/week: &nbsp;</label>
+                <span
+                  data-id="i14"
+                  step="any"
+                  id="i14-span"
+                  class="spans"
+                ></span>
+              </p>
+              <p>
+                <label for="i15-span">Daily exercise or intense exercise 3-4 times/week	: &nbsp;</label>
+                <span
+                  data-id="i15"
+                  step="any"
+                  id="i15-span"
+                  class="spans"
+                ></span>
+              </p>
+              <p>
+                <label for="i16-span">Intense exercise 6-7 times/week: &nbsp;</label>
+                <span
+                  data-id="i16"
+                  step="any"
+                  id="i16-span"
+                  class="spans"
+                ></span>
+              </p>
+              <p>
+                <label for="i17-span">Very intense exercise daily, or physical job: &nbsp;</label>
+                <span
+                  data-id="i17"
+                  step="any"
+                  id="i17-span"
+                  class="spans"
+                ></span>
+              </p>
+              <p>
+                Exercise: 15-30 minutes of elevated heart rate activity.<br /> 
+                Intense exercise: 45-120 minutes of elevated heart rate activity.<br /> 
+                Very intense exercise: 2+ hours of elevated heart rate activity.
+            </p>
+            </div>            
+        `
+        return newDiv
+      }
+
+      function setResult(resultObj) {
+        for (key of Object.keys(resultObj)) {
+          let val = resultObj[key].result;
+          let id = resultObj[key].type;
+
+          if (isNaN(val)) {
+           alert("Your input resulted in NAN.\n 0/0 \n Try again with valid input.");
+            return;
+          }
+          if (Math.abs(val) === Infinity) {
+            alert("Your input resulted in Infinity. \nDivision by zero. \nTry again with valid input.");
+            return;
+          }
+          const span = document.getElementById(`${id}-span`);
+          span.textContent = `${parseFloat(val)}`;
+        }
+      }
+
+      function calculateResults() {
+        // Retrieve input values
+        const age = parseFloat(ageEl.value);
+        const genderSelect = genderSelectEl.value
+        const heightSelect = heightSelectEl.value
+        const weightSelect = weightSelectEl.value
+        const height = toSIUnit("distance", heightSelect, parseFloat(heightEl.value));
+        const weight = toSIUnit("mass", weightSelect, parseFloat(weightEl.value)); 
+
+        if (isNaN(age) || isNaN(height) || isNaN(weight) || weight <= 0 ) {
+          alert("Please Enter All Details.");
+          return;
+        } else if (age < 15 || age > 80) {
+          alert("Please provide an age between 15 and 80");
+          return;
+        }
+
+        try {
+          const resultElement = createElement()
+          calcResultsEl.innerHTML = resultElement 
+
+          let BMR = 0
+          if (genderSelect === "male") {
+            BMR = 5 + (10 * weight) + (6.25 * height) - (5 * age)
+            console
+          } else if (genderSelect === "female") {
+            BMR = (10 * weight) + (6.25 * height) - (5 * age) - 161
+          }
+
+          const results = {
+            1: { result: Math.abs(BMR) > 1 ? BMR.toFixed() : BMR.toPrecision(3), type: "i11" },
+            2: { result: Math.abs(BMR * 1.2) > 1 ? (BMR * 1.2).toFixed() : (BMR * 1.2).toPrecision(3), type: "i12" },
+            3: { result: Math.abs(BMR * 1.375) > 1 ? (BMR * 1.375).toFixed() : (BMR * 1.375).toPrecision(3), type: "i13" },
+            4: { result: Math.abs(BMR * 1.465) > 1 ? (BMR * 1.465).toFixed() : (BMR * 1.465).toPrecision(3), type: "i14" },
+            5: { result: Math.abs(BMR * 1.55) > 1 ? (BMR * 1.55).toFixed() : (BMR * 1.55).toPrecision(3), type: "i15" },
+            6: { result: Math.abs(BMR * 1.725) > 1 ? (BMR * 1.725).toFixed() : (BMR * 1.725).toPrecision(3), type: "i16" },
+            7: { result: Math.abs(BMR * 1.9) > 1 ? (BMR * 1.9).toFixed() : (BMR * 1.9).toPrecision(3), type: "i17" },
+          }
+          setResult(results)
+
+        } catch (error) {
+          alert("Something Went Wrong!!!");
+          resetResult()
+          return;
+        }
+      }
+
+      function resetForm() {
+        ageEl.value = ""
+        heightEl.value = ""
+        weightEl.value = ""
+        weightSelectEl.selectedIndex = '6'
+        heightSelectEl.selectedIndex = '4'
+        genderSelectEl.selectedIndex = '1'
+        unitSelectEl.selectedIndex = '0'
+      }
+
+      function resetResult() {
+        calcResultsEl.innerHTML = "<p>Result will appear here...</p>";
+      } 
+
+      function resethandler() {
+        resetForm();
+        resetResult();
+      }
+
+      /*************** EVENTLISTINERS ***************/
+      [ageEl, heightEl, weightEl].forEach((el) => {
+        el.addEventListener("input", resetResult);
+      });
+
+      [weightSelectEl, heightSelectEl, genderSelectEl].forEach((el) => {
+        el.addEventListener("change", resetResult);
+      });
+
+      unitSelectEl.addEventListener("change", handleUnitSelectChange)
+      resetBtnEl.addEventListener("click", resethandler);
+      calcBtnEl.addEventListener("click", calculateResults);
+    </script>
+  </body>
+</html>

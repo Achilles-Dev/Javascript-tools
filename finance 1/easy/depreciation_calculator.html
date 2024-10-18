@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Depreciation Calculator</title>
+</head>
+<body>
+    <h1>Depreciation Calculator</h1>
+    <p>
+      Original cost:
+      <input type="number" id="originCost">
+    </p>
+    <p>
+      Residual value:
+      <input type="number" id="residVal" >
+    </p>
+    <p>
+      Lifetime:
+      <input type="number" id="lifetime">
+    </p>
+    <p>
+      End book value after...:
+      <input type="number" id="endBkVal">
+    </p>
+    <p>
+      Depreciation method:
+      <select id="methodSelect">
+        <option value="line" selected>Straight line depreciation</option>
+        <option value="decline">Declining balance depreciation</option>
+        <option value="sum">Sum-of-years' digits depreciation</option>
+      </select>
+    </p>
+    
+
+    <button id="calcBtn">Calculate</button>
+    <button id="resetBtn">Reset</button>
+    <hr>
+    <div>
+      <h3>Result:</h3>
+      <h3 id="calcResults">Result will appear here...</h3>
+    </div>
+
+    <script>
+      // Get required elements from the HTML
+      const originCostEl = document.getElementById("originCost");
+      const residValEl = document.getElementById("residVal");
+      const lifetimeEl = document.getElementById("lifetime");
+      const endBkValEl = document.getElementById("endBkVal");
+      const methodSelectEl = document.getElementById("methodSelect");
+
+      const calcBtnEl = document.getElementById('calcBtn');
+      const resetBtnEl = document.getElementById('resetBtn');
+      const calcResultsEl = document.getElementById('calcResults') 
+
+      function createElement() {
+        const newDiv = `
+            <p>
+              <label for="i11-span">Depreciation expense: &nbsp;</label>
+              <span
+                data-id="i11"
+                step="any"
+                id="i11-span"
+                class="spans"
+              ></span>
+            </p>
+            <p>
+              <label for="i12-span">End book value: &nbsp;</label>
+              <span
+                data-id="i12"
+                step="any"
+                id="i12-span"
+                class="spans"
+              ></span>
+            </p>
+        `
+        const newDiv2 = `
+            <p>
+              <label for="i13-span">Depreciation rate: &nbsp;</label>
+              <span
+                data-id="i13"
+                step="any"
+                id="i13-span"
+                class="spans"
+              ></span>%
+            </p>
+        `
+        if (methodSelectEl.value === "decline") {
+          return newDiv2 + newDiv
+        }
+        return newDiv
+      }
+
+      function setResult(resultObj) {
+        for (key of Object.keys(resultObj)) {
+          let val = resultObj[key].result;
+          let id = resultObj[key].type;
+
+          if (isNaN(val)) {
+            alert("Your input resulted in NAN.\n 0/0 \n Try again with valid input.");
+            return;
+          }
+          if (Math.abs(val) === Infinity) {
+            alert("Your input resulted in Infinity. \nDivision by zero. \nTry again with valid input.");
+            return;
+          }
+          const span = document.getElementById(`${id}-span`);
+          span.textContent = `${parseFloat(val)}`; 
+        }
+      }
+
+      function calculateResults() {
+          // Retrieve input values
+          const originCost = parseFloat(originCostEl.value);
+          const residVal = parseFloat(residValEl.value);
+          const lifetime = parseFloat(lifetimeEl.value);
+          const endBkVal = parseFloat(endBkValEl.value);
+          const method = methodSelectEl.value;
+
+          if (isNaN(originCost)  || originCost < 0 || isNaN(residVal) || residVal < 0 ||
+            isNaN(lifetime) || lifetime < 1 || isNaN(endBkVal) || endBkVal < 1
+          ) {
+            alert("Please Enter All Details.");
+            return;
+          } else if (endBkVal > lifetime) {
+            alert("End Book value must be equal or less than the lifetime.");
+            return;
+          }
+
+          try {
+            const resultElement = createElement()
+            calcResultsEl.innerHTML = resultElement
+
+            let results = {}
+            let depExp = 0
+            let EBV = 0
+
+            if (method === "decline") {
+              const depRate = 1 - ((residVal / originCost) ** (1 / lifetime))
+              depExp = depRate * originCost * ((1 - depRate) ** (endBkVal - 1))
+              EBV = originCost * ((1 - depRate) ** endBkVal)
+
+              results = {
+                3: { result: Math.abs(depRate * 100) > 1 ? (depRate * 100).toFixed(2) : (depRate * 100).toPrecision(2), type: "i13" },
+              }
+            } else if (method === "sum") {
+              let d = originCost - residVal
+              let D = d / ((lifetime + 1) * (lifetime / 2))
+              depExp = D * ((lifetime - endBkVal) + 1)
+              EBV = originCost - ((D * endBkVal * lifetime) - ((D * endBkVal * (endBkVal - 1)) / 2))
+            } else {
+              depExp = (originCost - residVal) / lifetime
+              EBV = originCost - (endBkVal * depExp)
+            }
+
+            results = {
+              ...results,
+              1: { result: Math.abs(depExp) > 1 ? depExp.toFixed(2) : depExp.toPrecision(2), type: "i11" },
+              2: { result: Math.abs(EBV) > 1 ? EBV.toFixed(2) : EBV.toPrecision(2), type: "i12" },
+            }
+            setResult(results)
+
+            
+
+          } catch (error) {
+            alert("Something Went Wrong!!!");
+            resetResult()
+            return;
+          }
+      }
+
+      function resetForm() {
+        originCostEl.value = "5"
+        residValEl.value = "0.1"
+        lifetimeEl.value = "10"
+        endBkValEl.value = "50"
+        methodSelectEl.value = "200"
+      }
+
+      function resetResult() {
+        calcResultsEl.innerHTML = "<p>Result will appear here...</p>";
+      } 
+
+      function resethandler() {
+        resetForm();
+        resetResult();
+      }
+
+      resetBtnEl.addEventListener("click", resethandler);
+      calcBtnEl.addEventListener("click", calculateResults);
+
+      [originCostEl, residValEl, lifetimeEl, endBkValEl, methodSelectEl].forEach((el) => {
+        el.addEventListener("input", resetResult);
+      });  
+    </script>
+</body>
+</html>
