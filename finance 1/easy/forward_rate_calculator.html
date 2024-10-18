@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Forward Rate Calculator</title>
+</head>
+<body>
+    <h1>Forward Rate Calculator</h1>
+    <p>Time period 1:</p>
+    <p>
+      Time period 1 (n₁):
+      <input type="number" id="period1">
+      <select
+        class="selects"
+        id="period1Select"
+      >
+        <option value="12">months</option>
+        <option value="1" selected>years</option>
+      </select>
+    </p>
+    <p>
+      Spot rate for time period 1 (S₁): 
+      <input type="number" id="spotRate1">%
+    </p>
+    <p>Time period 2:</p>
+    <p>
+      Time period 2 (n₂):
+      <input type="number" id="period2" >
+      <select
+        class="selects"
+        id="period2Select"
+      >
+        <option value="12">months</option>
+        <option value="1" selected>years</option>
+      </select>
+    </p>
+    <p>
+      Spot rate for time period 2 (S₂):
+      <input type="number" id="spotRate2">%
+    </p>
+
+
+    <button id="calcBtn">Calculate</button>
+    <button id="resetBtn">Reset</button>
+    <hr>
+    <div>
+      <h3>Result:</h3>
+      <h3 id="calcResults">Result will appear here...</h3>
+    </div>
+
+    <script>
+      // Get required elements from the HTML
+      const period1El = document.getElementById("period1");
+      const spotRate1El = document.getElementById("spotRate1");
+      const period2El = document.getElementById("period2");
+      const spotRate2El = document.getElementById("spotRate2");
+      const period1SelectEl = document.getElementById("period1Select");
+      const period2SelectEl = document.getElementById("period2Select");
+
+      const calcBtnEl = document.getElementById('calcBtn');
+      const resetBtnEl = document.getElementById('resetBtn');
+      const calcResultsEl = document.getElementById('calcResults') 
+
+      function createElement() {
+        const newDiv = `
+            <p>
+              <label for="i11-span">Forward rate: &nbsp;</label>
+              <span
+                data-id="i11"
+                step="any"
+                id="i11-span"
+                class="spans"
+              ></span>%
+            </p>
+        `
+        return newDiv
+      }
+
+      function setResult(resultObj) {
+        for (key of Object.keys(resultObj)) {
+          let val = resultObj[key].result;
+          let id = resultObj[key].type;
+
+          if (isNaN(val)) {
+           alert("Your input resulted in NAN.\n 0/0 \n Try again with valid input.");
+            return;
+          }
+          if (Math.abs(val) === Infinity) {
+            alert("Your input resulted in Infinity. \nDivision by zero. \nTry again with valid input.");
+            return;
+          }
+          const span = document.getElementById(`${id}-span`);
+          span.textContent = `${parseFloat(val)}`;
+        }
+      }
+
+      function calculateResults() {
+          // Retrieve input values
+          const period1 = parseFloat(period1El.value);
+          const spotRate1 = parseFloat(spotRate1El.value);
+          const period2 = parseFloat(period2El.value);
+          const spotRate2 = parseFloat(spotRate2El.value);
+          const period1Select = parseFloat(period1SelectEl.value);
+          const period2Select = parseFloat(period2SelectEl.value);
+
+          if (isNaN(period1) || period1 <= 0 || isNaN(spotRate1) || spotRate1 < 0 || isNaN(period2) || period2 <= 0 ||
+            isNaN(spotRate2) || spotRate2 < 0
+          ) {
+            alert("Please Enter All Details.");
+            return;
+          } else if (period1 <= period2) {
+            alert("Time period 1 must be longer than time period 2.");
+            return;
+          }
+
+          try {
+            const resultElement = createElement()
+            calcResultsEl.innerHTML = resultElement 
+
+            const forwardRate = 
+              (((((1 + (spotRate1 / 100)) ** (period1 / period1Select)) / 
+              ((1 + (spotRate2 / 100)) ** (period2 / period2Select))) ** 
+              (1 / ((period1 / period1Select) - (period2 / period2Select)))) - 1) * 100
+
+            const results = {
+              1: { result: Math.abs(forwardRate) > 1 ? forwardRate.toFixed(2) : forwardRate.toPrecision(2), type: "i11" },
+            }
+            setResult(results)
+
+          } catch (error) {
+            alert("Something Went Wrong!!!");
+            resetResult()
+            return;
+          }
+      }
+
+      function resetForm() {
+        period1El.value = ""
+        spotRate1El.value = ""
+        period2El.value = ""
+        spotRate2El.value = ""
+
+        period1SelectEl.selectedIndex = "1"
+        period2SelectEl.selectedIndex = "1"
+      }
+
+      function resetResult() {
+        calcResultsEl.innerHTML = "<p>Result will appear here...</p>";
+      } 
+
+      function resethandler() {
+        resetForm();
+        resetResult();
+      }
+
+      resetBtnEl.addEventListener("click", resethandler);
+      calcBtnEl.addEventListener("click", calculateResults);
+      [period1El, spotRate1El, period2El, spotRate2El].forEach((el) => {
+        el.addEventListener("input", resetResult);
+      });  
+
+      [period1SelectEl, period2SelectEl].forEach((el) => {
+        el.addEventListener("change", resetResult);
+      });  
+
+    </script>
+</body>
+</html>

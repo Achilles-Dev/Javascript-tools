@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>GRP Calculator</title>
+</head>
+<body>
+    <h1>GRP Calculator</h1>
+    <p>
+      I wish to calculate:
+      <select id="calculateSelect">
+        <option value="real" selected>Real Interest Rate</option>
+        <option value="nomi">Nominal Interest Rate</option>
+        <option value="infl">Inflation Rate</option>
+      </select>
+    </p>
+    <p id="realInput" style="display: none;" class="inputs">
+      Real Interest Rate (r):
+      <input type="number" id="realIntRate" value="4">
+    </p>
+    <p id="nomiInput" class="inputs">
+      Nominal Interest Rate (i):
+      <input type="number" id="nomIntRate" value="5">
+    </p>
+    <p id="inflInput" class="inputs">
+      Inflation Rate (π):
+      <input type="number" id="infRate" value="1">
+    </p>
+    
+
+    <button id="calcBtn">Calculate</button>
+    <button id="resetBtn">Reset</button>
+    <hr>
+    <div>
+      <h3>Result:</h3>
+      <h3 id="calcResults">Result will appear here...</h3>
+    </div>
+
+    <script>
+      // Get required elements from the HTML
+      const calculateSelectEl = document.getElementById("calculateSelect");
+      const realIntRateEl = document.getElementById("realIntRate");
+      const nomIntRateEl = document.getElementById("nomIntRate");
+      const infRateEl = document.getElementById("infRate");
+      const inputsEl = document.querySelectorAll(".inputs")
+
+      const calcBtnEl = document.getElementById('calcBtn');
+      const resetBtnEl = document.getElementById('resetBtn');
+      const calcResultsEl = document.getElementById('calcResults') 
+
+      function handleCalculateSelectChange(e) {
+        const value = e.target.value
+
+        inputsEl.forEach((input) => {
+          const idVal = input.id.slice(0,4)
+          if (value === idVal) {
+            input.style.display = "none"
+          } else {
+            input.style.display = "block"
+          }
+        })
+
+        resetResult()
+      }
+
+      function createElement() {
+        const name = calculateSelectEl.options[calculateSelectEl.selectedIndex].textContent
+        const newDiv = `
+            <p>
+              <label for="i11-span">${name}: &nbsp;</label>
+              <span
+                data-id="i11"
+                step="any"
+                id="i11-span"
+                class="spans"
+              ></span>%
+            </p>
+        `
+        return newDiv
+      }
+
+      function setResult(resultObj) {
+        for (key of Object.keys(resultObj)) {
+          let val = resultObj[key].result;
+          let id = resultObj[key].type;
+
+          if (isNaN(val)) {
+           alert("Your input resulted in NAN.\n 0/0 \n Try again with valid input.");
+            return;
+          }
+          if (Math.abs(val) === Infinity) {
+            alert("Your input resulted in Infinity. \nDivision by zero. \nTry again with valid input.");
+            return;
+          }
+          const span = document.getElementById(`${id}-span`);
+          span.textContent = `${parseFloat(val)}`;
+        }
+      }
+
+      function calculateResults() {
+          // Retrieve input values
+          const realIntRate = parseFloat(realIntRateEl.value);
+          const nomIntRate = parseFloat(nomIntRateEl.value);
+          const infRate = parseFloat(infRateEl.value);
+          const calculateSelect = calculateSelectEl.value
+
+          if ((realIntRateEl.checkVisibility() === true && (isNaN(realIntRate)  || realIntRate <= 0)) || 
+            (nomIntRateEl.checkVisibility() === true && (isNaN(nomIntRate) || nomIntRate < 0)) ||
+            (infRateEl.checkVisibility() === true && (isNaN(infRate) || infRate < 0))
+          ) {
+            alert("Please Enter All Details.");
+            return;
+          } 
+
+          try {
+            const resultElement = createElement()
+            calcResultsEl.innerHTML = resultElement 
+
+            let intRate =  0
+
+            if (calculateSelect === "real") {
+              intRate = ((((1 + (nomIntRate / 100)) / (1 + (infRate / 100)))) - 1) * 100
+            } else if (calculateSelect === "nomi") {
+              intRate = ((((1 + (realIntRate / 100)) * (1 + (infRate / 100)))) - 1) * 100
+            } else {
+              intRate = ((((1 + (nomIntRate / 100)) / (1 + (realIntRate / 100)))) - 1) * 100
+            }
+
+            const results = {
+              1: { result: Math.abs(intRate) > 1 ? intRate.toFixed(3) : intRate.toPrecision(3), type: "i11" },
+            }
+            setResult(results)
+
+          } catch (error) {
+            alert("Something Went Wrong!!!");
+            resetResult()
+            return;
+          }
+      }
+
+      function resetForm() {
+        realIntRateEl.value = "4"
+        nomIntRateEl.value = "5"
+        infRateEl.value = "1"
+
+        calculateSelectEl.selectedIndex = "0"
+
+        inputsEl.forEach((input) => {
+          const idVal = input.id.slice(0,4)
+          if (idVal === "real") {
+            input.style.display = "none"
+          } else {
+            input.style.display = "block"
+          }
+        })
+      }
+
+      function resetResult() {
+        calcResultsEl.innerHTML = "<p>Result will appear here...</p>";
+      } 
+
+      function resethandler() {
+        resetForm();
+        resetResult();
+      }
+
+      resetBtnEl.addEventListener("click", resethandler);
+      calcBtnEl.addEventListener("click", calculateResults);
+
+      calculateSelectEl.addEventListener("change", handleCalculateSelectChange)
+
+      [realIntRateEl, nomIntRateEl, infRateEl].forEach((el) => {
+        el.addEventListener("input", resetResult);
+      });  
+    </script>
+</body>
+</html>

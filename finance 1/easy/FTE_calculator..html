@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Full-time Equivalent (FTE) Calculator</title>
+</head>
+<body>
+    <h1>Full-time Equivalent (FTE) Calculator</h1>
+    <p>Full-time:</p>
+    <p>
+      Number of employees:
+      <input type="number" id="empNumFull">people
+    </p>
+    <p>
+      Working hours:
+      <input type="number" id="workHrsFull"> hrs /
+      <select id="workHrsFullSelect">
+        <option value="5">day</option>
+        <option value="1" selected>week</option>
+        <option value="0.22994818858">month</option>
+      </select>
+    </p>
+    <p>Part-time:</p>
+    <p>
+      Number of employees:
+      <input type="number" id="empNumPart">
+    </p>
+    <p>
+      Working hours:
+      <input type="number" id="workHrsPart">hrs /
+      <select id="workHrsPartSelect">
+        <option value="5">day</option>
+        <option value="1" selected>week</option>
+        <option value="0.22994818858">month</option>
+      </select>
+    </p>
+    
+
+    <button id="calcBtn">Calculate</button>
+    <button id="resetBtn">Reset</button>
+    <hr>
+    <div>
+      <h3>Result:</h3>
+      <h3 id="calcResults">Result will appear here...</h3>
+    </div>
+
+    <script>
+      // Get required elements from the HTML
+      const empNumFullEl = document.getElementById("empNumFull");
+      const workHrsFullEl = document.getElementById("workHrsFull");
+      const empNumPartEl = document.getElementById("empNumPart");
+      const workHrsPartEl = document.getElementById("workHrsPart");
+      const workHrsFullSelectEl = document.getElementById("workHrsFullSelect");
+      const workHrsPartSelectEl = document.getElementById("workHrsPartSelect");
+
+      const calcBtnEl = document.getElementById('calcBtn');
+      const resetBtnEl = document.getElementById('resetBtn');
+      const calcResultsEl = document.getElementById('calcResults') 
+
+      function createElement() {
+        const newDiv = `
+            <p>
+              <label for="i11-span">Full time equivalent: &nbsp;</label>
+              <span
+                data-id="i11"
+                step="any"
+                id="i11-span"
+                class="spans"
+              ></span> FTE
+            </p>
+        `
+        return newDiv
+      }
+
+      function setResult(resultObj) {
+        for (key of Object.keys(resultObj)) {
+          let val = resultObj[key].result;
+          let id = resultObj[key].type;
+
+          if (isNaN(val)) {
+            alert("Your input resulted in NAN.\n 0/0 \n Try again with valid input.");
+            return;
+          }
+          if (Math.abs(val) === Infinity) {
+            alert("Your input resulted in Infinity. \nDivision by zero. \nTry again with valid input.");
+            return;
+          }
+          const span = document.getElementById(`${id}-span`);
+          span.textContent = `${parseFloat(val)}`; 
+        }
+      }
+
+      function calculateResults() {
+          // Retrieve input values
+          const empNumFull = parseFloat(empNumFullEl.value);
+          const workHrsFull = parseFloat(workHrsFullEl.value) * parseFloat(workHrsFullSelectEl.value);
+          const empNumPart = parseFloat(empNumPartEl.value);
+          const workHrsPart = parseFloat(workHrsPartEl.value) * parseFloat(workHrsPartSelectEl.value);;
+
+          if (isNaN(empNumFull)  || empNumFull < 0.01 || isNaN(workHrsFull) || workHrsFull <= 0 ||
+            isNaN(empNumPart) || empNumPart < 0 || isNaN(workHrsPart) || workHrsPart <= 0
+          ) {
+            alert("Please Enter All Details.");
+            return;
+          } else if (workHrsFull <= workHrsPart) {
+            alert("The working hours for full-time employees should be greater than the working hours for part-time employees.");
+            return;
+          }
+
+          try {
+            const resultElement = createElement()
+            calcResultsEl.innerHTML = resultElement 
+
+            const totalFTWH = empNumFull * workHrsFull
+            const totalPTWH = empNumPart * workHrsPart
+            
+            const FTE = (totalFTWH + totalPTWH) / workHrsFull
+            const results = {
+              1: { result: Math.abs(FTE) > 1 ? FTE.toFixed(2) : FTE.toPrecision(2), type: "i11" },
+            }
+            setResult(results)
+
+          } catch (error) {
+            alert("Something Went Wrong!!!");
+            resetResult()
+            return;
+          }
+      }
+
+      function resetForm() {
+        empNumFullEl.value = ""
+        workHrsFullEl.value = ""
+        empNumPartEl.value = ""
+        workHrsPartEl.value = ""
+        workHrsFullSelectEl.selectedIndex = "1"
+        workHrsPartSelectEl.selectedIndex = "1"
+      }
+
+      function resetResult() {
+        calcResultsEl.innerHTML = "<p>Result will appear here...</p>";
+      } 
+
+      function resethandler() {
+        resetForm();
+        resetResult();
+      }
+
+      resetBtnEl.addEventListener("click", resethandler);
+      calcBtnEl.addEventListener("click", calculateResults);
+
+      [workHrsFullSelectEl, workHrsPartSelectEl].forEach((el) => {
+        el.addEventListener("change", resetResult);
+      });  
+
+      [empNumFullEl, workHrsFullEl, empNumPartEl, workHrsPartEl].forEach((el) => {
+        el.addEventListener("input", resetResult);
+      });  
+    </script>
+</body>
+</html>

@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>GRP Calculator</title>
+</head>
+<body>
+    <h1>GRP Calculator</h1>
+    <p>
+      Total audience:
+      <input type="number" id="totAudience">
+    </p>
+    <p>
+      Audience reached:
+      <input type="number" id="audReached">
+    </p>
+    <p>
+      Frequency per viewer:
+      <input type="number" id="freqPerView">
+    </p>
+    
+
+    <button id="calcBtn">Calculate</button>
+    <button id="resetBtn">Reset</button>
+    <hr>
+    <div>
+      <h3>Result:</h3>
+      <h3 id="calcResults">Result will appear here...</h3>
+    </div>
+
+    <script>
+      // Get required elements from the HTML
+      const totAudienceEl = document.getElementById("totAudience");
+      const audReachedEl = document.getElementById("audReached");
+      const freqPerViewEl = document.getElementById("freqPerView");
+
+      const calcBtnEl = document.getElementById('calcBtn');
+      const resetBtnEl = document.getElementById('resetBtn');
+      const calcResultsEl = document.getElementById('calcResults') 
+
+      function createElement() {
+        const newDiv = `
+            <p>
+              <label for="i11-span">Reach percentage: &nbsp;</label>
+              <span
+                data-id="i11"
+                step="any"
+                id="i11-span"
+                class="spans"
+              ></span>%
+            </p>
+            <p>
+              <label for="i12-span">GRP (gross rating point): &nbsp;</label>
+              <span
+                data-id="i12"
+                step="any"
+                id="i12-span"
+                class="spans"
+              ></span> points
+            </p>
+        `
+        return newDiv
+      }
+
+      function setResult(resultObj) {
+        for (key of Object.keys(resultObj)) {
+          let val = resultObj[key].result;
+          let id = resultObj[key].type;
+
+          if (isNaN(val)) {
+           alert("Your input resulted in NAN.\n 0/0 \n Try again with valid input.");
+            return;
+          }
+          if (Math.abs(val) === Infinity) {
+            alert("Your input resulted in Infinity. \nDivision by zero. \nTry again with valid input.");
+            return;
+          }
+          const span = document.getElementById(`${id}-span`);
+          span.textContent = `${parseFloat(val)}`;
+        }
+      }
+
+      function calculateResults() {
+          // Retrieve input values
+          const totAudience = parseFloat(totAudienceEl.value);
+          const audReached = parseFloat(audReachedEl.value);
+          const freqPerView = parseFloat(freqPerViewEl.value);
+
+          if (isNaN(totAudience)  || totAudience <= 0 || isNaN(audReached) || audReached < 0 ||
+            isNaN(freqPerView) || freqPerView < 0
+          ) {
+            alert("Please Enter All Details.");
+            return;
+          } 
+
+          try {
+            const resultElement = createElement()
+            calcResultsEl.innerHTML = resultElement 
+
+            const reachPercent =  (audReached / totAudience) * 100
+            const GRP = reachPercent * freqPerView
+
+            const results = {
+              1: { result: Math.abs(reachPercent) > 1 ? reachPercent.toFixed(2) : reachPercent.toPrecision(2), type: "i11" },
+              2: { result: Math.abs(GRP) > 1 ? GRP.toFixed(2) : GRP.toPrecision(2), type: "i12" },
+            }
+            setResult(results)
+
+          } catch (error) {
+            alert("Something Went Wrong!!!");
+            resetResult()
+            return;
+          }
+      }
+
+      function resetForm() {
+        totAudienceEl.value = ""
+        audReachedEl.value = ""
+        freqPerViewEl.value = ""
+      }
+
+      function resetResult() {
+        calcResultsEl.innerHTML = "<p>Result will appear here...</p>";
+      } 
+
+      function resethandler() {
+        resetForm();
+        resetResult();
+      }
+
+      resetBtnEl.addEventListener("click", resethandler);
+      calcBtnEl.addEventListener("click", calculateResults);
+
+      [totAudienceEl, audReachedEl, freqPerViewEl].forEach((el) => {
+        el.addEventListener("input", resetResult);
+      });  
+    </script>
+</body>
+</html>
