@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Marginal Cost Calculator</title>
+</head>
+<body>
+    <h1>Marginal Cost Calculator</h1>
+    <p>
+      Change in total cost:
+      <input type="number" id="costChange">
+    </p>
+    <p>
+      Change in quantity:
+      <input type="number" id="quantChange">
+      <select id="quantChangeSelect">
+        <option value="1" selected>units / points (1)</option>
+        <option value="2">pairs/couples/braces (2)</option>
+        <option value="10">decades (10)</option>
+        <option value="12">dozens (12)</option>
+      </select>
+    </p>
+
+    <button id="calcBtn">Calculate</button>
+    <button id="resetBtn">Reset</button>
+    <hr>
+    <div>
+      <h3>Result:</h3>
+      <h3 id="calcResults">Result will appear here...</h3>
+    </div>
+
+    <script>
+      // Get required elements from the HTML
+      const costChangeEl = document.getElementById("costChange");
+      const quantChangeEl = document.getElementById("quantChange");
+      const quantChangeSelectEl = document.getElementById("quantChangeSelect");
+
+      const calcBtnEl = document.getElementById('calcBtn');
+      const resetBtnEl = document.getElementById('resetBtn');
+      const calcResultsEl = document.getElementById('calcResults') 
+
+      function createElement() {
+        const newDiv = `
+            <p>
+              <label for="i11-span">Marginal cost: &nbsp;</label>
+              <span
+                data-id="i11"
+                step="any"
+                id="i11-span"
+                class="spans"
+              ></span>
+            </p>
+        `
+        return newDiv
+      }
+
+      function setResult(resultObj) {
+        for (key of Object.keys(resultObj)) {
+          let val = resultObj[key].result;
+          let id = resultObj[key].type;
+
+          if (isNaN(val)) {
+           alert("Your input resulted in NAN.\n 0/0 \n Try again with valid input.");
+            return;
+          }
+          if (Math.abs(val) === Infinity) {
+            alert("Your input resulted in Infinity. \nDivision by zero. \nTry again with valid input.");
+            return;
+          }
+          const span = document.getElementById(`${id}-span`);
+          span.textContent = `${parseFloat(val)}`;
+        }
+      }
+
+      function calculateResults() {
+          // Retrieve input values
+          const costChange = parseFloat(costChangeEl.value);
+          const quantChange = parseFloat(quantChangeEl.value);
+          const quantChangeSelect = parseFloat(quantChangeSelectEl.value);
+
+          if (isNaN(costChange)  || costChange < 0 || isNaN(quantChange) || quantChange <= 0
+          ) {
+            alert("Please Enter All Details.");
+            return;
+          }
+
+          try {
+            const resultElement = createElement()
+            calcResultsEl.innerHTML = resultElement 
+
+            const MC = costChange / (quantChange * quantChangeSelect)
+
+            const results = {
+              1: { result: Math.abs(MC) > 1 ? MC.toFixed(2) : MC.toPrecision(2), type: "i11" },
+            }
+            setResult(results)
+
+          } catch (error) {
+            alert("Something Went Wrong!!!");
+            resetResult()
+            return;
+          }
+      }
+
+      function resetForm() {
+        costChangeEl.value = ""
+        quantChangeEl.value = ""
+        quantChangeSelectEl.selectedIndex = "0"
+      }
+
+      function resetResult() {
+        calcResultsEl.innerHTML = "<p>Result will appear here...</p>";
+      } 
+
+      function resethandler() {
+        resetForm();
+        resetResult();
+      }
+
+      resetBtnEl.addEventListener("click", resethandler);
+      calcBtnEl.addEventListener("click", calculateResults);
+
+      quantChangeSelectEl.addEventListener("change", resetResult);
+
+      [costChangeEl, quantChangeEl].forEach((el) => {
+        el.addEventListener("input", resetResult);
+      });  
+    </script>
+</body>
+</html>

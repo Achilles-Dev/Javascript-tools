@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Maturity Value Calculator</title>
+</head>
+<body>
+    <h1>Maturity Value Calculator</h1>
+    <p>
+      Principal:
+      <input type="number" id="principal">
+    </p>
+    <p>
+      Interest rate:
+      <input type="number" id="intRate">%
+    </p>
+    <p>
+      Time of investment:
+      <input type="number" id="time">
+      <select id="timeSelect">
+        <option value="365.25">days (day)</option>
+        <option value="52.18">weeks (wks)</option>
+        <option value="12">months (mos)</option>
+        <option value="1" selected>years (yrs)</option>
+      </select>
+    </p>
+    
+
+    <button id="calcBtn">Calculate</button>
+    <button id="resetBtn">Reset</button>
+    <hr>
+    <div>
+      <h3>Result:</h3>
+      <h3 id="calcResults">Result will appear here...</h3>
+    </div>
+
+    <script>
+      // Get required elements from the HTML
+      const principalEl = document.getElementById("principal");
+      const intRateEl = document.getElementById("intRate");
+      const timeEl = document.getElementById("time");
+      const timeSelectEl = document.getElementById("timeSelect");
+
+      const calcBtnEl = document.getElementById('calcBtn');
+      const resetBtnEl = document.getElementById('resetBtn');
+      const calcResultsEl = document.getElementById('calcResults') 
+
+      function createElement() {
+        const newDiv = `
+            <p>
+              <label for="i11-span">Maturity value: &nbsp;</label>
+              <span
+                data-id="i11"
+                step="any"
+                id="i11-span"
+                class="spans"
+              ></span>
+            </p>
+        `
+        return newDiv
+      }
+
+      function setResult(resultObj) {
+        for (key of Object.keys(resultObj)) {
+          let val = resultObj[key].result;
+          let id = resultObj[key].type;
+
+          if (isNaN(val)) {
+           alert("Your input resulted in NAN.\n 0/0 \n Try again with valid input.");
+            return;
+          }
+          if (Math.abs(val) === Infinity) {
+            alert("Your input resulted in Infinity. \nDivision by zero. \nTry again with valid input.");
+            return;
+          }
+          const span = document.getElementById(`${id}-span`);
+          span.textContent = `${parseFloat(val)}`;
+        }
+      }
+
+      function calculateResults() {
+          // Retrieve input values
+          const principal = parseFloat(principalEl.value);
+          const intRate = parseFloat(intRateEl.value);
+          const timeSelect = parseFloat(timeSelectEl.value)
+          const time = parseFloat(timeEl.value);
+
+          if (isNaN(principal)  || principal < 0 || isNaN(intRate) || intRate < 0 ||
+            isNaN(time) || time < 0
+          ) {
+            alert("Please Enter All Details.");
+            return;
+          } 
+
+          try {
+            const resultElement = createElement()
+            calcResultsEl.innerHTML = resultElement 
+
+            const MV =  principal * ((1 + (intRate / 100)) ** (time / timeSelect))
+
+            const results = {
+              1: { result: Math.abs(MV) > 1 ? MV.toFixed(2) : MV.toPrecision(2), type: "i11" },
+            }
+            setResult(results)
+
+          } catch (error) {
+            alert("Something Went Wrong!!!");
+            resetResult()
+            return;
+          }
+      }
+
+      function resetForm() {
+        principalEl.value = ""
+        intRateEl.value = ""
+        timeEl.value = ""
+        timeSelectEl.selectedIndex = "3"
+      }
+
+      function resetResult() {
+        calcResultsEl.innerHTML = "<p>Result will appear here...</p>";
+      } 
+
+      function resethandler() {
+        resetForm();
+        resetResult();
+      }
+
+      resetBtnEl.addEventListener("click", resethandler);
+      calcBtnEl.addEventListener("click", calculateResults);
+
+      [principalEl, intRateEl, timeEl].forEach((el) => {
+        el.addEventListener("input", resetResult);
+      });  
+
+      timeSelectEl.addEventListener("change", resetResult)
+
+    </script>
+</body>
+</html>

@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Loan Analysis Calculator</title>
+</head>
+<body>
+    <h1>Loan Analysis Calculator</h1>
+    <p>
+      Calculate:
+      <select id="calculateSelect">
+        <option value="mon" selected>Monthly Payment</option>
+        <option value="amt">Loan Amount</option>
+        <option value="ter">Loan Term </option>
+        <option value="int">Annual Interest Rate </option>
+      </select>
+    </p>
+    <p id="amtInput" class="inputs">
+      Loan Amount:
+      <input type="number" id="loanAmt">
+    </p>
+    <p id="intInput" class="inputs">
+      Annual Interest Rate :
+      <input type="number" id="intRate" >% per year
+    </p>
+    <p id="terInput" class="inputs">
+      Loan Term:
+      <input type="number" id="termYear"> Years
+      <input type="number" id="termMonth"> Months
+    </p>
+    <p id="monInput" class="inputs" style="display: none;">
+      Monthly Payment:
+      <input type="number" id="payment">
+    </p>
+    
+
+    <button id="calcBtn">Calculate</button>
+    <button id="resetBtn">Reset</button>
+    <hr>
+    <div>
+      <h3>Result:</h3>
+      <h3 id="calcResults">Result will appear here...</h3>
+    </div>
+
+    <script>
+      // Get required elements from the HTML
+      const calculateSelectEl = document.getElementById("calculateSelect");
+      const loanAmtEl = document.getElementById("loanAmt");
+      const intRateEl = document.getElementById("intRate");
+      const termYearEl = document.getElementById("termYear");
+      const termMonthEl = document.getElementById("termMonth");
+      const paymentEl = document.getElementById("payment");
+      const inputsEl = document.querySelectorAll(".inputs")
+
+      const calcBtnEl = document.getElementById('calcBtn');
+      const resetBtnEl = document.getElementById('resetBtn');
+      const calcResultsEl = document.getElementById('calcResults') 
+
+      function handleCalculateSelectChange(e) {
+        const value = e.target.value
+
+        inputsEl.forEach((input) => {
+          const idVal = input.id.slice(0,3)
+          if (value === idVal) {
+            input.style.display = "none"
+          } else {
+            input.style.display = "block"
+          }
+        })
+
+        resetResult()
+      }
+
+      function createElement() {
+        const name = calculateSelectEl.options[calculateSelectEl.selectedIndex].textContent
+        const newDiv = `
+            <p>
+              <label for="i11-span">${name}: &nbsp;</label>
+              <span
+                data-id="i11"
+                step="any"
+                id="i11-span"
+                class="spans"
+              ></span>
+            </p>
+            <p>
+              <label for="i12-span">Total Payment: &nbsp;</label>
+              <span
+                data-id="i12"
+                step="any"
+                id="i12-span"
+                class="spans"
+              ></span>
+            </p>
+            <p>
+              <label for="i13-span">Total Interest: &nbsp;</label>
+              <span
+                data-id="i13"
+                step="any"
+                id="i13-span"
+                class="spans"
+              ></span>
+            </p>
+            <p>
+              <label for="i14-span">Annual Payment: &nbsp;</label>
+              <span
+                data-id="i14"
+                step="any"
+                id="i14-span"
+                class="spans"
+              ></span>
+            </p>
+        `
+        return newDiv
+      }
+
+      function setResult(resultObj) {
+        for (key of Object.keys(resultObj)) {
+          let val = resultObj[key].result;
+          let id = resultObj[key].type;
+
+          if (isNaN(val)) {
+           alert("Your input resulted in NAN.\n 0/0 \n Try again with valid input.");
+            return;
+          }
+          if (Math.abs(val) === Infinity) {
+            alert("Your input resulted in Infinity. \nDivision by zero. \nTry again with valid input.");
+            return;
+          }
+          const span = document.getElementById(`${id}-span`);
+          val = parseFloat(val)
+          span.textContent = calculateSelectEl.value === "ter" ? `${val} months` : val;
+        }
+      }
+
+      function calculateInterestRate(P, M, n) {
+        let low = 0;              // Minimum possible interest rate
+        let high = 1;             // Maximum possible interest rate (100% annually)
+        let epsilon = 0.000001;   // Precision for convergence
+
+        while (high - low > epsilon) {
+          let mid = (low + high) / 2; // Midpoint (monthly interest rate)
+          let calculatedPayment = (P * mid * Math.pow(1 + mid, n)) / (Math.pow(1 + mid, n) - 1);
+
+          if (calculatedPayment > M) {
+            high = mid; // Too high, so reduce upper bound
+          } else {
+            low = mid; // Too low, so increase lower bound
+          }
+        }
+
+        let monthlyRate = (low + high) / 2;
+        let annualRate = monthlyRate * 12; 
+        return annualRate * 100;          
+      }
+
+      function calculateResults() {
+          // Retrieve input values
+          const loanAmt = parseFloat(loanAmtEl.value);
+          const termYear = termYearEl.value !== "" ? parseFloat(termYearEl.value) : 0;
+          const termMonth = termMonthEl.value !== "" ? parseFloat(termMonthEl.value) : 0;
+          const intRate = intRateEl.value;
+          const payment = paymentEl.value;
+          const calculateSelect = calculateSelectEl.value
+          const totalTerm = (termYear * 12) + termMonth
+
+          if ((loanAmtEl.checkVisibility() === true && (isNaN(loanAmt)  || loanAmt < 0)) || 
+            (intRateEl.checkVisibility() === true && (isNaN(intRate)  || intRate < 0)) ||
+            (termYearEl.checkVisibility() === true && ((isNaN(termYear) || termYear < 0) && (isNaN(termMonth) || termMonth < 0))) || 
+            (paymentEl.checkVisibility() === true && (isNaN(payment) || payment < 0))
+          ) {
+            alert("Please Enter All Details.");
+            return;
+          }
+
+          try {
+            const resultElement = createElement()
+            calcResultsEl.innerHTML = resultElement 
+
+            let result = 0
+            let totalPmt = 0
+            let totalInt = 0
+            let annualPmt = 0
+            if (calculateSelect === "mon") {
+              result = (loanAmt * ((intRate / 100) / 12) * ((1 + ((intRate / 100) / 12)) ** (totalTerm))) / 
+                      (((1 + ((intRate / 100) / 12)) ** (totalTerm)) - 1)
+              totalPmt = result * totalTerm
+              totalInt = totalPmt - loanAmt
+              annualPmt = result * 12
+            } else if (calculateSelect === "amt") {
+              result = (payment * (((1 + ((intRate / 100) / 12)) ** (totalTerm)) - 1)) / 
+                      ((intRate / 100) / 12) * ((1 + ((intRate / 100) / 12)) ** (totalTerm))
+              totalPmt = payment * totalTerm
+              totalInt = totalPmt - result
+              annualPmt = payment * 12
+            } else if (calculateSelect === "ter") {
+              result = Math.log((payment / (payment - (loanAmt * ((intRate / 100) / 12))))) / 
+                      Math.log((1 + ((intRate / 100) / 12)))
+                  totalPmt = payment * result
+                  totalInt = totalPmt - loanAmt
+                  annualPmt = payment * 12
+            } else {
+              result = calculateInterestRate(loanAmt, payment, totalTerm)
+              totalPmt = payment * totalTerm
+              totalInt = totalPmt - loanAmt
+              annualPmt = payment * 12
+            }
+
+ 
+            const results = {
+              1: { result: Math.abs(result) > 1 ? result.toFixed(3) : result.toPrecision(3), type: "i11" },
+              2: { result: Math.abs(totalPmt) > 1 ? totalPmt.toFixed(2) : totalPmt.toPrecision(2), type: "i12" },
+              3: { result: Math.abs(totalInt) > 1 ? totalInt.toFixed(2) : totalInt.toPrecision(2), type: "i13" },
+              4: { result: Math.abs(annualPmt) > 1 ? annualPmt.toFixed(2) : annualPmt.toPrecision(2), type: "i14" },
+            }
+            setResult(results)
+
+          } catch (error) {
+            alert("Something Went Wrong!!!");
+            resetResult()
+            return;
+          }
+      }
+
+      function resetForm() {
+        loanAmtEl.value = ""
+        intRateEl.value = ""
+        termYearEl.value = ""
+        termMonthEl.value = ""
+        paymentEl.value = ""
+
+        calculateSelectEl.selectedindex = "0"
+
+        inputsEl.forEach((input) => {
+          const idVal = input.id.slice(0,3)
+          if (idVal === "mon") {
+            input.style.display = "none"
+          } else {
+            input.style.display = "block"
+          }
+        })
+      }
+
+      function resetResult() {
+        calcResultsEl.innerHTML = "<p>Result will appear here...</p>";
+      } 
+
+      function resethandler() {
+        resetForm();
+        resetResult();
+      }
+
+      resetBtnEl.addEventListener("click", resethandler);
+      calcBtnEl.addEventListener("click", calculateResults);
+
+      calculateSelectEl.addEventListener("change", handleCalculateSelectChange);
+
+      [loanAmtEl, intRateEl, termYearEl, termMonthEl, paymentEl].forEach((el) => {
+        el.addEventListener("input", resetResult);
+      });  
+    </script>
+</body>
+</html>

@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>GRP Calculator</title>
+  <title>Fisher Equation Calculator</title>
 </head>
 <body>
-    <h1>GRP Calculator</h1>
+    <h1>Fisher Equation Calculator</h1>
     <p>
       I wish to calculate:
       <select id="calculateSelect">
@@ -166,7 +166,7 @@
       resetBtnEl.addEventListener("click", resethandler);
       calcBtnEl.addEventListener("click", calculateResults);
 
-      calculateSelectEl.addEventListener("change", handleCalculateSelectChange)
+      calculateSelectEl.addEventListener("change", handleCalculateSelectChange);
 
       [realIntRateEl, nomIntRateEl, infRateEl].forEach((el) => {
         el.addEventListener("input", resetResult);

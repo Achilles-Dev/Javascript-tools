@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Marginal Revenue Calculator</title>
+</head>
+<body>
+    <h1>Marginal Revenue Calculator</h1>
+    <p>
+      Initial revenue:
+      <input type="number" id="initRevenue">
+    </p>
+    <p>
+      Final revenue: 
+      <input type="number" id="finalRevenue">
+    </p>
+    <p>
+      Initial quantity:
+      <input type="number" id="initQuantity" >
+    </p>
+    <p>
+      Final quantity:
+      <input type="number" id="finalQuantity">
+    </p>
+
+
+    <button id="calcBtn">Calculate</button>
+    <button id="resetBtn">Reset</button>
+    <hr>
+    <div>
+      <h3>Result:</h3>
+      <h3 id="calcResults">Result will appear here...</h3>
+    </div>
+
+    <script>
+      // Get required elements from the HTML
+      const initRevenueEl = document.getElementById("initRevenue");
+      const finalRevenueEl = document.getElementById("finalRevenue");
+      const initQuantityEl = document.getElementById("initQuantity");
+      const finalQuantityEl = document.getElementById("finalQuantity");
+
+      const calcBtnEl = document.getElementById('calcBtn');
+      const resetBtnEl = document.getElementById('resetBtn');
+      const calcResultsEl = document.getElementById('calcResults') 
+
+      function createElement() {
+        const newDiv = `
+            <p>
+              <label for="i11-span">Change in total revenue: &nbsp;</label>
+              <span
+                data-id="i11"
+                step="any"
+                id="i11-span"
+                class="spans"
+              ></span>
+            </p>
+            <p>
+              <label for="i12-span">Change in quantity: &nbsp;</label>
+              <span
+                data-id="i12"
+                step="any"
+                id="i12-span"
+                class="spans"
+              ></span>
+            </p>
+            <p>
+              <label for="i13-span">Marginal revenue: &nbsp;</label>
+              <span
+                data-id="i13"
+                step="any"
+                id="i13-span"
+                class="spans"
+              ></span>
+            </p>
+        `
+        return newDiv
+      }
+
+      function setResult(resultObj) {
+        for (key of Object.keys(resultObj)) {
+          let val = resultObj[key].result;
+          let id = resultObj[key].type;
+
+          if (isNaN(val)) {
+           alert("Your input resulted in NAN.\n 0/0 \n Try again with valid input.");
+            return;
+          }
+          if (Math.abs(val) === Infinity) {
+            alert("Your input resulted in Infinity. \nDivision by zero. \nTry again with valid input.");
+            return;
+          }
+          const span = document.getElementById(`${id}-span`);
+          span.textContent = `${parseFloat(val)}`;
+        }
+      }
+
+      function calculateResults() {
+          // Retrieve input values
+          const initRevenue = parseFloat(initRevenueEl.value);
+          const finalRevenue = parseFloat(finalRevenueEl.value);
+          const initQuantity = parseFloat(initQuantityEl.value);
+          const finalQuantity = parseFloat(finalQuantityEl.value);
+
+          if (isNaN(initRevenue) || initRevenue < 0 || isNaN(finalRevenue) || finalRevenue < 0 || isNaN(initQuantity) || initQuantity <= 0 ||
+            isNaN(finalQuantity) || finalQuantity <= 0
+          ) {
+            alert("Please Enter All Details.");
+            return;
+          } else if (initQuantity === finalQuantity) {
+            alert("Change in quantity cannot be zero.");
+            return;
+          }
+
+          try {
+            const resultElement = createElement()
+            calcResultsEl.innerHTML = resultElement 
+
+            const RC = finalRevenue - initRevenue
+            const QC = finalQuantity - initQuantity
+            const MR = RC / QC
+
+            const results = {
+              1: { result: Math.abs(RC) > 1 ? RC.toFixed(2) : RC.toPrecision(2), type: "i11" },
+              2: { result: Math.abs(QC) > 1 ? QC.toFixed(2) : QC.toPrecision(2), type: "i12" },
+              3: { result: Math.abs(MR) > 1 ? MR.toFixed(2) : MR.toPrecision(2), type: "i13" },
+            }
+            setResult(results)
+
+          } catch (error) {
+            alert("Something Went Wrong!!!");
+            resetResult()
+            return;
+          }
+      }
+
+      function resetForm() {
+        initRevenueEl.value = ""
+        finalRevenueEl.value = ""
+        initQuantityEl.value = ""
+        finalQuantityEl.value = ""
+      }
+
+      function resetResult() {
+        calcResultsEl.innerHTML = "<p>Result will appear here...</p>";
+      } 
+
+      function resethandler() {
+        resetForm();
+        resetResult();
+      }
+
+      resetBtnEl.addEventListener("click", resethandler);
+      calcBtnEl.addEventListener("click", calculateResults);
+      [initRevenueEl, finalRevenueEl, initQuantityEl, finalQuantityEl].forEach((el) => {
+        el.addEventListener("input", resetResult);
+      });  
+
+    </script>
+</body>
+</html>
