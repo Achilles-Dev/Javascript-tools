@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Yield to Call Calculator</title>
+</head>
+<body>
+    <h1>Yield to Call Calculator</h1>
+    <p>
+      Annual interest:
+      <input type="number" id="annInterest">
+    </p>
+    <p>
+      Call price: 
+      <input type="number" id="callPrice">
+    </p>
+    <p>
+      Market price:
+      <input type="number" id="marktPrice">
+    </p>
+    <p>
+      Number of years until call:
+      <input type="number" id="yearsCall">
+      <select id="periodSelect">
+        <option value="12">months (mos)</option>
+        <option value="1" selected>years (yrs)</option>
+      </select>
+    </p>
+
+
+    <button id="calcBtn">Calculate</button>
+    <button id="resetBtn">Reset</button>
+    <hr>
+    <div>
+      <h3>Result:</h3>
+      <h3 id="calcResults">Result will appear here...</h3>
+    </div>
+
+    <script>
+      // Get required elements from the HTML
+      const annInterestEl = document.getElementById("annInterest");
+      const callPriceEl = document.getElementById("callPrice");
+      const marktPriceEl = document.getElementById("marktPrice");
+      const yearsCallEl = document.getElementById("yearsCall");
+      const periodSelectEl = document.getElementById("periodSelect");
+
+      const calcBtnEl = document.getElementById('calcBtn');
+      const resetBtnEl = document.getElementById('resetBtn');
+      const calcResultsEl = document.getElementById('calcResults') 
+
+      function createElement() {
+        const newDiv = `
+            <p>
+              <label for="i11-span">Yield to call: &nbsp;</label>
+              <span
+                data-id="i11"
+                step="any"
+                id="i11-span"
+                class="spans"
+              ></span>%
+            </p>
+        `
+        return newDiv
+      }
+
+      function setResult(resultObj) {
+        for (key of Object.keys(resultObj)) {
+          let val = resultObj[key].result;
+          let id = resultObj[key].type;
+
+          if (isNaN(val)) {
+           alert("Your input resulted in NAN.\n 0/0 \n Try again with valid input.");
+            return;
+          }
+          if (Math.abs(val) === Infinity) {
+            alert("Your input resulted in Infinity. \nDivision by zero. \nTry again with valid input.");
+            return;
+          }
+          const span = document.getElementById(`${id}-span`);
+          span.textContent = `${parseFloat(val)}`;
+        }
+      }
+
+      function calculateResults() {
+          // Retrieve input values
+          const annInterest = parseFloat(annInterestEl.value);
+          const callPrice = parseFloat(callPriceEl.value);
+          const marktPrice = parseFloat(marktPriceEl.value);
+          const yearsCall = parseFloat(yearsCallEl.value);
+          const periodSelect = parseFloat(periodSelectEl.value);
+
+          if (isNaN(annInterest) || annInterest < 0 || isNaN(callPrice) || callPrice <= 0 || isNaN(marktPrice) || marktPrice <= 0 ||
+            isNaN(yearsCall) || yearsCall < 1
+          ) {
+            alert("Please Enter All Details.");
+            return;
+          }
+
+          try {
+            const resultElement = createElement()
+            calcResultsEl.innerHTML = resultElement 
+
+            const ytc = ((( annInterest + ((callPrice - marktPrice) / (yearsCall / periodSelect)))) / 
+                      ((callPrice + marktPrice) / 2)) * 100
+
+            const results = {
+              1: { result: Math.abs(ytc) > 1 ? ytc.toFixed(2) : ytc.toPrecision(2), type: "i11" },
+            }
+            setResult(results)
+
+          } catch (error) {
+            alert("Something Went Wrong!!!");
+            resetResult()
+            return;
+          }
+      }
+
+      function resetForm() {
+        annInterestEl.value = ""
+        callPriceEl.value = ""
+        marktPriceEl.value = ""
+        yearsCallEl.value = ""
+        periodSelectEl.selectedIndex = "1"
+      }
+
+      function resetResult() {
+        calcResultsEl.innerHTML = "<p>Result will appear here...</p>";
+      } 
+
+      function resethandler() {
+        resetForm();
+        resetResult();
+      }
+
+      resetBtnEl.addEventListener("click", resethandler);
+      calcBtnEl.addEventListener("click", calculateResults);
+      [annInterestEl, callPriceEl, marktPriceEl, yearsCallEl].forEach((el) => {
+        el.addEventListener("input", resetResult);
+      });  
+
+      periodSelectEl.addEventListener("change", resetResult)
+
+    </script>
+</body>
+</html>
