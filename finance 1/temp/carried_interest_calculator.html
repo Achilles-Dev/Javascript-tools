@@ -88,7 +88,7 @@
         `
         const newDiv2 = `
             <p>
-              <label for="i14-span">The total GP carry distribution is: &nbsp;</label>
+              <label for="i14-span">The GP catch-up is: &nbsp;</label>
               <span
                 data-id="i14"
                 step="any"
@@ -98,7 +98,7 @@
             </p>
          `
         if (catchUpSelectEl.value === "yes") {
-          return newDiv2 + newDiv
+          return newDiv + newDiv2
         }
 
         return newDiv
@@ -149,7 +149,7 @@
             const resultElement = createElement()
             calcResultsEl.innerHTML = resultElement 
 
-            const carryD = (finFundVal - iniFundVal) * ((1 + (hurdleRate / 100)) ** holdPeriod) * (carriedInterest / 100)
+            const carryD = (finFundVal - (iniFundVal * ((1 + (hurdleRate / 100)) ** holdPeriod))) * (carriedInterest / 100)
             
             const results = {
               1: { result: Math.abs(fundReturn) > 1 ? fundReturn.toFixed(2) : fundReturn.toPrecision(2), type: "i11" },
@@ -192,7 +192,7 @@
       [iniFundValEl, finFundValEl, holdPeriodEl, hurdleRateEl, carriedInterestEl].forEach((el) => {
         el.addEventListener("input", resetResult);
       });  
-      catchUpSelectEl.addEventListener("change", resetResult)
+      catchUpSelectEl.addEventListener("change", resetResult);
       
       resetBtnEl.addEventListener("click", resethandler);
       calcBtnEl.addEventListener("click", calculateResults);

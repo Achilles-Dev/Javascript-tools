@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Simple Savings Calculator</title>
+</head>
+<body>
+    <h1>Simple Savings Calculator</h1>
+    <p>
+      Initial deposit:
+      <input type="number" id="iniDeposit" value="1000">
+    </p>
+    <p>
+      Over a period of...: 
+      <input type="number" id="period" value="10">
+      <select id="periodSelect">
+        <option value="365.25">days (days)</option>
+        <option value="52.18">weeks (wks)</option>
+        <option value="12">months (mos)</option>
+        <option value="1" selected>years (yrs)</option>
+      </select>
+    </p>
+    <p>
+      Interest rate:
+      <input type="number" id="intRate" value="10">%
+    </p>
+    <p>
+      Deposit:
+      <input type="number" id="deposit" value="100">
+    </p>
+    <p>
+      Coupon frequency:
+      <select
+        class="selects"
+        id="freqSelect"
+      >
+        <option value="1">Yearly</option>
+        <option value="2">Semi-annually</option>
+        <option value="4">Quarterly</option>
+        <option value="12" selected>Monthly</option>
+        <option value="52">Weekly</option>
+        <option value="365">Daily</option>
+      </select>
+    </p>  
+
+
+    <button id="calcBtn">Calculate</button>
+    <button id="resetBtn">Reset</button>
+    <hr>
+    <div>
+      <h3>Result:</h3>
+      <h3 id="calcResults">Result will appear here...</h3>
+    </div>
+
+    <script>
+      // Get required elements from the HTML
+      const iniDepositEl = document.getElementById("iniDeposit");
+      const periodEl = document.getElementById("period");
+      const periodSelectEl = document.getElementById("periodSelect");
+      const intRateEl = document.getElementById("intRate");
+      const depositEl = document.getElementById("deposit");
+      const freqSelectEl = document.getElementById("freqSelect");
+
+      const calcBtnEl = document.getElementById('calcBtn');
+      const resetBtnEl = document.getElementById('resetBtn');
+      const calcResultsEl = document.getElementById('calcResults') 
+
+      function createElement() {
+        const newDiv = `
+            <p>
+              <label for="i11-span">Initial deposit: &nbsp;</label>
+              $<span
+                data-id="i11"
+                step="any"
+                id="i11-span"
+                class="spans"
+              ></span>
+            </p>
+            <p>
+              <label for="i12-span">Contributions: &nbsp;</label>
+              $<span
+                data-id="i12"
+                step="any"
+                id="i12-span"
+                class="spans"
+              ></span>
+            </p>
+            <p>
+              <label for="i13-span">Interest earned	: &nbsp;</label>
+              $<span
+                data-id="i13"
+                step="any"
+                id="i13-span"
+                class="spans"
+              ></span>
+            </p>
+            <p>
+              <label for="i14-span">Final savings: &nbsp;</label>
+              $<span
+                data-id="i14"
+                step="any"
+                id="i14-span"
+                class="spans"
+              ></span>
+            </p>
+        `
+        return newDiv
+      }
+
+      function setResult(resultObj) {
+        for (key of Object.keys(resultObj)) {
+          let val = resultObj[key].result;
+          let id = resultObj[key].type;
+
+          if (isNaN(val)) {
+           alert("Your input resulted in NAN.\n 0/0 \n Try again with valid input.");
+            return;
+          }
+          if (Math.abs(val) === Infinity) {
+            alert("Your input resulted in Infinity. \nDivision by zero. \nTry again with valid input.");
+            return;
+          }
+          const span = document.getElementById(`${id}-span`);
+          span.textContent = `${parseFloat(val)}`;
+        }
+      }
+
+      function calculateResults() {
+          // Retrieve input values
+          const iniDeposit = parseFloat(iniDepositEl.value);
+          const period = parseFloat(periodEl.value);
+          const intRate = parseFloat(intRateEl.value);
+          const deposit = parseFloat(depositEl.value);
+          const freqSelect = parseFloat(freqSelectEl.value)
+          const periodSelect = parseFloat(periodSelectEl.value)
+
+          if (isNaN(iniDeposit) || iniDeposit < 0 || isNaN(period) || period < 0 || isNaN(intRate) || intRate < 0 ||
+            isNaN(deposit) || deposit < 1
+          ) {
+            alert("Please Enter All Details.");
+            return;
+          } else if (intRate > 99) {
+            alert("Ensure this value is less than or equal to 99");
+            return;
+          }
+
+          try {
+            const resultElement = createElement()
+            calcResultsEl.innerHTML = resultElement 
+
+            const contributions = (deposit * freqSelect * (period / periodSelect))
+            const finalSavings = (iniDeposit * ((1 + (((intRate / freqSelect) / 100))) ** ((period / periodSelect) * freqSelect))) + 
+                (deposit * (((((1 + ((intRate / freqSelect) / 100)) ** ((period / periodSelect) * freqSelect))) - 1) / ((intRate / freqSelect) / 100)) *
+                (1 + (((intRate / freqSelect) / 100))))
+            const intEarned = finalSavings - contributions - iniDeposit
+
+            const results = {
+              1: { result: Math.abs(iniDeposit) > 1 ? iniDeposit.toFixed(2) : iniDeposit.toPrecision(2), type: "i11" },
+              2: { result: Math.abs(contributions) > 1 ? contributions.toFixed(2) : contributions.toPrecision(2), type: "i12" },
+              3: { result: Math.abs(intEarned) > 1 ? intEarned.toFixed(2) : intEarned.toPrecision(2), type: "i13" },
+              4: { result: Math.abs(finalSavings) > 1 ? finalSavings.toFixed(2) : finalSavings.toPrecision(2), type: "i14" },
+            }
+            setResult(results)
+
+          } catch (error) {
+            alert("Something Went Wrong!!!");
+            resetResult()
+            return;
+          }
+      }
+
+      function resetForm() {
+        iniDepositEl.value = "1000"
+        periodEl.value = "10"
+        intRateEl.value = "10"
+        depositEl.value = "100"
+        freqSelectEl.selectedIndex = "0"
+        periodSelectEl.selectedIndex = "3"
+      }
+
+      function resetResult() {
+        calcResultsEl.innerHTML = "<p>Result will appear here...</p>";
+      } 
+
+      function resethandler() {
+        resetForm();
+        resetResult();
+      }
+
+      resetBtnEl.addEventListener("click", resethandler);
+      calcBtnEl.addEventListener("click", calculateResults);
+      [iniDepositEl, periodEl, intRateEl, depositEl].forEach((el) => {
+        el.addEventListener("input", resetResult);
+      });  
+      [freqSelectEl, periodSelectEl].forEach((el) => {
+        el.addEventListener("change", resetResult);
+      });
+
+    </script>
+</body>
+</html>

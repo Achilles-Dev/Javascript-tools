@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Money Multiplier Calculator</title>
+</head>
+<body>
+    <h1>Money Multiplier Calculator</h1>
+    <p>
+      Checkable Deposit:
+      <input type="number" id="checkDeposit">
+      <select id="checkDepositSelect">
+        <option value="1">millions (million)</option>
+        <option value="1000">billions (billion)</option>
+        <option value="1000000">trillions (trillion)</option>
+      </select>
+    </p>
+    <p>
+      Reserve ratio:
+      <input type="number" id="reserveRatio">%
+    </p>
+    <p>
+      Currency in circulation:
+      <input type="number" id="circCurrency">
+      <select id="circCurrencySelect">
+        <option value="1">millions (million)</option>
+        <option value="1000">billions (billion)</option>
+        <option value="1000000">trillions (trillion)</option>
+      </select>
+    </p>
+    
+
+    <button id="calcBtn">Calculate</button>
+    <button id="resetBtn">Reset</button>
+    <hr>
+    <div>
+      <h3>Result:</h3>
+      <h3 id="calcResults">Result will appear here...</h3>
+    </div>
+
+    <script>
+      // Get required elements from the HTML
+      const checkDepositEl = document.getElementById("checkDeposit");
+      const reserveRatioEl = document.getElementById("reserveRatio");
+      const circCurrencyEl = document.getElementById("circCurrency");
+      const checkDepositSelectEl = document.getElementById("checkDepositSelect");
+      const circCurrencySelectEl = document.getElementById("circCurrencySelect");
+
+      const calcBtnEl = document.getElementById('calcBtn');
+      const resetBtnEl = document.getElementById('resetBtn');
+      const calcResultsEl = document.getElementById('calcResults') 
+
+      function createElement() {
+        const newDiv = `
+            <p>
+              <label for="i11-span">Bank reserves: &nbsp;</label>
+              <span
+                data-id="i11"
+                step="any"
+                id="i11-span"
+                class="spans"
+              ></span>
+            </p>
+            <p>
+              <label for="i12-span">Monetary base: &nbsp;</label>
+              <span
+                data-id="i12"
+                step="any"
+                id="i12-span"
+                class="spans"
+              ></span> million
+            </p>
+            <p>
+              <label for="i13-span">Money supply: &nbsp;</label>
+              <span
+                data-id="i13"
+                step="any"
+                id="i13-span"
+                class="spans"
+              ></span> million
+            </p>
+            <p>
+              <label for="i14-span">Money multiplier: &nbsp;</label>
+              <span
+                data-id="i14"
+                step="any"
+                id="i14-span"
+                class="spans"
+              ></span>
+            </p>
+        `
+        return newDiv
+      }
+
+      function setResult(resultObj) {
+        for (key of Object.keys(resultObj)) {
+          let val = resultObj[key].result;
+          let id = resultObj[key].type;
+
+          if (isNaN(val)) {
+           alert("Your input resulted in NAN.\n 0/0 \n Try again with valid input.");
+            return;
+          }
+          if (Math.abs(val) === Infinity) {
+            alert("Your input resulted in Infinity. \nDivision by zero. \nTry again with valid input.");
+            return;
+          }
+          const span = document.getElementById(`${id}-span`);
+          span.textContent = `${parseFloat(val)}`;
+        }
+      }
+
+      function calculateResults() {
+          // Retrieve input values
+          const checkDepositSelect = parseFloat(checkDepositSelectEl.value);
+          const circCurrencySelect = parseFloat(circCurrencySelectEl.value);
+          const checkDeposit = parseFloat(checkDepositEl.value) * checkDepositSelect;
+          const reserveRatio = parseFloat(reserveRatioEl.value);
+          const circCurrency = parseFloat(circCurrencyEl.value) * circCurrencySelect;
+          
+
+          if (isNaN(checkDeposit)  || checkDeposit < 0 || isNaN(reserveRatio) || reserveRatio < 0 ||
+            isNaN(circCurrency) || circCurrency < 0
+          ) {
+            alert("Please Enter All Details.");
+            return;
+          }
+
+          try {
+            const resultElement = createElement()
+            calcResultsEl.innerHTML = resultElement 
+
+            const BR = (checkDeposit * reserveRatio) / 100
+            const MB = BR + circCurrency
+            const MS = circCurrency + checkDeposit
+            const MM = MS / MB
+
+            const results = {
+              1: { result: Math.abs(BR) > 1 ? BR.toFixed(2) : BR.toPrecision(2), type: "i11" },
+              2: { result: Math.abs(MB) > 1 ? MB.toFixed(2) : MB.toPrecision(2), type: "i12" },
+              3: { result: Math.abs(MS) > 1 ? MS.toFixed(2) : MS.toPrecision(2), type: "i13" },
+              4: { result: Math.abs(MM) > 1 ? MM.toFixed(4) : MM.toPrecision(4), type: "i14" },
+            }
+            setResult(results)
+
+          } catch (error) {
+            alert("Something Went Wrong!!!");
+            resetResult()
+            return;
+          }
+      }
+
+      function resetForm() {
+        checkDepositEl.value = ""
+        reserveRatioEl.value = ""
+        circCurrencyEl.value = ""
+        checkDepositSelectEl.selectedIndex = "0"
+        circCurrencySelectEl.selectedIndex = "0"
+      }
+
+      function resetResult() {
+        calcResultsEl.innerHTML = "<p>Result will appear here...</p>";
+      } 
+
+      function resethandler() {
+        resetForm();
+        resetResult();
+      }
+
+      resetBtnEl.addEventListener("click", resethandler);
+      calcBtnEl.addEventListener("click", calculateResults);
+
+      [checkDepositEl, reserveRatioEl, circCurrencyEl].forEach((el) => {
+        el.addEventListener("input", resetResult);
+      }); 
+      
+      [checkDepositSelectEl, circCurrencySelectEl].forEach((el) => {
+        el.addEventListener("change", resetResult);
+      }); 
+    </script>
+</body>
+</html>

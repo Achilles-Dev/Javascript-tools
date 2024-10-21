@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Margin of Safety Calculator</title>
+</head>
+<body>
+    <h1>Margin of Safety Calculator</h1>
+    <p>
+      Current (estimated) sales:
+      <input type="number" id="currSales">
+    </p>
+    <p>
+      Breakeven sales:
+      <input type="number" id="breakSales">
+    </p>
+    <p>
+      Sales volume:
+      <input type="number" id="salesVol">
+    </p>
+    
+
+    <button id="calcBtn">Calculate</button>
+    <button id="resetBtn">Reset</button>
+    <hr>
+    <div>
+      <h3>Result:</h3>
+      <h3 id="calcResults">Result will appear here...</h3>
+    </div>
+
+    <script>
+      // Get required elements from the HTML
+      const currSalesEl = document.getElementById("currSales");
+      const breakSalesEl = document.getElementById("breakSales");
+      const salesVolEl = document.getElementById("salesVol");
+
+      const calcBtnEl = document.getElementById('calcBtn');
+      const resetBtnEl = document.getElementById('resetBtn');
+      const calcResultsEl = document.getElementById('calcResults') 
+
+      function createElement() {
+        const newDiv = `
+            <p>
+              <label for="i11-span">Selling price per unit: &nbsp;</label>
+              <span
+                data-id="i11"
+                step="any"
+                id="i11-span"
+                class="spans"
+              ></span>
+            </p>
+            <p>
+              <label for="i12-span">Cost price per unit: &nbsp;</label>
+              <span
+                data-id="i12"
+                step="any"
+                id="i12-span"
+                class="spans"
+              ></span>
+            </p>
+            <p>
+              <label for="i13-span">Margin of safety: &nbsp;</label>
+              <span
+                data-id="i13"
+                step="any"
+                id="i13-span"
+                class="spans"
+              ></span>
+            </p>
+            <p>
+              <label for="i14-span">Margin of safety ratio: &nbsp;</label>
+              <span
+                data-id="i14"
+                step="any"
+                id="i14-span"
+                class="spans"
+              ></span>
+            </p>
+            <p>
+              <label for="i15-span">Margin of safety percentage: &nbsp;</label>
+              <span
+                data-id="i15"
+                step="any"
+                id="i15-span"
+                class="spans"
+              ></span>%
+            </p>
+            <p>
+              <label for="i16-span">Margin of safety (units): &nbsp;</label>
+              <span
+                data-id="i16"
+                step="any"
+                id="i16-span"
+                class="spans"
+              ></span>
+            </p>
+        `
+        return newDiv
+      }
+
+      function setResult(resultObj) {
+        for (key of Object.keys(resultObj)) {
+          let val = resultObj[key].result;
+          let id = resultObj[key].type;
+
+          if (isNaN(val)) {
+           alert("Your input resulted in NAN.\n 0/0 \n Try again with valid input.");
+            return;
+          }
+          if (Math.abs(val) === Infinity) {
+            alert("Your input resulted in Infinity. \nDivision by zero. \nTry again with valid input.");
+            return;
+          }
+          const span = document.getElementById(`${id}-span`);
+          span.textContent = `${parseFloat(val)}`;
+        }
+      }
+
+      function calculateResults() {
+          // Retrieve input values
+          const currSales = parseFloat(currSalesEl.value);
+          const breakSales = parseFloat(breakSalesEl.value);
+          const salesVol = parseFloat(salesVolEl.value);
+
+          if (isNaN(currSales)  || currSales < 1 || isNaN(breakSales) || breakSales < 1 ||
+            isNaN(salesVol) || salesVol < 1
+          ) {
+            alert("Please Enter All Details.");
+            return;
+          }
+
+          try {
+            const resultElement = createElement()
+            calcResultsEl.innerHTML = resultElement 
+
+            const SP = currSales / salesVol
+            const CP = breakSales / salesVol
+            const MOS = currSales - breakSales
+            const MOSRatio = MOS / currSales
+            const MOSUnit = MOS / salesVol
+
+            const results = {
+              1: { result: Math.abs(SP) > 1 ? SP.toFixed(2) : SP.toPrecision(2), type: "i11" },
+              2: { result: Math.abs(CP) > 1 ? CP.toFixed(2) : CP.toPrecision(2), type: "i12" },
+              3: { result: Math.abs(MOS) > 1 ? MOS.toFixed(2) : MOS.toPrecision(2), type: "i13" },
+              4: { result: Math.abs(MOSRatio) > 1 ? MOSRatio.toFixed(2) : MOSRatio.toPrecision(2), type: "i14" },
+              5: { result: Math.abs(MOSRatio * 100) > 1 ? (MOSRatio * 100).toFixed(2) : (MOSRatio * 100).toPrecision(2), type: "i15" },
+              6: { result: Math.abs(MOSUnit) > 1 ? MOSUnit.toFixed(2) : MOSUnit.toPrecision(2), type: "i16" },
+            }
+            setResult(results)
+
+          } catch (error) {
+            alert("Something Went Wrong!!!");
+            resetResult()
+            return;
+          }
+      }
+
+      function resetForm() {
+        currSalesEl.value = "10"
+        breakSalesEl.value = "1"
+        salesVolEl.value = "2"
+      }
+
+      function resetResult() {
+        calcResultsEl.innerHTML = "<p>Result will appear here...</p>";
+      } 
+
+      function resethandler() {
+        resetForm();
+        resetResult();
+      }
+
+      resetBtnEl.addEventListener("click", resethandler);
+      calcBtnEl.addEventListener("click", calculateResults);
+
+      [currSalesEl, breakSalesEl, salesVolEl].forEach((el) => {
+        el.addEventListener("input", resetResult);
+      });  
+    </script>
+</body>
+</html>

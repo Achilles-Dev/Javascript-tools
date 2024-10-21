@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Student Loan Payoff Calculator</title>
+</head>
+<body>
+    <h1>Student Loan Payoff Calculator</h1>
+    <h3>Calculate a student loan payoff date and see how much faster you can pay it off by changing your monthly payment.</h3>
+    <p>
+      Loan Balance:
+      <input type="number" id="loanBalance" value="40000">
+    </p>
+    <p>
+      Monthly Payment:
+      <input type="number" id="payment" value="650">
+    </p>
+    <p>
+      Interest Rate:
+      <input type="number" id="intRate" value="6.25">%
+    </p>
+    
+
+    <button id="calcBtn">Calculate</button>
+    <button id="resetBtn">Reset</button>
+    <hr>
+    <div>
+      <h3>Result:</h3>
+      <h3 id="calcResults">Result will appear here...</h3>
+    </div>
+
+    <script>
+      // Get required elements from the HTML
+      const loanBalanceEl = document.getElementById("loanBalance");
+      const paymentEl = document.getElementById("payment");
+      const intRateEl = document.getElementById("intRate");
+
+      const calcBtnEl = document.getElementById('calcBtn');
+      const resetBtnEl = document.getElementById('resetBtn');
+      const calcResultsEl = document.getElementById('calcResults') 
+
+      function createElement() {
+        const newDiv = `
+            <p>Student Loan Payoff Summary:</p>
+            <p>
+              <label for="i11-span">Estimated Payoff Date: &nbsp;</label>
+              <span
+                data-id="i11"
+                step="any"
+                id="i11-span"
+                class="spans"
+              ></span>
+            </p>
+            <p>
+              <label for="i12-span">Time to Pay Off: &nbsp;</label>
+              <span
+                data-id="i12"
+                step="any"
+                id="i12-span"
+                class="spans"
+              ></span>
+            </p>
+            <p>
+              <label for="i13-span">Total Interest: &nbsp;</label>
+              $<span
+                data-id="i13"
+                step="any"
+                id="i13-span"
+                class="spans"
+              ></span>
+            </p>
+            <p>
+              <label for="i14-span">Total Payments: &nbsp;</label>
+              $<span
+                data-id="i14"
+                step="any"
+                id="i14-span"
+                class="spans"
+              ></span>
+            </p>
+        `
+        return newDiv
+      }
+
+      function setResult(resultObj) {
+        for (key of Object.keys(resultObj)) {
+          let val = resultObj[key].result;
+          let id = resultObj[key].type;
+
+          if (id === "i12") {
+            const span = document.getElementById(`${id}-span`);
+            let payoffYear = Math.floor(val / 12)
+            let payoffMonth = ((val % 12) % 1) === 0 ? (val % 12) : Math.floor((val % 12) + 1)
+            span.textContent = `${payoffYear} yrs and ${payoffMonth} mos`;
+          } else if (id === "i11") {
+            const currentDate = new Date();
+
+            const monthsToAdd = (val % 1) === 0 ? (val + 1) : Math.floor(val + 1)  + 1
+
+            const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
+
+            const futureYear = currentDate.getFullYear() + Math.floor((currentDate.getMonth() + monthsToAdd) / 12);
+            const futureMonth = (currentDate.getMonth() + monthsToAdd) % 12;
+
+            const finalMonth = futureMonth === 0 ? 12 : futureMonth;
+            const finalYear = finalMonth === 12 ? futureYear - 1 : futureYear
+
+            const span = document.getElementById(`${id}-span`);
+            span.textContent = `${monthNames[finalMonth - 1]} ${finalYear}`;
+          } else {
+            if (isNaN(val)) {
+              alert("Your input resulted in NAN.\n 0/0 \n Try again with valid input.");
+              return;
+            }
+            if (Math.abs(val) === Infinity) {
+              alert("Your input resulted in Infinity. \nDivision by zero. \nTry again with valid input.");
+              return;
+            }
+            const span = document.getElementById(`${id}-span`);
+            span.textContent = `${parseFloat(val)}`;
+          }
+        }
+      }
+
+      function calculateResults() {
+          // Retrieve input values
+          const loanBalance = parseFloat(loanBalanceEl.value);
+          const payment = parseFloat(paymentEl.value);
+          const intRate = parseFloat(intRateEl.value);
+
+          if (isNaN(loanBalance)  || loanBalance < 1 || isNaN(payment) || payment < 1 ||
+            isNaN(intRate) || intRate < 1
+          ) {
+            alert("Please Enter All Details.");
+            return;
+          }
+
+          try {
+            const resultElement = createElement()
+            calcResultsEl.innerHTML = resultElement 
+
+            const payoffTime = Math.log(payment / (payment - (loanBalance * ((intRate / 12) / 100)))) / 
+                                Math.log(1 + ((intRate / 12) / 100))
+            
+            const totalInterest = (payoffTime * payment) - loanBalance
+            const totalPayment = (payoffTime * payment)
+
+            const results = {
+              1: { result: payoffTime, type: "i11" },
+              2: { result: payoffTime, type: "i12" },
+              3: { result: Math.abs(totalInterest) > 1 ? totalInterest.toFixed(2) : totalInterest.toPrecision(2), type: "i13" },
+              4: { result: Math.abs(totalPayment) > 1 ? totalPayment.toFixed(2) : totalPayment.toPrecision(2), type: "i14" },
+            }
+            setResult(results)
+
+          } catch (error) {
+            alert("Something Went Wrong!!!");
+            resetResult()
+            return;
+          }
+      }
+
+      function resetForm() {
+        loanBalanceEl.value = "40000"
+        paymentEl.value = "650"
+        intRateEl.value = "6.25"
+      }
+
+      function resetResult() {
+        calcResultsEl.innerHTML = "<p>Result will appear here...</p>";
+      } 
+
+      function resethandler() {
+        resetForm();
+        resetResult();
+      }
+
+      resetBtnEl.addEventListener("click", resethandler);
+      calcBtnEl.addEventListener("click", calculateResults);
+
+      [loanBalanceEl, paymentEl, intRateEl].forEach((el) => {
+        el.addEventListener("input", resetResult);
+      });  
+    </script>
+</body>
+</html>

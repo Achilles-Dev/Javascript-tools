@@ -1,23 +1,26 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Scrap Gold Calculator</title>
+  <title>MPC Calculator</title>
 </head>
 <body>
-    <h1>Scrap Gold Calculator</h1>
+    <h1>MPC Calculator</h1>
     <p>
-      Weight of scrap gold:
-      <input type="number" id="assetVal">
+      Increase in disposable income:
+      <input type="number" id="dispIncomeIncr" value="1000">
     </p>
     <p>
-      Gold purity by karat:
-      <input type="number" id="fialVal">K
+      Increase in consumer spending: 
+      <input type="number" id="consumerSpendInc" value="600">
     </p>
     <p>
-      Price per unit weight:
-      <input type="number" id="depPeriod">
+      Autonomous consumer spending:
+      <input type="number" id="autoConsSpend" value="18000">
     </p>
-    
+    <p>
+      Disposable income:
+      <input type="number" id="dispIncome" value="40000">
+    </p>
 
     <button id="calcBtn">Calculate</button>
     <button id="resetBtn">Reset</button>
@@ -29,9 +32,10 @@
 
     <script>
       // Get required elements from the HTML
-      const assetValEl = document.getElementById("assetVal");
-      const fialValEl = document.getElementById("fialVal");
-      const depPeriodEl = document.getElementById("depPeriod");
+      const dispIncomeIncrEl = document.getElementById("dispIncomeIncr");
+      const consumerSpendIncEl = document.getElementById("consumerSpendInc");
+      const dispIncomeEl = document.getElementById("dispIncome");
+      const autoConsSpendEl = document.getElementById("autoConsSpend");
 
       const calcBtnEl = document.getElementById('calcBtn');
       const resetBtnEl = document.getElementById('resetBtn');
@@ -40,7 +44,7 @@
       function createElement() {
         const newDiv = `
             <p>
-              <label for="i11-span">Depreciable Base: &nbsp;</label>
+              <label for="i11-span">Consumer spending: &nbsp;</label>
               <span
                 data-id="i11"
                 step="any"
@@ -49,7 +53,7 @@
               ></span>
             </p>
             <p>
-              <label for="i12-span">1st Year Depreciation Expense: &nbsp;</label>
+              <label for="i12-span">MPC: &nbsp;</label>
               <span
                 data-id="i12"
                 step="any"
@@ -57,16 +61,6 @@
                 class="spans"
               ></span>
             </p>
-            <p>
-              <label for="i13-span">Final Year Depreciation Expense: &nbsp;</label>
-              <span
-                data-id="i13"
-                step="any"
-                id="i13-span"
-                class="spans"
-              ></span>
-            </p>
-            <p>
         `
         return newDiv
       }
@@ -91,14 +85,18 @@
 
       function calculateResults() {
           // Retrieve input values
-          const assetVal = parseFloat(assetValEl.value);
-          const fialVal = parseFloat(fialValEl.value);
-          const depPeriod = parseFloat(depPeriodEl.value);
+          const dispIncomeIncr = parseFloat(dispIncomeIncrEl.value);
+          const consumerSpendInc = parseFloat(consumerSpendIncEl.value);
+          const dispIncome = parseFloat(dispIncomeEl.value);
+          const autoConsSpend = parseFloat(autoConsSpendEl.value);
 
-          if (isNaN(assetVal)  || assetVal <= 0 || isNaN(fialVal) || fialVal <= 0 ||
-            isNaN(depPeriod) || depPeriod <= 0
+          if (isNaN(dispIncomeIncr) || dispIncomeIncr <= 0 || isNaN(consumerSpendInc) || consumerSpendInc <= 0 || 
+            isNaN(dispIncome) || dispIncome <= 0 || isNaN(autoConsSpend) || autoConsSpend <= 0
           ) {
             alert("Please Enter All Details.");
+            return;
+          } else if (dispIncomeIncr <= consumerSpendInc) {
+            alert("The change in consumer spending must be smaller than the amount of the additional disposable income.");
             return;
           }
 
@@ -106,12 +104,12 @@
             const resultElement = createElement()
             calcResultsEl.innerHTML = resultElement 
 
-            const unitPrice = (assetVal / fialVal) / depPeriod 
+            const MPC = consumerSpendInc / dispIncomeIncr
+            const CS = autoConsSpend + (MPC * dispIncome)
 
             const results = {
-              1: { result: Math.abs(unitPrice) > 1 ? unitPrice.toFixed(2) : unitPrice.toPrecision(2), type: "i11" },
-              2: { result: Math.abs(unitPrice) > 1 ? unitPrice.toFixed(2) : unitPrice.toPrecision(2), type: "i12" },
-              3: { result: Math.abs(unitPrice) > 1 ? unitPrice.toFixed(2) : unitPrice.toPrecision(2), type: "i13" },
+              1: { result: Math.abs(CS) > 1 ? CS.toFixed(2) : CS.toPrecision(2), type: "i11" },
+              2: { result: Math.abs(MPC) > 1 ? MPC.toFixed(2) : MPC.toPrecision(2), type: "i12" },
             }
             setResult(results)
 
@@ -123,9 +121,10 @@
       }
 
       function resetForm() {
-        assetValEl.value = ""
-        fialValEl.value = ""
-        depPeriodEl.value = ""
+        dispIncomeIncrEl.value = "1000"
+        consumerSpendIncEl.value = "600"
+        dispIncomeEl.value = "18000"
+        autoConsSpendEl.value = "40000"
       }
 
       function resetResult() {
@@ -139,10 +138,10 @@
 
       resetBtnEl.addEventListener("click", resethandler);
       calcBtnEl.addEventListener("click", calculateResults);
-
-      [assetValEl, fialValEl, depPeriodEl].forEach((el) => {
+      [dispIncomeIncrEl, consumerSpendIncEl, dispIncomeEl, autoConsSpendEl].forEach((el) => {
         el.addEventListener("input", resetResult);
       });  
+
     </script>
 </body>
 </html>

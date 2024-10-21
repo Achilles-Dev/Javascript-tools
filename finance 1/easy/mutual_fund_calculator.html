@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Mutual Fund Calculator</title>
+</head>
+<body>
+    <h1>Mutual Fund Calculator</h1>
+    <p>
+      Investment form:
+      <select id="invFormSelect">
+        <option value="sys">Systematic Investment Plan</option>
+        <option value="one">One-time investment</option>
+      </select>
+    </p>
+    <p id="sysInput" class="inputs">
+      Monthly investment:
+      <input type="number" id="monthInvest">
+    </p>
+    <p id="oneInput" class="inputs" style="display: none;">
+      Investment amount: 
+      <input type="number" id="investAmt">
+    </p>
+    <p>
+      Expected annual return:
+      <input type="number" id="annualReturn">%
+    </p>
+    <p>
+      Investment period:
+      <input type="number" id="period">
+      <select id="periodSelect">
+        <option value="12">months (mos)</option>
+        <option value="1" selected>years (yrs)</option>
+      </select>
+    </p>
+
+    <button id="calcBtn">Calculate</button>
+    <button id="resetBtn">Reset</button>
+    <hr>
+    <div>
+      <h3>Result:</h3>
+      <h3 id="calcResults">Result will appear here...</h3>
+    </div>
+
+    <script>
+      // Get required elements from the HTML
+      const invFormSelectEl = document.getElementById("invFormSelect");
+      const monthInvestEl = document.getElementById("monthInvest");
+      const investAmtEl = document.getElementById("investAmt");
+      const annualReturnEl = document.getElementById("annualReturn");
+      const periodEl = document.getElementById("period");
+      const periodSelectEl = document.getElementById("periodSelect");
+      const inputsEl = document.querySelectorAll(".inputs");
+
+      const calcBtnEl = document.getElementById('calcBtn');
+      const resetBtnEl = document.getElementById('resetBtn');
+      const calcResultsEl = document.getElementById('calcResults') 
+
+      function handleInvFormSelectChange(e) {
+        const value = e.target.value
+
+        inputsEl.forEach((input) => {
+          const idVal = input.id.slice(0, 3)
+          if (idVal === value) {
+            input.style.display = "block"
+          } else {
+            input.style.display = "none"
+          }
+        })
+
+        resetResult()
+      }
+
+      function createElement() {
+        const newDiv = `
+            <p>
+              <label for="i11-span">Investment amount at maturity: &nbsp;</label>
+              <span
+                data-id="i11"
+                step="any"
+                id="i11-span"
+                class="spans"
+              ></span>
+            </p>
+        `
+        return newDiv
+      }
+
+      function setResult(resultObj) {
+        for (key of Object.keys(resultObj)) {
+          let val = resultObj[key].result;
+          let id = resultObj[key].type;
+
+          if (isNaN(val)) {
+           alert("Your input resulted in NAN.\n 0/0 \n Try again with valid input.");
+            return;
+          }
+          if (Math.abs(val) === Infinity) {
+            alert("Your input resulted in Infinity. \nDivision by zero. \nTry again with valid input.");
+            return;
+          }
+          const span = document.getElementById(`${id}-span`);
+          span.textContent = `${parseFloat(val)}`;
+        }
+      }
+
+      function mutualFundCalculator(monthlyInvestment, annualReturnRate, investmentPeriodYears) {
+        const r = annualReturnRate / 100;
+        
+        const n = 12;
+        
+        const futureValue = monthlyInvestment * (
+            ((Math.pow(1 + r / n, n * investmentPeriodYears) - 1) / (r / n)) * (1 + r / n))
+        
+        return futureValue;
+      }
+
+      function calculateResults() {
+          // Retrieve input values
+          const monthInvest = parseFloat(monthInvestEl.value);
+          const investAmt = parseFloat(investAmtEl.value);
+          const periodSelect = parseFloat(periodSelectEl.value);
+          const period = parseFloat(periodEl.value);
+          const annualReturn = parseFloat(annualReturnEl.value);
+          const invFormSelect = invFormSelectEl.value
+
+          if ((monthInvestEl.checkVisibility() === true && (isNaN(monthInvest) || monthInvest <= 0)) || 
+            (investAmtEl.checkVisibility() === true && (isNaN(investAmt) || investAmt <= 0)) || 
+            isNaN(period) || period <= 0 || isNaN(annualReturn) || annualReturn <= 0
+          ) {
+            alert("Please Enter All Details.");
+            return;
+          }
+
+          try {
+            const resultElement = createElement()
+            calcResultsEl.innerHTML = resultElement 
+
+            console.log(invFormSelect)
+            let invAmt = 0
+            if (invFormSelect === "sys") {
+              invAmt = mutualFundCalculator(monthInvest, annualReturn, (period / periodSelect))
+            } else {
+              invAmt = investAmt * ((1 + (annualReturn / 100)) ** (period / periodSelect))
+            }
+
+            const results = {
+              1: { result: Math.abs(invAmt) > 1 ? invAmt.toFixed(2) : invAmt.toPrecision(2), type: "i11" },
+            }
+            setResult(results)
+
+          } catch (error) {
+            alert("Something Went Wrong!!!");
+            resetResult()
+            return;
+          }
+      }
+
+      function resetForm() {
+        monthInvestEl.value = ""
+        investAmtEl.value = ""
+        periodEl.value = ""
+        annualReturnEl.value = ""
+        periodSelectEl.selectedIndex = "1"
+      }
+
+      function resetResult() {
+        calcResultsEl.innerHTML = "<p>Result will appear here...</p>";
+      } 
+
+      function resethandler() {
+        resetForm();
+        resetResult();
+      }
+
+      resetBtnEl.addEventListener("click", resethandler);
+      calcBtnEl.addEventListener("click", calculateResults);
+      [monthInvestEl, investAmtEl, annualReturnEl, periodEl, periodSelectEl].forEach((el) => {
+        el.addEventListener("input", resetResult);
+      });  
+
+      invFormSelectEl.addEventListener("change", handleInvFormSelectChange)
+
+    </script>
+</body>
+</html>

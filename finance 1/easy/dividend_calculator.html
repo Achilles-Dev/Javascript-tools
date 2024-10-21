@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Dividend Calculator</title>
+</head>
+<body>
+    <h1>Dividend Calculator</h1>
+    <p>
+      Share price:
+      <input type="number" id="sharePrice">
+    </p>
+    <p>
+      Annual dividend per share: 
+      <input type="number" id="perShareDividend">
+    </p>
+    <p>
+      Money invested:
+      <input type="number" id="moneyInvested" >
+    </p>
+    <p>
+      Number of years:
+      <input type="number" id="years">
+    </p>
+    <p>
+      Compound frequency:
+      <select
+        class="selects"
+        id="freqSelect"
+      >
+        <option value="1" selected>Yearly</option>
+        <option value="2">Half-yearly</option>
+        <option value="4">Quarterly</option>
+        <option value="12">Monthly</option>
+        <option value="52">Weekly</option>
+        <option value="365">Daily</option>
+      </select>
+    </p>
+
+
+    <button id="calcBtn">Calculate</button>
+    <button id="resetBtn">Reset</button>
+    <hr>
+    <div>
+      <h3>Result:</h3>
+      <h3 id="calcResults">Result will appear here...</h3>
+    </div>
+
+    <script>
+      // Get required elements from the HTML
+      const sharePriceEl = document.getElementById("sharePrice");
+      const perShareDividendEl = document.getElementById("perShareDividend");
+      const moneyInvestedEl = document.getElementById("moneyInvested");
+      const yearsEl = document.getElementById("years");
+      const freqSelectEl = document.getElementById("freqSelect");
+
+      const calcBtnEl = document.getElementById('calcBtn');
+      const resetBtnEl = document.getElementById('resetBtn');
+      const calcResultsEl = document.getElementById('calcResults') 
+
+      function createElement() {
+        const newDiv = `
+            <p>
+              <label for="i11-span">Dividend yield: &nbsp;</label>
+              <span
+                data-id="i11"
+                step="any"
+                id="i11-span"
+                class="spans"
+              ></span>%
+            </p>
+            <p>
+              <label for="i12-span">Final balance: &nbsp;</label>
+              <span
+                data-id="i12"
+                step="any"
+                id="i12-span"
+                class="spans"
+              ></span>
+            </p>
+            <p>
+              <label for="i13-span">Overall growth: &nbsp;</label>
+              <span
+                data-id="i13"
+                step="any"
+                id="i13-span"
+                class="spans"
+              ></span>%
+            </p>
+             <p>
+              <label for="i14-span">Profit from dividends: &nbsp;</label>
+              <span
+                data-id="i14"
+                step="any"
+                id="i14-span"
+                class="spans"
+              ></span>
+            </p>
+        `
+        return newDiv
+      }
+
+      function setResult(resultObj) {
+        for (key of Object.keys(resultObj)) {
+          let val = resultObj[key].result;
+          let id = resultObj[key].type;
+
+          if (isNaN(val)) {
+           alert("Your input resulted in NAN.\n 0/0 \n Try again with valid input.");
+            return;
+          }
+          if (Math.abs(val) === Infinity) {
+            alert("Your input resulted in Infinity. \nDivision by zero. \nTry again with valid input.");
+            return;
+          }
+          const span = document.getElementById(`${id}-span`);
+          span.textContent = `${parseFloat(val)}`;
+        }
+      }
+
+      function calculateResults() {
+          // Retrieve input values
+          const sharePrice = parseFloat(sharePriceEl.value);
+          const perShareDividend = parseFloat(perShareDividendEl.value);
+          const moneyInvested = parseFloat(moneyInvestedEl.value);
+          const years = parseFloat(yearsEl.value);
+          const freqSelect = parseFloat(freqSelectEl.value);
+
+          if (isNaN(sharePrice) || sharePrice <= 0 || isNaN(perShareDividend) || perShareDividend < 0 || 
+          isNaN(moneyInvested) || moneyInvested <= 0 || isNaN(years) || years <= 0
+          ) {
+            alert("Please Enter All Details.");
+            return;
+          } else if (moneyInvested === years) {
+            alert("Change in quantity cannot be zero.");
+            return;
+          }
+
+          try {
+            const resultElement = createElement()
+            calcResultsEl.innerHTML = resultElement 
+
+            const DY = (perShareDividend / sharePrice) * 100
+            const FB = moneyInvested * ((1 + ((DY / freqSelect) / 100)) ** (years * freqSelect))
+            const DP = FB - moneyInvested
+            const OG = (DP / moneyInvested) * 100
+
+            const results = {
+              1: { result: Math.abs(DY) > 1 ? DY.toFixed(2) : DY.toPrecision(2), type: "i11" },
+              2: { result: Math.abs(FB) > 1 ? FB.toFixed(2) : FB.toPrecision(2), type: "i12" },
+              3: { result: Math.abs(OG) > 1 ? OG.toFixed(2) : OG.toPrecision(2), type: "i13" },
+              4: { result: Math.abs(DP) > 1 ? DP.toFixed(2) : DP.toPrecision(2), type: "i14" },
+            }
+            setResult(results)
+
+          } catch (error) {
+            alert("Something Went Wrong!!!");
+            resetResult()
+            return;
+          }
+      }
+
+      function resetForm() {
+        sharePriceEl.value = ""
+        perShareDividendEl.value = ""
+        moneyInvestedEl.value = ""
+        yearsEl.value = ""
+        freqSelectEl.selectedIndex = "0"
+      }
+
+      function resetResult() {
+        calcResultsEl.innerHTML = "<p>Result will appear here...</p>";
+      } 
+
+      function resethandler() {
+        resetForm();
+        resetResult();
+      }
+
+      resetBtnEl.addEventListener("click", resethandler);
+      calcBtnEl.addEventListener("click", calculateResults);
+      [sharePriceEl, perShareDividendEl, moneyInvestedEl, yearsEl].forEach((el) => {
+        el.addEventListener("input", resetResult);
+      });  
+
+      freqSelectEl.addEventListener("change", resetResult);
+
+    </script>
+</body>
+</html>

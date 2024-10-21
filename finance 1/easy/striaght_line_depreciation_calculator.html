@@ -1,21 +1,21 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Scrap Gold Calculator</title>
+  <title>Straight Line Depreciation Calculator</title>
 </head>
 <body>
-    <h1>Scrap Gold Calculator</h1>
+    <h1>Straight Line Depreciation Calculator</h1>
     <p>
-      Weight of scrap gold:
-      <input type="number" id="assetVal">
+      Asset Value:
+      <input type="number" id="assetVal" value="10000">
     </p>
     <p>
-      Gold purity by karat:
-      <input type="number" id="fialVal">K
+      Final Value:
+      <input type="number" id="finalVal" value="2000">
     </p>
     <p>
-      Price per unit weight:
-      <input type="number" id="depPeriod">
+      Depreciation Period:
+      <input type="number" id="depPeriod" value="5">Years
     </p>
     
 
@@ -30,7 +30,7 @@
     <script>
       // Get required elements from the HTML
       const assetValEl = document.getElementById("assetVal");
-      const fialValEl = document.getElementById("fialVal");
+      const finalValEl = document.getElementById("finalVal");
       const depPeriodEl = document.getElementById("depPeriod");
 
       const calcBtnEl = document.getElementById('calcBtn');
@@ -92,13 +92,16 @@
       function calculateResults() {
           // Retrieve input values
           const assetVal = parseFloat(assetValEl.value);
-          const fialVal = parseFloat(fialValEl.value);
+          const finalVal = parseFloat(finalValEl.value);
           const depPeriod = parseFloat(depPeriodEl.value);
 
-          if (isNaN(assetVal)  || assetVal <= 0 || isNaN(fialVal) || fialVal <= 0 ||
-            isNaN(depPeriod) || depPeriod <= 0
+          if (isNaN(assetVal)  || assetVal < 0 || isNaN(finalVal) || finalVal < 0 ||
+            isNaN(depPeriod) || depPeriod < 1
           ) {
             alert("Please Enter All Details.");
+            return;
+          } else if (assetVal < finalVal) {
+            alert("No depreciation occurs");
             return;
           }
 
@@ -106,12 +109,13 @@
             const resultElement = createElement()
             calcResultsEl.innerHTML = resultElement 
 
-            const unitPrice = (assetVal / fialVal) / depPeriod 
+            const depBase =  Math.abs(assetVal - finalVal)
+            const depExpense =  depBase / depPeriod
 
             const results = {
-              1: { result: Math.abs(unitPrice) > 1 ? unitPrice.toFixed(2) : unitPrice.toPrecision(2), type: "i11" },
-              2: { result: Math.abs(unitPrice) > 1 ? unitPrice.toFixed(2) : unitPrice.toPrecision(2), type: "i12" },
-              3: { result: Math.abs(unitPrice) > 1 ? unitPrice.toFixed(2) : unitPrice.toPrecision(2), type: "i13" },
+              1: { result: Math.abs(depBase) > 1 ? depBase.toFixed(2) : depBase.toPrecision(2), type: "i11" },
+              2: { result: Math.abs(depExpense) > 1 ? depExpense.toFixed(2) : depExpense.toPrecision(2), type: "i12" },
+              3: { result: Math.abs(depExpense) > 1 ? depExpense.toFixed(2) : depExpense.toPrecision(2), type: "i13" },
             }
             setResult(results)
 
@@ -123,9 +127,9 @@
       }
 
       function resetForm() {
-        assetValEl.value = ""
-        fialValEl.value = ""
-        depPeriodEl.value = ""
+        assetValEl.value = "10000"
+        finalValEl.value = "2000"
+        depPeriodEl.value = "5"
       }
 
       function resetResult() {
@@ -140,7 +144,7 @@
       resetBtnEl.addEventListener("click", resethandler);
       calcBtnEl.addEventListener("click", calculateResults);
 
-      [assetValEl, fialValEl, depPeriodEl].forEach((el) => {
+      [assetValEl, finalValEl, depPeriodEl].forEach((el) => {
         el.addEventListener("input", resetResult);
       });  
     </script>

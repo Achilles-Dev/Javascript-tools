@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Loan Interest Calculator</title>
+</head>
+<body>
+    <h1>Loan Interest Calculator</h1>
+    <p>
+      Loan balance:
+      <input type="number" id="loanBalance" value="10000">
+    </p>
+    <p>
+      Loan term: 
+      <input type="number" id="loanTerm" value="10">
+      <select id="loanTermSelect">
+        <option value="12">months (mos)</option>
+        <option value="1" selected>years (yrs)</option>
+      </select>
+    </p>
+    <p>
+      Interest rate:
+      <input type="number" id="intRate" value="12.5"> %
+    </p>
+    <p>
+      Payment frequency:
+      <select
+        class="selects"
+        id="pmtFreqSelect"
+      >
+        <option value="1">Yearly</option>
+        <option value="2">Semi-annually</option>
+        <option value="4">Quarterly</option>
+        <option value="12" selected>Monthly</option>
+        <option value="26">Bi-weekly</option>
+        <option value="52">Weekly</option>
+        <option value="365">Daily</option>
+      </select>
+    </p>
+    <p>
+      Compounding frequency:
+      <select
+        class="selects"
+        id="compFreqSelect"
+      >
+        <option value="1">Yearly</option>
+        <option value="2">Semi-annually</option>
+        <option value="4">Quarterly</option>
+        <option value="12" selected>Monthly</option>
+        <option value="26">Bi-weekly</option>
+        <option value="52">Weekly</option>
+        <option value="365">Daily</option>
+      </select>
+    </p>
+
+
+    <button id="calcBtn">Calculate</button>
+    <button id="resetBtn">Reset</button>
+    <hr>
+    <div>
+      <h3>Result:</h3>
+      <h3 id="calcResults">Result will appear here...</h3>
+    </div>
+
+    <script>
+      // Get required elements from the HTML
+      const loanBalanceEl = document.getElementById("loanBalance");
+      const loanTermEl = document.getElementById("loanTerm");
+      const loanTermSelectEl = document.getElementById("loanTermSelect");
+      const intRateEl = document.getElementById("intRate");
+      const pmtFreqSelectEl = document.getElementById("pmtFreqSelect");
+      const compFreqSelectEl = document.getElementById("compFreqSelect");
+
+      const calcBtnEl = document.getElementById('calcBtn');
+      const resetBtnEl = document.getElementById('resetBtn');
+      const calcResultsEl = document.getElementById('calcResults') 
+
+      function createElement() {
+        const newDiv = `
+            <p>
+              <label for="i11-span">Interest to be paid: &nbsp;</label>
+              <span
+                data-id="i11"
+                step="any"
+                id="i11-span"
+                class="spans"
+              ></span>
+            </p>
+            <p>
+              <label for="i12-span">Total payment: &nbsp;</label>
+              <span
+                data-id="i12"
+                step="any"
+                id="i12-span"
+                class="spans"
+              ></span>
+            </p>
+            <p>
+              <label for="i13-span">Monthly payment: &nbsp;</label>
+              <span
+                data-id="i13"
+                step="any"
+                id="i13-span"
+                class="spans"
+              ></span>
+            </p>
+        `
+        return newDiv
+      }
+
+      function setResult(resultObj) {
+        for (key of Object.keys(resultObj)) {
+          let val = resultObj[key].result;
+          let id = resultObj[key].type;
+
+          if (isNaN(val)) {
+           alert("Your input resulted in NAN.\n 0/0 \n Try again with valid input.");
+            return;
+          }
+          if (Math.abs(val) === Infinity) {
+            alert("Your input resulted in Infinity. \nDivision by zero. \nTry again with valid input.");
+            return;
+          }
+          const span = document.getElementById(`${id}-span`);
+          span.textContent = `${parseFloat(val)}`;
+        }
+      }
+
+      function calculatePaymentWithCompoundingAndPaymentFrequency(loanAmount, annualInterestRate, loanTermYears, compoundingFrequency, paymentFrequency) {
+        // Convert annual interest rate to the rate per compounding period
+        const interestRatePerCompoundingPeriod = annualInterestRate / compoundingFrequency;
+
+        // Total number of compounding periods
+        const totalCompoundingPeriods = loanTermYears * compoundingFrequency;
+
+        // Calculate the payment based on the payment frequency
+        const totalPayments = loanTermYears * paymentFrequency;
+
+        // Calculate the periodic payment
+        const payment = loanAmount * (interestRatePerCompoundingPeriod * Math.pow(1 + interestRatePerCompoundingPeriod, totalCompoundingPeriods)) / 
+                        (Math.pow(1 + interestRatePerCompoundingPeriod, totalCompoundingPeriods) - 1);
+
+        // Adjust the payment frequency
+        const adjustedPayment = payment * (compoundingFrequency / paymentFrequency);
+
+        // Return the payment rounded to 2 decimal places
+        return adjustedPayment.toFixed(2);
+      }
+
+      function calculateResults() {
+          // Retrieve input values
+          const loanBalance = parseFloat(loanBalanceEl.value);
+          const loanTermSelect = parseFloat(loanTermSelectEl.value);
+          const compFreqSelect = parseFloat(compFreqSelectEl.value);
+          const pmtFreqSelect = parseFloat(pmtFreqSelectEl.value);
+          const loanTerm = parseFloat(loanTermEl.value) / loanTermSelect;
+          const intRate = parseFloat(intRateEl.value);
+
+          if (isNaN(loanBalance) || loanBalance < 0 || isNaN(loanTerm) || loanTerm <= 0 || 
+          isNaN(intRate) || intRate <= 0 
+          ) {
+            alert("Please Enter All Details.");
+            return;
+          }
+
+          try {
+            const resultElement = createElement()
+            calcResultsEl.innerHTML = resultElement 
+            const test = calculatePaymentWithCompoundingAndPaymentFrequency(loanBalance, intRate / 100, loanTerm, compFreqSelect, pmtFreqSelect)
+            console.log(test)
+            const monthyPmt = (loanBalance * (intRate / 100)) / ((1 - ((1 + (intRate / 100)) ** (-1 * (loanTerm * compFreqSelect )))))
+            const totalPmt = (monthyPmt) * (loanTerm * pmtFreqSelect)
+            const loanInt = totalPmt - loanBalance
+        
+            const results = {
+              1: { result: Math.abs(loanInt) > 1 ? loanInt.toFixed(2) : loanInt.toPrecision(2), type: "i11" },
+              2: { result: Math.abs(totalPmt) > 1 ? totalPmt.toFixed(2) : totalPmt.toPrecision(2), type: "i12" },
+              3: { result: Math.abs(monthyPmt) > 1 ? monthyPmt.toFixed(2) : monthyPmt.toPrecision(2), type: "i13" },
+            }
+            setResult(results)
+
+          } catch (error) {
+            alert("Something Went Wrong!!!");
+            resetResult()
+            return;
+          }
+      }
+
+      function resetForm() {
+        loanBalanceEl.value = "10000"
+        loanTermEl.value = "10"
+        intRateEl.value = "12.5"
+        loanTermSelectEl.selectedIndex = "1"
+        pmtFreqSelectEl.selectedIndex = "3"
+        compFreqSelectEl.selectedIndex = "3"
+      }
+
+      function resetResult() {
+        calcResultsEl.innerHTML = "<p>Result will appear here...</p>";
+      } 
+
+      function resethandler() {
+        resetForm();
+        resetResult();
+      }
+
+      resetBtnEl.addEventListener("click", resethandler);
+      calcBtnEl.addEventListener("click", calculateResults);
+      [loanBalanceEl, loanTermEl, intRateEl].forEach((el) => {
+        el.addEventListener("input", resetResult);
+      });  
+
+      [loanTermSelectEl, pmtFreqSelectEl, compFreqSelectEl].forEach((el) => {
+        el.addEventListener("change", resetResult);
+      });  
+
+    </script>
+</body>
+</html>
