@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Productivity Calculator</title>
+</head>
+<body>
+    <h1>Productivity Calculator</h1>
+    <h3>Use this productivity calculator to easily calculate the labor productivity based on work hours and/or <br />
+      number of employees (or machines, depending on use case).</h3>
+    <p>
+      Work hours:
+      <input type="number" id="workHrs" value="8">
+    </p>
+    <p>
+      Employees:
+      <input type="number" id="employees" value="2">
+    </p>
+    <p>
+      Revenue:
+      <input type="number" id="revenue" value="800">
+    </p>
+    
+    <button id="calcBtn">Calculate</button>
+    <button id="resetBtn">Reset</button>
+    <hr>
+    <div>
+      <h3>Result:</h3>
+      <h3 id="calcResults">Result will appear here...</h3>
+    </div>
+
+    <script>
+      // Get required elements from the HTML
+      const workHrsEl = document.getElementById("workHrs");
+      const employeesEl = document.getElementById("employees");
+      const revenueEl = document.getElementById("revenue");
+
+      const calcBtnEl = document.getElementById('calcBtn');
+      const resetBtnEl = document.getElementById('resetBtn');
+      const calcResultsEl = document.getElementById('calcResults') 
+
+      function createElement() {
+        const newDiv = `
+            <p>
+              <label for="i11-span">Labor productivity: &nbsp;</label>
+             $<span
+                data-id="i11"
+                step="any"
+                id="i11-span"
+                class="spans"
+              ></span> per hour of work
+            </p>
+            <p>
+              <label for="i12-span">Labor productivity: &nbsp;</label>
+              $<span
+                data-id="i12"
+                step="any"
+                id="i12-span"
+                class="spans"
+              ></span> per employee
+            </p>
+        `
+        return newDiv
+      }
+
+      function setResult(resultObj) {
+        for (key of Object.keys(resultObj)) {
+          let val = resultObj[key].result;
+          let id = resultObj[key].type;
+
+          if (isNaN(val)) {
+           alert("Your input resulted in NAN.\n 0/0 \n Try again with valid input.");
+            return;
+          }
+          if (Math.abs(val) === Infinity) {
+            alert("Your input resulted in Infinity. \nDivision by zero. \nTry again with valid input.");
+            return;
+          }
+          const span = document.getElementById(`${id}-span`);
+          span.textContent = `${parseFloat(val)}`;
+        }
+      }
+
+      function calculateResults() {
+          // Retrieve input values
+          const workHrs = parseFloat(workHrsEl.value);
+          const employees = parseFloat(employeesEl.value);
+          const revenue = parseFloat(revenueEl.value);
+
+          if (isNaN(workHrs)  || workHrs <= 0 || isNaN(employees) || employees <= 0 ||
+            isNaN(revenue) || revenue < 0
+          ) {
+            alert("Please Enter All Details.");
+            return;
+          }
+
+          try {
+            
+            const resultElement = createElement()
+            calcResultsEl.innerHTML = resultElement 
+            
+            const LPPHoW = revenue / workHrs
+            const LPPE = revenue / employees
+
+            const results = {
+              1: { result: Math.abs(LPPHoW) > 1 ? LPPHoW.toFixed(2) : LPPHoW.toPrecision(2), type: "i11" },
+              2: { result: Math.abs(LPPE) > 1 ? LPPE.toFixed(2) : LPPE.toPrecision(2), type: "i12" },
+            }
+            
+            setResult(results)
+
+          } catch (error) {
+            alert("Something Went Wrong!!!");
+            resetResult()
+            return;
+          }
+      }
+
+      function resetForm() {
+        workHrsEl.value = "8"
+        employeesEl.value = "2"
+        revenueEl.value = "800"
+      }
+
+      function resetResult() {
+        calcResultsEl.innerHTML = "<p>Result will appear here...</p>";
+      } 
+
+      function resethandler() {
+        resetForm();
+        resetResult();
+      }
+
+      resetBtnEl.addEventListener("click", resethandler);
+      calcBtnEl.addEventListener("click", calculateResults);
+
+      [workHrsEl, employeesEl, revenueEl].forEach((el) => {
+        el.addEventListener("input", resetResult);
+      });  
+    </script>
+</body>
+</html>

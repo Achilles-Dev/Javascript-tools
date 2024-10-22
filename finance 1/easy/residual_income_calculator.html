@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Residual Income Calculator</title>
+</head>
+<body>
+    <h1>Residual Income Calculator</h1>
+    <p>
+      Equity capital:
+      <input type="number" id="equityCapital">
+    </p>
+    <p>
+      Cost of equity:
+      <input type="number" id="equityCost">%
+    </p>
+    <p>
+      Net income:
+      <input type="number" id="netIncome">
+    </p>
+    
+
+    <button id="calcBtn">Calculate</button>
+    <button id="resetBtn">Reset</button>
+    <hr>
+    <div>
+      <h3>Result:</h3>
+      <h3 id="calcResults">Result will appear here...</h3>
+    </div>
+
+    <script>
+      // Get required elements from the HTML
+      const equityCapitalEl = document.getElementById("equityCapital");
+      const equityCostEl = document.getElementById("equityCost");
+      const netIncomeEl = document.getElementById("netIncome");
+
+      const calcBtnEl = document.getElementById('calcBtn');
+      const resetBtnEl = document.getElementById('resetBtn');
+      const calcResultsEl = document.getElementById('calcResults') 
+
+      function createElement() {
+        const newDiv = `
+            <p>
+              <label for="i11-span">Equity charge: &nbsp;</label>
+              <span
+                data-id="i11"
+                step="any"
+                id="i11-span"
+                class="spans"
+              ></span>
+            </p>
+            <p>
+              <label for="i12-span">Residual income: &nbsp;</label>
+              <span
+                data-id="i12"
+                step="any"
+                id="i12-span"
+                class="spans"
+              ></span>
+            </p>
+        `
+        return newDiv
+      }
+
+      function setResult(resultObj) {
+        for (key of Object.keys(resultObj)) {
+          let val = resultObj[key].result;
+          let id = resultObj[key].type;
+
+          if (isNaN(val)) {
+           alert("Your input resulted in NAN.\n 0/0 \n Try again with valid input.");
+            return;
+          }
+          if (Math.abs(val) === Infinity) {
+            alert("Your input resulted in Infinity. \nDivision by zero. \nTry again with valid input.");
+            return;
+          }
+          const span = document.getElementById(`${id}-span`);
+          span.textContent = `${parseFloat(val)}`;
+        }
+      }
+
+      function calculateResults() {
+          // Retrieve input values
+          const equityCapital = parseFloat(equityCapitalEl.value);
+          const equityCost = parseFloat(equityCostEl.value);
+          const netIncome = parseFloat(netIncomeEl.value);
+          
+
+          if (isNaN(equityCapital)  || equityCapital < 0.01 || isNaN(equityCost) || equityCost < 0 ||
+            isNaN(netIncome) || netIncome < 0
+          ) {
+            alert("Please Enter All Details.");
+            return;
+          } 
+
+          try {
+            const resultElement = createElement()
+            calcResultsEl.innerHTML = resultElement 
+
+            const EC = (equityCost / 100) * equityCapital
+            const RI = netIncome - EC
+
+            const results = {
+              1: { result: Math.abs(EC) > 1 ? EC.toFixed(2) : EC.toPrecision(2), type: "i11" },
+              2: { result: Math.abs(RI) > 1 ? RI.toFixed(2) : RI.toPrecision(2), type: "i12" },
+            }
+            setResult(results)
+
+          } catch (error) {
+            alert("Something Went Wrong!!!");
+            resetResult()
+            return;
+          }
+      }
+
+      function resetForm() {
+        equityCapitalEl.value = ""
+        equityCostEl.value = ""
+        netIncomeEl.value = ""
+      }
+
+      function resetResult() {
+        calcResultsEl.innerHTML = "<p>Result will appear here...</p>";
+      } 
+
+      function resethandler() {
+        resetForm();
+        resetResult();
+      }
+
+      resetBtnEl.addEventListener("click", resethandler);
+      calcBtnEl.addEventListener("click", calculateResults);
+
+      [equityCapitalEl, equityCostEl, netIncomeEl].forEach((el) => {
+        el.addEventListener("input", resetResult);
+      });  
+
+    </script>
+</body>
+</html>

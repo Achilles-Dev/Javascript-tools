@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Property Management Cost Calculator</title>
+</head>
+<body>
+    <h1>Property Management Cost Calculator</h1>
+    <h3>Estimate annual property management fees for a property using the calculator below.</h3>
+    <p>
+      Monthly Rent:
+      <input type="number" id="monthlyRent">
+    </p>
+    <p>
+      Annual Repairs:
+      <input type="number" id="annRepairs">
+    </p>
+    <p>Fee Structure:</p>
+    <p>
+      Management Fee:
+      <input type="number" id="mgtFee">% of rent
+    </p>
+    <p>
+      Lease-Up Fee:
+      <input type="number" id="leaseFee">% of 1st month
+    </p>
+    <p>
+      Repair Markup:
+      <input type="number" id="repairMarkup">% of repairs
+    </p>
+
+    <button id="calcBtn">Calculate</button>
+    <button id="resetBtn">Reset</button>
+    <hr>
+    <div>
+      <h3>Result:</h3>
+      <h3 id="calcResults">Result will appear here...</h3>
+    </div>
+
+    <script>
+      // Get required elements from the HTML
+      const monthlyRentEl = document.getElementById("monthlyRent");
+      const annRepairsEl = document.getElementById("annRepairs");
+      const mgtFeeEl = document.getElementById("mgtFee");
+      const leaseFeeEl = document.getElementById("leaseFee");
+      const repairMarkupEl = document.getElementById("repairMarkup")
+
+      const calcBtnEl = document.getElementById('calcBtn');
+      const resetBtnEl = document.getElementById('resetBtn');
+      const calcResultsEl = document.getElementById('calcResults') 
+
+      function createElement() {
+        const newDiv = `
+            <p>
+              <label for="i11-span">Annual Property Management Fees: &nbsp;</label>
+              $<span
+                data-id="i11"
+                step="any"
+                id="i11-span"
+                class="spans"
+              ></span>
+            </p>
+            <p>
+              <label for="i12-span">Annual Rent Income: &nbsp;</label>
+              $<span
+                data-id="i12"
+                step="any"
+                id="i12-span"
+                class="spans"
+              ></span>
+            </p>
+            <p>
+              <label for="i13-span">Percentage of Rent in Fees: &nbsp;</label>
+              <span
+                data-id="i13"
+                step="any"
+                id="i13-span"
+                class="spans"
+              ></span>%
+            </p>
+            <p>Fee Breakdown:</p>
+            <p>
+              <label for="i14-span">Management Fee: &nbsp;</label>
+              $<span
+                data-id="i14"
+                step="any"
+                id="i14-span"
+                class="spans"
+              ></span>
+            </p>
+            <p>
+              <label for="i15-span">Lease-Up Fee:	&nbsp;</label>
+              $<span
+                data-id="i15"
+                step="any"
+                id="i15-span"
+                class="spans"
+              ></span>
+            </p>
+            <p>
+              <label for="i16-span">Repairs Markup: &nbsp;</label>
+              $<span
+                data-id="i16"
+                step="any"
+                id="i16-span"
+                class="spans"
+              ></span>
+            </p>
+        `
+        return newDiv
+      }
+
+      function setResult(resultObj) {
+        for (key of Object.keys(resultObj)) {
+          let val = resultObj[key].result;
+          let id = resultObj[key].type;
+
+          if (isNaN(val)) {
+            alert("Your input resulted in NAN.\n 0/0 \n Try again with valid input.");
+            return;
+          }
+          if (Math.abs(val) === Infinity) {
+            alert("Your input resulted in Infinity. \nDivision by zero. \nTry again with valid input.");
+            return;
+          }
+          const span = document.getElementById(`${id}-span`);
+          span.textContent = `${parseFloat(val)}`;
+        }
+      }
+
+      function calculateResults() {
+          // Retrieve input values
+          const monthlyRent = parseFloat(monthlyRentEl.value);
+          const annRepairs = parseFloat(annRepairsEl.value);
+          const mgtFee = parseFloat(mgtFeeEl.value);
+          const leaseFee = parseFloat(leaseFeeEl.value);
+          const repairMarkup = parseFloat(repairMarkupEl.value);
+
+          if (isNaN(monthlyRent)  || monthlyRent <= 0 || isNaN(annRepairs) || annRepairs < 0 ||
+            isNaN(mgtFee) || mgtFee < 0 || isNaN(leaseFee) || leaseFee < 0 || isNaN(repairMarkup) || repairMarkup < 0
+          ) {
+            alert("Please Enter All Details.");
+            return;
+          } 
+
+          try {
+            const resultElement = createElement()
+            calcResultsEl.innerHTML = resultElement 
+            
+            
+            const ARI =  monthlyRent * 12
+            const MF = (mgtFee / 100) * ARI
+            const LUF = (leaseFee / 100) * monthlyRent
+            const RMU = (repairMarkup / 100) * annRepairs
+            const APMF = MF + LUF + RMU
+            const PRF = (APMF / ARI) * 100
+
+            const results = {
+              1: { result: Math.abs(APMF) > 1 ? APMF.toFixed(2) : APMF.toPrecision(2), type: "i11" },
+              2: { result: Math.abs(ARI) > 1 ? ARI.toFixed(2) : ARI.toPrecision(2), type: "i12" },
+              3: { result: Math.abs(PRF) > 1 ? PRF.toFixed(2) : PRF.toPrecision(2), type: "i13" },
+              4: { result: Math.abs(MF) > 1 ? MF.toFixed(2) : MF.toPrecision(2), type: "i14" },
+              5: { result: Math.abs(LUF) > 1 ? LUF.toFixed(2) : LUF.toPrecision(2), type: "i15" },
+              6: { result: Math.abs(RMU) > 1 ? RMU.toFixed(2) : RMU.toPrecision(2), type: "i16" },
+            }
+            setResult(results)
+
+          } catch (error) {
+            alert("Something Went Wrong!!!");
+            resetResult()
+            return;
+          }
+      }
+
+      function resetForm() {
+        monthlyRentEl.value = ""
+        annRepairsEl.value = "0"
+        mgtFeeEl.value = "0"
+        leaseFeeEl.value = "0"
+        repairMarkupEl.value = "0"
+      }
+
+      function resetResult() {
+        calcResultsEl.innerHTML = "<p>Result will appear here...</p>";
+      } 
+
+      function resethandler() {
+        resetForm();
+        resetResult();
+      }
+
+      resetBtnEl.addEventListener("click", resethandler);
+      calcBtnEl.addEventListener("click", calculateResults);
+
+      [monthlyRentEl, annRepairsEl, mgtFeeEl, leaseFeeEl, repairMarkupEl].forEach((el) => {
+        el.addEventListener("input", resetResult);
+      });  
+
+    </script>
+</body>
+</html>

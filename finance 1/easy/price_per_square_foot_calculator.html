@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Price Per Square Foot Calculator</title>
+</head>
+<body>
+    <h1>Price Per Square Foot Calculator</h1>
+    <p>
+      Properties:
+      <select id="propertySelect">
+        <option value="fst">One Property</option>
+        <option value="snd">Two Properties</option>
+        <option value="thd">Three Properties</option>
+      </select>
+    </p>
+    <p>
+      Price or rent:
+      <input type="number" id="price1">
+    </p>
+    <p>
+      Square footage:
+      <input type="number" id="footage1">
+      <select id="footage1Select" data-type="area" data-prev="ft²">
+        <option value="m²">square meters</option>
+        <option value="in²">square inches</option>
+        <option value="ft²" selected>square feet</option>
+        <option value="yd²">square yards</option>
+      </select>
+    </p>
+    <div id="sndInputs" class="inputs" style="display: none;">
+      <p>Second property:</p>
+      <p>
+        Price or rent:
+        <input type="number" id="price2">
+      </p>
+      <p>
+        Square footage:
+        <input type="number" id="footage2">
+        <select id="footage2Select" data-type="area" data-prev="ft²">
+          <option value="m²">square meters</option>
+          <option value="in²">square inches</option>
+          <option value="ft²" selected>square feet</option>
+          <option value="yd²">square yards</option>
+        </select>
+      </p>
+    </div>
+
+    <div id="thdInputs" class="inputs" style="display: none;">
+      <p>Third property:</p>
+      <p>
+        Price or rent:
+        <input type="number" id="price3">
+      </p>
+      <p>
+        Square footage:
+        <input type="number" id="footage3" data-type="area" data-prev="ft²">
+        <select id="footage3Select">
+          <option value="m²">square meters</option>
+          <option value="in²">square inches</option>
+          <option value="ft²" selected>square feet</option>
+          <option value="yd²">square yards</option>
+        </select>
+      </p>
+    </div>
+
+    <button id="calcBtn">Calculate</button>
+    <button id="resetBtn">Reset</button>
+    <hr>
+    <div>
+      <h3>Result:</h3>
+      <h3 id="calcResults">Result will appear here...</h3>
+    </div>
+
+    <script>
+      // Get required elements from the HTML
+      const price1El = document.getElementById("price1");
+      const footage1El = document.getElementById("footage1");
+      const price2El = document.getElementById("price2");
+      const footage2El = document.getElementById("footage2");
+      const price3El = document.getElementById("price3");
+      const footage3El = document.getElementById("footage3");
+      const propertySelectEl = document.getElementById("propertySelect")
+      const inputsEl = document.querySelectorAll(".inputs");
+
+      const footage1SelectEl = document.getElementById("footage1Select");
+      const footage2SelectEl = document.getElementById("footage2Select");
+      const footage3SelectEl = document.getElementById("footage3Select");
+
+      const calcBtnEl = document.getElementById('calcBtn');
+      const resetBtnEl = document.getElementById('resetBtn');
+      const calcResultsEl = document.getElementById('calcResults') 
+
+      const UNITS = {
+        area: {
+          "m²": 0.0929,
+          "in²": 144,
+          "ft²": 1,
+          "yd²": 1 / 9,
+        },
+      };
+      /*************** FUNCTIONS ***************/
+      function toSIUnit(type, unit, value) {
+        return value / UNITS[type][unit];
+      }
+
+      function fromSIUnit(type, unit, value) {
+        return value * UNITS[type][unit];
+      }
+
+      function handlePropertySelectChange(e) {
+        const value = e.target.value
+        const input2 = document.getElementById("sndInputs");
+        inputsEl.forEach((input) => {
+          const idVal = input.id.slice(0, 3)
+          if (idVal === value) {
+            input.style.display = "block"
+          } else {
+            input.style.display = "none"
+          } 
+        })
+
+        input2.style.display = value === "fst" ? "none" : "block"
+
+        resetResult()
+      }
+
+      function createElement() {
+        const newDiv = `
+            <p>
+              <label for="i11-span">Price per sqft: &nbsp;</label>
+              <span
+                data-id="i11"
+                step="any"
+                id="i11-span"
+                class="spans"
+              ></span>
+               <select
+                class="selectsResult"
+                id="i11-select"
+                data-type="area"
+                data-prev="ft²"
+                data-id="i11"
+              >
+                <option value="m²">square meters</option>
+                <option value="in²">square inches</option>
+                <option value="ft²" selected>square feet</option>
+                <option value="yd²">square yards</option>
+              </select>
+            </p>
+        `
+        const newDiv2 = `
+            <p>
+              <label for="i12-span">Price per sqft (Second property): &nbsp;</label>
+              <span
+                data-id="i12"
+                step="any"
+                id="i12-span"
+                class="spans"
+              ></span>
+              <select
+                class="selectsResult"
+                id="i12-select"
+                data-type="area"
+                data-prev="ft²"
+                data-id="i12"
+              >
+                <option value="m²">square meters</option>
+                <option value="in²">square inches</option>
+                <option value="ft²" selected>square feet</option>
+                <option value="yd²">square yards</option>
+              </select>
+            </p>
+        `
+        const newDiv3 = `
+            <p>
+              <label for="i13-span">Price per sqft (Third property): &nbsp;</label>
+              <span
+                data-id="i13"
+                step="any"
+                id="i13-span"
+                class="spans"
+              ></span>
+               <select
+                class="selectsResult"
+                id="i13-select"
+                data-type="area"
+                data-prev="ft²"
+                data-id="i13"
+              >
+                <option value="m²">square meters</option>
+                <option value="in²">square inches</option>
+                <option value="ft²" selected>square feet</option>
+                <option value="yd²">square yards</option>
+              </select>
+            </p>
+        `
+        if (propertySelectEl.value === "thd") {
+          return newDiv + newDiv2 + newDiv3
+        } else if (propertySelectEl.value === "snd") {
+          return newDiv + newDiv2
+        }
+        return newDiv
+      }
+
+      function setResult(resultObj) {
+        for (key of Object.keys(resultObj)) {
+          let val = resultObj[key].result;
+          let id = resultObj[key].type;
+
+          if (isNaN(val)) {
+            alert("Your input resulted in NAN.\n 0/0 \n Try again with valid input.");
+            return;
+          }
+          if (Math.abs(val) === Infinity) {
+            alert("Your input resulted in Infinity. \nDivision by zero. \nTry again with valid input.");
+            return;
+          }
+          const span = document.getElementById(`${id}-span`);
+          span.textContent = `${parseFloat(val)}`;
+        }
+      }
+
+      function handleResultsChange(e) {
+        let select = e.target;
+        let id = select.getAttribute("data-id");
+        let span = document.getElementById(`${id}-span`);
+
+        let prevUnit = select.getAttribute("data-prev");
+        let currentUnit = select.value;
+        select.setAttribute("data-prev", currentUnit);
+
+        if (span.textContent === "") {
+          return;
+        }
+
+        let type = select.getAttribute("data-type");
+
+        let value = parseFloat(span.textContent);
+        value = parseFloat(value);
+        if (isNaN(value)) value = 0.0;
+
+        let si = fromSIUnit(type, prevUnit, value);
+        let result = toSIUnit(type, currentUnit, si);
+        result = parseFloat(result)
+        result = Math.abs(result) > 1 ? result.toFixed(2) : result.toPrecision(2)
+        span.textContent = result;
+      }
+
+
+      function calculateResults() {
+          // Retrieve input values
+          const footage1Select = footage1SelectEl.value
+          const footage2Select = footage2SelectEl.value
+          const footage3Select = footage3SelectEl.value
+
+          const price1 = parseFloat(price1El.value);
+          const footage1 = toSIUnit("area", footage1Select, parseFloat(footage1El.value));
+          const price2 = parseFloat(price2El.value);
+          const footage2 = toSIUnit("area", footage2Select, parseFloat(footage2El.value));
+          const price3 = parseFloat(price3El.value);
+          const footage3 = toSIUnit("area", footage3Select, parseFloat(footage3El.value));
+          const propertySelect = propertySelectEl.value
+
+          console.log(footage1, footage2, footage3)
+
+          if (isNaN(price1)  || price1 < 0 || isNaN(footage1) || footage1 <= 0 ||
+            (propertySelect !== "fst" && (isNaN(price2) || price2 < 0 || isNaN(footage2) || footage2 <= 0)) ||
+            (propertySelect === "thd" && (isNaN(price3) || price3 < 0 || isNaN(footage3) || footage3 <= 0))
+          ) {
+            alert("Please Enter All Details.");
+            return;
+          } 
+
+          try {
+            const resultElement = createElement()
+            calcResultsEl.innerHTML = resultElement 
+
+            const newSelects = document.querySelectorAll(".selectsResult");
+
+            newSelects.forEach((select) => {
+              select.addEventListener("change", handleResultsChange);
+            });
+
+            const PPSF = price1 / footage1
+            let results = {}
+            if (propertySelect === "snd") {
+              const PPSF2 = price2 / footage2
+              results = {
+                2: { result: Math.abs(PPSF2) > 1 ? PPSF2.toFixed(2) : PPSF2.toPrecision(2), type: "i12" },
+              }
+            } else if (propertySelect === "thd") {
+              const PPSF2 = price2 / footage2
+              const PPSF3 = price3 / footage3
+              results = {
+                2: { result: Math.abs(PPSF2) > 1 ? PPSF2.toFixed(2) : PPSF2.toPrecision(2), type: "i12" },
+                3: { result: Math.abs(PPSF3) > 1 ? PPSF3.toFixed(4) : PPSF3.toPrecision(5), type: "i13" },
+              }
+            }
+
+            results = {
+              ...results,
+              1: { result: Math.abs(PPSF) > 1 ? PPSF.toFixed(2) : PPSF.toPrecision(2), type: "i11" },
+            }
+            setResult(results)
+
+          } catch (error) {
+            alert("Something Went Wrong!!!");
+            resetResult()
+            return;
+          }
+      }
+
+      function resetForm() {
+        price1El.value = ""
+        footage1El.value = ""
+        price2El.value = ""
+        footage2El.value = ""
+        price3El.value = ""
+        footage3El.value = ""
+        propertySelectEl.selectedIndex = "0"
+
+        inputsEl.forEach((input) => {
+          input.style.display = "none"
+        })
+      }
+
+      function resetResult() {
+        calcResultsEl.innerHTML = "<p>Result will appear here...</p>";
+      } 
+
+      function resethandler() {
+        resetForm();
+        resetResult();
+      }
+
+      resetBtnEl.addEventListener("click", resethandler);
+      calcBtnEl.addEventListener("click", calculateResults);
+
+      [price1El, footage1El, price2El, footage2El, price3El, footage3El].forEach((el) => {
+        el.addEventListener("input", resetResult);
+      });  
+
+      propertySelectEl.addEventListener("change", handlePropertySelectChange);
+    </script>
+</body>
+</html>
