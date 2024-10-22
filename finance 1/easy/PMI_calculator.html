@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>PMI Calculator</title>
+</head>
+<body>
+    <h1>PMI Calculator</h1>
+    <p>
+      Home price:
+      <input type="number" id="homePrice" name="homePrice">
+    </p>
+    <p>
+      Down payment: 
+      <input type="number" id="downPmt" name="downPmt">
+      Percent:
+      <input type="number" id="downPmtPercent" disabled>%
+    </p>
+    <!-- <p>
+      Mortgage loan:
+      <input type="number" id="mortLoan" name="mortLoan">
+      LTV ratio:
+      <input type="number" id="ltvRatio" disabled>%
+    </p> -->
+    <p>PMI estimations:</p>
+    <p>
+      PMI rate:
+      <input type="number" id="pmiRate" name="pmiRate">%
+      Annual PMI:
+      <input type="number" id="annualPMI" disabled>
+    </p>  
+
+    <button id="calcBtn">Calculate</button>
+    <button id="resetBtn">Reset</button>
+    <hr>
+    <div>
+      <h3>Result:</h3>
+      <h3 id="calcResults">Result will appear here...</h3>
+    </div>
+
+    <script>
+      // Get required elements from the HTML
+      const homePriceEl = document.getElementById("homePrice");
+      const downPmtEl = document.getElementById("downPmt");
+      const annualPMIEl = document.getElementById("annualPMI");
+      const pmiRateEl = document.getElementById("pmiRate");
+      const downPmtPercentEl = document.getElementById("downPmtPercent");
+
+      const calcBtnEl = document.getElementById('calcBtn');
+      const resetBtnEl = document.getElementById('resetBtn');
+      const calcResultsEl = document.getElementById('calcResults') 
+
+      function handleInputChange(e) {
+        const {name, value} = e.target
+        const homePrice = parseFloat(homePriceEl.value)
+        const downPmt = parseFloat(downPmtEl.value)
+        const pmiRate = parseFloat(pmiRateEl.value)
+        
+        if (name === "downPmt" && !isNaN(homePrice)) {
+          if (value !== "") {
+            downPmtPercentEl.value = ((parseFloat(value) / homePrice) * 100) < 1 ? ((parseFloat(value) / homePrice) * 100).toPrecison(5) :
+            ((parseFloat(value) / homePrice) * 100).toFixed(2)
+          }
+          
+        } else if (name === "pmiRate" && !isNaN(downPmt)) {
+          const mortLoan = homePrice - downPmt
+          if (value !== "") {
+            annualPMIEl.value = ((parseFloat(value) / 100) * mortLoan) < 1 ? ((parseFloat(value) / 100) * mortLoan).toPrecison(5) :
+            ((parseFloat(value) / 100) * mortLoan).toFixed(2)
+          }
+
+        } else if (name === "homePrice" && !isNaN(downPmt)) {
+          if (value !== "") {
+            downPmtPercentEl.value = ((downPmt / parseFloat(value) ) * 100) < 1 ? ((downPmt / parseFloat(value) ) * 100).toPrecison(5) :
+            ((downPmt / parseFloat(value) ) * 100).toFixed(2)
+          }
+          
+        } else if (name === "homePrice" && !isNaN(pmiRate)) {
+          if (value !== "") {
+            const mortLoan = value - downPmt
+            annualPMIEl.value = ((pmiRate / 100) * mortLoan) < 1 ? ((pmiRate / 100) * mortLoan).toPrecison(5) :
+            ((pmiRate / 100) * mortLoan).toFixed(2)
+          }
+        }
+
+        resetResult()
+      }
+
+      function createElement() {
+        const newDiv = `
+            <p>
+              <label for="i11-span">Mortgage loan: &nbsp;</label>
+              <span
+                data-id="i11"
+                step="any"
+                id="i11-span"
+                class="spans"
+              ></span>
+            </p>
+            <p>
+              <label for="i12-span">LTV ratio: &nbsp;</label>
+              <span
+                data-id="i12"
+                step="any"
+                id="i12-span"
+                class="spans"
+              ></span>%
+            </p>
+            <p>
+              <label for="i13-span">Monthly PMI: &nbsp;</label>
+              <span
+                data-id="i13"
+                step="any"
+                id="i13-span"
+                class="spans"
+              ></span> / month
+            </p>
+        `
+        return newDiv
+      }
+
+      function setResult(resultObj) {
+        for (key of Object.keys(resultObj)) {
+          let val = resultObj[key].result;
+          let id = resultObj[key].type;
+
+          if (isNaN(val)) {
+           alert("Your input resulted in NAN.\n 0/0 \n Try again with valid input.");
+            return;
+          }
+          if (Math.abs(val) === Infinity) {
+            alert("Your input resulted in Infinity. \nDivision by zero. \nTry again with valid input.");
+            return;
+          }
+          const span = document.getElementById(`${id}-span`);
+          span.textContent = `${parseFloat(val)}`;
+        }
+      }
+
+
+      function calculateResults() {
+          // Retrieve input values
+          const homePrice = parseFloat(homePriceEl.value);
+          const annualPMI = parseFloat(annualPMIEl.value);
+          const pmiRate = parseFloat(pmiRateEl.value)
+          const downPmtPercent = parseFloat(downPmtPercentEl.value);
+          const downPmt = parseFloat(downPmtEl.value);
+
+          if (isNaN(homePrice) || homePrice < 0 || isNaN(downPmt) || downPmt < 0 ||
+            isNaN(annualPMI) || annualPMI < 0 || isNaN(pmiRate) || pmiRate < 0
+          ) {
+            alert("Please Enter All Details.");
+            return;
+          } else if (downPmtPercent >= 20) {
+            alert("PMI is only required if you cannot meet 20% of your mortgage loan.");
+            return;
+          }
+
+          try {
+            const resultElement = createElement()
+            calcResultsEl.innerHTML = resultElement 
+
+            const mortLoan = homePrice - downPmt
+            const ltvRatio = (mortLoan / homePrice) * 100
+            const PMI = ((pmiRate / 100) * mortLoan) / 12
+
+            const results = {
+              1: { result: Math.abs(mortLoan) > 1 ? mortLoan.toFixed(2) : mortLoan.toPrecision(2), type: "i11" },
+              2: { result: Math.abs(ltvRatio) > 1 ? ltvRatio.toFixed(2) : ltvRatio.toPrecision(2), type: "i12" },
+              3: { result: Math.abs(PMI) > 1 ? PMI.toFixed(2) : PMI.toPrecision(2), type: "i13" },
+            }
+            setResult(results)
+
+          } catch (error) {
+            alert("Something Went Wrong!!!");
+            resetResult()
+            return;
+          }
+      }
+
+      function resetForm() {
+        homePriceEl.value = ""
+        downPmtEl.value = ""
+        annualPMIEl.value = ""
+        pmiRateEl.value = ""
+        downPmtPercentEl.value = ""
+      }
+
+      function resetResult() {
+        calcResultsEl.innerHTML = "<p>Result will appear here...</p>";
+      } 
+
+      function resethandler() {
+        resetForm();
+        resetResult();
+      }
+
+      resetBtnEl.addEventListener("click", resethandler);
+      calcBtnEl.addEventListener("click", calculateResults);
+      [homePriceEl, downPmtEl, pmiRateEl].forEach((el) => {
+        el.addEventListener("input", handleInputChange);
+      });  
+
+
+    </script>
+</body>
+</html>

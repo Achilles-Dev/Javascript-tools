@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>LTV Calculator</title>
+</head>
+<body>
+    <h1>LTV Calculator</h1>
+    <h3>Calculate Loan-to-Value Ratio</h3>
+    <p>
+      Calculate for:
+      <select id="calculateSelect">
+        <option value="pur" selected>Purchase</option>
+        <option value="ref">Refinance</option>
+      </select>
+    </p>
+    <div id="purInputs" class="inputs">
+      <p>
+        Purchase Price:
+        <input type="number" id="purcPrice">
+      </p>
+      <p>
+        Down Payment: 
+        <input type="number" id="downPayment">
+      </p>
+      <p>
+        Finance Fees:
+        <input type="number" id="financeFee">
+      </p>
+    </div>
+    <div id="refInputs" class="inputs" style="display: none;">
+      <p>
+        Home Value:
+        <input type="number" id="homeValue">
+      <p>
+        Mortgage Balance:
+        <input type="number" id="mortPayment">
+      </p>
+    </div>
+
+    <button id="calcBtn">Calculate</button>
+    <button id="resetBtn">Reset</button>
+    <hr>
+    <div>
+      <h3>Result:</h3>
+      <h3 id="calcResults">Result will appear here...</h3>
+    </div>
+
+    <script>
+      // Get required elements from the HTML
+      const calculateSelectEl = document.getElementById("calculateSelect");
+      const purcPriceEl = document.getElementById("purcPrice");
+      const downPaymentEl = document.getElementById("downPayment");
+      const financeFeeEl = document.getElementById("financeFee");
+      const mortPaymentEl = document.getElementById("mortPayment");
+      const homeValueEl = document.getElementById("homeValue");
+      const inputsEl = document.querySelectorAll(".inputs");
+
+      const calcBtnEl = document.getElementById('calcBtn');
+      const resetBtnEl = document.getElementById('resetBtn');
+      const calcResultsEl = document.getElementById('calcResults') 
+
+      function handleCalculateSelectChange(e) {
+        const value = e.target.value
+
+        inputsEl.forEach((input) => {
+          const idVal = input.id.slice(0, 3)
+          if (idVal === value) {
+            input.style.display = "block"
+          } else {
+            input.style.display = "none"
+          }
+        })
+
+        resetResult()
+      }
+
+      function createElement() {
+        const newDiv = `
+            <p>
+              <label for="i11-span">Loan-to-Value: &nbsp;</label>
+              <span
+                data-id="i11"
+                step="any"
+                id="i11-span"
+                class="spans"
+              ></span>%
+            </p>
+            <p>
+              <label for="i12-span">Loan Amount: &nbsp;</label>
+              <span
+                data-id="i12"
+                step="any"
+                id="i12-span"
+                class="spans"
+              ></span>
+            </p>
+        `
+        const newDiv2 = `
+            <p>
+              <label for="i13-span">Current Loan-to-Value: &nbsp;</label>
+              <span
+                data-id="i13"
+                step="any"
+                id="i13-span"
+                class="spans"
+              ></span>%
+            </p>
+        `
+        if (calculateSelectEl.value === "ref") {
+          return newDiv2
+        }
+        return newDiv
+      }
+
+      function setResult(resultObj) {
+        for (key of Object.keys(resultObj)) {
+          let val = resultObj[key].result;
+          let id = resultObj[key].type;
+
+          if (isNaN(val)) {
+           alert("Your input resulted in NAN.\n 0/0 \n Try again with valid input.");
+            return;
+          }
+          if (Math.abs(val) === Infinity) {
+            alert("Your input resulted in Infinity. \nDivision by zero. \nTry again with valid input.");
+            return;
+          }
+          const span = document.getElementById(`${id}-span`);
+          span.textContent = `${parseFloat(val)}`;
+        }
+      }
+
+      function calculateResults() {
+          // Retrieve input values
+          const purcPrice = parseFloat(purcPriceEl.value);
+          const downPayment = parseFloat(downPaymentEl.value);
+          const financeFee = parseFloat(financeFeeEl.value);
+          const mortPayment = parseFloat(mortPaymentEl.value);
+          const homeValue = parseFloat(homeValueEl.value)
+          const calculateSelect = calculateSelectEl.value
+
+          if ((calculateSelect === "pur" && (isNaN(purcPrice) || purcPrice <= 0 || isNaN(downPayment) || downPayment <= 0 || isNaN(financeFee) || 
+            financeFee <= 0 )) || (calculateSelect === "ref" && (isNaN(mortPayment) || mortPayment <= 0 || isNaN(homeValue) || homeValue <= 0 ))
+          ) {
+            alert("Please Enter All Details.");
+            return;
+          }
+
+          try {
+            const resultElement = createElement()
+            calcResultsEl.innerHTML = resultElement 
+
+            let results = {}
+
+            if (calculateSelect === "pur") {
+              const loanAmt = purcPrice - downPayment + financeFee
+              const LTV = (loanAmt / purcPrice) * 100
+              results = {
+                1: { result: Math.abs(LTV) > 1 ? LTV.toFixed(2) : LTV.toPrecision(2), type: "i11" },
+                2: { result: Math.abs(loanAmt) > 1 ? loanAmt.toFixed(2) : loanAm.toPrecision(2), type: "i12" },
+              }
+            } else {
+              const CLTV = (1 - (mortPayment / homeValue)) * 100
+              results = {
+                3: { result: Math.abs(CLTV) > 1 ? CLTV.toFixed(2) : CLTV.toPrecision(2), type: "i13" },
+              }
+            }
+             
+            setResult(results)
+
+          } catch (error) {
+            alert("Something Went Wrong!!!");
+            resetResult()
+            return;
+          }
+      }
+
+      function resetForm() {
+        purcPriceEl.value = ""
+        downPaymentEl.value = ""
+        financeFeeEl.value = ""
+        mortPaymentEl.value = ""
+        homeValueEl.value = ""
+        calculateSelectEl.selectedIndex = "0"
+
+        inputsEl.forEach((input) => {
+          const idVal = input.id.slice(0, 3)
+          if (idVal === "pur") {
+            input.style.display = "block"
+          } else {
+            input.style.display = "none"
+          }
+        })
+      }
+
+      function resetResult() {
+        calcResultsEl.innerHTML = "<p>Result will appear here...</p>";
+      } 
+
+      function resethandler() {
+        resetForm();
+        resetResult();
+      }
+
+      resetBtnEl.addEventListener("click", resethandler);
+      calcBtnEl.addEventListener("click", calculateResults);
+      [purcPriceEl, downPaymentEl, financeFeeEl, mortPaymentEl, homeValueEl].forEach((el) => {
+        el.addEventListener("input", resetResult);
+      });  
+
+      calculateSelectEl.addEventListener("change", handleCalculateSelectChange);
+
+    </script>
+</body>
+</html>
