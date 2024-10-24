@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Business Loan Calculator</title>
+</head>
+<body>
+    <h1>Business Loan Calculator</h1>
+    <p>
+      Loan amount:
+      <input type="number" id="loanAmt" value="10000">
+    </p>
+    <p>
+      Interest rate: 
+      <input type="number" id="intRate" value="10">%
+    </p>
+    <p>
+      Compound:
+      <select
+        class="selects"
+        id="compoundSelect"
+      >
+        <option value="1">Annually</option>
+        <option value="2">Semi-annually</option>
+        <option value="4">Quarterly</option>
+        <option value="12" selected>Monthly</option>
+        <option value="24">Semi-monthly</option>
+        <option value="26">Bi-Weekly</option>
+        <option value="52">Weekly</option>
+        <option value="365">Daily</option>
+        <option value="0">Continuously</option>
+      </select>
+    </p>  
+    <p>
+      Loan term:
+      <input type="number" id="loanTermYr" value="5"> years
+      <input type="number" id="loanTermMonth" value="0"> months
+    </p>
+    <p>
+      Pay back:
+      <select
+        class="selects"
+        id="freqSelect"
+      >
+        <option value="1">Every Day</option>
+        <option value="2">Every Week</option>
+        <option value="4">Every 2 Weeks</option>
+        <option value="4">Every Half Month</option>
+        <option value="12" selected>Every Month</option>
+        <option value="26">Every Quarter</option>
+        <option value="26">Every 6 Months</option>
+        <option value="52">Every Year</option>
+        <option value="365">Interest Only</option>
+        <option value="365">In the End</option>
+      </select>
+    </p>  
+    <p>
+      Origination fee: 
+      <input type="number" id="originFee" value="5">% 
+    </p>
+    <p>
+      Documentation fee:
+      <input type="number" id="documentFee" value="750">
+    </p>
+    <p>
+      Other fees:
+      <input type="number" id="otherFees" value="0">
+    </p>
+
+    <button id="calcBtn">Calculate</button>
+    <button id="resetBtn">Reset</button>
+    <hr>
+    <div>
+      <h3>Result:</h3>
+      <h3 id="calcResults">Result will appear here...</h3>
+    </div>
+
+    <script>
+      // Get required elements from the HTML
+      const loanAmtEl = document.getElementById("loanAmt");
+      const intRateEl = document.getElementById("intRate");
+      const loanTermYrEl = document.getElementById("loanTermYr");
+      const loanTermMonthEl = document.getElementById("loanTermMonth");
+      const documentFeeEl = document.getElementById("documentFee");
+      const freqSelectEl = document.getElementById("freqSelect");
+      const originFeeEl = document.getElementById("originFee");
+      const compoundSelectEl = document.getElementById("compoundSelect");
+      const otherFeesEl = document.getElementById("otherFees");
+
+      const calcBtnEl = document.getElementById('calcBtn');
+      const resetBtnEl = document.getElementById('resetBtn');
+      const calcResultsEl = document.getElementById('calcResults') 
+
+      function createElement() {
+        const totalMonths = (parseFloat(loanTermYrEl.value) * 12) + parseFloat(loanTermMonthEl.value)
+        const newDiv = `
+            <p>
+              <label for="i11-span">Payback every month: &nbsp;</label>
+              <span
+                data-id="i11"
+                step="any"
+                id="i11-span"
+                class="spans"
+              ></span>%
+            </p>
+            <p>
+              <label for="i12-span">Total of ${totalMonths} loan payments: &nbsp;</label>
+              <span
+                data-id="i12"
+                step="any"
+                id="i12-span"
+                class="spans"
+              ></span>
+            </p>
+            <p>
+              <label for="i13-span">Interest: &nbsp;</label>
+              <span
+                data-id="i13"
+                step="any"
+                id="i13-span"
+                class="spans"
+              ></span>
+            </p>
+            <p>
+              <label for="i14-span">Interest + fee: &nbsp;</label>
+              <span
+                data-id="i14"
+                step="any"
+                id="i14-span"
+                class="spans"
+              ></span>
+            </p>
+            <p>
+              <label for="i15-span">Real rate (APR): &nbsp;</label>
+              <span
+                data-id="i15"
+                step="any"
+                id="i15-span"
+                class="spans"
+              ></span>
+            </p>
+        `
+        return newDiv
+      }
+
+      function setResult(resultObj) {
+        for (key of Object.keys(resultObj)) {
+          let val = resultObj[key].result;
+          let id = resultObj[key].type;
+
+          if (isNaN(val)) {
+           alert("Your input resulted in NAN.\n 0/0 \n Try again with valid input.");
+            return;
+          }
+          if (Math.abs(val) === Infinity) {
+            alert("Your input resulted in Infinity. \nDivision by zero. \nTry again with valid input.");
+            return;
+          }
+          const span = document.getElementById(`${id}-span`);
+          val = Math.abs(val) > 1 ? val.toFixed(2) : val.toPrecision(2)
+          span.textContent = val;
+        }
+      }
+
+      function calculateResults() {
+          // Retrieve input values
+          const loanAmt = parseFloat(loanAmtEl.value);
+          const intRate = parseFloat(intRateEl.value);
+          const loanTermYr = parseFloat(loanTermYrEl.value);
+          const loanTermMonth = parseFloat(loanTermMonthEl.value);
+          const documentFee = documentFeeEl.value;
+          const originFee = parseFloat(originFeeEl.value);
+          const otherFees = otherFeesEl.value;
+          const compoundSelect = parseFloat(compoundSelectEl.value)
+          const freqSelect = parseFloat(freqSelectEl.value)
+
+          if (isNaN(loanAmt) || loanAmt < 0 || isNaN(intRate) || intRate < 0 || isNaN(loanTermYr) || loanTermYr < 0 ||
+            isNaN(originFee) || originFee < 1
+          ) {
+            alert("Please Enter All Details.");
+            return;
+          }
+
+          try {
+            const resultElement = createElement()
+            calcResultsEl.innerHTML = resultElement 
+
+            const payback = 0
+            const totalPmts = 0
+            const totalInt = 0
+            const totalIntAndFees = 0
+            const realAPR = 0
+
+
+            const results = {
+              1: { result: payback, type: "i11" },
+              2: { result: totalPmts, type: "i12" },
+              3: { result: totalInt, type: "i13" },
+              4: { result: totalIntAndFees, type: "i14" },
+              5: { result: realAPR, type: "i15" },
+            }
+            setResult(results)
+
+          } catch (error) {
+            alert("Something Went Wrong!!!");
+            resetResult()
+            return;
+          }
+      }
+
+      function resetForm() {
+        loanAmtEl.value = "10000"
+        intRateEl.value = "10"
+        loanTermYrEl.value = "5"
+        loanTermMonthEl.value = "0"
+        documentFeeEl.value = "750"
+        originFeeEl.value = "0"
+        otherFeesEl.value = "0"
+        compoundSelectEl.selectedIndex = "3"
+        freqSelectEl.selectedIndex = "4"
+      }
+
+      function resetResult() {
+        calcResultsEl.innerHTML = "<p>Result will appear here...</p>";
+      } 
+
+      function resethandler() {
+        resetForm();
+        resetResult();
+      }
+
+      resetBtnEl.addEventListener("click", resethandler);
+      calcBtnEl.addEventListener("click", calculateResults);
+      [loanAmtEl, intRateEl, loanTermYrEl, documentFeeEl, otherFeesEl, originFeeEl, loanTermMonthEl].forEach((el) => {
+        el.addEventListener("input", resetResult);
+      }); 
+      
+      [freqSelectEl, compoundSelectEl].forEach((el) => {
+        el.addEventListener("change", resetResult);
+      });  
+
+    </script>
+</body>
+</html>

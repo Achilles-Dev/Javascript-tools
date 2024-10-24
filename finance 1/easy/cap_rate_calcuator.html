@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Cap Rate Calculator</title>
+</head>
+<body>
+    <h1>Cap Rate Calculator</h1>
+    <p>
+      Property value:
+      <input type="number" id="propertyVal">
+    </p>
+    <p>
+      Annual gross income: 
+      <input type="number" id="grossIncome">
+    </p>
+    <p>
+      Operating expenses (percentage):
+      <input type="number" id="operatingExp" value="0">%
+    </p>
+    <p>
+      Vacancy rate:
+      <input type="number" id="vacancyRate" value="0">%
+    </p>
+
+
+    <button id="calcBtn">Calculate</button>
+    <button id="resetBtn">Reset</button>
+    <hr>
+    <div>
+      <h3>Result:</h3>
+      <h3 id="calcResults">Result will appear here...</h3>
+    </div>
+
+    <script>
+      // Get required elements from the HTML
+      const propertyValEl = document.getElementById("propertyVal");
+      const grossIncomeEl = document.getElementById("grossIncome");
+      const operatingExpEl = document.getElementById("operatingExp");
+      const vacancyRateEl = document.getElementById("vacancyRate");
+
+      const calcBtnEl = document.getElementById('calcBtn');
+      const resetBtnEl = document.getElementById('resetBtn');
+      const calcResultsEl = document.getElementById('calcResults') 
+
+      function createElement() {
+        const newDiv = `
+            <p>
+              <label for="i11-span">Operating expenses (total): &nbsp;</label>
+              <span
+                data-id="i11"
+                step="any"
+                id="i11-span"
+                class="spans"
+              ></span>
+            </p>
+            <p>
+              <label for="i12-span">Annual net income: &nbsp;</label>
+              <span
+                data-id="i12"
+                step="any"
+                id="i12-span"
+                class="spans"
+              ></span>
+            </p>
+            <p>
+              <label for="i13-span">Cap rate: &nbsp;</label>
+              <span
+                data-id="i13"
+                step="any"
+                id="i13-span"
+                class="spans"
+              ></span>%
+            </p>
+        `
+        return newDiv
+      }
+
+      function setResult(resultObj) {
+        for (key of Object.keys(resultObj)) {
+          let val = resultObj[key].result;
+          let id = resultObj[key].type;
+
+          if (isNaN(val)) {
+           alert("Your input resulted in NAN.\n 0/0 \n Try again with valid input.");
+            return;
+          }
+          if (Math.abs(val) === Infinity) {
+            alert("Your input resulted in Infinity. \nDivision by zero. \nTry again with valid input.");
+            return;
+          }
+          const span = document.getElementById(`${id}-span`);
+          span.textContent = `${val}`;
+        }
+      }
+
+      function calculateResults() {
+          // Retrieve input values
+          const propertyVal = parseFloat(propertyValEl.value);
+          const grossIncome = parseFloat(grossIncomeEl.value);
+          const operatingExp = parseFloat(operatingExpEl.value);
+          const vacancyRate = parseFloat(vacancyRateEl.value);
+
+          if (isNaN(propertyVal) || propertyVal <= 0 || isNaN(grossIncome) || grossIncome <= 0 || isNaN(operatingExp) || operatingExp < 0 ||
+            isNaN(vacancyRate) || vacancyRate < 0
+          ) {
+            alert("Please Enter All Details.");
+            return;
+          } else if (operatingExp >= 100 || vacancyRate >= 100) {
+            alert("Ensure this value is less than 100");
+            return;
+          }
+
+          try {
+            const resultElement = createElement()
+            calcResultsEl.innerHTML = resultElement 
+
+            const expTotal = (operatingExp / 100) * grossIncome
+            const netIncome = ((100 - operatingExp) / 100) * ((100 - vacancyRate) / 100) * grossIncome
+            const capRate = (netIncome / propertyVal) * 100
+
+            const results = {
+              1: { result: Math.abs(expTotal) > 1 ? expTotal.toFixed(2) : expTotal.toPrecision(2), type: "i11" },
+              2: { result: Math.abs(netIncome) > 1 ? netIncome.toFixed(2) : netIncome.toPrecision(2), type: "i12" },
+              3: { result: Math.abs(capRate) > 1 ? capRate.toFixed(2) : capRate.toPrecision(2), type: "i13" },
+            }
+            setResult(results)
+
+          } catch (error) {
+            alert("Something Went Wrong!!!");
+            resetResult()
+            return;
+          }
+      }
+
+      function resetForm() {
+        propertyValEl.value = ""
+        grossIncomeEl.value = ""
+        operatingExpEl.value = ""
+        vacancyRateEl.value = ""
+      }
+
+      function resetResult() {
+        calcResultsEl.innerHTML = "<p>Result will appear here...</p>";
+      } 
+
+      function resethandler() {
+        resetForm();
+        resetResult();
+      }
+
+      resetBtnEl.addEventListener("click", resethandler);
+      calcBtnEl.addEventListener("click", calculateResults);
+      [propertyValEl, grossIncomeEl, operatingExpEl, vacancyRateEl].forEach((el) => {
+        el.addEventListener("input", resetResult);
+      });  
+
+    </script>
+</body>
+</html>

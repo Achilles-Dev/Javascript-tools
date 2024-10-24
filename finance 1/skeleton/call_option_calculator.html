@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Call Option Calculator</title>
+</head>
+<body>
+    <h1>Call Option Calculator</h1>
+    <p>
+      Select calculator mode:
+      <select id="calcSelect">
+        <option value="cal">Call option calculator</option>
+        <option value="put">Put option calculator</option>
+      </select>
+    </p>
+    <p>
+      Current asset price or target price:
+      <input type="number" id="assetPrice">
+    </p>
+    <p>
+      Strike price: 
+      <input type="number" id="strikePrice">
+    </p>
+    <p id="calInput" class="inputs">
+      Price of the call option:
+      <input type="number" id="callPrice">
+    </p>
+    <p id="putInput" class="inputs" style="display: none;">
+      Price of the put option:
+      <input type="number" id="putPrice">
+    </p>
+    <p>
+      Number of option contracts:
+      <input type="number" id="contractNum">
+    </p>
+
+
+    <button id="calcBtn">Calculate</button>
+    <button id="resetBtn">Reset</button>
+    <hr>
+    <div>
+      <h3>Result:</h3>
+      <h3 id="calcResults">Result will appear here...</h3>
+    </div>
+
+    <script>
+      // Get required elements from the HTML
+      const calcSelectEl = document.getElementById("calcSelect");
+      const assetPriceEl = document.getElementById("assetPrice");
+      const strikePriceEl = document.getElementById("strikePrice");
+      const callPriceEl = document.getElementById("callPrice");
+      const putPriceEl = document.getElementById("putPrice");
+      const contractNumEl = document.getElementById("contractNum");
+      const inputsEl = document.querySelectorAll(".inputs");
+
+      const calcBtnEl = document.getElementById('calcBtn');
+      const resetBtnEl = document.getElementById('resetBtn');
+      const calcResultsEl = document.getElementById('calcResults') 
+
+      function handleCalcSelectChange(e) {
+        const value = e.target.value
+
+        inputsEl.forEach((input) => {
+          const idVal = input.id.slice(0, 3)
+          if (idVal === value) {
+            input.style.display = "block"
+          } else {
+            input.style.display = "none"
+          }
+        })
+
+        resetResult()
+      }
+
+      function createElement() {
+        const newDiv = `
+            <p>
+              <label for="i11-span">Total call cost (premium): &nbsp;</label>
+              <span
+                data-id="i11"
+                step="any"
+                id="i11-span"
+                class="spans"
+              ></span>
+            </p>
+        `
+        return newDiv
+      }
+
+      function setResult(resultObj) {
+        for (key of Object.keys(resultObj)) {
+          let val = resultObj[key].result;
+          let id = resultObj[key].type;
+
+          if (isNaN(val)) {
+           alert("Your input resulted in NAN.\n 0/0 \n Try again with valid input.");
+            return;
+          }
+          if (Math.abs(val) === Infinity) {
+            alert("Your input resulted in Infinity. \nDivision by zero. \nTry again with valid input.");
+            return;
+          }
+          const span = document.getElementById(`${id}-span`);
+          span.textContent = `${parseFloat(val)}`;
+        }
+      }
+
+      function calculateResults() {
+          // Retrieve input values
+          const assetPrice = parseFloat(assetPriceEl.value);
+          const strikePrice = parseFloat(strikePriceEl.value);
+          const callPrice = parseFloat(callPriceEl.value);
+          const putPrice = parseFloat(putPriceEl.value);
+          const contractNum = parseFloat(contractNumEl.value);
+          const calcSelect = calcSelectEl.value
+
+          if (isNaN(assetPrice) || assetPrice < 0.01 || isNaN(strikePrice) || strikePrice < 0 || 
+            (calcSelect === "cal" && (isNaN(callPrice) || callPrice < 0 )) ||
+            (calcSelect === "put" && (isNaN(putPrice) || putPrice < 0 )) ||
+            isNaN(contractNum) || contractNum < 1
+          ) {
+            alert("Please Enter All Details.");
+            return;
+          } else if (callPrice > 99) {
+            alert("Ensure this value is less than or equal to 99");
+            return;
+          }
+
+          try {
+            const resultElement = createElement()
+            calcResultsEl.innerHTML = resultElement 
+
+            let result = 0
+            if (calcSelect === "cal") {
+              result = 0
+            } else {
+              result = 0
+            }
+
+            const results = {
+              1: { result: Math.abs(result) > 1 ? result.toFixed(4) : result.toPrecision(4), type: "i11" },
+            }
+            setResult(results)
+
+          } catch (error) {
+            alert("Something Went Wrong!!!");
+            resetResult()
+            return;
+          }
+      }
+
+      function resetForm() {
+        assetPriceEl.value = ""
+        strikePriceEl.value = ""
+        callPriceEl.value = ""
+        contractNumEl.value = ""
+
+        calcSelectEl.selectedIndex = "0"
+      }
+
+      function resetResult() {
+        calcResultsEl.innerHTML = "<p>Result will appear here...</p>";
+      } 
+
+      function resethandler() {
+        resetForm();
+        resetResult();
+      }
+
+      resetBtnEl.addEventListener("click", resethandler);
+      calcBtnEl.addEventListener("click", calculateResults);
+      [assetPriceEl, strikePriceEl, callPriceEl, contractNumEl].forEach((el) => {
+        el.addEventListener("input", resetResult);
+      });  
+
+      calcSelectEl.addEventListener("change", handleCalcSelectChange);
+
+    </script>
+</body>
+</html>

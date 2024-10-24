@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Cash Conversion Cycle Calculator</title>
+</head>
+<body>
+    <h1>Cash Conversion Cycle Calculator</h1>
+    <p>
+      Period of analysis:
+      <input type="number" id="period" value="365">days
+    </p>
+    <p>
+      Total revenues: 
+      <input type="number" id="totRevenue">
+    </p>
+    <p>
+      Cost of goods sold:
+      <input type="number" id="goodsCost">
+    </p>
+    <p>
+      Average inventory:
+      <input type="number" id="avgInventory">
+    </p>
+    <p>
+      Average accounts receivables:
+      <input type="number" id="avgReceivable">
+    </p>
+    <p>
+      Average accounts payable:
+      <input type="number" id="avgPayable">
+    </p>
+
+    <button id="calcBtn">Calculate</button>
+    <button id="resetBtn">Reset</button>
+    <hr>
+    <div>
+      <h3>Result:</h3>
+      <h3 id="calcResults">Result will appear here...</h3>
+    </div>
+
+    <script>
+      // Get required elements from the HTML
+      const periodEl = document.getElementById("period");
+      const totRevenueEl = document.getElementById("totRevenue");
+      const goodsCostEl = document.getElementById("goodsCost");
+      const avgInventoryEl = document.getElementById("avgInventory");
+      const avgReceivableEl = document.getElementById("avgReceivable");
+      const avgPayableEl = document.getElementById("avgPayable");
+
+      const calcBtnEl = document.getElementById('calcBtn');
+      const resetBtnEl = document.getElementById('resetBtn');
+      const calcResultsEl = document.getElementById('calcResults') 
+
+      function createElement() {
+        const newDiv = `
+            <p>
+              <label for="i11-span">Accounts receivables days: &nbsp;</label>
+              <span
+                data-id="i11"
+                step="any"
+                id="i11-span"
+                class="spans"
+              ></span> days
+            </p>
+            <p>
+              <label for="i12-span">Inventory days: &nbsp;</label>
+              <span
+                data-id="i12"
+                step="any"
+                id="i12-span"
+                class="spans"
+              ></span> days
+            </p>
+            <p>
+              <label for="i13-span">Accounts payable days: &nbsp;</label>
+              <span
+                data-id="i13"
+                step="any"
+                id="i13-span"
+                class="spans"
+              ></span> days
+            </p>
+            <p>
+              <label for="i14-span">Cash conversion cycle: &nbsp;</label>
+              <span
+                data-id="i14"
+                step="any"
+                id="i14-span"
+                class="spans"
+              ></span> days
+            </p>
+        `
+        return newDiv
+      }
+
+      function setResult(resultObj) {
+        for (key of Object.keys(resultObj)) {
+          let val = resultObj[key].result;
+          let id = resultObj[key].type;
+
+          if (isNaN(val)) {
+           alert("Your input resulted in NAN.\n 0/0 \n Try again with valid input.");
+            return;
+          }
+          if (Math.abs(val) === Infinity) {
+            alert("Your input resulted in Infinity. \nDivision by zero. \nTry again with valid input.");
+            return;
+          }
+          const span = document.getElementById(`${id}-span`);
+          span.textContent = `${val * 1}`;
+        }
+      }
+
+      function calculateResults() {
+          // Retrieve input values
+          const period = parseFloat(periodEl.value);
+          const totRevenue = parseFloat(totRevenueEl.value);
+          const goodsCost = parseFloat(goodsCostEl.value);
+          const avgInventory = parseFloat(avgInventoryEl.value);
+          const avgReceivable = parseFloat(avgReceivableEl.value);
+          const avgPayable = parseFloat(avgPayableEl.value);
+
+          if (isNaN(period) || period <= 0 || isNaN(totRevenue) || totRevenue <= 0 || isNaN(goodsCost) || goodsCost <= 0 ||
+            isNaN(avgInventory) || avgInventory < 0 || isNaN(avgReceivable) || avgReceivable < 0 || isNaN(avgPayable) || 
+            avgPayable < 0
+          ) {
+            alert("Please Enter All Details.");
+            return;
+          } else if (goodsCost >= 100 || avgInventory >= 100) {
+            alert("Ensure this value is less than 100");
+            return;
+          }
+
+          try {
+            const resultElement = createElement()
+            calcResultsEl.innerHTML = resultElement 
+
+            const ARD = 0
+            const invDays = 0
+            const APD = 0
+            const CCC = 0
+
+            const results = {
+              1: { result: Math.abs(ARD) > 1 ? ARD.toFixed(2) : ARD.toPrecision(2), type: "i11" },
+              2: { result: Math.abs(invDays) > 1 ? invDays.toFixed(2) : invDays.toPrecision(2), type: "i12" },
+              3: { result: Math.abs(APD) > 1 ? APD.toFixed(2) : APD.toPrecision(2), type: "i13" },
+              4: { result: Math.abs(CCC) > 1 ? CCC.toFixed(2) : CCC.toPrecision(2), type: "i14" },
+            }
+            setResult(results)
+
+          } catch (error) {
+            alert("Something Went Wrong!!!");
+            resetResult()
+            return;
+          }
+      }
+
+      function resetForm() {
+        periodEl.value = "365"
+        totRevenueEl.value = ""
+        goodsCostEl.value = ""
+        avgInventoryEl.value = ""
+        avgReceivableEl.value = ""
+        avgPayableEl.value = ""
+      }
+
+      function resetResult() {
+        calcResultsEl.innerHTML = "<p>Result will appear here...</p>";
+      } 
+
+      function resethandler() {
+        resetForm();
+        resetResult();
+      }
+
+      resetBtnEl.addEventListener("click", resethandler);
+      calcBtnEl.addEventListener("click", calculateResults);
+      [periodEl, totRevenueEl, goodsCostEl, avgInventoryEl, 
+        avgReceivableEl, avgPayableEl].forEach((el) => {
+        el.addEventListener("input", resetResult);
+      });  
+
+    </script>
+</body>
+</html>
