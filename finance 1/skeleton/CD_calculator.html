@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Cash Conversion Cycle Calculator</title>
+</head>
+<body>
+    <h1>Cash Conversion Cycle Calculator</h1>
+    <h3>Use this certificate of deposit calculator to easily calculate the cd rate, interest accrued, <br /> 
+      total return, and growth rate based on an initial deposit. Supports daily, monthly, quarterly, <br />
+       semiannual, and annual interest compounding.
+    </h3>
+    <p>
+      Initial Deposit:
+      <input type="number" id="initDeposit">
+    </p>
+    <p>
+      Time duration: 
+      <input type="number" id="time">
+      <select
+        class="selects"
+        id="timeSelect"
+      >
+        <option value="1" selected>Years</option>
+        <option value="2">1/2-Years</option>
+        <option value="4">Quarters</option>
+        <option value="12">Months</option>
+        <option value="365">Days</option>
+      </select>
+    </p>
+    <p>
+      Interest rate:
+      <input type="number" id="intRate">%
+    </p>
+    <p>
+      Compound frequency:
+      <select
+        class="selects"
+        id="freqSelect"
+      >
+        <option value="1" selected>Annually</option>
+        <option value="0.5">Semiannually</option>
+        <option value="0.25">Quarterly</option>
+        <option value="0.08333333333">Monthly</option>
+        <option value="0.0027397260274">Daily</option>
+      </select>
+    </p>
+    <div id="amInputs" class="inputs" style="display: none;">
+      <p>
+        Contribution:
+        <input type="number" id="contribution">
+        <select
+          class="selects"
+          id="contributeSelect"
+        >
+          <option value="1" selected>$ / Year</option>
+          <option value="2">$ / 1/2-Year</option>
+          <option value="4">$ / Quarter</option>
+          <option value="12">$ / Month</option>
+          <option value="365">$ / Day</option>
+        </select>
+      </p>
+      <p>
+        Add contribution at:
+        <select id="contributeAtSelect">
+          <option value="start">Start of each initDeposit</option>
+          <option value="end" selected>End of each initDeposit</option>
+        </select>
+      </p>
+      <p>
+        Tax rate:
+        <input type="number" id="taxRate">%
+      </p>
+      <p>
+        Inflation rate:
+        <input type="number" id="infRate">%
+      </p>
+    </div>
+    <p>
+      Mode:
+      <select id="modeSelect">
+        <option value="am">Advanced</option>
+        <option value="sm" selected>Simple</option>
+      </select>
+    </p>
+
+    <button id="calcBtn">Calculate</button>
+    <button id="resetBtn">Reset</button>
+    <hr>
+    <div>
+      <h3>Result:</h3>
+      <h3 id="calcResults">Result will appear here...</h3>
+    </div>
+
+    <script>
+      // Get required elements from the HTML
+      const initDepositEl = document.getElementById("initDeposit");
+      const timeEl = document.getElementById("time");
+      const intRateEl = document.getElementById("intRate");
+      const infRateEl = document.getElementById("infRate");
+      const contributionEl = document.getElementById("contribution");
+      const taxRateEl = document.getElementById("taxRate");
+      const freqSelectEl = document.getElementById("freqSelect");
+      const contributeSelectEl = document.getElementById("contributeSelect");
+      const contributeAtSelectEl = document.getElementById("contributeAtSelect");
+      const modeSelectEl = document.getElementById("modeSelect");
+
+      const inputsEl = document.querySelectorAll(".inputs")
+
+      const calcBtnEl = document.getElementById('calcBtn');
+      const resetBtnEl = document.getElementById('resetBtn');
+      const calcResultsEl = document.getElementById('calcResults') 
+
+      function handleModeSelectChange(e) {
+        const value = e.target.value
+        
+        inputsEl.forEach((input) => {
+          const idVal = input.id.slice(0, 2)
+          input.style.display = idVal === value ? "block" : "none"
+        })
+
+        resetResult()
+      }
+
+      function createElement() {
+        const newDiv = `
+            <p>
+              <label for="i11-span">Deposit value after 2 years: &nbsp;</label>
+              <span
+                data-id="i11"
+                step="any"
+                id="i11-span"
+                class="spans"
+              ></span>
+            </p>
+            <p>
+              <label for="i12-span">Value with inflation adjustment: &nbsp;</label>
+              <span
+                data-id="i12"
+                step="any"
+                id="i12-span"
+                class="spans"
+              ></span>
+            </p>
+            <p>
+              <label for="i13-span">Interest accrued (return): &nbsp;</label>
+              <span
+                data-id="i13"
+                step="any"
+                id="i13-span"
+                class="spans"
+              ></span>
+            </p>
+            <p>
+              <label for="i14-span">Effective interest rate: &nbsp;</label>
+              <span
+                data-id="i14"
+                step="any"
+                id="i14-span"
+                class="spans"
+              ></span>%
+            </p>
+            <p>
+              <label for="i15-span">Capital growth (nominal): &nbsp;</label>
+              <span
+                data-id="i15"
+                step="any"
+                id="i15-span"
+                class="spans"
+              ></span>%
+            </p>
+            <p>
+              <label for="i16-span">Capital growth (inflation-adjusted): &nbsp;</label>
+              <span
+                data-id="i16"
+                step="any"
+                id="i16-span"
+                class="spans"
+              ></span>%
+            </p>
+            <p>
+              <label for="i17-span">Total contributions: &nbsp;</label>
+              <span
+                data-id="i17"
+                step="any"
+                id="i17-span"
+                class="spans"
+              ></span>
+            </p>
+            <p>
+              <label for="i18-span">Total tax: &nbsp;</label>
+              <span
+                data-id="i18"
+                step="any"
+                id="i18-span"
+                class="spans"
+              ></span>
+            </p>
+        `
+        return newDiv
+      }
+
+      function setResult(resultObj) {
+        for (key of Object.keys(resultObj)) {
+          let val = resultObj[key].result;
+          let id = resultObj[key].type;
+
+          if (isNaN(val)) {
+           alert("Your input resulted in NAN.\n 0/0 \n Try again with valid input.");
+            return;
+          }
+          if (Math.abs(val) === Infinity) {
+            alert("Your input resulted in Infinity. \nDivision by zero. \nTry again with valid input.");
+            return;
+          }
+          const span = document.getElementById(`${id}-span`);
+          span.textContent = `${val * 1}`;
+        }
+      }
+
+      function calculateResults() {
+          // Retrieve input values
+          const initDeposit = parseFloat(initDepositEl.value);
+          const time = parseFloat(timeEl.value);
+          const intRate = parseFloat(intRateEl.value);
+          const infRate = parseFloat(infRateEl.value);
+          const contribution = parseFloat(contributionEl.value);
+          const taxRate = parseFloat(taxRateEl.value);
+          const mode = modeSelectEl.value
+
+          if (isNaN(initDeposit) || initDeposit <= 0 || isNaN(time) || time <= 0 || isNaN(intRate) || intRate < 0 ||
+            (mode === "am" && (isNaN(infRate) || infRate < 0 || isNaN(contribution) || contribution < 0 || 
+            isNaN(taxRate) || taxRate < 0 || isNaN(infRate) || infRate < 0))
+          ) {
+            alert("Please Enter All Details.");
+            return;
+          } else if (intRate >= 100 || infRate >= 100) {
+            alert("Ensure this value is less than 100");
+            return;
+          }
+
+          try {
+            const resultElement = createElement()
+            calcResultsEl.innerHTML = resultElement 
+
+            const depositVal = 0
+            const depositValWithInf = 0
+            const interestAcc = 0
+            const EIR = 0
+            const CapGrthNom = 0
+            const CapGrthInf = 0
+            const totalContrib = 0
+            const totalTax = 0
+
+            const results = {
+              1: { result: Math.abs(depositVal) > 1 ? depositVal.toFixed(2) : depositVal.toPrecision(2), type: "i11" },
+              2: { result: Math.abs(depositValWithInf) > 1 ? depositValWithInf.toFixed(2) : depositValWithInf.toPrecision(2), type: "i12" },
+              3: { result: Math.abs(interestAcc) > 1 ? interestAcc.toFixed(2) : interestAcc.toPrecision(2), type: "i13" },
+              4: { result: Math.abs(EIR) > 1 ? EIR.toFixed(2) : EIR.toPrecision(2), type: "i14" },
+              5: { result: Math.abs(CapGrthNom) > 1 ? CapGrthNom.toFixed(2) : CapGrthNom.toPrecision(2), type: "i15" },
+              6: { result: Math.abs(CapGrthInf) > 1 ? CapGrthInf.toFixed(2) : CapGrthInf.toPrecision(2), type: "i16" },
+              7: { result: Math.abs(totalContrib) > 1 ? totalContrib.toFixed(2) : totalContrib.toPrecision(2), type: "i17" },
+              8: { result: Math.abs(totalTax) > 1 ? totalTax.toFixed(2) : totalTax.toPrecision(2), type: "i18" },
+            }
+            setResult(results)
+
+          } catch (error) {
+            alert("Something Went Wrong!!!");
+            resetResult()
+            return;
+          }
+      }
+
+      function resetForm() {
+        initDepositEl.value = ""
+        timeEl.value = ""
+        intRateEl.value = ""
+        infRateEl.value = ""
+        contributionEl.value = ""
+        taxRateEl.value = ""
+        freqSelectEl.selectedIndex = "0"
+        contributeSelectEl.selectedIndex = "0"
+        contributeAtSelectEl.selectedIndex = "0"
+        modeSelectEl.selectedIndex = "1"
+      }
+
+      function resetResult() {
+        calcResultsEl.innerHTML = "<p>Result will appear here...</p>";
+      } 
+
+      function resethandler() {
+        resetForm();
+        resetResult();
+      }
+
+      resetBtnEl.addEventListener("click", resethandler);
+      calcBtnEl.addEventListener("click", calculateResults);
+      [initDepositEl, timeEl, intRateEl, infRateEl, 
+        contributionEl, taxRateEl].forEach((el) => {
+        el.addEventListener("input", resetResult);
+      }); 
+      
+      [freqSelectEl, contributeSelectEl, contributeAtSelectEl].forEach((el) => {
+        el.addEventListener("change", resetResult);
+      }); 
+
+      modeSelectEl.addEventListener("change", handleModeSelectChange);
+
+    </script>
+</body>
+</html>
