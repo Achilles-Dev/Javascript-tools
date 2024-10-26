@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Credit Card Payment Calculator</title>
+</head>
+<body>
+    <h1>Credit Card Payment Calculator</h1>
+    <h3>Calculate your credit card payment.</h3>
+    <p>
+      Credit card balance:
+      <input type="number" id="cardBalance" value="3000">
+    </p>
+    <p>
+      Annual interest rate (APR):
+      <input type="number" id="intRate" value="17">%
+    </p>
+    <p>
+      Number of months to pay off:
+      <input type="number" id="payoffMonths" value="12">
+    </p>
+
+    <button id="calcBtn">Calculate</button>
+    <button id="resetBtn">Reset</button>
+    <hr>
+    <div>
+      <h3>Result:</h3>
+      <h3 id="calcResults">Result will appear here...</h3>
+    </div>
+
+    <script>
+      // Get required elements from the HTML
+      const cardBalanceEl = document.getElementById("cardBalance");
+      const intRateEl = document.getElementById("intRate");
+      const payoffMonthsEl = document.getElementById("payoffMonths");
+
+      const calcBtnEl = document.getElementById('calcBtn');
+      const resetBtnEl = document.getElementById('resetBtn');
+      const calcResultsEl = document.getElementById('calcResults') 
+
+      function createElement() {
+        const newDiv = `
+            <p>
+              <label for="i11-span">Monthly Payments: &nbsp;</label>
+              <span
+                data-id="i11"
+                step="any"
+                id="i11-span"
+                class="spans"
+              ></span>
+            </p>
+            <p>
+              <label for="i12-span">Total Interest Paid: &nbsp;</label>
+              <span
+                data-id="i12"
+                step="any"
+                id="i12-span"
+                class="spans"
+              ></span>
+            </p>
+            <p>
+              <label for="i13-span">Total Payments: &nbsp;</label>
+              <span
+                data-id="i13"
+                step="any"
+                id="i13-span"
+                class="spans"
+              ></span>
+            </p>
+        `
+        return newDiv
+      }
+
+      function setResult(resultObj) {
+        for (key of Object.keys(resultObj)) {
+          let val = resultObj[key].result;
+          let id = resultObj[key].type;
+
+          if (isNaN(val)) {
+           alert("Your input resulted in NAN.\n 0/0 \n Try again with valid input.");
+            return;
+          }
+          if (Math.abs(val) === Infinity) {
+            alert("Your input resulted in Infinity. \nDivision by zero. \nTry again with valid input.");
+            return;
+          }
+          const span = document.getElementById(`${id}-span`);
+          span.textContent = `${val}`;
+        }
+      }
+
+      function calculateResults() {
+          // Retrieve input values
+          const cardBalance = parseFloat(cardBalanceEl.value);
+          const intRate = parseFloat(intRateEl.value);
+          const payoffMonths = parseFloat(payoffMonthsEl.value);
+
+          if (isNaN(cardBalance) || cardBalance < 0.001 || isNaN(intRate) || intRate < 0 || isNaN(payoffMonths) || payoffMonths < 1
+          ) {
+            alert("Please Enter All Details.");
+            return;
+          } else if (intRate > 99) {
+            alert("Ensure this value is less than or equal to 99");
+            return;
+          }
+
+          try {
+            const resultElement = createElement()
+            calcResultsEl.innerHTML = resultElement 
+
+            const monthlyPmt = 0
+            const totalInt = 0
+            const totalPmt = 0
+
+            const results = {
+              1: { result: Math.abs(monthlyPmt) > 1 ? monthlyPmt.toFixed(2) : monthlyPmt.toPrecision(2), type: "i11" },
+              2: { result: Math.abs(totalInt) > 1 ? totalInt.toFixed(2) : totalInt.toPrecision(2), type: "i12" },
+              3: { result: Math.abs(totalPmt) > 1 ? totalPmt.toFixed(2) : totalPmt.toPrecision(2), type: "i13" },
+            }
+            setResult(results)
+
+          } catch (error) {
+            alert("Something Went Wrong!!!");
+            resetResult()
+            return;
+          }
+      }
+
+      function resetForm() {
+        cardBalanceEl.value = "3000"
+        intRateEl.value = "17"
+        payoffMonthsEl.value = "12"
+      }
+
+      function resetResult() {
+        calcResultsEl.innerHTML = "<p>Result will appear here...</p>";
+      } 
+
+      function resethandler() {
+        resetForm();
+        resetResult();
+      }
+
+      resetBtnEl.addEventListener("click", resethandler);
+      calcBtnEl.addEventListener("click", calculateResults);
+      [cardBalanceEl, intRateEl, payoffMonthsEl].forEach((el) => {
+        el.addEventListener("input", resetResult);
+      });  
+
+    </script>
+</body>
+</html>
