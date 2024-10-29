@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Discounted Cash Flow Calculator</title>
+</head>
+<body>
+    <h1>Discounted Cash Flow Calculator</h1>
+    <p>
+      Current value:
+      <input type="number" id="currVal">
+    </p>
+    <p>
+      Discount rate: 
+      <input type="number" id="discountRate">%
+    </p>
+    <p>
+      Growth rate:
+      <input type="number" id="growthRate">%
+    </p>
+    <p>
+      Growing over:
+      <input type="number" id="growingOver"> years
+    </p>
+    <p>
+      Terminal rate:
+      <input type="number" id="terminalRate">%
+    </p>
+    <p>
+      Terminal rate over:
+      <input type="number" id="TerminalRateOver"> years
+    </p>
+
+
+    <button id="calcBtn">Calculate</button>
+    <button id="resetBtn">Reset</button>
+    <hr>
+    <div>
+      <h3>Result:</h3>
+      <h3 id="calcResults">Result will appear here...</h3>
+    </div>
+
+    <script>
+      // Get required elements from the HTML
+      const currValEl = document.getElementById("currVal");
+      const discountRateEl = document.getElementById("discountRate");
+      const growthRateEl = document.getElementById("growthRate");
+      const growingOverEl = document.getElementById("growingOver");
+      const terminalRateEl = document.getElementById("terminalRate");
+      const TerminalRateOverEl = document.getElementById("TerminalRateOver");
+
+      const calcBtnEl = document.getElementById('calcBtn');
+      const resetBtnEl = document.getElementById('resetBtn');
+      const calcResultsEl = document.getElementById('calcResults') 
+
+      function createElement() {
+        const newDiv = `
+            <p>
+              <label for="i11-span">Growth Discounted Present Value: &nbsp;</label>
+              <span
+                data-id="i11"
+                step="any"
+                id="i11-span"
+                class="spans"
+              ></span>
+            </p>
+            <p>
+              <label for="i12-span">Terminal Discounted Present Value: &nbsp;</label>
+              <span
+                data-id="i12"
+                step="any"
+                id="i12-span"
+                class="spans"
+              ></span>
+            </p>
+            <p>
+              <label for="i13-span">Total Discounted Present Value: &nbsp;</label>
+              <span
+                data-id="i13"
+                step="any"
+                id="i13-span"
+                class="spans"
+              ></span>
+            </p>
+        `
+        return newDiv
+      }
+
+      function setResult(resultObj) {
+        for (key of Object.keys(resultObj)) {
+          let val = resultObj[key].result;
+          let id = resultObj[key].type;
+
+          if (isNaN(val)) {
+           alert("Your input resulted in NAN.\n 0/0 \n Try again with valid input.");
+            return;
+          }
+          if (Math.abs(val) === Infinity) {
+            alert("Your input resulted in Infinity. \nDivision by zero. \nTry again with valid input.");
+            return;
+          }
+          const span = document.getElementById(`${id}-span`);
+          span.textContent = `${val}`;
+        }
+      }
+
+      function calculateResults() {
+          // Retrieve input values
+          const currVal = parseFloat(currValEl.value);
+          const discountRate = parseFloat(discountRateEl.value);
+          const growthRate = parseFloat(growthRateEl.value);
+          const growingOver = parseFloat(growingOverEl.value);
+          const terminalRate = parseFloat(terminalRateEl.value);
+          const TerminalRateOver = parseFloat(TerminalRateOverEl.value);
+
+          if (isNaN(currVal) || currVal < 1 || isNaN(discountRate) || discountRate <= 0 || isNaN(growthRate) || growthRate <= 0 ||
+            isNaN(growingOver) || growingOver <= 0 || isNaN(terminalRate) || terminalRate < 0 || isNaN(TerminalRateOver) || TerminalRateOver <= 0
+          ) {
+            alert("Please Enter All Details.");
+            return;
+          } else if (growthRate === terminalRate || growthRate === discountRate || discountRate === terminalRate) {
+            alert("Invalid growth, terminal, or discount value. Impossible to compute discounted value with this input due to division by zero.");
+            return;
+            
+          }
+
+          try {
+            const resultElement = createElement()
+            calcResultsEl.innerHTML = resultElement 
+
+            const GDPV = 0
+            const TerDPV = 0
+            const TDPV = 0
+
+            const results = {
+              1: { result: Math.abs(GDPV) > 1 ? GDPV.toFixed(2) : GDPV.toPrecision(2), type: "i11" },
+              2: { result: Math.abs(TerDPV) > 1 ? TerDPV.toFixed(2) : TerDPV.toPrecision(2), type: "i12" },
+              3: { result: Math.abs(TDPV) > 1 ? TDPV.toFixed(2) : TDPV.toPrecision(2), type: "i13" },
+            }
+            setResult(results)
+
+          } catch (error) {
+            alert("Something Went Wrong!!!");
+            resetResult()
+            return;
+          }
+      }
+
+      function resetForm() {
+        currValEl.value = ""
+        discountRateEl.value = ""
+        growthRateEl.value = ""
+        growingOverEl.value = ""
+        terminalRateEl.value = ""
+        TerminalRateOverEl.value = ""
+      }
+
+      function resetResult() {
+        calcResultsEl.innerHTML = "<p>Result will appear here...</p>";
+      } 
+
+      function resethandler() {
+        resetForm();
+        resetResult();
+      }
+
+      resetBtnEl.addEventListener("click", resethandler);
+      calcBtnEl.addEventListener("click", calculateResults);
+      [currValEl, discountRateEl, growthRateEl, growingOverEl, terminalRateEl, TerminalRateOverEl].forEach((el) => {
+        el.addEventListener("input", resetResult);
+      });  
+
+    </script>
+</body>
+</html>

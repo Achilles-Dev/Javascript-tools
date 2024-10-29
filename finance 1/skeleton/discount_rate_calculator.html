@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Discount Rate Calculator</title>
+</head>
+<body>
+    <h1>Discount Rate Calculator</h1>
+    <p>
+      Present Value (PV):
+      <input type="number" id="presentVal">
+    </p>
+    <p>
+      Future Value (FV): 
+      <input type="number" id="futureVal">
+    </p>
+    <p>
+      Term or number of periods:  
+      <input type="number" id="period">
+      <select id="periodSelect">
+        <option value="12">months</option>
+        <option value="1" selected>years</option>
+      </select>
+    </p>
+    <p>
+      Compounding frequency:
+      <select
+        class="selects"
+        id="compoundSelect"
+      >
+        <option value="1" selected>Yearly (1/Yr)</option>
+        <option value="2">Semi-annually (2/Yr)</option>
+        <option value="4">Quarterly (4/Yr)</option>
+        <option value="12">Monthly (12/Yr)</option>
+        <option value="52">Weekly (52/Yr)</option>
+        <option value="365">Daily (365/Yr)</option>
+        <option value="0">Continuous (∞)</option>
+      </select>
+    </p>  
+   <p>Periodic cash flows:</p>
+   <p>
+    Cash Flow (CF):
+    <input type="number" id="cashFlow" value="0">
+  </p>
+    <p>
+      Cash flow frequency:
+      <select
+        class="selects"
+        id="freqSelect"
+      >
+        <option value="1" selected>Yearly</option>
+        <option value="2">Semi-annually</option>
+        <option value="4">Quarterly</option>
+        <option value="12">Monthly</option>
+        <option value="52">Weekly</option>
+        <option value="365">Daily</option>
+      </select>
+    </p> 
+    
+    <p>
+      Type of cash flows:  
+      <select id="typeSelect">
+        <option value="12">Beginning of period</option>
+        <option value="1" selected>End of period</option>
+      </select>
+    </p>
+
+    <button id="calcBtn">Calculate</button>
+    <button id="resetBtn">Reset</button>
+    <hr>
+    <div>
+      <h3>Result:</h3>
+      <h3 id="calcResults">Result will appear here...</h3>
+    </div>
+
+    <script>
+      // Get required elements from the HTML
+      const presentValEl = document.getElementById("presentVal");
+      const futureValEl = document.getElementById("futureVal");
+      const cashFlowEl = document.getElementById("cashFlow");
+      const freqSelectEl = document.getElementById("freqSelect");
+      const periodEl = document.getElementById("period");
+      const periodSelectEl = document.getElementById("periodSelect");
+      const compoundSelectEl = document.getElementById("compoundSelect");
+      const typeSelectEl = document.getElementById("typeSelect");
+
+      const calcBtnEl = document.getElementById('calcBtn');
+      const resetBtnEl = document.getElementById('resetBtn');
+      const calcResultsEl = document.getElementById('calcResults') 
+
+      function createElement() {
+        const newDiv = `
+            <p>
+              <label for="i11-span">The estimated annual discount rate is: &nbsp;</label>
+              <span
+                data-id="i11"
+                step="any"
+                id="i11-span"
+                class="spans"
+              ></span>%
+            </p>
+        `
+        const newDiv2 = `
+          <p>
+            <label for="i12-span">The total cash flow is: &nbsp;</label>
+            <span
+              data-id="i12"
+              step="any"
+              id="i12-span"
+              class="spans"
+            ></span>
+          </p>
+        `
+        if (parseFloat(cashFlowEl.value) > 0) {
+          return newDiv + newDiv2
+        }
+        return newDiv
+      }
+
+      function setResult(resultObj) {
+        for (key of Object.keys(resultObj)) {
+          let val = resultObj[key].result;
+          let id = resultObj[key].type;
+
+          if (isNaN(val)) {
+           alert("Your input resulted in NAN.\n 0/0 \n Try again with valid input.");
+            return;
+          }
+          if (Math.abs(val) === Infinity) {
+            alert("Your input resulted in Infinity. \nDivision by zero. \nTry again with valid input.");
+            return;
+          }
+          const span = document.getElementById(`${id}-span`);
+          val = Math.abs(val) > 1 ? val.toFixed(2) : val.toPrecision(2)
+          span.textContent = val;
+        }
+      }
+
+      function calculateResults() {
+          // Retrieve input values
+          const presentVal = parseFloat(presentValEl.value);
+          const futureVal = parseFloat(futureValEl.value);
+          const cashFlow = parseFloat(cashFlowEl.value);
+          const period = parseFloat(periodEl.value);
+          const typeSelect = parseFloat(typeSelectEl.value)
+          const compoundSelect = parseFloat(compoundSelectEl.value)
+          const freqSelect = parseFloat(freqSelectEl.value)
+
+          if (isNaN(presentVal) || presentVal < 0 || isNaN(futureVal) || futureVal < 0 || isNaN(cashFlow) || cashFlow < 0 ||
+            isNaN(period) || period <= 0
+          ) {
+            alert("Please Enter All Details.");
+            return;
+          }
+
+          try {
+            const resultElement = createElement()
+            calcResultsEl.innerHTML = resultElement 
+
+            let results = {}
+
+            const EADR = 0
+
+            if (cashFlow > 0) {
+              const PDR = 0
+              results = {
+                1: { result: EADR, type: "i11" },
+                2: { result: PDR, type: "i12" },
+              }
+            }
+
+            results = {
+              1: { result: EADR, type: "i11" },
+            }
+            setResult(results)
+
+          } catch (error) {
+            alert("Something Went Wrong!!!");
+            resetResult()
+            return;
+          }
+      }
+
+      function resetForm() {
+        presentValEl.value = ""
+        futureValEl.value = ""
+        cashFlowEl.value = "0"
+        periodEl.value = ""
+        typeSelectEl.selectedIndex = "1"
+        compoundSelectEl.selectedIndex = "0"
+        freqSelectEl.selectedIndex = "0"
+        periodSelectEl.selectedIndex = "1"
+      }
+
+      function resetResult() {
+        calcResultsEl.innerHTML = "<p>Result will appear here...</p>";
+      } 
+
+      function resethandler() {
+        resetForm();
+        resetResult();
+      }
+
+      resetBtnEl.addEventListener("click", resethandler);
+      calcBtnEl.addEventListener("click", calculateResults);
+      [presentValEl, futureValEl, cashFlowEl, periodEl].forEach((el) => {
+        el.addEventListener("input", resetResult);
+      }); 
+      
+      [freqSelectEl, compoundSelectEl, periodSelectEl, typeSelectEl].forEach((el) => {
+        el.addEventListener("change", resetResult);
+      });  
+
+    </script>
+</body>
+</html>

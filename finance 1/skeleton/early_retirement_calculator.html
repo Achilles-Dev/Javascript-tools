@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Early Retirement Calculator</title>
+</head>
+<body>
+    <h1>Early Retirement Calculator</h1>
+    <p>
+      Net income:
+      <input type="number" id="netIncome">
+      <select id="netIncomeSelect">
+        <option value="31557600">second (sec)</option>
+        <option value="525960">minute (min)</option>
+        <option value="8766">hour (hr)</option>
+        <option value="365.25">day (day)</option>
+        <option value="52.17857142857">week (wk)</option>
+        <option value="12">month (mo)</option>
+        <option value="1" selected>year (yr)</option>
+      </select>
+    </p>
+    <p>
+      Expenses: 
+      <input type="number" id="expenses">
+      <select id="expensesSelect">
+        <option value="31557600">second (sec)</option>
+        <option value="525960">minute (min)</option>
+        <option value="8766">hour (hr)</option>
+        <option value="365.25">day (day)</option>
+        <option value="52.17857142857">week (wk)</option>
+        <option value="12">month (mo)</option>
+        <option value="1" selected>year (yr)</option>
+      </select>
+    </p>
+    <p>
+      Initial balance:
+      <input type="number" id="initBalance" value="0">
+    </p>
+    <p>
+      Return on investment:
+      <input type="number" id="investReturn" value="5">% / yr
+    </p>
+    <p>
+      Withdrawal rate:
+      <input type="number" id="withrawRate" value="4">%
+    </p>
+
+
+    <button id="calcBtn">Calculate</button>
+    <button id="resetBtn">Reset</button>
+    <hr>
+    <div>
+      <h3>Result:</h3>
+      <h3 id="calcResults">Result will appear here...</h3>
+    </div>
+
+    <script>
+      // Get required elements from the HTML
+      const netIncomeEl = document.getElementById("netIncome");
+      const expensesEl = document.getElementById("expenses");
+      const initBalanceEl = document.getElementById("initBalance");
+      const investReturnEl = document.getElementById("investReturn");
+      const withrawRateEl = document.getElementById("withrawRate");
+      const netIncomeSelectEl = document.getElementById("netIncomeSelect");
+      const expensesSelectEl = document.getElementById("expensesSelect");
+
+      const calcBtnEl = document.getElementById('calcBtn');
+      const resetBtnEl = document.getElementById('resetBtn');
+      const calcResultsEl = document.getElementById('calcResults') 
+
+      const UNITS = {
+        time: {
+          "sec": 31557600,
+          "min": 525960,
+          "hrs": 8766,
+          "days": 365.25,
+          "wks": 52.17857142857,
+          "mos": 12,
+          "yrs": 1,
+        },
+      };
+      /*************** FUNCTIONS ***************/
+      function toSIUnit(type, unit, value) {
+        return value / UNITS[type][unit];
+      }
+
+      function fromSIUnit(type, unit, value) {
+        return value * UNITS[type][unit];
+      }
+
+      function createElement() {
+        const newDiv = `
+            <p>
+              <label for="i11-span">Monthly deposit: &nbsp;</label>
+              <span
+                data-id="i11"
+                step="any"
+                id="i11-span"
+                class="spans"
+              ></span>
+            </p>
+            <p>
+              <label for="i12-span">Required balance: &nbsp;</label>
+              <span
+                data-id="i12"
+                step="any"
+                id="i12-span"
+                class="spans"
+              ></span>
+            </p>
+            <p>
+              <label for="i13-span">Duration: &nbsp;</label>
+              <span
+                data-id="i13"
+                step="any"
+                id="i13-span"
+                class="spans"
+              ></span>
+              <select 
+                class="selectsResult"
+                id="i13-select"
+                data-type="time"
+                data-prev="yrs"
+                data-id="i13"
+              >
+                <option value="sec">seconds (sec)</option>
+                <option value="min">minutes (min)</option>
+                <option value="hrs">hours (hrs)</option>
+                <option value="days">days (days)</option>
+                <option value="wks">weeks (wks)</option>
+                <option value="mos">months (mos)</option>
+                <option value="yrs" selected>years (yrs)</option>
+              </select>
+            </p>
+        `
+        return newDiv
+      }
+
+      function setResult(resultObj) {
+        for (key of Object.keys(resultObj)) {
+          let val = resultObj[key].result;
+          let id = resultObj[key].type;
+
+          if (isNaN(val)) {
+           alert("Your input resulted in NAN.\n 0/0 \n Try again with valid input.");
+            return;
+          }
+          if (Math.abs(val) === Infinity) {
+            alert("Your input resulted in Infinity. \nDivision by zero. \nTry again with valid input.");
+            return;
+          }
+          const span = document.getElementById(`${id}-span`);
+          span.textContent = `${val}`;
+        }
+      }
+
+      function handleResultsChange(e) {
+        let select = e.target;
+        let id = select.getAttribute("data-id");
+        let span = document.getElementById(`${id}-span`);
+
+        let prevUnit = select.getAttribute("data-prev");
+        let currentUnit = select.value;
+        select.setAttribute("data-prev", currentUnit);
+
+        if (span.textContent === "") {
+          return;
+        }
+
+        let type = select.getAttribute("data-type");
+
+        let value = parseFloat(span.textContent);
+        value = parseFloat(value);
+        if (isNaN(value)) value = 0.0;
+
+        let si = fromSIUnit(type, prevUnit, value);
+        let result = toSIUnit(type, currentUnit, si);
+        result = parseFloat(result)
+        result = Math.abs(result) > 1 ? result.toFixed(2) * 1 : result.toPrecision(2) * 1
+        span.textContent = result;
+      }
+
+      function calculateResults() {
+          // Retrieve input values
+          const netIncome = parseFloat(netIncomeEl.value);
+          const expenses = parseFloat(expensesEl.value);
+          const initBalance = parseFloat(initBalanceEl.value);
+          const investReturn = parseFloat(investReturnEl.value);
+          const withrawRate = parseFloat(withrawRateEl.value);
+          const netIncomeSelect = parseFloat(netIncomeSelectEl.value);
+          const expensesSelect = parseFloat(expensesSelectEl.value);
+
+          if (isNaN(netIncome) || netIncome <= 0 || isNaN(expenses) || expenses <= 0 || isNaN(initBalance) || initBalance < 0 ||
+            isNaN(investReturn) || investReturn <= 0 || isNaN(withrawRate) || withrawRate <= 0
+          ) {
+            alert("Please Enter All Details.");
+            return;
+          } else if (expenses >= netIncome) {
+            alert("Income needs to be higher than expenses!");
+            return;
+          }
+
+          try {
+            const resultElement = createElement()
+            calcResultsEl.innerHTML = resultElement 
+
+            const newSelects = document.querySelectorAll(".selectsResult");
+
+            newSelects.forEach((select) => {
+              select.addEventListener("change", handleResultsChange);
+            });
+
+            const deposit = 0
+            const reqBalance = 0
+            const duration = 0
+
+            const results = {
+              1: { result: Math.abs(deposit) > 1 ? deposit.toFixed(2) : deposit.toPrecision(2), type: "i11" },
+              2: { result: Math.abs(reqBalance) > 1 ? reqBalance.toFixed(2) : reqBalance.toPrecision(2), type: "i12" },
+              3: { result: Math.abs(duration) > 1 ? duration.toFixed(2) : duration.toPrecision(2), type: "i13" },
+            }
+            setResult(results)
+
+          } catch (error) {
+            alert("Something Went Wrong!!!");
+            resetResult()
+            return;
+          }
+      }
+
+      function resetForm() {
+        netIncomeEl.value = ""
+        expensesEl.value = ""
+        initBalanceEl.value = "0"
+        investReturnEl.value = "5"
+        withrawRateEl.value = "4"
+
+        netIncomeSelectEl.selectedIndex = "6"
+        expensesSelectEl.selectedIndex = "6"
+      }
+
+      function resetResult() {
+        calcResultsEl.innerHTML = "<p>Result will appear here...</p>";
+      } 
+
+      function resethandler() {
+        resetForm();
+        resetResult();
+      }
+
+      resetBtnEl.addEventListener("click", resethandler);
+      calcBtnEl.addEventListener("click", calculateResults);
+      [netIncomeEl, expensesEl, initBalanceEl, investReturnEl, withrawRateEl].forEach((el) => {
+        el.addEventListener("input", resetResult);
+      });  
+
+      [netIncomeSelectEl, expensesSelectEl].forEach((el) => {
+        el.addEventListener("change", resetResult);
+      }); 
+
+    </script>
+</body>
+</html>

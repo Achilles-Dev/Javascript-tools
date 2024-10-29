@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>5-Number Summary Calculator</title>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.6.5/dist/sweetalert2.all.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11.6.5/dist/sweetalert2.min.css" rel="stylesheet">
+</head>
+
+<body>
+    <h1>5-Number Summary Calculator</h1>
+
+    <div>
+        <p>
+            <label for="dataSet">Enter your dataset (comma, space, or newline separated): </label>
+            <textarea id="dataSet" rows="4" cols="50" placeholder="Example: 1, 2, 3 or 1 2 3 or&#10;1&#10;2&#10;3"></textarea>
+        </p>
+
+        <button id="calculate" class="page-button">Calculate</button>&nbsp;&nbsp;&nbsp;
+        <button id="reset" class="page-button white">Reset</button>
+
+        <hr>
+
+        <div id="result">
+            <p>Results will appear here....</p>
+        </div>
+
+    </div>
+
+    <script>
+        // Get all elements
+        const dataSetEl = document.getElementById('dataSet');
+        const calculateEl = document.getElementById('calculate');
+        const resetEl = document.getElementById('reset');
+        const resultsEl = document.getElementById('result');
+
+        // Function to calculate 5-number summary
+        function calculateSummary() {
+            try {
+                // Retrieve input values and convert to array of numbers
+                const data = dataSetEl.value
+                    .split(/[\s,]+/)
+                    .map(Number)
+                    .sort((a, b) => a - b);
+
+                // Validate input values
+                if (data.length < 2 || data.some(isNaN)) {
+                    throw new Error('Please enter at least two valid numbers separated by commas, spaces, or new lines.');
+                }
+
+                // Calculate quartiles
+                const min = data[0];
+                const max = data[data.length - 1];
+                const median = calculateMedian(data);
+                let q1 = calculateMedian(data.slice(0, Math.floor(data.length / 2)));
+                let q3 = calculateMedian(data.slice(Math.ceil(data.length / 2)));
+
+                const exceptList = [5, 9, 13, 17, 21, 25, 29]
+
+                let midNum = Math.floor(data.length / 2)
+                let quartileIndex = Math.floor(midNum / 2)  
+                if (data.length % 2 !== 0 && exceptList.includes(data.length)) {
+                    q1 = data[quartileIndex]
+                    q3 = data[midNum + quartileIndex]
+                } else if (data % 2 !== 0) {
+                    q1 = (data[quartileIndex] + data[quartileIndex + 1]) / 2
+                    q3 = (data[midNum + quartileIndex] + data[midNum + quartileIndex + 1]) / 2
+                }
+
+                // Display results
+                resultsEl.innerHTML = `
+                <p>
+                    Your sorted dataset is: ${data.join(', ')}.<br>
+                    The five numbers corresponding to your dataset are:<br>
+                    Minimum: ${min},<br>
+                    First quartile: ${q1},<br>
+                    Median: ${median},<br>
+                    Third quartile: ${q3},<br>
+                    Maximum: ${max}.
+                </p>
+                `;
+                resultsEl.style.display = 'block';
+
+            } catch (error) {
+                showError(error.message);
+            }
+        }
+
+        // Function to calculate median
+        function calculateMedian(arr) {
+            const mid = Math.floor(arr.length / 2);
+            return arr.length % 2 !== 0 ? arr[mid] : (arr[mid - 1] + arr[mid]) / 2;
+        }
+
+        function showError(errorMessage) {
+            Swal.fire({
+                icon: "error",
+                title: "Error",
+                text: errorMessage,
+            });
+        }
+
+        function resetResultContainer() {
+            resultsEl.innerHTML = "<p>Results will appear here....</p>";
+        }
+
+        function resetHandler() {
+            resetForm();
+            resetResultContainer();
+        }
+        // Reset function
+        function resetForm() {
+            dataSetEl.value = "";
+        }
+
+        // Event listeners
+        calculateEl.addEventListener("click", calculateSummary);
+        resetEl.addEventListener("click", resetHandler);
+
+        dataSetEl.addEventListener("input", () => {
+            resetResultContainer();
+        });
+
+    </script>
+</body>
+
+</html>

@@ -132,8 +132,6 @@
           const gdp = fromSIUnit("currency", gdpSelect, parseFloat(gdpEl.value));
           const deflator = parseFloat(deflatorEl.value);
 
-          console.log(gdp)
-
           if (isNaN(gdp) || gdp <= 0 || isNaN(deflator) || deflator <= 0 ) {
             alert("Please Enter All Details.");
             return;

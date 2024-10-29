@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Down Payment Calculator</title>
+</head>
+<body>
+    <h1>Down Payment Calculator</h1>
+    <p>
+      Calculate:
+      <select id="calculateSelect">
+        <option value="upfCash" selected>Use the Upfront Cash Available</option>
+        <option value="hopce">Use the Home Price</option>
+        <option value="hopceUpfCash">Use the Home Price and Upfront Cash Available</option>
+      </select>
+    </p>
+    <p id="homePriceInput" style="display: none;">
+      Home Price: 
+      <input type="number" id="homePrice" value="500000">
+    </p>
+    <p id="unpfrontInput">
+      Upfront Cash Available:
+      <input type="number" id="upfrontCash" value="100000">
+    </p>
+    <p id="downpmtInput">
+      Down Payment:
+      <input type="number" id="downpmt" value="20">%
+    </p>
+    <p>
+      Include Closing costs:
+      <select id="closingCostSelect">
+        <option value="yes" selected>Yes</option>
+        <option value="no">No</option>
+      </select>
+    </p>
+    <p>
+      Closing costs:
+      <input type="number" id="closingCost" value="3">%
+    </p>
+    <p>
+      Interest Rate:
+      <input type="number" id="intRate" value="6.757">
+    </p>
+    <p>
+      Loan Term:
+      <input type="number" id="loanTerm" value="30"> years
+    </p>
+
+
+    <button id="calcBtn">Calculate</button>
+    <button id="resetBtn">Reset</button>
+    <hr>
+    <div>
+      <h3>Result:</h3>
+      <h3 id="calcResults">Result will appear here...</h3>
+    </div>
+
+    <script>
+      // Get required elements from the HTML
+      const upfrontCashEl = document.getElementById("upfrontCash");
+      const homePriceEl = document.getElementById("homePrice");
+      const downpmtEl = document.getElementById("downpmt");
+      const closingCostEl = document.getElementById("closingCost");
+      const closingCostSelectEl = document.getElementById("closingCostSelect");
+      const loanTermEl = document.getElementById("loanTerm");
+      const intRateEl = document.getElementById("intRate");
+      const calculateSelectEl = document.getElementById("calculateSelect")
+      const homePriceInputEl = document.getElementById("homePriceInput");
+      const unpfrontInputEl = document.getElementById("unpfrontInput");
+      const downpmtInputEl = document.getElementById("downpmtInput");
+
+      const calcBtnEl = document.getElementById('calcBtn');
+      const resetBtnEl = document.getElementById('resetBtn');
+      const calcResultsEl = document.getElementById('calcResults') 
+
+      function handleCalculateSelectChange(e) {
+        const value = e.target.value
+
+        homePriceInputEl.style.display = value === "upfCash" ? "none" : "block";
+        unpfrontInputEl.style.display = value === "hopce" ? "none" : "block";
+        downpmtInputEl.style.display = value === "hopceUpfCash" ? "none" : "block";
+
+        resetResult()
+      }
+
+      function handleClosingCostSelectChange(e) {
+        const value = e.target.value
+
+        closingCostEl.disabled = value === "no" ? true : false
+
+        resetResult()
+      }
+
+      function createElement() {
+        const newDiv = `
+            <p>
+              <label for="i11-span">Loan Amount: &nbsp;</label>
+              <span
+                data-id="i11"
+                step="any"
+                id="i11-span"
+                class="spans"
+              ></span>
+            </p>
+            <p>
+              <label for="i12-span">Monthly Payment: &nbsp;</label>
+              <span
+                data-id="i12"
+                step="any"
+                id="i12-span"
+                class="spans"
+              ></span>
+            </p>
+        `
+        const newDiv1 = `
+            <p>
+              <label for="i13-span">Home Price: &nbsp;</label>
+              <span
+                data-id="i13"
+                step="any"
+                id="i13-span"
+                class="spans"
+              ></span> 
+            </p>
+             <p>
+              <label for="i14-span">Down Payment: &nbsp;</label>
+              <span
+                data-id="i14"
+                step="any"
+                id="i14-span"
+                class="spans"
+              ></span> 
+            </p>
+             <p>
+              <label for="i15-span">Closing Costs: &nbsp;</label>
+              <span
+                data-id="i15"
+                step="any"
+                id="i15-span"
+                class="spans"
+              ></span> 
+            </p>
+        `
+        const newDiv2 = `
+            <p>
+              <label for="i13-span">Down Payment: &nbsp;</label>
+              <span
+                data-id="i13"
+                step="any"
+                id="i13-span"
+                class="spans"
+              ></span> 
+            </p>
+             <p>
+              <label for="i14-span">Down Payment Percentage: &nbsp;</label>
+              <span
+                data-id="i14"
+                step="any"
+                id="i14-span"
+                class="spans"
+              ></span> 
+            </p>
+             <p>
+              <label for="i15-span">Closing Costs: &nbsp;</label>
+              <span
+                data-id="i15"
+                step="any"
+                id="i15-span"
+                class="spans"
+              ></span> 
+            </p>
+        `
+        const newDiv3 = `
+            <p>
+              <label for="i13-span">Down Payment: &nbsp;</label>
+              <span
+                data-id="i13"
+                step="any"
+                id="i13-span"
+                class="spans"
+              ></span> 
+            </p>
+             <p>
+              <label for="i14-span">Closing Costs: &nbsp;</label>
+              <span
+                data-id="i14"
+                step="any"
+                id="i14-span"
+                class="spans"
+              ></span> 
+            </p>
+             <p>
+              <label for="i15-span">Down Payment + Closing Costs: &nbsp;</label>
+              <span
+                data-id="i15"
+                step="any"
+                id="i15-span"
+                class="spans"
+              ></span> 
+            </p>
+        `
+        if (calculateSelectEl.value === "upfCash") {
+          return newDiv1 + newDiv
+        } else if (calculateSelectEl.value === "hopce") {
+          return newDiv3 + newDiv
+        } else {
+          return newDiv2 + newDiv
+        }
+      }
+
+      function setResult(resultObj) {
+        for (key of Object.keys(resultObj)) {
+          let val = resultObj[key].result;
+          let id = resultObj[key].type;
+
+          if (isNaN(val)) {
+           alert("Your input resulted in NAN.\n 0/0 \n Try again with valid input.");
+            return;
+          }
+          if (Math.abs(val) === Infinity) {
+            alert("Your input resulted in Infinity. \nDivision by zero. \nTry again with valid input.");
+            return;
+          }
+          const span = document.getElementById(`${id}-span`);
+          span.textContent = `${val}`;
+        }
+      }
+
+      function calculateResults() {
+          // Retrieve input values
+          const upfrontCash = parseFloat(upfrontCashEl.value);
+          const homePrice = parseFloat(homePriceEl.value);
+          const downpmt = parseFloat(downpmtEl.value);
+          const closingCost = parseFloat(closingCostEl.value);
+          const loanTerm = parseFloat(loanTermEl.value);
+          const intRate = parseFloat(intRateEl.value);
+          const calculateSelect = calculateSelectEl.value;
+          const closingCostSelect = closingCostSelectEl.value;
+          
+
+          if ((calculateSelect !== "hopce" && (isNaN(upfrontCash) || upfrontCash <= 0)) || 
+            (calculateSelect !== "upfCash" && (isNaN(homePrice) || homePrice < 0)) || 
+            (calculateSelect !== "hopceUpfCash" && (isNaN(downpmt) || downpmt <= 0)) ||
+            (closingCostSelect === "yes" && (isNaN(closingCost) || closingCost < 0)) || 
+            isNaN(loanTerm) || loanTerm <= 0 || isNaN(intRate) || intRate < 0
+          ) {
+            alert("Please Enter All Details.");
+            return;
+          }
+
+          try {
+            const resultElement = createElement()
+            calcResultsEl.innerHTML = resultElement 
+
+            const loanAmt = 0
+            const monthlyPmt = 0
+            
+            let results = {}
+            if (calculateSelect === "upfCash") {
+              const homePriceValue = 0
+              const downPmtValue = 0
+              const closingCostValue = 0
+
+              results = {
+                3: { result: Math.abs(homePriceValue) > 1 ? homePriceValue.toFixed(2) : homePriceValue.toPrecision(2), type: "i13" },
+                4: { result: Math.abs(downPmtValue) > 1 ? downPmtValue.toFixed(2) : downPmtValue.toPrecision(2), type: "i14" },
+                5: { result: Math.abs(closingCostValue) > 1 ? closingCostValue.toFixed(2) : closingCostValue.toPrecision(2), type: "i15" },
+              }
+            } else if (calculateSelect === "hopce") {
+              const downPmtValue = 0
+              const closingCostValue = 0
+              const downPmtClosingCostVal = 0
+
+              results = {
+                3: { result: Math.abs(downPmtValue) > 1 ? downPmtValue.toFixed(2) : downPmtValue.toPrecision(2), type: "i13" },
+                4: { result: Math.abs(closingCostValue) > 1 ? closingCostValue.toFixed(2) : closingCostValue.toPrecision(2), type: "i14" },
+                5: { result: Math.abs(downPmtClosingCostVal) > 1 ? downPmtClosingCostVal.toFixed(2) : downPmtClosingCostVal.toPrecision(2), type: "i15" },
+              }
+            } else {
+              const downPmtValue = 0
+              const downPmtPercent = 0
+              const closingCostValue = 0
+
+              results = {
+                3: { result: Math.abs(loanAmt) > 1 ? loanAmt.toFixed(2) : loanAmt.toPrecision(2), type: "i13" },
+                4: { result: Math.abs(downPmtPercent) > 1 ? downPmtPercent.toFixed(2) : downPmtPercent.toPrecision(2), type: "i14" },
+                5: { result: Math.abs(closingCostValue) > 1 ? closingCostValue.toFixed(2) : closingCostValue.toPrecision(2), type: "i15" },
+              }
+            }
+
+            results = {
+              ...results,
+              1: { result: Math.abs(loanAmt) > 1 ? loanAmt.toFixed(2) : loanAmt.toPrecision(2), type: "i11" },
+              2: { result: Math.abs(monthlyPmt) > 1 ? monthlyPmt.toFixed(2) : monthlyPmt.toPrecision(2), type: "i12" },
+            }
+            setResult(results)
+
+          } catch (error) {
+            alert("Something Went Wrong!!!");
+            resetResult()
+            return;
+          }
+      }
+
+      function resetForm() {
+        upfrontCashEl.value = "100000"
+        homePriceEl.value = "500000"
+        downpmtEl.value = "20"
+        closingCostEl.value = "3"
+        loanTermEl.value = "30"
+        intRateEl.value = "6.757"
+        calculateSelectEl.selectedIndex = "0"
+        closingCostSelectEl.selectedIndex = "0"
+
+        homePriceInputEl.style.display = "none";
+        unpfrontInputEl.style.display = "block";
+        downpmtInputEl.style.display = "block";
+      }
+
+      function resetResult() {
+        calcResultsEl.innerHTML = "<p>Result will appear here...</p>";
+      } 
+
+      function resethandler() {
+        resetForm();
+        resetResult();
+      }
+
+      resetBtnEl.addEventListener("click", resethandler);
+      calcBtnEl.addEventListener("click", calculateResults);
+
+      [upfrontCashEl, homePriceEl, downpmtEl, closingCostEl, loanTermEl, intRateEl].forEach((el) => {
+        el.addEventListener("input", resetResult);
+      });  
+
+      calculateSelectEl.addEventListener("change", handleCalculateSelectChange)
+      closingCostSelectEl.addEventListener("change", handleClosingCostSelectChange)
+
+    </script>
+</body>
+</html>
