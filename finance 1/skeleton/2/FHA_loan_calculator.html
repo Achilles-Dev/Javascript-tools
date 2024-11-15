@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>FHA Loan calculator</title>
+</head>
+<body>
+    <h1>FHA Loan calculator</h1>
+    <p>
+      Home price:
+      <input type="number" id="homePrice" value="200000">
+    </p>
+    <p>
+      Down payment percentage: 
+      <input type="number" id="downPmtPercent" value="10">%
+    </p>
+    <p>
+      Loan term:
+      <input type="number" id="loanTerm" value="30"> yrs
+    </p>
+    <p>
+      Interest rate:
+      <input type="number" id="intRate" value="3">%
+    </p>
+    <p>
+      FHA Annual MIP:
+      <input type="number" id="annMIP" value="0.85">%
+    </p>
+
+    <button id="calcBtn">Calculate</button>
+    <button id="resetBtn">Reset</button>
+    <hr>
+    <div>
+      <h3>Result:</h3>
+      <h3 id="calcResults">Result will appear here...</h3>
+    </div>
+
+    <script>
+      // Get required elements from the HTML
+      const homePriceEl = document.getElementById("homePrice");
+      const downPmtPercentEl = document.getElementById("downPmtPercent");
+      const annMIPEl = document.getElementById("annMIP");
+      const intRateEl = document.getElementById("intRate");
+      const loanTermEl = document.getElementById("loanTerm");
+
+      const calcBtnEl = document.getElementById('calcBtn');
+      const resetBtnEl = document.getElementById('resetBtn');
+      const calcResultsEl = document.getElementById('calcResults') 
+
+      function createElement() {
+        const newDiv = `
+            <p>
+              <label for="i11-span">Your down payment: &nbsp;</label>
+              <span
+                data-id="i11"
+                step="any"
+                id="i11-span"
+                class="spans"
+              ></span>
+            </p>
+            <p>
+              <label for="i12-span">FHA base loan amount: &nbsp;</label>
+              <span
+                data-id="i12"
+                step="any"
+                id="i12-span"
+                class="spans"
+              ></span>
+            </p>
+            <p>
+              <label for="i13-span">FHA Upfront MIP: &nbsp;</label>
+              <span
+                data-id="i13"
+                step="any"
+                id="i13-span"
+                class="spans"
+              ></span>
+            </p>
+            <p>
+              <label for="i14-span">Monthly mortgage payment: &nbsp;</label>
+              <span
+                data-id="i14"
+                step="any"
+                id="i14-span"
+                class="spans"
+              ></span>
+            </p>
+            <p>
+              <label for="i15-span">Monthly MIP: &nbsp;</label>
+              <span
+                data-id="i15"
+                step="any"
+                id="i15-span"
+                class="spans"
+              ></span>
+            </p>
+            <p>
+              <label for="i16-span">Total FHA loan amount: &nbsp;</label>
+              <span
+                data-id="i16"
+                step="any"
+                id="i16-span"
+                class="spans"
+              ></span>
+            </p>
+            <p>
+              <label for="i17-span">Total monthly payment: &nbsp;</label>
+              <span
+                data-id="i17"
+                step="any"
+                id="i17-span"
+                class="spans"
+              ></span>
+            </p>
+            <p>
+              <label for="i18-span">Total cost of loan: &nbsp;</label>
+              <span
+                data-id="i18"
+                step="any"
+                id="i18-span"
+                class="spans"
+              ></span>
+            </p>
+            <p>
+              <label for="i19-span">Periodic interest rate: &nbsp;</label>
+              <span
+                data-id="i19"
+                step="any"
+                id="i19-span"
+                class="spans"
+              ></span>%
+            </p>
+            <p>
+              <label for="i110-span">Number of payments: &nbsp;</label>
+              <span
+                data-id="i110"
+                step="any"
+                id="i110-span"
+                class="spans"
+              ></span>
+            </p>
+        `
+        return newDiv
+      }
+
+      function setResult(resultObj) {
+        for (key of Object.keys(resultObj)) {
+          let val = resultObj[key].result;
+          let id = resultObj[key].type;
+
+          if (isNaN(val)) {
+           alert("Your input resulted in NAN.\n 0/0 \n Try again with valid input.");
+            return;
+          }
+          if (Math.abs(val) === Infinity) {
+            alert("Your input resulted in Infinity. \nDivision by zero. \nTry again with valid input.");
+            return;
+          }
+          const span = document.getElementById(`${id}-span`);
+          span.textContent = `${val}`;
+        }
+      }
+
+      function calculateResults() {
+          // Retrieve input values
+          const homePrice = parseFloat(homePriceEl.value);
+          const downPmtPercent = parseFloat(downPmtPercentEl.value);
+          const annMIP = parseFloat(annMIPEl.value);
+          const intRate = parseFloat(intRateEl.value);
+          const loanTerm = parseFloat(loanTermEl.value);
+
+          if (isNaN(homePrice) || homePrice < 0 || isNaN(downPmtPercent) || downPmtPercent < 0 || isNaN(annMIP) || annMIP < 0 ||
+            isNaN(intRate) || intRate <= 0 || isNaN(loanTerm) || loanTerm <= 0
+          ) {
+            alert("Please Enter All Details.");
+            return;
+          }
+
+          try {
+            const resultElement = createElement()
+            calcResultsEl.innerHTML = resultElement 
+
+            const downPmt = 0
+            const baseLoanAmt = 0
+            const upfrontMIP = 0
+            const monthlyMortPmt = 0
+            const monthlyMIP = 0
+            const totLoanAmt = 0
+            const totMonthlyPmt = 0
+            const totLoanCost = 0
+            const periodIntRate = 0
+            const pmtsNum = 0
+
+            const results = {
+              1: { result: Math.abs(downPmt) > 1 ? downPmt.toFixed(2) : downPmt.toPrecision(2), type: "i11" },
+              2: { result: Math.abs(baseLoanAmt) > 1 ? baseLoanAmt.toFixed(2) : baseLoanAmt.toPrecision(2), type: "i12" },
+              3: { result: Math.abs(upfrontMIP) > 1 ? upfrontMIP.toFixed(2) : upfrontMIP.toPrecision(2), type: "i13" },
+              4: { result: Math.abs(monthlyMortPmt) > 1 ? monthlyMortPmt.toFixed(2) : monthlyMortPmt.toPrecision(2), type: "i14" },
+              5: { result: Math.abs(monthlyMIP) > 1 ? monthlyMIP.toFixed(2) : monthlyMIP.toPrecision(2), type: "i15" },
+              6: { result: Math.abs(totLoanAmt) > 1 ? totLoanAmt.toFixed(2) : totLoanAmt.toPrecision(2), type: "i16" },
+              7: { result: Math.abs(totMonthlyPmt) > 1 ? totMonthlyPmt.toFixed(2) : totMonthlyPmt.toPrecision(2), type: "i17" },
+              8: { result: Math.abs(totLoanCost) > 1 ? totLoanCost.toFixed(2) : totLoanCost.toPrecision(2), type: "i18" },
+              9: { result: Math.abs(periodIntRate) > 1 ? periodIntRate.toFixed(2) : periodIntRate.toPrecision(2), type: "i19" },
+              10: { result: Math.abs(pmtsNum) > 1 ? pmtsNum.toFixed(2) : pmtsNum.toPrecision(2), type: "i110" },
+            }
+            setResult(results)
+
+          } catch (error) {
+            alert("Something Went Wrong!!!");
+            resetResult()
+            return;
+          }
+      }
+
+      function resetForm() {
+        homePriceEl.value = "200000"
+        downPmtPercentEl.value = "10"
+        annMIPEl.value = "30"
+        intRateEl.value = "3"
+        loanTermEl.value = "0.85"
+      }
+
+      function resetResult() {
+        calcResultsEl.innerHTML = "<p>Result will appear here...</p>";
+      } 
+
+      function resethandler() {
+        resetForm();
+        resetResult();
+      }
+
+      resetBtnEl.addEventListener("click", resethandler);
+      calcBtnEl.addEventListener("click", calculateResults);
+      [homePriceEl, downPmtPercentEl, annMIPEl, intRateEl, loanTermEl].forEach((el) => {
+        el.addEventListener("input", resetResult);
+      });  
+
+    </script>
+</body>
+</html>

@@ -179,6 +179,9 @@
           ) {
             alert("Please Enter All Details.");
             return;
+          } else if (intRate > 50) {
+            alert("Ensure this value is less than or equal to 50.");
+            return;
           }
 
           try {

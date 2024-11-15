@@ -79,6 +79,30 @@
         }
       }
 
+      function calculateInterestRate(PMT, principal, numPayments) {
+        const tolerance = 1e-8; // Tolerance for stopping the iteration
+        let low = 0.0001; // Lower bound for interest rate
+        let high = 0.1; // Upper bound for interest rate
+        let mid;
+
+        function loanEquation(i) {
+            return principal * i * Math.pow(1 + i, numPayments) / (Math.pow(1 + i, numPayments) - 1) - PMT;
+        }
+
+        while (high - low > tolerance) {
+            mid = (low + high) / 2;
+            const value = loanEquation(mid);
+
+            if (value > 0) {
+                high = mid; // Root is in the lower half
+            } else {
+                low = mid; // Root is in the upper half
+            }
+        }
+
+        return mid; // Return the interest rate
+      }
+
       function calculateResults() {
           // Retrieve input values
           const loanAmt = parseFloat(loanAmtEl.value);
@@ -98,12 +122,14 @@
             const resultElement = createElement()
             calcResultsEl.innerHTML = resultElement 
 
-            const interest = loanAmt * (annIntRate / 100) * (noOfMths / 12)
+            const monthlyRate = (annIntRate / 100) / 12;
+
+            const monthlyPayment = (loanAmt + extCost) * (monthlyRate * Math.pow(1 + monthlyRate, noOfMths)) / (Math.pow(1 + monthlyRate, noOfMths) - 1);
             
-            const apr = (((extCost + interest) / loanAmt) / (noOfMths / 12)) * 100
+            const apr = 12 * calculateInterestRate(monthlyPayment, loanAmt, noOfMths) * 100
 
             const results = {
-              1: { result: Math.abs(apr) > 1 ? apr.toFixed(2) : apr.toPrecision(2), type: "i11" },
+              1: { result: Math.abs(apr) > 1 ? apr.toFixed(3) : apr.toPrecision(3), type: "i11" },
             }
             setResult(results)
 

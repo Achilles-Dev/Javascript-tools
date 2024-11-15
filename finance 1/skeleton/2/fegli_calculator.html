@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>FEGLI Calculator</title>
+  </head>
+  <body>
+    <h1>FEGLI Calculator</h1>
+      <p>
+        <label>Your Age</label>
+        <select name="age" id="age">
+          <option value="Under 35" selected>Under 35</option>
+          <option value="35">35</option>
+          <option value="36">36</option>
+          <option value="37">37</option>
+          <option value="38">38</option>
+          <option value="39">39</option>
+          <option value="40">40</option>
+          <option value="41">41</option>
+          <option value="42">42</option>
+          <option value="43">43</option>
+          <option value="44">44</option>
+          <option value="45 through 49">45 through 49</option>
+          <option value="50 through 54">50 through 54</option>
+          <option value="55 through 59">55 through 59</option>
+          <option value="60 through 64">60 through 64</option>
+          <option value="65 through 69">65 through 69</option>
+          <option value="70 through 74">70 through 74</option>
+          <option value="75 through 79">75 through 79</option>
+          <option value="80 and over">80 and over</option>
+        </select>
+      </p>
+      <p>
+        <label>Your Current Base Salary ($)</label>
+        <input
+          type="number"
+          min="0"
+          step="any"
+          id="salary"
+          name="salary"
+          value="50000"
+        />
+      </p>
+      <p>
+        <label>Payment Frequency</label>
+        <select id="paymFr">
+          <option value="0" selected="">Bi-Weekly</option>
+          <option value="1">Monthly</option>
+        </select>
+      </p>
+      <p>
+        <label>Option A (Standard)</label>
+        <input type="checkbox" id="optA" value="1" />
+      </p>
+      <p>
+        <label>Option B (Additional)</label>
+        <select id="optB">
+          <option value="0" selected>0</option>
+          <option value="1">1</option>
+          <option value="2">2</option>
+          <option value="3">3</option>
+          <option value="4">4</option>
+          <option value="5">5</option>
+        </select>
+      </p>
+      <p>
+        <label>Option C (Family)</label>
+        <select id="optC">
+          <option value="0" selected>0</option>
+          <option value="1">1</option>
+          <option value="2">2</option>
+          <option value="3">3</option>
+          <option value="4">4</option>
+          <option value="5">5</option>
+        </select>
+      </p>
+      <p>
+        <label>U.S. Postal Employee ?</label>
+        <select id="posEmp">
+          <option value="0" selected>No</option>
+          <option value="1">Yes</option>
+        </select>
+      </p>
+
+    <button id="calcBtn">Calculate</button>
+    <button id="resetBtn">Reset</button>
+    <hr />
+    <div>
+      <h3>Result:</h3>
+      <h3 id="calcResults">Result will appear here...</h3>
+    </div>
+
+    <script>
+      // Get required elements from the HTML
+      const salaryEl = document.getElementById("salary");
+      const ageEl = document.getElementById("age");
+      const paymFrEl = document.getElementById("paymFr");
+      const optAEl = document.getElementById("optA");
+      const optBEl = document.getElementById("optB");
+      const optCEl = document.getElementById("optC");
+      const posEmpEl = document.getElementById("posEmp");
+
+      const calcBtnEl = document.getElementById("calcBtn");
+      const resetBtnEl = document.getElementById("resetBtn");
+      const calcResultsEl = document.getElementById("calcResults");
+
+      function createElement() {
+        const newDiv = `
+            <p>
+              <label for="i11-span">Basic Coverage: &nbsp;</label>
+              <span
+                data-id="i11"
+                step="any"
+                id="i11-span"
+                class="spans"
+              ></span>
+            </p>
+            <p>
+              <label for="i12-span">Extra Benefit: &nbsp;</label>
+              <span
+                data-id="i12"
+                step="any"
+                id="i12-span"
+                class="spans"
+              ></span>
+            </p>
+            <p>
+              <label for="i13-span">Total Basic: &nbsp;</label>
+              <span
+                data-id="i13"
+                step="any"
+                id="i13-span"
+                class="spans"
+              ></span>
+            </p>
+            <p>
+              <label for="i14-span">Total FEGLI Coverage: &nbsp;</label>
+              <span
+                data-id="i14"
+                step="any"
+                id="i14-span"
+                class="spans"
+              ></span>
+            </p>
+            <p>
+              <label for="i15-span">Total Bi-Weekly Cost: &nbsp;</label>
+              <span
+                data-id="i15"
+                step="any"
+                id="i15-span"
+                class="spans"
+              ></span>
+            </p>
+            <p>
+              <label for="i16-span">Annual Cost: &nbsp;</label>
+              <span
+                data-id="i16"
+                step="any"
+                id="i16-span"
+                class="spans"
+              ></span>
+            </p>
+        `;
+        return newDiv;
+      }
+
+      function setResult(resultObj) {
+        for (key of Object.keys(resultObj)) {
+          let val = resultObj[key].result;
+          let id = resultObj[key].type;
+
+          if (isNaN(val)) {
+            alert(
+              "Your input resulted in NAN.\n 0/0 \n Try again with valid input."
+            );
+            return;
+          }
+          if (Math.abs(val) === Infinity) {
+            alert(
+              "Your input resulted in Infinity. \nDivision by zero. \nTry again with valid input."
+            );
+            return;
+          }
+          const span = document.getElementById(`${id}-span`);
+          span.textContent = `${val}`;
+        }
+      }
+
+      function calculateResults() {
+        // Retrieve input values
+        const salary = parseFloat(salaryEl.value);
+        const age = parseFloat(ageEl.value);
+        const paymFr = parseFloat(paymFrEl.value);
+        const optA = parseFloat(optAEl.value);
+        const optB = parseFloat(optBEl.value);
+        const optC = parseFloat(optCEl.value);
+        const posEmp = parseFloat(posEmpEl.value);
+
+        if (isNaN(salary) || salary <= 0 ) {
+          alert("Please Enter All Details.");
+          return;
+        } 
+
+        try {
+          const resultElement = createElement();
+          calcResultsEl.innerHTML = resultElement;
+
+          const basicCov = 0
+          const extBenefit = 0
+          const totBasic = 0
+          const totFEGLI = 0
+          const TBWC = 0
+          const annCost = 0
+
+          const results = {
+            1: {
+              result:
+                Math.abs(basicCov) > 1
+                  ? basicCov.toFixed(2)
+                  : basicCov.toPrecision(2),
+              type: "i11",
+            },
+            2: {
+              result:
+                Math.abs(extBenefit) > 1
+                  ? extBenefit.toFixed(2)
+                  : extBenefit.toPrecision(2),
+              type: "i12",
+            },
+            3: {
+              result:
+                Math.abs(totBasic) > 1
+                  ? totBasic.toFixed(2)
+                  : totBasic.toPrecision(2),
+              type: "i13",
+            },
+            4: {
+              result:
+                Math.abs(totFEGLI) > 1
+                  ? totFEGLI.toFixed(2)
+                  : totFEGLI.toPrecision(2),
+              type: "i14",
+            },
+            5: {
+              result:
+                Math.abs(TBWC) > 1
+                  ? TBWC.toFixed(2)
+                  : TBWC.toPrecision(2),
+              type: "i15",
+            },
+            6: {
+              result:
+                Math.abs(annCost) > 1
+                  ? annCost.toFixed(2)
+                  : annCost.toPrecision(2),
+              type: "i16",
+            },
+          };
+          setResult(results);
+        } catch (error) {
+          alert("Something Went Wrong!!!");
+          resetResult();
+          return;
+        }
+      }
+
+      function resetForm() {
+        salaryEl.value = "50000";
+        ageEl.selectedIndex = "0";
+        paymFrEl.selectedIndex = "0";
+        optAEl.selectedIndex = "0";
+        optBEl.selectedIndex = "0";
+        optCEl.selectedIndex = "0";
+        posEmp.selectedIndex = "0";
+      }
+
+      function resetResult() {
+        calcResultsEl.innerHTML = "<p>Result will appear here...</p>";
+      }
+
+      function resethandler() {
+        resetForm();
+        resetResult();
+      }
+
+      resetBtnEl.addEventListener("click", resethandler);
+      calcBtnEl.addEventListener("click", calculateResults);
+      [salaryEl, ageEl, paymFrEl, optAEl].forEach(
+        (el) => {
+          el.addEventListener("input", resetResult);
+        }
+      );
+    </script>
+  </body>
+</html>

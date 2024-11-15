@@ -42,7 +42,7 @@
                 step="any"
                 id="i11-span"
                 class="spans"
-              ></span>
+              ></span>%
             </p>
         `
         return newDiv
@@ -80,7 +80,7 @@
             const resultElement = createElement()
             calcResultsEl.innerHTML = resultElement 
 
-            const capitalGainsYield = (currPrice - originPrice) / originPrice
+            const capitalGainsYield = ((currPrice - originPrice) / originPrice) * 100
 
             const results = {
               1: { result: Math.abs(capitalGainsYield) > 1 ? capitalGainsYield.toFixed(2) : capitalGainsYield.toPrecision(2), type: "i11" },

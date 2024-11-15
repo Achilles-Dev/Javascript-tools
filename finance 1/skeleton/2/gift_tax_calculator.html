@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Gift Tax Calculator</title>
+  </head>
+  <body>
+    <h1>Gift Tax Calculator</h1>
+    <p>
+      <label>Tax Year:</label>
+      <select id="taxYrSelect">
+        <option value="0" selected>2024</option>
+        <option value="1">2023</option>
+        <option value="2">2022</option>
+        <option value="3">2021</option>
+        <option value="4">2020</option>
+        <option value="5">2019</option>
+        <option value="6">2018</option>
+        <option value="7">2017</option>
+        <option value="8">2016</option>
+        <option value="9">2015</option>
+      </select>
+    </p>
+    <p>
+      <label>Filing Status:</label>
+      <select id="filingStatus">
+        <option value="0" selected>Single</option>
+        <option value="1">Married Joint</option>
+      </select>
+    </p>
+    <p>
+      <label>Value of Gifts Given In <span class="syr">2024</span>:</label>
+      $<input type="number" id="giftsGiven" value="10000" />
+    </p>
+    <p>
+      <label>Value of Gifts Given Before <span class="syr">2024</span>:</label
+      >
+      $<input
+        type="number"
+        id="giftsGivenBefore"
+        min="0"
+        value="500000"
+      />
+    </p>
+
+    <button id="calcBtn">Calculate</button>
+    <button id="resetBtn">Reset</button>
+    <hr />
+    <div>
+      <h3>Result:</h3>
+      <h3 id="calcResults">Result will appear here...</h3>
+    </div>
+
+    <script>
+      // Get required elements from the HTML
+      const giftsGivenBeforeEl = document.getElementById("giftsGivenBefore");
+      const giftsGivenEl = document.getElementById("giftsGiven");
+      const taxYrSelectEl = document.getElementById("taxYrSelect");
+      const filingStatusEl = document.getElementById("filingStatus");
+      const syrEl = document.querySelectorAll(".syr");
+
+      const calcBtnEl = document.getElementById("calcBtn");
+      const resetBtnEl = document.getElementById("resetBtn");
+      const calcResultsEl = document.getElementById("calcResults");
+
+      function handleTaxYrSelectChange(e) {
+        const value = e.target.value
+        
+        syrEl.forEach((item) => {
+          item.textContent = taxYrSelectEl.options[taxYrSelectEl.selectedIndex].text
+        })
+        
+        resetResult()
+      }
+
+      function createElement() {
+        const newDiv = `
+            <p>
+              <label for="i11-span">Gift Tax Lifetime Exclusion: &nbsp;</label>
+              $<span
+                data-id="i11"
+                step="any"
+                id="i11-span"
+                class="spans"
+              ></span>
+            </p>
+            <p>
+              <label for="i11-span">Lifetime Exclusion Remaining: &nbsp;</label>
+              $<span
+                data-id="i11"
+                step="any"
+                id="i11-span"
+                class="spans"
+              ></span>
+            </p>
+            <p>
+              <label for="i11-span">${syrEl[0].textContent} Gift Tax Annual Exclusion: &nbsp;</label>
+              $<span
+                data-id="i11"
+                step="any"
+                id="i11-span"
+                class="spans"
+              ></span>
+            </p>
+            <p>
+              <label for="i11-span">${syrEl[0].textContent} Exclusion Remaining: &nbsp;</label>
+              $<span
+                data-id="i11"
+                step="any"
+                id="i11-span"
+                class="spans"
+              ></span>
+            </p>
+            <p>
+              <label for="i11-span">Total Taxes Owed:: &nbsp;</label>
+              $<span
+                data-id="i11"
+                step="any"
+                id="i11-span"
+                class="spans"
+              ></span>
+            </p>
+        `;
+        return newDiv;
+      }
+
+      function setResult(resultObj) {
+        for (key of Object.keys(resultObj)) {
+          let val = resultObj[key].result;
+          let id = resultObj[key].type;
+
+          if (isNaN(val)) {
+            alert(
+              "Your input resulted in NAN.\n 0/0 \n Try again with valid input."
+            );
+            return;
+          }
+          if (Math.abs(val) === Infinity) {
+            alert(
+              "Your input resulted in Infinity. \nDivision by zero. \nTry again with valid input."
+            );
+            return;
+          }
+          const span = document.getElementById(`${id}-span`);
+          span.textContent = `${val * 1}`;
+        }
+      }
+
+      function calculateResults() {
+        // Retrieve input values
+        const giftsGivenBefore = parseFloat(giftsGivenBeforeEl.value);
+        const giftsGiven = parseFloat(giftsGivenEl.value);
+        const taxYrSelect = parseFloat(taxYrSelectEl.value);
+        const filingStatus = parseFloat(filingStatusEl.value);
+
+        if (isNaN(giftsGivenBefore) || giftsGivenBefore < 0 || isNaN(giftsGiven) || giftsGiven < 0) {
+          alert("Please Enter All Details.");
+          return;
+        }
+
+        try {
+          const resultElement = createElement();
+          calcResultsEl.innerHTML = resultElement;
+
+          const GTLE = 0
+          const LER = 0
+          const GTAE = 0
+          const ER = 0
+          const TaO = 0
+
+          const results = {
+            1: {result: Math.abs(GTLE) > 1 ? GTLE.toFixed(4) : GTLE.toPrecision(4), type: "i11"},
+            2: {result: Math.abs(LER) > 1 ? LER.toFixed(4) : LER.toPrecision(4), type: "i12"},
+            3: {result: Math.abs(GTAE) > 1 ? GTAE.toFixed(4) : GTAE.toPrecision(4), type: "i13"},
+            4: {result: Math.abs(ER) > 1 ? ER.toFixed(4) : ER.toPrecision(4), type: "i14"},
+            5: {result: Math.abs(TaO) > 1 ? TaO.toFixed(4) : TaO.toPrecision(4), type: "i15"},
+          };
+          setResult(results);
+        } catch (error) {
+          alert("Something Went Wrong!!!");
+          resetResult();
+          return;
+        }
+      }
+
+      function resetForm() {
+        giftsGivenBeforeEl.value = "";
+        giftsGivenEl.value = "";
+        taxYrSelectEl.selectedIndex = "0";
+        filingStatusEl.selectedIndex = "0";
+      }
+
+      function resetResult() {
+        calcResultsEl.innerHTML = "<p>Result will appear here...</p>";
+      }
+
+      function resethandler() {
+        resetForm();
+        resetResult();
+      }
+
+      resetBtnEl.addEventListener("click", resethandler);
+      calcBtnEl.addEventListener("click", calculateResults);
+      [giftsGivenBeforeEl, giftsGivenEl].forEach((el) => {
+        el.addEventListener("input", resetResult);
+      });
+      filingStatusEl.addEventListener("change", resetResult);
+      taxYrSelectEl.addEventListener("change", handleTaxYrSelectChange)
+    </script>
+  </body>
+</html>

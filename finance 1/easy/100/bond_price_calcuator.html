@@ -20,11 +20,11 @@
       id="freqSelect"
     >
       <option value="1" selected>Annually</option>
-      <option value="0.5">Semi-annually</option>
-      <option value="0.25">Quarterly</option>
-      <option value="0.08333333333">Monthly</option>
-      <option value="0.0192307692308">Weekly</option>
-      <option value="0.0027397260274">Daily</option>
+      <option value="2">Semi-annually</option>
+      <option value="4">Quarterly</option>
+      <option value="12">Monthly</option>
+      <option value="52">Weekly</option>
+      <option value="365">Daily</option>
     </select>
     </p>
     <p>
@@ -125,18 +125,17 @@
             const resultElement = createElement()
             calcResultsEl.innerHTML = resultElement 
 
-            const couponFreq = freqSelect * faceVal * (couponRate / 100)
+            const couponPeriod =  faceVal * (couponRate / 100) / freqSelect
             const annualCoupon = faceVal * (couponRate / 100)
             let bondPrice = 0
-            for (let i = 1; i < yearsMature; i++) {
-              console.log((annualCoupon / ((1 + (yieldMature / 100)) ** i)))
-              bondPrice += (annualCoupon / ((1 + (yieldMature / 100)) ** i))
+            for (let i = 1; i < (yearsMature * freqSelect); i++) {
+              bondPrice += (couponPeriod / ((1 + ((yieldMature / freqSelect) / 100)) ** i))
             }
-            bondPrice += ((annualCoupon + faceVal) / ((1 + (yieldMature / 100)) ** yearsMature))
+            bondPrice += ((couponPeriod + faceVal) / ((1 + ((yieldMature / freqSelect) / 100)) ** (yearsMature * freqSelect)))
             
 
             const results = {
-              1: { result: Math.abs(couponFreq) > 1 ? couponFreq.toFixed(2) : couponFreq.toPrecision(2), type: "i11" },
+              1: { result: Math.abs(couponPeriod) > 1 ? couponPeriod.toFixed(2) : couponPeriod.toPrecision(2), type: "i11" },
               2: { result: Math.abs(annualCoupon) > 1 ? annualCoupon.toFixed(2) : annualCoupon.toPrecision(2), type: "i12" },
               3: { result: Math.abs(bondPrice) > 1 ? bondPrice.toFixed(2) : bondPrice.toPrecision(2), type: "i13" },
             }

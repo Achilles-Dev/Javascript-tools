@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Electricity Bill Calculator</title>
+</head>
+<body>
+    <h1>Electricity Bill Calculator</h1>
+    <p>
+      Select country:
+      <select id="country">
+        <option>Australia</option>
+        <option>Canada</option>
+        <option>France</option>
+        <option>Germany</option>
+        <option>India</option>
+        <option>Philippines</option>
+        <option>Singapore</option>
+        <option>United Kingdom</option>
+        <option selected>United States</option>
+        <option>Other country</option>
+      </select>
+    </p>
+    <p>
+      Typical appliance:
+      <select id="appliance">
+        <option selected>Air conditioner</option>
+        <option>Clothes dryer</option>
+        <option>Clothes iron</option>
+        <option>Dishwasher</option>
+        <option>Electric kettle</option>
+        <option>Fan</option>
+        <option>Heater</option>
+        <option>Microwave oven</option>
+        <option>Desktop computer</option>
+        <option>Laptop computer</option>
+        <option>Refrigerator</option>
+        <option>Stereo receiver</option>
+        <option>Television</option>
+        <option>Toaster oven</option>
+        <option>Vacuum cleaner</option>
+        <option>Washing machine</option>
+        <option>Water heater</option>
+      </select>
+    </p>
+    <p>
+      Power consumption:
+      <input id="power" type="number">
+      <select id="powerSelect">
+        <option selected>watts (W)</option>
+        <option>kilowatts (kW)</option>
+      </select>
+    </p>
+    <p>
+      Hours of use per day:
+      <input id="useHours" type="number"> h/day
+    </p>
+    <p>
+      1 kilowatt-hour (kWh) cost:
+      <input id="cost" type="number" value="12">
+      <select id="costSelect">
+        <option selected>cent</option>
+        <option>pence</option>
+        <option>rupee</option>
+        <option>peso</option>
+      </select>
+    </p>
+
+    <button id="calcBtn">Calculate</button>
+    <button id="resetBtn">Reset</button>
+    <hr>
+    <div>
+      <h3>Result:</h3>
+      <h3 id="calcResults">Result will appear here...</h3>
+    </div>
+
+    <script>
+      // Get required elements from the HTML
+      const countryEl = document.getElementById("country");
+      const applianceEl = document.getElementById("appliance");
+      const useHoursEl = document.getElementById("useHours");
+      const powerSelectEl = document.getElementById("powerSelect");
+      const powerEl = document.getElementById("power");
+      const costEl = document.getElementById("cost");
+      const costSelectEl = document.getElementById("costSelect");
+
+      const calcBtnEl = document.getElementById('calcBtn');
+      const resetBtnEl = document.getElementById('resetBtn');
+      const calcResultsEl = document.getElementById('calcResults') 
+
+      function createElement() {
+        const newDiv = `
+            <p>
+              <label for="i11-span">Electricity cost per day: &nbsp;</label>
+              <span
+                data-id="i11"
+                step="any"
+                id="i11-span"
+                class="spans"
+              ></span>
+            </p>
+            <p>
+              <label for="i12-span">Electricity cost per month: &nbsp;</label>
+              <span
+                data-id="i12"
+                step="any"
+                id="i12-span"
+                class="spans"
+              ></span>
+            </p>
+            <p>
+              <label for="i13-span">Electricity cost per year: &nbsp;</label>
+              <span
+                data-id="i13"
+                step="any"
+                id="i13-span"
+                class="spans"
+              ></span>
+            </p>
+        `
+        return newDiv
+      }
+
+      function setResult(resultObj) {
+        for (key of Object.keys(resultObj)) {
+          let val = resultObj[key].result;
+          let id = resultObj[key].type;
+
+          if (isNaN(val)) {
+           alert("Your input resulted in NAN.\n 0/0 \n Try again with valid input.");
+            return;
+          }
+          if (Math.abs(val) === Infinity) {
+            alert("Your input resulted in Infinity. \nDivision by zero. \nTry again with valid input.");
+            return;
+          }
+          const span = document.getElementById(`${id}-span`);
+          span.textContent = `${val}`;
+        }
+      }
+
+      function calculateResults() {
+          // Retrieve input values
+          const country = countryEl.value;
+          const appliance = applianceEl.value;
+          const useHours = parseFloat(useHoursEl.value);
+          const powerSelect = powerSelectEl.value;
+          const power = parseFloat(powerEl.value);
+          const cost = parseFloat(costEl.value);
+          const costSelect = costSelectEl.value;
+
+          if (isNaN(useHours) || useHours < 0 || isNaN(power) || power < 0 || isNaN(cost) || cost < 0 ) {
+            alert("Please Enter All Details.");
+            return;
+          }
+
+          try {
+            const resultElement = createElement()
+            calcResultsEl.innerHTML = resultElement 
+
+            const costPerDay = 0
+            const costPerMos = 0
+            const costPerYr = 0
+            
+
+            const results = {
+              1: { result: Math.abs(costPerDay) > 1 ? costPerDay.toFixed(2) : costPerDay.toPrecision(2), type: "i11" },
+              2: { result: Math.abs(costPerMos) > 1 ? costPerMos.toFixed(2) : costPerMos.toPrecision(2), type: "i12" },
+              3: { result: Math.abs(costPerYr) > 1 ? costPerYr.toFixed(2) : costPerYr.toPrecision(2), type: "i13" },
+            }
+            setResult(results)
+
+          } catch (error) {
+            alert("Something Went Wrong!!!");
+            resetResult()
+            return;
+          }
+      }
+
+      function resetForm() {
+        countryEl.selectedIndex = "8"
+        applianceEl.selectedIndex = "0"
+        useHoursEl.value = ""
+        powerSelectEl.selectedIndex = "0"
+        powerEl.value = ""
+        costEl.value = "12"
+        costSelectEl.selectedIndex = "0"
+      }
+
+      function resetResult() {
+        calcResultsEl.innerHTML = "<p>Result will appear here...</p>";
+      } 
+
+      function resethandler() {
+        resetForm();
+        resetResult();
+      }
+
+      resetBtnEl.addEventListener("click", resethandler);
+      calcBtnEl.addEventListener("click", calculateResults);
+      [useHoursEl, costEl, powerEl].forEach((el) => {
+        el.addEventListener("input", resetResult);
+      }); 
+      [countryEl, applianceEl, powerSelectEl, costSelectEl].forEach((el) => {
+        el.addEventListener("change", resetResult);
+      });  
+
+    </script>
+</body>
+</html>

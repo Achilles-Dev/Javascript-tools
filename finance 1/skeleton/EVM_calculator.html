@@ -1,20 +1,22 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Commission Calculator</title>
+  <title>Customer Retention Rate Calculator</title>
 </head>
 <body>
-    <h1>Commission Calculator</h1>
-    <h3>Calculate the commission for a sale.</h3>
+    <h1>Customer Retention Rate Calculator</h1>
     <p>
-      Total Sales ($):
-      <input type="number" id="totalSales">
+      Existing customers:
+      <input type="number" id="existCust">
     </p>
     <p>
-      Commission Percentage:
-      <input type="number" id="commPercent">%
+      New customers: 
+      <input type="number" id="newCust">
     </p>
-    
+    <p>
+      Total customers:
+      <input type="number" id="totCust">
+    </p>
 
     <button id="calcBtn">Calculate</button>
     <button id="resetBtn">Reset</button>
@@ -26,8 +28,9 @@
 
     <script>
       // Get required elements from the HTML
-      const totalSalesEl = document.getElementById("totalSales");
-      const commPercentEl = document.getElementById("commPercent");
+      const existCustEl = document.getElementById("existCust");
+      const newCustEl = document.getElementById("newCust");
+      const totCustEl = document.getElementById("totCust");
 
       const calcBtnEl = document.getElementById('calcBtn');
       const resetBtnEl = document.getElementById('resetBtn');
@@ -36,13 +39,22 @@
       function createElement() {
         const newDiv = `
             <p>
-              <label for="i11-span">Your Commission: &nbsp;</label>
+              <label for="i11-span">Attrition rate: &nbsp;</label>
               <span
                 data-id="i11"
                 step="any"
                 id="i11-span"
                 class="spans"
-              ></span>
+              ></span>%
+            </p>
+            <p>
+              <label for="i12-span">Customer retention rate: &nbsp;</label>
+              <span
+                data-id="i12"
+                step="any"
+                id="i12-span"
+                class="spans"
+              ></span>%
             </p>
         `
         return newDiv
@@ -62,20 +74,25 @@
             return;
           }
           const span = document.getElementById(`${id}-span`);
-          span.textContent = `$${parseFloat(val)}`;
+          span.textContent = `${val * 1}`;
         }
       }
 
       function calculateResults() {
           // Retrieve input values
-          const totalSales = parseFloat(totalSalesEl.value);
-          const commPercent = parseFloat(commPercentEl.value);
+          const existCust = parseFloat(existCustEl.value);
+          const newCust = parseFloat(newCustEl.value);
+          const totCust = parseFloat(totCustEl.value);
 
-          if (isNaN(totalSales) || totalSales < 0 || isNaN(commPercent) || commPercent < 0 ) {
+          if (isNaN(existCust) || existCust <= 0 || isNaN(newCust) || newCust <= 0 || isNaN(totCust) || totCust < 0
+          ) {
             alert("Please Enter All Details.");
             return;
-          } else if (commPercent > 100) {
-            alert("Ensure this value is less than or equal to 100.");
+          } else if (totCust <= newCust ) {
+            alert("The total number of customers must be greater than the number of new customers .");
+            return;
+          } else if (totCust > (newCust + existCust) ) {
+            alert("The total number of customers must be greater than the number of new customers .");
             return;
           }
 
@@ -83,10 +100,12 @@
             const resultElement = createElement()
             calcResultsEl.innerHTML = resultElement 
 
-            const commission = totalSales * (commPercent / 100)
+            const retRate = ((totCust - newCust) / existCust) * 100
+            const attRate =  100 - retRate
 
             const results = {
-              1: { result: Math.abs(commission) > 1 ? commission.toFixed(2) : commission.toPrecision(2), type: "i11" },
+              1: { result: Math.abs(attRate) > 1 ? attRate.toFixed(2) : attRate.toPrecision(2), type: "i11" },
+              2: { result: Math.abs(retRate) > 1 ? retRate.toFixed(2) : retRate.toPrecision(2), type: "i12" },
             }
             setResult(results)
 
@@ -98,8 +117,9 @@
       }
 
       function resetForm() {
-        totalSalesEl.value = ""
-        commPercentEl.value = ""
+        existCustEl.value = ""
+        newCustEl.value = ""
+        totCustEl.value = ""
       }
 
       function resetResult() {
@@ -113,10 +133,10 @@
 
       resetBtnEl.addEventListener("click", resethandler);
       calcBtnEl.addEventListener("click", calculateResults);
-
-      [totalSalesEl, commPercentEl].forEach((el) => {
+      [existCustEl, newCustEl, totCustEl].forEach((el) => {
         el.addEventListener("input", resetResult);
       });  
+
     </script>
 </body>
 </html>

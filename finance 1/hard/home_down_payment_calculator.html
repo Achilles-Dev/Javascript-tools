@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Home Down Payment Calculator</title>
+  </head>
+  <body>
+    <h1>Home Down Payment Calculator</h1>
+    <p>
+      <label>Property Value:</label>
+      <input
+        type="number"
+        id="propertyVal"
+        min="0"
+        value="200000"
+      />
+    </p>
+    <p>
+      <label>Savings Amount:</label>
+      <input
+        type="number"
+        id="savingsAmt"
+        min="0"
+        value="50000"
+      />
+    </p>
+    <p>
+      <label>Loan Term (years):</label>
+      <input
+        type="number"
+        id="loanTerm"
+        min="0"
+        value="30"
+      />
+    </p>
+    <p>
+      <label>Interest Rate (%):</label>
+      <input
+        type="number"
+        id="intRate"
+        min="0"
+        value="5"
+      />
+    </p>
+    <p>
+      <label>Annual PMI Rate (%):</label>
+      <input
+        type="number"
+        id="pmiRate"
+        min="0"
+        value="0.5"
+      />
+    </p>
+    <p>
+      <label>Annual Property Taxes (<span id="cur3">$</span>):</label>
+      <input
+        type="number"
+        id="taxes"
+        min="0"
+        value="2500"
+      />
+    </p>
+    <p>
+      <label>Annual Homeowners Insurance (<span id="cur4">$</span>):</label>
+      <input
+        type="number"
+        id="insurance"
+        min="0"
+        value="1500"
+      />
+    </p>
+
+    <button id="calcBtn">Calculate</button>
+    <button id="resetBtn">Reset</button>
+    <hr />
+    <div>
+      <h3>Result:</h3>
+      <h3 id="calcResults">Result will appear here...</h3>
+    </div>
+
+    <script>
+      // Get required elements from the HTML
+      const propertyValEl = document.getElementById("propertyVal");
+      const savingsAmtEl = document.getElementById("savingsAmt");
+      const loanTermEl = document.getElementById("loanTerm");
+      const intRateEl = document.getElementById("intRate");
+      const pmiRateEl = document.getElementById("pmiRate");
+      const taxesEl = document.getElementById("taxes");
+      const insuranceEl = document.getElementById("insurance");
+
+      const calcBtnEl = document.getElementById("calcBtn");
+      const resetBtnEl = document.getElementById("resetBtn");
+      const calcResultsEl = document.getElementById("calcResults");
+
+      function createElement() {
+        const newDiv = `
+            <p>
+              <label for="i11-span">Fund return: &nbsp;</label>
+              <span
+                data-id="i11"
+                step="any"
+                id="i11-span"
+                class="spans"
+              ></span>%
+            </p>
+            <p>
+              <label for="i12-span">The GP profit split is: &nbsp;</label>
+              <span
+                data-id="i12"
+                step="any"
+                id="i12-span"
+                class="spans"
+              ></span>
+            </p>
+            <p>
+              <label for="i13-span">The total GP carry distribution is: &nbsp;</label>
+              <span
+                data-id="i13"
+                step="any"
+                id="i13-span"
+                class="spans"
+              ></span>💰
+            </p>
+        `;
+        const newDiv2 = `
+            <p>
+              <label for="i14-span">The GP catch-up is: &nbsp;</label>
+              <span
+                data-id="i14"
+                step="any"
+                id="i14-span"
+                class="spans"
+              ></span>💰
+            </p>
+         `;
+        if (taxesEl.value === "yes") {
+          return newDiv + newDiv2;
+        }
+
+        return newDiv;
+      }
+
+      function setResult(resultObj) {
+        for (key of Object.keys(resultObj)) {
+          let val = resultObj[key].result;
+          let id = resultObj[key].type;
+
+          if (isNaN(val)) {
+            alert(
+              "Your input resulted in NAN.\n 0/0 \n Try again with valid input."
+            );
+            return;
+          }
+          if (Math.abs(val) === Infinity) {
+            alert(
+              "Your input resulted in Infinity. \nDivision by zero. \nTry again with valid input."
+            );
+            return;
+          }
+          const span = document.getElementById(`${id}-span`);
+          span.textContent = `${parseFloat(val)}`;
+        }
+      }
+
+      function calculateResults() {
+        // Retrieve input values
+        const propertyVal = parseFloat(propertyValEl.value);
+        const savingsAmt = parseFloat(savingsAmtEl.value);
+        const loanTerm = parseFloat(loanTermEl.value);
+        const intRate = parseFloat(intRateEl.value);
+        const pmiRate = parseFloat(pmiRateEl.value);
+        const taxes = parseFloat(taxesEl.value);
+        const insurance = parseFloat(insuranceEl.value);
+
+        if (
+          isNaN(propertyVal) ||
+          propertyVal < 0 ||
+          isNaN(savingsAmt) ||
+          savingsAmt < 0 ||
+          isNaN(loanTerm) ||
+          loanTerm < 1 ||
+          isNaN(intRate) ||
+          intRate < 0 ||
+          isNaN(pmiRate) ||
+          pmiRate < 0 ||
+          isNaN(taxes) ||
+          taxes < 0 ||
+          isNaN(insurance) ||
+          insurance < 0
+        ) {
+          alert("Please Enter All Details.");
+          return;
+        }
+
+        try {
+          const fundReturn = (savingsAmt / propertyVal - 1) * 100;
+
+          if (fundReturn < intRate) {
+            calcResultsEl.innerHTML = `
+                <p>As the fund return is lower than the hurdle rate, you will not incur any carry distribution 💸</p>
+            `;
+            return;
+          }
+          const resultElement = createElement();
+          calcResultsEl.innerHTML = resultElement;
+
+          const carryD =
+            (savingsAmt - propertyVal * (1 + intRate / 100) ** loanTerm) *
+            (pmiRate / 100);
+
+          const results = {
+            1: {
+              result:
+                Math.abs(fundReturn) > 1
+                  ? fundReturn.toFixed(2)
+                  : fundReturn.toPrecision(2),
+              type: "i11",
+            },
+            2: {
+              result:
+                Math.abs(carryD) > 1
+                  ? carryD.toFixed(2)
+                  : carryD.toPrecision(2),
+              type: "i12",
+            },
+            3: {
+              result:
+                Math.abs(carryD) > 1
+                  ? carryD.toFixed(4)
+                  : carryD.toPrecision(4),
+              type: "i13",
+            },
+          };
+          setResult(results);
+          if (taxesEl.value === "yes") {
+            const GPDist = 0;
+            const results = {
+              4: {
+                result:
+                  Math.abs(GPDist) > 1
+                    ? GPDist.toFixed(2)
+                    : GPDist.toPrecision(2),
+                type: "i14",
+              },
+            };
+          }
+        } catch (error) {
+          alert("Something Went Wrong!!!");
+          resetResult();
+          return;
+        }
+      }
+
+      function resetForm() {
+        propertyValEl.value = "200000";
+        savingsAmtEl.value = "50000";
+        loanTermEl.value = "30";
+        intRateEl.value = "5";
+        pmiRateEl.value = "0.5";
+        taxesEl.value = "2500";
+        insuranceEl.value = "1500";
+      }
+
+      function resetResult() {
+        calcResultsEl.innerHTML = "<p>Result will appear here...</p>";
+      }
+
+      function resethandler() {
+        resetForm();
+        resetResult();
+      }
+
+      [
+        propertyValEl,
+        savingsAmtEl,
+        loanTermEl,
+        intRateEl,
+        pmiRateEl,
+      ].forEach((el) => {
+        el.addEventListener("input", resetResult);
+      });
+      taxesEl.addEventListener("change", resetResult);
+
+      resetBtnEl.addEventListener("click", resethandler);
+      calcBtnEl.addEventListener("click", calculateResults);
+    </script>
+  </body>
+</html>

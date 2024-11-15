@@ -1,20 +1,18 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Commission Calculator</title>
+  <title>Emergency Fund Calculator</title>
 </head>
 <body>
-    <h1>Commission Calculator</h1>
-    <h3>Calculate the commission for a sale.</h3>
+    <h1>Emergency Fund Calculator</h1>
     <p>
-      Total Sales ($):
-      <input type="number" id="totalSales">
+      Average monthly expenses:
+      <input type="number" id="expenses">
     </p>
     <p>
-      Commission Percentage:
-      <input type="number" id="commPercent">%
+      Months of savings desired: 
+      <input type="number" id="months"> months
     </p>
-    
 
     <button id="calcBtn">Calculate</button>
     <button id="resetBtn">Reset</button>
@@ -26,8 +24,8 @@
 
     <script>
       // Get required elements from the HTML
-      const totalSalesEl = document.getElementById("totalSales");
-      const commPercentEl = document.getElementById("commPercent");
+      const expensesEl = document.getElementById("expenses");
+      const monthsEl = document.getElementById("months");
 
       const calcBtnEl = document.getElementById('calcBtn');
       const resetBtnEl = document.getElementById('resetBtn');
@@ -36,8 +34,8 @@
       function createElement() {
         const newDiv = `
             <p>
-              <label for="i11-span">Your Commission: &nbsp;</label>
-              <span
+              <label for="i11-span">Emergency fund: &nbsp;</label>
+              $<span
                 data-id="i11"
                 step="any"
                 id="i11-span"
@@ -62,20 +60,17 @@
             return;
           }
           const span = document.getElementById(`${id}-span`);
-          span.textContent = `$${parseFloat(val)}`;
+          span.textContent = `${val * 1}`;
         }
       }
 
       function calculateResults() {
           // Retrieve input values
-          const totalSales = parseFloat(totalSalesEl.value);
-          const commPercent = parseFloat(commPercentEl.value);
+          const expenses = parseFloat(expensesEl.value);
+          const months = parseFloat(monthsEl.value);
 
-          if (isNaN(totalSales) || totalSales < 0 || isNaN(commPercent) || commPercent < 0 ) {
+          if (isNaN(expenses) || expenses <= 0 || isNaN(months) || months < 0 ) {
             alert("Please Enter All Details.");
-            return;
-          } else if (commPercent > 100) {
-            alert("Ensure this value is less than or equal to 100.");
             return;
           }
 
@@ -83,10 +78,10 @@
             const resultElement = createElement()
             calcResultsEl.innerHTML = resultElement 
 
-            const commission = totalSales * (commPercent / 100)
+            const EF = expenses * months
 
             const results = {
-              1: { result: Math.abs(commission) > 1 ? commission.toFixed(2) : commission.toPrecision(2), type: "i11" },
+              1: { result: Math.abs(EF) > 1 ? EF.toFixed(4) : EF.toPrecision(4), type: "i11" },
             }
             setResult(results)
 
@@ -98,8 +93,8 @@
       }
 
       function resetForm() {
-        totalSalesEl.value = ""
-        commPercentEl.value = ""
+        expensesEl.value = ""
+        monthsEl.value = ""
       }
 
       function resetResult() {
@@ -113,10 +108,10 @@
 
       resetBtnEl.addEventListener("click", resethandler);
       calcBtnEl.addEventListener("click", calculateResults);
-
-      [totalSalesEl, commPercentEl].forEach((el) => {
+      [expensesEl, monthsEl].forEach((el) => {
         el.addEventListener("input", resetResult);
       });  
+
     </script>
 </body>
 </html>
