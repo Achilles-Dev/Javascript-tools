@@ -113,8 +113,10 @@
           const carg = parseFloat(cargEl.value);
           const calcSelect = calcSelectEl.value
 
-          if (isNaN(initialValue) || initialValue <= 0 || isNaN(finalValue) || finalValue <= 0 || isNaN(duration) || duration <= 0 ||
-            isNaN(carg) || carg <= 0
+          if ((initialValueEl.checkVisibility() === true && isNaN(initialValue) || initialValue <= 0) || 
+           (finalValueEl.checkVisibility() === true && isNaN(finalValue) || finalValue <= 0) || 
+           (durationEl.checkVisibility() === true && isNaN(duration) || duration <= 0) ||
+           (cargEl.checkVisibility() === true && isNaN(carg) || carg <= 0)
           ) {
             alert("Please Enter All Details.");
             return;
@@ -126,17 +128,17 @@
 
             let result = 0
             if (calcSelect === "init") {
-              result = 0
+              result = finalValue / ((1 + (carg / 100)) ** duration)
             } else if (calcSelect === "fina") {
-              result = 0
+              result = initialValue * ((1 + (carg / 100)) ** duration)
             } else if (calcSelect === "dura") {
-              result = 0
+              result = Math.log(finalValue / initialValue) / Math.log(1 + (carg / 100))
             } else {
-              result = 0
+              result = ((finalValue / initialValue) ** (1 / duration) - 1) * 100
             }
 
             const results = {
-              1: { result: Math.abs(result) > 1 ? result.toFixed(4) : result.toPrecision(4), type: "i11" },
+              1: { result: Math.abs(result) > 1 ? result.toFixed(3) : result.toPrecision(3), type: "i11" },
             }
             setResult(results)
 

@@ -108,7 +108,7 @@
                 step="any"
                 id="i11-span"
                 class="spans"
-              ></span>%
+              ></span>
             </p>
             <p>
               <label for="i12-span">New credit card cost: &nbsp;</label>
@@ -116,6 +116,14 @@
                 data-id="i12"
                 step="any"
                 id="i12-span"
+                class="spans"
+              ></span>
+            </p>
+            <p>
+              <span
+                data-id="i13"
+                step="any"
+                id="i13-span"
                 class="spans"
               ></span>
             </p>
@@ -128,6 +136,12 @@
           let val = resultObj[key].result;
           let id = resultObj[key].type;
 
+          const span = document.getElementById(`${id}-span`);
+          if (id === "i13") {
+            span.textContent = val;
+            return;
+          }
+
           if (isNaN(val)) {
            alert("Your input resulted in NAN.\n 0/0 \n Try again with valid input.");
             return;
@@ -136,7 +150,7 @@
             alert("Your input resulted in Infinity. \nDivision by zero. \nTry again with valid input.");
             return;
           }
-          const span = document.getElementById(`${id}-span`);
+          
           val = Math.abs(val) > 1 ? val.toFixed(2) : val.toPrecision(2)
           span.textContent = val;
         }
@@ -171,12 +185,38 @@
             const resultElement = createElement()
             calcResultsEl.innerHTML = resultElement 
 
-            const oldCost = 0
-            const newCost = 0
+            let oldCost = 0
+            let newCost = 0
+            let detail = ""
+            let diff = 0
+
+            if (periodSelect === "prom") {
+              oldCost = (oldRate / 100) * transferAmt * (time / 12)
+              newCost = ((transferFee / 100) * transferAmt) + ((promoRate1 / 100) * transferAmt * time / 12)
+              diff = newCost - oldCost
+            } else {
+              const finalPeriod = time - promoPeriod
+              oldCost = (oldRate / 100) * transferAmt * (time / 12)
+              newCost = ((transferFee / 100) * transferAmt) + ((promoRate2 / 100) * transferAmt * promoPeriod / 12) + 
+                  ((finalRate / 100) * transferAmt * finalPeriod / 12)
+              diff = newCost - oldCost
+            }
+            if (diff < 0) {
+              const monthPay = ((transferAmt + newCost) / time).toFixed(2)
+              detail = `This new rate will suit your pocket better and save you ${Math.abs(diff)} in the ${time} month period. 
+                To pay off your card in this time frame you will need to pay ${monthPay} per month. `
+            } else if (diff > 0) {
+              const monthPay = ((transferAmt + newCost) / time).toFixed(2)
+              detail = `This is not a good deal. You will lose ${Math.abs(diff)} in the ${time} month period. 
+                To pay off your card in this time frame you will need to pay ${monthPay} per month. `
+            } else {
+              detail = "This is more effort than it is worth. You will not profit from this deal. "
+            }
 
             const results = {
               1: { result: oldCost, type: "i11" },
               2: { result: newCost, type: "i12" },
+              3: { result: detail, type: "i13" },
             }
             setResult(results)
 

@@ -72,7 +72,55 @@
       }
 
       function createElement() {
-        const newDiv = `
+        if (calcSelectEl.value === "cal") {
+          if (parseFloat(strikePriceEl.value) > parseFloat(assetPriceEl.value)) {
+            const newDiv = `
+              <p>
+                <label for="i11-span">Total call cost (premium): &nbsp;</label>
+                <span
+                  data-id="i11"
+                  step="any"
+                  id="i11-span"
+                  class="spans"
+                ></span>
+              </p>
+          `
+          return newDiv
+          } else {
+            const newDiv = `
+              <p>
+                <label for="i11-span">Total call cost (premium): &nbsp;</label>
+                <span
+                  data-id="i11"
+                  step="any"
+                  id="i11-span"
+                  class="spans"
+                ></span>
+              </p>
+              <p>
+                <label for="i12-span">Call potential profit: &nbsp;</label>
+                <span
+                  data-id="i12"
+                  step="any"
+                  id="i12-span"
+                  class="spans"
+                ></span>
+              </p>
+              <p>
+                <label for="i13-span">Call potential return: &nbsp;</label>
+                <span
+                  data-id="i13"
+                  step="any"
+                  id="i13-span"
+                  class="spans"
+                ></span>%
+              </p>
+          `
+          return newDiv
+          }
+        } else {
+          if (parseFloat(strikePriceEl.value) <= parseFloat(assetPriceEl.value)) {
+          const newDiv = `
             <p>
               <label for="i11-span">Total call cost (premium): &nbsp;</label>
               <span
@@ -84,6 +132,40 @@
             </p>
         `
         return newDiv
+        } else {
+          const newDiv = `
+            <p>
+              <label for="i11-span">Total call cost (premium): &nbsp;</label>
+              <span
+                data-id="i11"
+                step="any"
+                id="i11-span"
+                class="spans"
+              ></span>
+            </p>
+            <p>
+              <label for="i12-span">Call potential profit: &nbsp;</label>
+              <span
+                data-id="i12"
+                step="any"
+                id="i12-span"
+                class="spans"
+              ></span>
+            </p>
+            <p>
+              <label for="i13-span">Call potential return: &nbsp;</label>
+              <span
+                data-id="i13"
+                step="any"
+                id="i13-span"
+                class="spans"
+              ></span>%
+            </p>
+        `
+        return newDiv
+        }
+        }
+        
       }
 
       function setResult(resultObj) {
@@ -120,24 +202,46 @@
           ) {
             alert("Please Enter All Details.");
             return;
-          } else if (callPrice > 99) {
-            alert("Ensure this value is less than or equal to 99");
-            return;
           }
 
           try {
             const resultElement = createElement()
             calcResultsEl.innerHTML = resultElement 
 
-            let result = 0
+            let TCC = 0
+            let CPP = 0
+            let CPR = 0
+            let results = {}
             if (calcSelect === "cal") {
-              result = 0
+              TCC = callPrice * contractNum * 100
+              CPP = (assetPrice - strikePrice - callPrice) * contractNum * 100
+              CPR = ((assetPrice - strikePrice - callPrice) / callPrice) * 100
+              if (strikePrice > assetPrice) {
+                results = {
+                  1: { result: Math.abs(TCC) > 1 ? TCC.toFixed(2) : TCC.toPrecision(2), type: "i11" },
+                }
+              } else {
+                results = {
+                  1: { result: Math.abs(TCC) > 1 ? TCC.toFixed(2) : TCC.toPrecision(2), type: "i11" },
+                  2: { result: Math.abs(CPP) > 1 ? CPP.toFixed(2) : CPP.toPrecision(2), type: "i12" },
+                  3: { result: Math.abs(CPR) > 1 ? CPR.toFixed(2) : CPR.toPrecision(2), type: "i13" }
+                }
+              }
             } else {
-              result = 0
-            }
-
-            const results = {
-              1: { result: Math.abs(result) > 1 ? result.toFixed(4) : result.toPrecision(4), type: "i11" },
+              TCC = callPrice * contractNum * 100
+              CPP = (strikePrice - assetPrice - callPrice) * contractNum * 100
+              CPR = ((strikePrice - assetPrice - callPrice) / callPrice) * 100
+              if (strikePrice <= assetPrice) {
+                results = {
+                  1: { result: Math.abs(TCC) > 1 ? TCC.toFixed(2) : TCC.toPrecision(2), type: "i11" },
+                }
+              } else {
+                results = {
+                  1: { result: Math.abs(TCC) > 1 ? TCC.toFixed(2) : TCC.toPrecision(2), type: "i11" },
+                  2: { result: Math.abs(CPP) > 1 ? CPP.toFixed(2) : CPP.toPrecision(2), type: "i12" },
+                  3: { result: Math.abs(CPR) > 1 ? CPR.toFixed(2) : CPR.toPrecision(2), type: "i13" }
+                }
+              }
             }
             setResult(results)
 

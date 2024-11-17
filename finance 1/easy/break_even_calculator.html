@@ -170,7 +170,7 @@
           }
           const span = document.getElementById(`${id}-span`);
           val = Math.abs(val) > 1 ? val.toFixed(2) : val.toPrecision(2)
-          span.textContent = val;
+          span.textContent = val * 1;
         }
       }
 
@@ -179,7 +179,7 @@
           const fixedCosts = parseFloat(fixedCostsEl.value);
           const unitCost = parseFloat(unitCostEl.value);
           const revenue = parseFloat(revenueEl.value);
-          const markup = markupEl.value;
+          const markup = parseFloat(markupEl.value);
           const unitsSold = parseFloat(unitsSoldEl.value)
           const margin = parseFloat(marginEl.value);
 
@@ -193,13 +193,18 @@
             const resultElement = createElement(unitsSold)
             calcResultsEl.innerHTML = resultElement 
 
-            const toSell = 0
-            const totalRevenue = 0
-            const marginPercent = 0
-            const markupPercent = 0
+            const toSell = fixedCosts / (revenue - unitCost)
+            const totalRevenue = revenue * toSell
+            const marginPercent = marginEl.checkVisibility() === true ? margin : ((revenue - unitCost) / revenue) * 100
+            const markupPercent = markupEl.checkVisibility() === true ? markup : ((revenue - unitCost) / unitCost) * 100
 
             if (!isNaN(unitsSold)) {
-              const breakEven = 0
+              let breakEven = 0
+              let totalRevenueMonth = revenue * unitsSold
+              while (totalRevenueMonth <= totalRevenue) {
+                breakEven += 1
+                totalRevenueMonth += revenue * unitsSold
+              }
               const results = {
                 5: { result: breakEven, type: "i15" },
               }

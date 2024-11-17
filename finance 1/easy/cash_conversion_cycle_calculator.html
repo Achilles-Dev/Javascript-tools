@@ -126,19 +126,16 @@
           ) {
             alert("Please Enter All Details.");
             return;
-          } else if (goodsCost >= 100 || avgInventory >= 100) {
-            alert("Ensure this value is less than 100");
-            return;
           }
 
           try {
             const resultElement = createElement()
             calcResultsEl.innerHTML = resultElement 
 
-            const ARD = 0
-            const invDays = 0
-            const APD = 0
-            const CCC = 0
+            const ARD = avgReceivable / (totRevenue / period)
+            const invDays = avgInventory / (goodsCost / period)
+            const APD = avgPayable / (goodsCost / period)
+            const CCC = ARD + invDays - APD
 
             const results = {
               1: { result: Math.abs(ARD) > 1 ? ARD.toFixed(2) : ARD.toPrecision(2), type: "i11" },
