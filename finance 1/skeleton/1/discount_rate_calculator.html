@@ -110,8 +110,25 @@
             ></span>
           </p>
         `
+        const newDiv3 = `
+          <p>
+            <label for="i13-span">The periodic discount rate is: &nbsp;</label>
+            <span
+              data-id="i13"
+              step="any"
+              id="i13-span"
+              class="spans"
+            ></span>
+          </p>
+        `
+
         if (parseFloat(cashFlowEl.value) > 0) {
-          return newDiv + newDiv2
+          if (parseFloat(compoundSelectEl.value) > 1) {
+            return newDiv + newDiv3 + newDiv2
+          }
+          return newDiv + newDiv2 
+        } else if (parseFloat(compoundSelectEl.value) > 1) {
+          return newDiv + newDiv3
         }
         return newDiv
       }
@@ -130,7 +147,7 @@
             return;
           }
           const span = document.getElementById(`${id}-span`);
-          val = Math.abs(val) > 1 ? val.toFixed(2) : val.toPrecision(2)
+          val = Math.abs(val) > 1 ? val.toFixed(3) : val.toPrecision(3)
           span.textContent = val;
         }
       }
@@ -140,8 +157,9 @@
           const presentVal = parseFloat(presentValEl.value);
           const futureVal = parseFloat(futureValEl.value);
           const cashFlow = parseFloat(cashFlowEl.value);
-          const period = parseFloat(periodEl.value);
           const typeSelect = parseFloat(typeSelectEl.value)
+          const periodSelect = parseFloat(periodSelectEl.value)
+          const period = parseFloat(periodEl.value) / periodSelect;
           const compoundSelect = parseFloat(compoundSelectEl.value)
           const freqSelect = parseFloat(freqSelectEl.value)
 
@@ -158,17 +176,30 @@
 
             let results = {}
 
-            const EADR = 0
+            const EADR = (((futureVal / presentVal) ** (1 / (period * compoundSelect)) - 1) * 100) * compoundSelect
 
             if (cashFlow > 0) {
-              const PDR = 0
+              const TCF = cashFlow * period * freqSelect
+              if (compoundSelect > 1) {
+                const PDR = EADR / compoundSelect
+                results = {
+                  3: { result: PDR, type: "i13" },
+                }
+              }  else {
+                results = {
+                  ...results,
+                  2: { result: TCF, type: "i12" },
+                }
+              }
+            } else if (compoundSelect > 1) {
+              const PDR = EADR / compoundSelect
               results = {
-                1: { result: EADR, type: "i11" },
-                2: { result: PDR, type: "i12" },
+                3: { result: PDR, type: "i13" },
               }
             }
 
             results = {
+              ...results,
               1: { result: EADR, type: "i11" },
             }
             setResult(results)

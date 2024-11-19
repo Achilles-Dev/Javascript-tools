@@ -30,9 +30,9 @@
       <input type="number" id="accPeriod" value="365">
       <select id="accPeriodSelect">
         <option value="1">days (days)</option>
-        <option value="1">weeks (wks)</option>
-        <option value="1">months (mos)</option>
-        <option value="1">years (yrs)</option>
+        <option value="7">weeks (wks)</option>
+        <option value="30.4375">months (mos)</option>
+        <option value="365.25">years (yrs)</option>
       </select>
     </p>
 
@@ -117,8 +117,8 @@
           const beginInvent = parseFloat(beginInventEl.value);
           const endInvent = parseFloat(endInventEl.value);
           const goodsCost = parseFloat(goodsCostEl.value);
-          const accPeriod = parseFloat(accPeriodEl.value);
           const accPeriodSelect = parseFloat(accPeriodSelectEl.value);
+          const accPeriod = parseFloat(accPeriodEl.value) * accPeriodSelect;
 
           if (isNaN(beginAcct) || beginAcct < 0 || isNaN(endAcct) || endAcct < 0 || isNaN(beginInvent) || beginInvent < 0 ||
             isNaN(endInvent) || endInvent <= 0 || isNaN(goodsCost) || goodsCost <= 0 || isNaN(accPeriod) || accPeriod <= 0
@@ -131,9 +131,9 @@
             const resultElement = createElement()
             calcResultsEl.innerHTML = resultElement 
 
-            const AAP = 0
-            const purchases = 0
-            const DPO = 0
+            const AAP = (beginAcct + endAcct) / 2
+            const purchases = (endInvent - beginInvent) + goodsCost
+            const DPO = AAP / purchases * accPeriod
 
             const results = {
               1: { result: Math.abs(AAP) > 1 ? AAP.toFixed(2) : AAP.toPrecision(2), type: "i11" },

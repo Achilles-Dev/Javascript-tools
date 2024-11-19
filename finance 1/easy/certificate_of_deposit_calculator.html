@@ -1,22 +1,35 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Credit Card Payoff Calculator</title>
+  <title>Certificate of Deposit Calculator</title>
 </head>
 <body>
-    <h1>Credit Card Payoff Calculator</h1>
-    <h3>Calculate the time it will take to pay off credit card debt using the payoff calculator below.</h3>
+    <h1>Certificate of Deposit Calculator</h1>
+    <h3>Calculate the fixed deposit interest and maturity amount.</h3>
     <p>
-      Balance:
-      <input type="number" id="balance" value="7500">
+      Initial deposit:
+      <input type="number" id="initDeposit">
     </p>
     <p>
-      Monthly Payment:
-      <input type="number" id="monthlyPmt" value="500">
+      Months:
+      <input type="number" id="months"> months
     </p>
     <p>
-      Interest Rate:
-      <input type="number" id="intRate" value="18.99">%
+      Annual interest rate:
+      <input type="number" id="intRate">%
+    </p>
+    <p>
+      Compound:
+      <select
+        class="selects"
+        id="freqSelect"
+      >
+        <option value="365">Daily</option>
+        <option value="12">Monthly</option>
+        <option value="4">Quarterly</option>
+        <option value="2">Semi-Annually</option>
+        <option value="1" selected>Annually</option>
+      </select>
     </p>
 
     <button id="calcBtn">Calculate</button>
@@ -29,9 +42,10 @@
 
     <script>
       // Get required elements from the HTML
-      const balanceEl = document.getElementById("balance");
-      const monthlyPmtEl = document.getElementById("monthlyPmt");
-      const intRateEl = document.getElementById("intRate");
+      const initDepositEl = document.getElementById("initDeposit");
+      const monthsEl = document.getElementById("months");
+      const goodsCostEl = document.getElementById("intRate");
+      const freqSelectEl = document.getElementById("freqSelect");
 
       const calcBtnEl = document.getElementById('calcBtn');
       const resetBtnEl = document.getElementById('resetBtn');
@@ -40,16 +54,16 @@
       function createElement() {
         const newDiv = `
             <p>
-              <label for="i11-span">Estimated Payoff Date: &nbsp;</label>
+              <label for="i11-span">Annual Percentage Yield (APY): &nbsp;</label>
               <span
                 data-id="i11"
                 step="any"
                 id="i11-span"
                 class="spans"
-              ></span>
+              ></span>%
             </p>
             <p>
-              <label for="i12-span">Time to Pay Off: &nbsp;</label>
+              <label for="i12-span">Total Interest Earned: &nbsp;</label>
               <span
                 data-id="i12"
                 step="any"
@@ -58,20 +72,11 @@
               ></span>
             </p>
             <p>
-              <label for="i13-span">Total Interest: &nbsp;</label>
+              <label for="i13-span">Ending Balance: &nbsp;</label>
               <span
                 data-id="i13"
                 step="any"
                 id="i13-span"
-                class="spans"
-              ></span>
-            </p>
-            <p>
-              <label for="i14-span">Total Payments: &nbsp;</label>
-              <span
-                data-id="i14"
-                step="any"
-                id="i14-span"
                 class="spans"
               ></span>
             </p>
@@ -93,22 +98,23 @@
             return;
           }
           const span = document.getElementById(`${id}-span`);
-          span.textContent = `${val}`;
+          span.textContent = `${val * 1}`;
         }
       }
 
       function calculateResults() {
           // Retrieve input values
-          const balance = parseFloat(balanceEl.value);
-          const monthlyPmt = parseFloat(monthlyPmtEl.value);
-          const intRate = parseFloat(intRateEl.value);
+          const initDeposit = parseFloat(initDepositEl.value);
+          const months = parseFloat(monthsEl.value);
+          const intRate = parseFloat(goodsCostEl.value);
+          const freqSelect = parseFloat(freqSelectEl.value);
 
-          if (isNaN(balance) || balance <= 0 || isNaN(monthlyPmt) || monthlyPmt <= 0 || isNaN(intRate) || intRate <= 0
+          if (isNaN(initDeposit) || initDeposit <= 0 || isNaN(months) || months < 1 || isNaN(intRate) || intRate < 0.1
           ) {
             alert("Please Enter All Details.");
             return;
           } else if (intRate >= 100) {
-            alert("Interest Rate should be less than 100");
+            alert("Ensure this value is less than 100");
             return;
           }
 
@@ -116,16 +122,15 @@
             const resultElement = createElement()
             calcResultsEl.innerHTML = resultElement 
 
-            const payoffDate = 0
-            const payoffTime = 0
-            const totalInt = 0
-            const totalPmt = 0
+            const year = months / 12
+            const APY = (((1 + (intRate / 100 / freqSelect)) ** freqSelect) - 1) * 100
+            const endingBal = initDeposit * ((1 + (intRate / 100 / freqSelect)) ** (freqSelect * year))
+            const totalInt = endingBal - initDeposit
 
             const results = {
-              1: { result: Math.abs(payoffDate) > 1 ? payoffDate.toFixed(2) : payoffDate.toPrecision(2), type: "i11" },
-              2: { result: Math.abs(payoffTime) > 1 ? payoffTime.toFixed(2) : payoffTime.toPrecision(2), type: "i12" },
-              3: { result: Math.abs(totalInt) > 1 ? totalInt.toFixed(2) : totalInt.toPrecision(2), type: "i13" },
-              4: { result: Math.abs(totalPmt) > 1 ? totalPmt.toFixed(2) : totalPmt.toPrecision(2), type: "i14" },
+              1: { result: Math.abs(APY) > 1 ? APY.toFixed(3) : APY.toPrecision(3), type: "i11" },
+              2: { result: Math.abs(totalInt) > 1 ? totalInt.toFixed(2) : totalInt.toPrecision(2), type: "i12" },
+              3: { result: Math.abs(endingBal) > 1 ? endingBal.toFixed(2) : endingBal.toPrecision(2), type: "i13" },
             }
             setResult(results)
 
@@ -137,9 +142,10 @@
       }
 
       function resetForm() {
-        balanceEl.value = "3000"
-        monthlyPmtEl.value = "17"
-        intRateEl.value = "12"
+        initDepositEl.value = ""
+        monthsEl.value = ""
+        goodsCostEl.value = ""
+        freqSelectEl.selectedIndex = "4"
       }
 
       function resetResult() {
@@ -153,9 +159,11 @@
 
       resetBtnEl.addEventListener("click", resethandler);
       calcBtnEl.addEventListener("click", calculateResults);
-      [balanceEl, monthlyPmtEl, intRateEl].forEach((el) => {
+      [initDepositEl, monthsEl, goodsCostEl].forEach((el) => {
         el.addEventListener("input", resetResult);
       });  
+
+      freqSelectEl.addEventListener("change", resetResult);
 
     </script>
 </body>

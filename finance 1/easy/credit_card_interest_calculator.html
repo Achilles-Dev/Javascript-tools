@@ -16,7 +16,7 @@
     </p>
     <p>
       Minimum payment percentage:
-      <input type="number" id="minPmtPercent" value="3" />%
+      <input type="number" id="minPmtPercent" value="30" />%
     </p>
     <p>
       Minimum payment amount:
@@ -97,6 +97,31 @@
         }
       }
 
+      function calculateCreditCardRepayment(balance, annualInterestRate, minPaymentPercentage, minPaymentAmount) {
+        const monthlyInterestRate = annualInterestRate / 12;
+        let totalInterestPaid = 0;
+        let month = 0;
+
+        while (balance > 0) {
+          const interest = balance * monthlyInterestRate;
+
+          const paymentByPercentage = balance * minPaymentPercentage;
+          const minimumPayment = Math.max(paymentByPercentage, minPaymentAmount);
+          const actualPayment = Math.min(balance + interest, minimumPayment);
+
+          const principalPayment = actualPayment - interest;
+          balance -= principalPayment;
+          month += 1
+          totalInterestPaid += interest;
+          if (balance <= 0) break;
+        }
+
+        return {
+            totalInt: totalInterestPaid,
+            paymentNum: month,
+        };
+      }
+
       function calculateResults() {
         // Retrieve input values
         const balance = parseFloat(balanceEl.value);
@@ -125,22 +150,21 @@
           const resultElement = createElement();
           calcResultsEl.innerHTML = resultElement;
 
-          const totalPmt = 0;
-          const paymentNum = 0;
-          const totalYears = 0;
+          const {totalInt, paymentNum} = calculateCreditCardRepayment(balance, (apr / 100), (minPmtPercent / 100), minPmtAmt)
+          const totalYears = paymentNum / 12;
 
           const results = {
             1: {
               result:
-                Math.abs(totalPmt) > 1
-                  ? totalPmt.toFixed(2)
-                  : totalPmt.toPrecision(2),
+                Math.abs(totalInt) > 1
+                  ? totalInt.toFixed(2)
+                  : totalInt.toPrecision(2),
               type: "i11",
             },
             2: {
               result:
                 Math.abs(paymentNum) > 1
-                  ? paymentNum.toFixed(2)
+                  ? paymentNum.toFixed()
                   : paymentNum.toPrecision(2),
               type: "i12",
             },
@@ -162,7 +186,7 @@
 
       function resetForm() {
         balanceEl.value = "3000";
-        minPmtPercentEl.value = "3";
+        minPmtPercentEl.value = "30";
         aprEl.value = "17";
         minPmtAmtEl.value = "100";
       }

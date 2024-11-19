@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Credit Card Payoff Calculator</title>
+</head>
+<body>
+    <h1>Credit Card Payoff Calculator</h1>
+    <h3>Calculate the time it will take to pay off credit card debt using the payoff calculator below.</h3>
+    <p>
+      Balance:
+      <input type="number" id="balance" value="7500">
+    </p>
+    <p>
+      Monthly Payment:
+      <input type="number" id="monthlyPmt" value="500">
+    </p>
+    <p>
+      Interest Rate:
+      <input type="number" id="intRate" value="18.99">%
+    </p>
+
+    <button id="calcBtn">Calculate</button>
+    <button id="resetBtn">Reset</button>
+    <hr>
+    <div>
+      <h3>Result:</h3>
+      <h3 id="calcResults">Result will appear here...</h3>
+    </div>
+
+    <script>
+      // Get required elements from the HTML
+      const balanceEl = document.getElementById("balance");
+      const monthlyPmtEl = document.getElementById("monthlyPmt");
+      const intRateEl = document.getElementById("intRate");
+
+      const calcBtnEl = document.getElementById('calcBtn');
+      const resetBtnEl = document.getElementById('resetBtn');
+      const calcResultsEl = document.getElementById('calcResults') 
+
+      function createElement() {
+        const newDiv = `
+            <p>
+              <label for="i11-span">Estimated Payoff Date: &nbsp;</label>
+              <span
+                data-id="i11"
+                step="any"
+                id="i11-span"
+                class="spans"
+              ></span>
+            </p>
+            <p>
+              <label for="i12-span">Time to Pay Off: &nbsp;</label>
+              <span
+                data-id="i12"
+                step="any"
+                id="i12-span"
+                class="spans"
+              ></span>
+            </p>
+            <p>
+              <label for="i13-span">Total Interest: &nbsp;</label>
+              <span
+                data-id="i13"
+                step="any"
+                id="i13-span"
+                class="spans"
+              ></span>
+            </p>
+            <p>
+              <label for="i14-span">Total Payments: &nbsp;</label>
+              <span
+                data-id="i14"
+                step="any"
+                id="i14-span"
+                class="spans"
+              ></span>
+            </p>
+        `
+        return newDiv
+      }
+
+      function setResult(resultObj) {
+        for (key of Object.keys(resultObj)) {
+          let val = resultObj[key].result;
+          let id = resultObj[key].type;
+
+          if (id === "i11" || id === "i12") {
+            const span = document.getElementById(`${id}-span`);
+            span.textContent = val;
+          } else {
+            if (isNaN(val)) {
+              alert("Your input resulted in NAN.\n 0/0 \n Try again with valid input.");
+              return;
+            }
+            if (Math.abs(val) === Infinity) {
+              alert("Your input resulted in Infinity. \nDivision by zero. \nTry again with valid input.");
+              return;
+            }
+            const span = document.getElementById(`${id}-span`);
+            span.textContent = `${val}`;
+          }
+        }
+      }
+
+      function calculatePayoffDetails(balance, annualInterestRate, monthlyPayment) {
+        const monthlyInterestRate = annualInterestRate / 12;
+        let totalInterest = 0;
+        let months = 0;
+        const today = new Date();
+
+        while (balance > 0) {
+            const interest = balance * monthlyInterestRate;
+
+            if (monthlyPayment <= interest) {
+                throw new Error("Monthly payment is too low to cover the interest. Increase the payment.");
+            }
+            const principalPayment = monthlyPayment - interest;
+            balance -= principalPayment;
+            totalInterest += interest;
+            months++;
+        }
+
+
+        const payoffDate = new Date(today);
+        payoffDate.setMonth(today.getMonth() + months);
+        const payoffMonth = payoffDate.toLocaleString('default', { month: 'short' }); // e.g., "May"
+        const payoffYear = payoffDate.getFullYear();
+
+        const yearsToPayoff = Math.floor(months / 12);
+        const monthsToPayoff = months % 12;
+
+        return {
+            totalInt: totalInterest,
+            payoffTime: `${yearsToPayoff} year${yearsToPayoff !== 1 ? 's' : ''} and ${monthsToPayoff} month${monthsToPayoff !== 1 ? 's' : ''}`,
+            payoffDate: `${payoffMonth} ${payoffYear}`, 
+        };
+      }
+
+      function calculateResults() {
+          // Retrieve input values
+          const balance = parseFloat(balanceEl.value);
+          const monthlyPmt = parseFloat(monthlyPmtEl.value);
+          const intRate = parseFloat(intRateEl.value);
+
+          if (isNaN(balance) || balance <= 0 || isNaN(monthlyPmt) || monthlyPmt <= 0 || isNaN(intRate) || intRate <= 0
+          ) {
+            alert("Please Enter All Details.");
+            return;
+          } else if (intRate >= 100) {
+            alert("Interest Rate should be less than 100");
+            return;
+          }
+
+          try {
+            const resultElement = createElement()
+            calcResultsEl.innerHTML = resultElement 
+
+            const {payoffDate, payoffTime, totalInt} = calculatePayoffDetails(balance, intRate/ 100, monthlyPmt)
+            const totalPmt = balance + totalInt
+
+            const results = {
+              1: { result: payoffDate, type: "i11" },
+              2: { result: payoffTime, type: "i12" },
+              3: { result: Math.abs(totalInt) > 1 ? totalInt.toFixed(2) : totalInt.toPrecision(2), type: "i13" },
+              4: { result: Math.abs(totalPmt) > 1 ? totalPmt.toFixed(2) : totalPmt.toPrecision(2), type: "i14" },
+            }
+            setResult(results)
+
+          } catch (error) {
+            alert("Something Went Wrong!!!");
+            resetResult()
+            return;
+          }
+      }
+
+      function resetForm() {
+        balanceEl.value = "3000"
+        monthlyPmtEl.value = "17"
+        intRateEl.value = "12"
+      }
+
+      function resetResult() {
+        calcResultsEl.innerHTML = "<p>Result will appear here...</p>";
+      } 
+
+      function resethandler() {
+        resetForm();
+        resetResult();
+      }
+
+      resetBtnEl.addEventListener("click", resethandler);
+      calcBtnEl.addEventListener("click", calculateResults);
+      [balanceEl, monthlyPmtEl, intRateEl].forEach((el) => {
+        el.addEventListener("input", resetResult);
+      });  
+
+    </script>
+</body>
+</html>

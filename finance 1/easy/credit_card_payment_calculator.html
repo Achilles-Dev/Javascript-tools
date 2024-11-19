@@ -88,6 +88,23 @@
         }
       }
 
+      function calculateCreditCardPayment(balance, annualInterestRate, months) {
+        const monthlyInterestRate = annualInterestRate / 12;
+        const numPayments = months;
+
+        const monthlyPayment = (monthlyInterestRate * balance) / 
+                              (1 - Math.pow(1 + monthlyInterestRate, -numPayments));
+
+        const totalPayment = monthlyPayment * numPayments;
+        const totalInterest = totalPayment - balance;
+
+        return {
+            monthlyPmt: monthlyPayment,
+            totalInt: totalInterest,
+            totalPmt: totalPayment
+        };
+      }
+
       function calculateResults() {
           // Retrieve input values
           const cardBalance = parseFloat(cardBalanceEl.value);
@@ -107,9 +124,10 @@
             const resultElement = createElement()
             calcResultsEl.innerHTML = resultElement 
 
-            const monthlyPmt = 0
-            const totalInt = 0
-            const totalPmt = 0
+            const {monthlyPmt, totalInt, totalPmt} = calculateCreditCardPayment(cardBalance, intRate/ 100, payoffMonths)
+            // const monthlyPmt = 0
+            // const totalInt = 0
+            // const totalPmt = 0
 
             const results = {
               1: { result: Math.abs(monthlyPmt) > 1 ? monthlyPmt.toFixed(2) : monthlyPmt.toPrecision(2), type: "i11" },
