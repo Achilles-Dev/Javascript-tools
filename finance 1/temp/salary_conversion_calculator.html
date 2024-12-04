@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Salary Conversion Calculator</title>
+</head>
+<body>
+    <h1>Salary Conversion Calculator</h1>
+    <h3>All-in-One Salary Conversion Calculator: From Hourly to Annual and Everything In Between</h3>
+    <p>
+      Amount of the wage you wish to convert ($):
+      <input type="number" id="wageAmt">
+    </p>
+    <p>
+      Period the above wage represents:
+      <select
+        class="selects"
+        id="periodSelect"
+      >
+        <option value="hr">Hourly</option>
+        <option value="day" >Daily</option>
+        <option value="wk" >Weekly</option>
+        <option value="bi-wk" >Bi-Weekly</option>
+        <option value="semi-mo">Semi-Monthly</option>
+        <option value="mo">Monthly</option>
+        <option value="qua" selected>Quarterly</option>
+        <option value="semi-ann">Semi-Annually</option>
+        <option value="ann">Annually</option>
+      </select>
+    </p>
+    <p>
+      Work hours per week:
+      <input type="number" id="hoursPerWk" value="40"> hours
+    </p>
+    
+
+    <button id="calcBtn">Calculate</button>
+    <button id="resetBtn">Reset</button>
+    <hr>
+    <div>
+      <h3>Result:</h3>
+      <h3 id="calcResults">Result will appear here...</h3>
+    </div>
+
+    <script>
+      // Get required elements from the HTML
+      const wageAmtEl = document.getElementById("wageAmt");
+      const periodSelectEl = document.getElementById("periodSelect");
+      const hoursPerWkEl = document.getElementById("hoursPerWk");
+
+      const calcBtnEl = document.getElementById('calcBtn');
+      const resetBtnEl = document.getElementById('resetBtn');
+      const calcResultsEl = document.getElementById('calcResults') 
+
+      const UNITS = {
+        time: {
+          hr: 1 / parseFloat(hoursPerWkEl.value), 
+          day: 8 / parseFloat(hoursPerWkEl.value),
+          wk: 1,
+          "bi-wk": 2,
+          "semi-mo": 52 / 24,
+          mo: 52 / 12,
+          "qua": 52 / 4,
+          "semi-ann": 52 / 2,
+          ann: 52,
+        },
+        
+      };
+
+      /*************** FUNCTIONS ***************/
+      function toSIUnit(type, unit, value) {
+        return value / UNITS[type][unit];
+      }
+
+      function fromSIUnit(type, unit, value) {
+        return value * UNITS[type][unit];
+      }
+
+      function createElement() {
+        const newDiv = []
+        Array.from(periodSelectEl).forEach((option, index) => {
+          newDiv.push(
+            `
+              <p>
+                <label for="i1${index + 1}-span">${option.textContent}: &nbsp;</label>
+                <span
+                  data-id="i1${index + 1}"
+                  step="any"
+                  id="i1${index + 1}-span"
+                  class="spans"
+                ></span>
+              </p>
+            `
+          )
+        }
+        )
+        return newDiv.join("")
+      }
+
+      function setResult(resultObj) {
+        for (key of Object.keys(resultObj)) {
+          let val = resultObj[key].result;
+          let id = resultObj[key].type;
+
+          if (isNaN(val)) {
+           alert("Your input resulted in NAN.\n 0/0 \n Try again with valid input.");
+            return;
+          }
+          if (Math.abs(val) === Infinity) {
+            alert("Your input resulted in Infinity. \nDivision by zero. \nTry again with valid input.");
+            return;
+          }
+          const span = document.getElementById(`${id}-span`);
+          span.textContent = `${parseFloat(val)}`;
+        }
+      }
+
+      function calculateResults() {
+          // Retrieve input values
+          const wageAmt = parseFloat(wageAmtEl.value);
+          const periodSelect = periodSelectEl.value;
+          const hoursPerWk = parseFloat(hoursPerWkEl.value);
+
+          if (isNaN(wageAmt)  || wageAmt < 0.001 ||
+            isNaN(hoursPerWk) || hoursPerWk < 1
+          ) {
+            alert("Please Enter All Details.");
+            return;
+          } 
+
+          try {
+            const resultElement = createElement()
+            calcResultsEl.innerHTML = resultElement 
+
+            const houly = wageAmt * toSIUnit("time", periodSelect, hoursPerWk)
+            const results = {
+              1: { result: Math.abs(houly) > 1 ? houly.toFixed(2) : houly.toPrecision(2), type: "i11" },
+            }
+            setResult(results)
+
+          } catch (error) {
+            alert("Something Went Wrong!!!");
+            resetResult()
+            return;
+          }
+      }
+
+      function resetForm() {
+        wageAmtEl.value = ""
+        periodSelectEl.value = ""
+        hoursPerWkEl.value = ""
+      }
+
+      function resetResult() {
+        calcResultsEl.innerHTML = "<p>Result will appear here...</p>";
+      } 
+
+      function resethandler() {
+        resetForm();
+        resetResult();
+      }
+
+      resetBtnEl.addEventListener("click", resethandler);
+      calcBtnEl.addEventListener("click", calculateResults);
+
+      [wageAmtEl, periodSelectEl, hoursPerWkEl].forEach((el) => {
+        el.addEventListener("input", resetResult);
+      });  
+    </script>
+</body>
+</html>

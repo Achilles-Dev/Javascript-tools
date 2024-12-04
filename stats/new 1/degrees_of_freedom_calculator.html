@@ -124,7 +124,7 @@
         if (
           (sampleSize1El != "" && isNaN(sampleSize1)) || sampleSize1 < 1 ||
           (sampleSize2El != "" && isNaN(sampleSize2)) || sampleSize2 < 1 || (variance1El != "" && isNaN(variance1)) ||
-          variance1 < 1 || (variance2El != "" && isNaN(variance2)) || variance2 < 1 || (colsNumEl != "" && isNaN(colsNum)) ||
+          variance1 <= 0 || (variance2El != "" && isNaN(variance2)) || variance2 <= 0 || (colsNumEl != "" && isNaN(colsNum)) ||
           colsNum < 1 || (rowsNumEl != "" && isNaN(rowsNum)) || rowsNum < 1 || (groupsNumEl != "" && isNaN(groupsNum))
           || groupsNum < 1
         ) {
@@ -142,25 +142,25 @@
             calcResultsEl.innerHTML = `<p> Degrees of freedom: ${results}</p>`;
 
           } else if (testSelect == "twoSampleEqual") {
-            results = sampleSize1 + sampleSize2 - 1;
+            results = sampleSize1 + sampleSize2 - 2;
             calcResultsEl.innerHTML = `<p> Degrees of freedom: ${results}</p>                                  
             `;
           } else if (testSelect == "twoSampleUnequal") {
             let numVal = (((variance1 / sampleSize1) + (variance2 / sampleSize2)) ** 2);
             let denVal = ((variance1 ** 2) / ((sampleSize1 ** 2) * (sampleSize1 - 1))) + ((variance2 ** 2) / ((sampleSize2 ** 2) * (sampleSize2 - 1)));
             results = numVal / denVal
-            calcResultsEl.innerHTML = `<p> Degrees of freedom: ${results.toFixed(3) * 1}</p>
-                                        <p> Standard deviation (s₁): ${(Math.sqrt(variance1)).toFixed(3) * 1}</p>                               
-                                        <p> Standard deviation (s₂):	${(Math.sqrt(variance2)).toFixed(3) * 1}</p>                                                          
+            calcResultsEl.innerHTML = `<p> Degrees of freedom: ${results.toFixed(2) * 1}</p>
+                                        <p> Standard deviation (s₁): ${(Math.sqrt(variance1)).toFixed(4) * 1}</p>                               
+                                        <p> Standard deviation (s₂):	${(Math.sqrt(variance2)).toFixed(4) * 1}</p>                                                          
             `;
           } else if (testSelect == "x2") {
             results = (rowsNum - 1) * (colsNum - 1);
-            calcResultsEl.innerHTML = `<p> Degrees of freedom: ${results.toFixed(3) * 1}</p>`;
+            calcResultsEl.innerHTML = `<p> Degrees of freedom: ${results.toFixed(4) * 1}</p>`;
           } else {
             results = sampleSize1 - 1;
             const dfBetween = groupsNum - 1;
             const dfWithin = sampleSize1 - groupsNum;
-            calcResultsEl.innerHTML = `<p>Degrees of freedom: ${results.toFixed(3) * 1}</p>
+            calcResultsEl.innerHTML = `<p>Degrees of freedom: ${results.toFixed(4) * 1}</p>
                                         <p>Degrees of freedom between groups:	${dfBetween.toFixed(3) * 1}</p> 
                                         <p>Degrees of freedom within groups: ${dfWithin.toFixed(3) * 1}</p>                                                                                        
             `;

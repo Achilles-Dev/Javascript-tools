@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Appreciation Calculator</title>
+</head>
+<body>
+    <h1>Appreciation Calculator</h1>
+    <h3>Calculate the Final value (ACV).</h3>
+    <p>
+      Starting value:
+      <input type="number" id="strtVal" value="10000">
+    </p>
+    <p>
+      Appreciation rate: 
+      <input type="number" id="appRate">%
+    </p>
+    <p>
+      Appreciation rate period:
+      <select id="appRatePeriod">
+        <option value="360">Daily</option>
+        <option value="12" selected>Monthly</option>
+        <option value="1">Yearly</option>
+      </select>
+    </p>
+    <p>
+      Period: 
+      <input type="number" id="period">
+      <select id="periodSelect">
+        <option value="days">days (days)</option>
+        <option value="mos">months (mos)</option>
+        <option value="yrs" selected>years (yrs)</option>
+      </select>
+    </p>
+
+    <button id="calcBtn">Calculate</button>
+    <button id="resetBtn">Reset</button>
+    <hr>
+    <div>
+      <h3>Result:</h3>
+      <h3 id="calcResults">Result will appear here...</h3>
+    </div>
+
+    <script>
+      // Get required elements from the HTML
+      const strtValEl = document.getElementById("strtVal");
+      const appRateEl = document.getElementById("appRate");
+      const appRatePeriodEl = document.getElementById("appRatePeriod");
+      const periodEl = document.getElementById("period");
+      const periodSelectEl = document.getElementById("periodSelect");
+
+      const calcBtnEl = document.getElementById('calcBtn');
+      const resetBtnEl = document.getElementById('resetBtn');
+      const calcResultsEl = document.getElementById('calcResults') 
+
+      function createElement() {
+        const newDiv = `
+            <p>
+              <label for="i11-span">Final value: &nbsp;</label>
+              <span
+                data-id="i11"
+                step="any"
+                id="i11-span"
+                class="spans"
+                data-name="Final value"
+              ></span>
+            </p>
+        `
+        return newDiv
+      }
+
+      function setResult(resultObj) {
+        for (key of Object.keys(resultObj)) {
+          let val = resultObj[key].result;
+          let id = resultObj[key].type;
+
+          if (isNaN(val)) {
+          alert("Your input resulted in NAN.\n 0/0 \n Try again with valid input.");
+            return;
+          }
+          if (Math.abs(val) === Infinity) {
+            alert("Your input resulted in Infinity. \nDivision by zero. \nTry again with valid input.");
+            return;
+          }
+          const span = document.getElementById(`${id}-span`);
+          span.textContent = `$${parseFloat(val)}`;
+        }
+      }
+
+      function calculateResults() {
+          // Retrieve input values
+          const strtVal = parseFloat(strtValEl.value);
+          const appRate = parseFloat(appRateEl.value);
+          const appRatePeriod = parseFloat(appRatePeriodEl.value);
+          const period = parseFloat(periodEl.value);
+          const periodSelect = periodSelectEl.value;
+
+          if (isNaN(strtVal) || strtVal <= 0 || isNaN(appRate) || isNaN(period) || period < 0.1) {
+            alert("Please Enter All Details.");
+            return;
+          }
+
+          try {
+            const resultElement = createElement()
+            calcResultsEl.innerHTML = resultElement 
+            let totalPeriod = 0
+            if (periodSelect === "days") {
+              totalPeriod = (period / 365.25) * appRatePeriod
+            } else if (periodSelect === "mos") {
+              totalPeriod = (period / 12) * appRatePeriod
+            } else {
+              totalPeriod = period * appRatePeriod
+            }
+            const finalVal = strtVal * (((appRate / 100) + 1) ** totalPeriod)
+
+            const results = {
+              1: { result: Math.abs(finalVal) > 1 ? finalVal.toFixed(2) : finalVal.toPrecision(2), type: "i11" },
+            }
+            setResult(results)
+
+          } catch (error) {
+            alert("Something Went Wrong!!!");
+            resetResult()
+            return;
+          }
+      }
+
+      function resetForm() {
+        strtValEl.value = "10000"
+        appRateEl.value = ""
+        appRatePeriodEl.selectedIndex = "1"
+        periodEl.value = ""
+        periodSelectEl.selectedIndex = "2"
+      }
+
+      function resetResult() {
+        calcResultsEl.innerHTML = "<p>Result will appear here...</p>";
+      } 
+
+      function resethandler() {
+        resetForm();
+        resetResult();
+      }
+
+      resetBtnEl.addEventListener("click", resethandler);
+      calcBtnEl.addEventListener("click", calculateResults);
+
+      [strtValEl, appRateEl, appRatePeriodEl, periodEl, periodSelectEl].forEach((el) => {
+        el.addEventListener("input", resetResult);
+      });  
+    </script>
+</body>
+</html>

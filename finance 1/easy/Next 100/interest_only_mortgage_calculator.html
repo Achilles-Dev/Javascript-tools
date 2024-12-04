@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Interest-Only Mortgage Calculator</title>
+</head>
+<body>
+    <h1>Interest-Only Mortgage Calculator</h1>
+    <p>
+      Loan amount: 
+      <input type="number" id="loanAmt">
+    </p>
+    <p>
+      Annual interest rate:
+      <input type="number" id="intRate">
+    </p>
+    <p>
+      Payment frequency
+      <select
+        class="selects"
+        id="freqSelect"
+      >
+        <option value="0.03287671232">Daily</option>
+        <option value="1" selected>Monthly</option>
+        <option value="3">Quarterly</option>
+        <option value="12">Yearly</option>
+      </select>
+    </p>
+    <p>
+      Interest-only period:
+      <input type="number" id="period">
+      <select
+        class="selects"
+        id="periodSelect"
+      >
+        <option value="0.03287671232">days</option>
+        <option value="1" selected>months</option>
+        <option value="12">years</option>
+      </select>
+    </p>
+
+
+    <button id="calcBtn">Calculate</button>
+    <button id="resetBtn">Reset</button>
+    <hr>
+    <div>
+      <h3>Result:</h3>
+      <h3 id="calcResults">Result will appear here...</h3>
+    </div>
+
+    <script>
+      // Get required elements from the HTML
+      const intRateEl = document.getElementById("intRate");
+      const loanAmtEl = document.getElementById("loanAmt");
+      const periodEl = document.getElementById("period");
+      const freqSelectEl = document.getElementById("freqSelect");
+      const periodSelectEl = document.getElementById("periodSelect");
+
+      const calcBtnEl = document.getElementById('calcBtn');
+      const resetBtnEl = document.getElementById('resetBtn');
+      const calcResultsEl = document.getElementById('calcResults') 
+
+      function createElement() {
+        const name = freqSelectEl.options[freqSelectEl.selectedIndex].textContent
+        const newDiv = `
+            <p>
+              <label for="i11-span">${name} payment: &nbsp;</label>
+              <span
+                data-id="i11"
+                step="any"
+                id="i11-span"
+                class="spans"
+              ></span>
+            </p>
+            <p>
+              <label for="i12-span">Total amount paid in interest-only period: &nbsp;</label>
+              <span
+                data-id="i12"
+                step="any"
+                id="i12-span"
+                class="spans"
+              ></span>
+            </p>
+        `
+        return newDiv
+      }
+
+      function setResult(resultObj) {
+        for (key of Object.keys(resultObj)) {
+          let val = resultObj[key].result;
+          let id = resultObj[key].type;
+
+          if (isNaN(val)) {
+           alert("Your input resulted in NAN.\n 0/0 \n Try again with valid input.");
+            return;
+          }
+          if (Math.abs(val) === Infinity) {
+            alert("Your input resulted in Infinity. \nDivision by zero. \nTry again with valid input.");
+            return;
+          }
+          const span = document.getElementById(`${id}-span`);
+          span.textContent = `${parseFloat(val)}`;
+        }
+      }
+
+      function calculateResults() {
+          // Retrieve input values
+          const intRate = parseFloat(intRateEl.value);
+          const loanAmt = parseFloat(loanAmtEl.value);
+          const period = parseFloat(periodEl.value);
+          const freqSelect = parseFloat(freqSelectEl.value);
+          const periodSelect = parseFloat(periodSelectEl.value);
+
+          if (isNaN(intRate) || intRate <= 0 || isNaN(loanAmt) || loanAmt <= 0 ||
+            isNaN(period) || period <= 0
+          ) {
+            alert("Please Enter All Details.");
+            return;
+          }
+
+          try {
+            const resultElement = createElement()
+            calcResultsEl.innerHTML = resultElement 
+
+            const yearPaymt = (loanAmt * (intRate / 100)) * freqSelect
+            const monthPaymt = yearPaymt / 12
+            const IOP = (((loanAmt * (intRate / 100))) / 12) * periodSelect * period
+
+            const results = {
+              1: { result: Math.abs(monthPaymt) > 1 ? monthPaymt.toFixed(2) : monthPaymt.toPrecision(2), type: "i11" },
+              2: { result: Math.abs(IOP) > 1 ? IOP.toFixed(2) : IOP.toPrecision(2), type: "i12" },
+            }
+            setResult(results)
+
+          } catch (error) {
+            alert("Something Went Wrong!!!");
+            resetResult()
+            return;
+          }
+      }
+
+      function resetForm() {
+        intRateEl.value = ""
+        loanAmtEl.value = ""
+        periodEl.value = ""
+        freqSelectEl.selectedIndex = "0"
+      }
+
+      function resetResult() {
+        calcResultsEl.innerHTML = "<p>Result will appear here...</p>";
+      } 
+
+      function resethandler() {
+        resetForm();
+        resetResult();
+      }
+
+      resetBtnEl.addEventListener("click", resethandler);
+      calcBtnEl.addEventListener("click", calculateResults);
+      [intRateEl, loanAmtEl, periodEl].forEach((el) => {
+        el.addEventListener("input", resetResult);
+      });  
+      freqSelectEl.addEventListener("change", resetResult)
+
+    </script>
+</body>
+</html>

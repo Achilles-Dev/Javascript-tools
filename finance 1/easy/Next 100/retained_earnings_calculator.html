@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Retained Earnings Calculator</title>
+</head>
+<body>
+    <h1>Retained Earnings Calculator</h1>
+    <p>
+      Earnings:
+      <input type="number" id="earnings">
+    </p>
+    <p>
+      Dividend payout ratio:
+      <input type="number" id="payoutRatio">%
+    </p>
+    <p>
+      Number of shares outstanding:
+      <input type="number" id="sharesNum">
+    </p>
+
+    <button id="calcBtn">Calculate</button>
+    <button id="resetBtn">Reset</button>
+    <hr>
+    <div>
+      <h3>Result:</h3>
+      <h3 id="calcResults">Result will appear here...</h3>
+    </div>
+
+    <script>
+      // Get required elements from the HTML
+      const earningsEl = document.getElementById("earnings");
+      const payoutRatioEl = document.getElementById("payoutRatio");
+      const sharesNumEl = document.getElementById("sharesNum");
+
+      const calcBtnEl = document.getElementById('calcBtn');
+      const resetBtnEl = document.getElementById('resetBtn');
+      const calcResultsEl = document.getElementById('calcResults') 
+
+      function createElement() {
+        const newDiv = `
+            <p>
+              <label for="i11-span">Dividends distributed: &nbsp;</label>
+              <span
+                data-id="i11"
+                step="any"
+                id="i11-span"
+                class="spans"
+              ></span>
+            </p>
+            <p>
+              <label for="i12-span">Retained earnings: &nbsp;</label>
+              <span
+                data-id="i12"
+                step="any"
+                id="i12-span"
+                class="spans"
+              ></span>
+            </p>
+            <p>
+              <label for="i13-span">Retained earnings per share: &nbsp;</label>
+              <span
+                data-id="i13"
+                step="any"
+                id="i13-span"
+                class="spans"
+              ></span>
+            </p>
+        `
+        return newDiv
+      }
+
+      function setResult(resultObj) {
+        for (key of Object.keys(resultObj)) {
+          let val = resultObj[key].result;
+          let id = resultObj[key].type;
+
+          if (isNaN(val)) {
+           alert("Your input resulted in NAN.\n 0/0 \n Try again with valid input.");
+            return;
+          }
+          if (Math.abs(val) === Infinity) {
+            alert("Your input resulted in Infinity. \nDivision by zero. \nTry again with valid input.");
+            return;
+          }
+          const span = document.getElementById(`${id}-span`);
+          span.textContent = `${parseFloat(val)}`;
+        }
+      }
+
+      function calculateResults() {
+          // Retrieve input values
+          const earnings = parseFloat(earningsEl.value);
+          const payoutRatio = parseFloat(payoutRatioEl.value);
+          const sharesNum = parseFloat(sharesNumEl.value);
+
+          if (isNaN(earnings) || earnings <= 0 || isNaN(payoutRatio) || payoutRatio <= 0 ||
+            isNaN(sharesNum) || sharesNum <= 0
+          ) {
+            alert("Please Enter All Details.");
+            return;
+          }
+
+          try {
+            const resultElement = createElement()
+            calcResultsEl.innerHTML = resultElement 
+
+            const dividendDist = earnings * (payoutRatio / 100)
+            const RE = earnings - dividendDist
+            const REPS = RE / sharesNum
+
+            const results = {
+              1: { result: Math.abs(dividendDist) > 1 ? dividendDist.toFixed(2) : dividendDist.toPrecision(2), type: "i11" },
+              2: { result: Math.abs(RE) > 1 ? RE.toFixed(2) : RE.toPrecision(2), type: "i12" },
+              3: { result: Math.abs(REPS) > 1 ? REPS.toFixed(2) : REPS.toPrecision(2), type: "i13" },
+            }
+            setResult(results)
+
+          } catch (error) {
+            alert("Something Went Wrong!!!");
+            resetResult()
+            return;
+          }
+      }
+
+      function resetForm() {
+        earningsEl.value = ""
+        payoutRatioEl.value = ""
+        sharesNumEl.value = "0"
+      }
+
+      function resetResult() {
+        calcResultsEl.innerHTML = "<p>Result will appear here...</p>";
+      } 
+
+      function resethandler() {
+        resetForm();
+        resetResult();
+      }
+
+      resetBtnEl.addEventListener("click", resethandler);
+      calcBtnEl.addEventListener("click", calculateResults);
+
+      [earningsEl, payoutRatioEl, sharesNumEl].forEach((el) => {
+        el.addEventListener("input", resetResult);
+      });  
+    </script>
+</body>
+</html>

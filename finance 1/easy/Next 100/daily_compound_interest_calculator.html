@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Daily Compound Interest Calculator</title>
+</head>
+<body>
+    <h1>Daily Compound Interest Calculator</h1>
+    <h3>Calculate the future value of an investment or debt where the initVal is compounded daily.</h3>
+    <p>
+      Initial Value:
+      <input type="number" id="initVal">
+    </p>
+    <p>
+      Interest Rate:
+      <input type="number" id="intRate">%
+      <select id="freqSelect">
+        <option value="day">daily</option>
+        <option value="annual">annually</option>
+      </select>
+    </p>
+    <p>
+      Time:
+      <input type="number" id="days">days
+    </p>
+
+    <button id="calcBtn">Calculate</button>
+    <button id="resetBtn">Reset</button>
+    <hr>
+    <div>
+      <h3>Result:</h3>
+      <h3 id="calcResults">Result will appear here...</h3>
+    </div>
+
+    <script>
+      // Get required elements from the HTML
+      const initValEl = document.getElementById("initVal");
+      const daysEl = document.getElementById("days");
+      const intRateEl = document.getElementById("intRate");
+      const freqSelectEl = document.getElementById("freqSelect");
+
+      const calcBtnEl = document.getElementById('calcBtn');
+      const resetBtnEl = document.getElementById('resetBtn');
+      const calcResultsEl = document.getElementById('calcResults') 
+
+      function createElement() {
+        const newDiv = `
+            <p>
+              <label for="i11-span">Future Value: &nbsp;</label>
+              $<span
+                data-id="i11"
+                step="any"
+                id="i11-span"
+                class="spans"
+              ></span>
+            </p>
+            <p>
+              <label for="i12-span">Total Interest:	 &nbsp;</label>
+              $<span
+                data-id="i12"
+                step="any"
+                id="i12-span"
+                class="spans"
+              ></span>
+            </p>
+        `
+        return newDiv
+      }
+
+      function setResult(resultObj) {
+        for (key of Object.keys(resultObj)) {
+          let val = resultObj[key].result;
+          let id = resultObj[key].type;
+
+          if (isNaN(val)) {
+           alert("Your input resulted in NAN.\n 0/0 \n Try again with valid input.");
+            return;
+          }
+          if (Math.abs(val) === Infinity) {
+            alert("Your input resulted in Infinity. \nDivision by zero. \nTry again with valid input.");
+            return;
+          }
+          const span = document.getElementById(`${id}-span`);
+          span.textContent = `${parseFloat(val)}`;
+        }
+      }
+
+      function calculateResults() {
+          // Retrieve input values
+          const initVal = parseFloat(initValEl.value);
+          const days = parseFloat(daysEl.value);
+          const intRate = parseFloat(intRateEl.value);
+          const freqSelect = freqSelectEl.value;
+
+          if (isNaN(initVal) || initVal < 1 || isNaN(days) || days < 1 || isNaN(intRate) || intRate < 1) {
+            alert("Please Enter All Details.");
+            return;
+          }
+
+          try {
+            const resultElement = createElement()
+            calcResultsEl.innerHTML = resultElement 
+
+            let compPeriod = 1
+            let CI = 0
+
+           if (freqSelect === "day") {
+              CI = initVal * ((1 +(((intRate) / 100) / compPeriod)) ** days)
+            } else {
+              compPeriod = 365
+              CI = initVal * ((1 +((intRate / 100) / compPeriod)) ** days)
+            }
+
+            const totInterest = CI - initVal
+
+            const results = {
+              1: { result: Math.abs(totInterest) > 1 ? totInterest.toFixed(2) : totInterest.toPrecision(2), type: "i12" },
+              2: { result: Math.abs(CI) > 1 ? CI.toFixed(2) : CI.toPrecision(2), type: "i11" },
+            }
+            setResult(results)
+
+          } catch (error) {
+            alert("Something Went Wrong!!!");
+            resetResult()
+            return;
+          }
+      }
+
+      function resetForm() {
+        initValEl.value = ""
+        daysEl.value = ""
+        intRateEl.value = ""
+        freqSelectEl.value = ""
+      }
+
+      function resetResult() {
+        calcResultsEl.innerHTML = "<p>Result will appear here...</p>";
+      } 
+
+      function resethandler() {
+        resetForm();
+        resetResult();
+      }
+
+      resetBtnEl.addEventListener("click", resethandler);
+      calcBtnEl.addEventListener("click", calculateResults);
+      [initValEl, daysEl, intRateEl].forEach((el) => {
+        el.addEventListener("input", resetResult);
+      });  
+      freqSelectEl.addEventListener("change", resetResult)
+
+    </script>
+</body>
+</html>

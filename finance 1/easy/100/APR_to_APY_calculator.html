@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>APR to APY Calculator</title>
+</head>
+<body>
+    <h1>APR to APY Calculator</h1>
+    <h3>Convert APR into APY.</h3>
+    <p>
+      APR (Annual Percentage Rate):
+      <input type="number" id="annPerRate" value="7.0"> %
+    </p>
+    <p>
+      The number of periods:
+      <input type="number" id="numOfPeriods" value="12">
+    </p>
+    
+    <button id="calcBtn">Calculate</button>
+    <button id="resetBtn">Reset</button>
+    <hr>
+    <div>
+      <h3>Result:</h3>
+      <h3 id="calcResults">Result will appear here...</h3>
+    </div>
+
+    <script>
+      // Get required elements from the HTML
+      const annPerRateEl = document.getElementById("annPerRate");
+      const numOfPeriodsEl = document.getElementById("numOfPeriods");
+
+      const calcBtnEl = document.getElementById('calcBtn');
+      const resetBtnEl = document.getElementById('resetBtn');
+      const calcResultsEl = document.getElementById('calcResults') 
+
+      function createElement() {
+        const newDiv = `
+            <p>
+              <label for="i11-span">APY: &nbsp;</label>
+              <span
+                data-id="i11"
+                step="any"
+                id="i11-span"
+                class="spans"
+                data-name="APY"
+              ></span>
+            </p>
+        `
+        return newDiv
+      }
+
+      function setResult(resultObj) {
+        for (key of Object.keys(resultObj)) {
+          let val = resultObj[key].result;
+          let id = resultObj[key].type;
+
+          if (isNaN(val)) {
+           alert("Your input resulted in NAN.\n 0/0 \n Try again with valid input.");
+            return;
+          }
+          if (Math.abs(val) === Infinity) {
+            alert("Your input resulted in Infinity. \nDivision by zero. \nTry again with valid input.");
+            return;
+          }
+          const span = document.getElementById(`${id}-span`);
+          span.textContent = `${parseFloat(val)}%`;
+        }
+      }
+
+      function calculateResults() {
+          // Retrieve input values
+          const annPerRate = parseFloat(annPerRateEl.value);
+          const numOfPeriods = parseFloat(numOfPeriodsEl.value);
+
+          if (isNaN(annPerRate) || annPerRate < 0 || isNaN(numOfPeriods)  || numOfPeriods <= 0) {
+            alert("Please Enter All Details.");
+            return;
+          } else if (annPerRate > 100) {
+            alert("APR (Annual Percentage Rate) must be less than ro equal to 100");
+            return;
+          }
+
+          try {
+            const resultElement = createElement()
+            calcResultsEl.innerHTML = resultElement 
+            
+            const apy = (((1 + ((annPerRate / 100) / numOfPeriods)) ** (numOfPeriods)) - 1) * 100
+
+            const results = {
+              1: { result: Math.abs(apy) > 1 ? apy.toFixed(3) : apy.toPrecision(3), type: "i11" },
+            }
+            setResult(results)
+
+          } catch (error) {
+            alert("Something Went Wrong!!!");
+            resetResult()
+            return;
+          }
+      }
+
+      function resetForm() {
+        annPerRateEl.value = "7.0"
+        numOfPeriodsEl.value = "12"
+      }
+
+      function resetResult() {
+        calcResultsEl.innerHTML = "<p>Result will appear here...</p>";
+      } 
+
+      function resethandler() {
+        resetForm();
+        resetResult();
+      }
+
+      resetBtnEl.addEventListener("click", resethandler);
+      calcBtnEl.addEventListener("click", calculateResults);
+
+      [annPerRateEl, numOfPeriodsEl].forEach((el) => {
+        el.addEventListener("input", resetResult);
+      });  
+    </script>
+</body>
+</html>

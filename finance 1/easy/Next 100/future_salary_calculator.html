@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Future Salary Calculator</title>
+</head>
+<body>
+    <h1>Future Salary Calculator</h1>
+    <p>
+      Current salary:
+      <input type="number" id="currSalary">
+    </p>
+    <p>
+      Average salary change per year: 
+      <input type="number" id="avgSalaryChange">%
+    </p>
+    <p>
+      Number of years:
+      <input type="number" id="years" >
+      <select id="yearsSelect">
+        <option value="365">days</option>
+        <option value="12">months</option>
+        <option value="1" selected>years</option>
+      </select>
+    </p>
+    <p>
+      Average inflation:
+      <input type="number" id="inflation">
+    </p>
+
+
+    <button id="calcBtn">Calculate</button>
+    <button id="resetBtn">Reset</button>
+    <hr>
+    <div>
+      <h3>Result:</h3>
+      <h3 id="calcResults">Result will appear here...</h3>
+    </div>
+
+    <script>
+      // Get required elements from the HTML
+      const currSalaryEl = document.getElementById("currSalary");
+      const avgSalaryChangeEl = document.getElementById("avgSalaryChange");
+      const yearsEl = document.getElementById("years");
+      const yearsSelectEl = document.getElementById("yearsSelect");
+      const inflationEl = document.getElementById("inflation");
+
+      const calcBtnEl = document.getElementById('calcBtn');
+      const resetBtnEl = document.getElementById('resetBtn');
+      const calcResultsEl = document.getElementById('calcResults') 
+
+      function createElement() {
+        const newDiv = `
+            <p>
+              <label for="i11-span">Expected future salary: &nbsp;</label>
+              <span
+                data-id="i11"
+                step="any"
+                id="i11-span"
+                class="spans"
+              ></span>
+            </p>
+            <p>
+              <label for="i12-span">Real future salary: &nbsp;</label>
+              <span
+                data-id="i12"
+                step="any"
+                id="i12-span"
+                class="spans"
+              ></span>
+            </p>
+        `
+        return newDiv
+      }
+
+      function setResult(resultObj) {
+        for (key of Object.keys(resultObj)) {
+          let val = resultObj[key].result;
+          let id = resultObj[key].type;
+
+          if (isNaN(val)) {
+           alert("Your input resulted in NAN.\n 0/0 \n Try again with valid input.");
+            return;
+          }
+          if (Math.abs(val) === Infinity) {
+            alert("Your input resulted in Infinity. \nDivision by zero. \nTry again with valid input.");
+            return;
+          }
+          const span = document.getElementById(`${id}-span`);
+          span.textContent = `${parseFloat(val)}`;
+        }
+      }
+
+      function calculateResults() {
+          // Retrieve input values
+          const currSalary = parseFloat(currSalaryEl.value);
+          const avgSalaryChange = parseFloat(avgSalaryChangeEl.value);
+          const years = parseFloat(yearsEl.value);
+          const inflation = parseFloat(inflationEl.value);
+          const yearsSelect = parseFloat(yearsSelectEl.value)
+
+          if (isNaN(currSalary) || currSalary < 0 || isNaN(avgSalaryChange) || avgSalaryChange < 0 || isNaN(years) || years <= 0 ||
+            isNaN(inflation) || inflation < 0
+          ) {
+            alert("Please Enter All Details.");
+            return;
+          }
+
+          try {
+            const resultElement = createElement()
+            calcResultsEl.innerHTML = resultElement 
+
+            const FS = currSalary * ((1 + avgSalaryChange / 100) ** (years / yearsSelect))
+            const RFS = FS / ((1 + (inflation / 100)) ** (years / yearsSelect))
+
+            const results = {
+              1: { result: Math.abs(FS) > 1 ? FS.toFixed(2) : FS.toPrecision(2), type: "i11" },
+              2: { result: Math.abs(RFS) > 1 ? RFS.toFixed(2) : RFS.toPrecision(2), type: "i12" },
+            }
+            setResult(results)
+
+          } catch (error) {
+            alert("Something Went Wrong!!!");
+            resetResult()
+            return;
+          }
+      }
+
+      function resetForm() {
+        currSalaryEl.value = ""
+        avgSalaryChangeEl.value = ""
+        yearsEl.value = ""
+        inflationEl.value = ""
+        yearsSelectEl.selectedIndex = "2"
+      }
+
+      function resetResult() {
+        calcResultsEl.innerHTML = "<p>Result will appear here...</p>";
+      } 
+
+      function resethandler() {
+        resetForm();
+        resetResult();
+      }
+
+      resetBtnEl.addEventListener("click", resethandler);
+      calcBtnEl.addEventListener("click", calculateResults);
+      [currSalaryEl, avgSalaryChangeEl, yearsEl, inflationEl].forEach((el) => {
+        el.addEventListener("input", resetResult);
+      });  
+
+      yearsSelectEl.addEventListener("change", resetResult)
+
+    </script>
+</body>
+</html>

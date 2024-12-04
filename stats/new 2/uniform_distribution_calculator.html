@@ -27,11 +27,11 @@
     </p>
     <p>
       Pararmeter (a):
-      <input type="number" id="paramA">
+      <input type="number" id="paramA" value="0">
     </p>
     <p>
       Pararmeter (b): 
-      <input type="number" id="paramB">
+      <input type="number" id="paramB" value="1">
     </p>
     <p id="xInput">
       <span id="xName">x</span>: 
@@ -81,10 +81,10 @@
           xNameEl.innerHTML = "Sample length"
           functionNameEl.innerHTML = ""
         } else if (value == "pdf") {
-          xNameEl.innerHTML = "f(x)"
+          xNameEl.innerHTML = "x"
           functionNameEl.innerHTML = "f(x) = <sup>1</sup>&frasl;<sub>(b - a)</sub> for a ≤ x ≤ b"
         } else if (value == "cdf") {
-          xNameEl.innerHTML = "F(x)"
+          xNameEl.innerHTML = "x"
           functionNameEl.innerHTML = "F(x) = <sup>(x - a)</sup>&frasl;<sub>(b - a)</sub> for a ≤ x ≤ b"
         } else if (value == "quantile") {
           xNameEl.innerHTML = "Quantile (p)"
@@ -182,10 +182,16 @@
               modeName = "f(x)"
               decimalPlace = 8
               results = 1 / (paramB - paramA)
+              if (xValue > paramB) {
+                results = 0
+              }
             } else if (modeSelect == "cdf") {
               modeName = "F(x)"
               decimalPlace = 8
               results = (xValue - paramA) / (paramB - paramA)
+              if (xValue > paramB) {
+                results = 1
+              }
             } else if (modeSelect == "quantile") {
               modeName = "Q(p)"
               results = (paramB - paramA) * xValue + paramA
@@ -213,8 +219,8 @@
       function resetForm() {
         modeSelectEl.selectedIndex = "0"
         typeSelectEl.selectedIndex = "0"
-        paramAEl.value = ""
-        paramBEl.value = ""
+        paramAEl.value = "0"
+        paramBEl.value = "1"
         xNameEl.innerHTML = "x"
         xValueEl.value = ""
         x2ValueEl.value = ""

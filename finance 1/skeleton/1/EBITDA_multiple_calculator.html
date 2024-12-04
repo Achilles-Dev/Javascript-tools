@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>EBITDA Multiple Calculator</title>
+</head>
+<body>
+    <h1>EBITDA Multiple Calculator</h1>
+    <p>
+      Cash and cash equivalents:
+      <input type="number" id="cashEquiv">
+    </p>
+    <p>
+      Market capitalization: 
+      <input type="number" id="mrktCapital">
+    </p>
+    <p>
+      Minority interest:
+      <input type="number" id="minInterest">
+    </p>
+    <p>
+      Preferred shares:
+      <input type="number" id="prefShares">
+    </p>
+    <p>
+      Value of debt:
+      <input type="number" id="debtVal">
+    </p>
+    <p>
+      EBITDA:
+      <input type="number" id="ebitda">
+    </p>
+
+
+    <button id="calcBtn">Calculate</button>
+    <button id="resetBtn">Reset</button>
+    <hr>
+    <div>
+      <h3>Result:</h3>
+      <h3 id="calcResults">Result will appear here...</h3>
+    </div>
+
+    <script>
+      // Get required elements from the HTML
+      const cashEquivEl = document.getElementById("cashEquiv");
+      const mrktCapitalEl = document.getElementById("mrktCapital");
+      const minInterestEl = document.getElementById("minInterest");
+      const prefSharesEl = document.getElementById("prefShares");
+      const loanTermEl = document.getElementById("loanTerm");
+      const ebitdaEl = document.getElementById("ebitda");
+
+      const calcBtnEl = document.getElementById('calcBtn');
+      const resetBtnEl = document.getElementById('resetBtn');
+      const calcResultsEl = document.getElementById('calcResults') 
+
+      function createElement() {
+        const newDiv = `
+            <p>
+              <label for="i11-span">Enterprise value: &nbsp;</label>
+              <span
+                data-id="i11"
+                step="any"
+                id="i11-span"
+                class="spans"
+              ></span>
+            </p>
+            <p>
+              <label for="i12-span">EBITDA multiple: &nbsp;</label>
+              <span
+                data-id="i12"
+                step="any"
+                id="i12-span"
+                class="spans"
+              ></span>
+            </p>
+        `
+        return newDiv
+      }
+
+      function setResult(resultObj) {
+        for (key of Object.keys(resultObj)) {
+          let val = resultObj[key].result;
+          let id = resultObj[key].type;
+
+          if (isNaN(val)) {
+           alert("Your input resulted in NAN.\n 0/0 \n Try again with valid input.");
+            return;
+          }
+          if (Math.abs(val) === Infinity) {
+            alert("Your input resulted in Infinity. \nDivision by zero. \nTry again with valid input.");
+            return;
+          }
+          const span = document.getElementById(`${id}-span`);
+          span.textContent = `${val}`;
+        }
+      }
+
+      function calculateResults() {
+          // Retrieve input values
+          const cashEquiv = parseFloat(cashEquivEl.value);
+          const mrktCapital = parseFloat(mrktCapitalEl.value);
+          const minInterest = parseFloat(minInterestEl.value);
+          const prefShares = parseFloat(prefSharesEl.value);
+          const loanTerm = parseFloat(loanTermEl.value);
+          const ebitda = parseFloat(ebitdaEl.value);
+
+          if (isNaN(cashEquiv) || cashEquiv < 0 || isNaN(mrktCapital) || mrktCapital < 0 || isNaN(minInterest) || minInterest < 0 ||
+            isNaN(prefShares) || prefShares <= 0 || isNaN(loanTerm) || loanTerm <= 0 || isNaN(ebitda) || ebitda <= 0
+          ) {
+            alert("Please Enter All Details.");
+            return;
+          }
+
+          try {
+            const resultElement = createElement()
+            calcResultsEl.innerHTML = resultElement 
+
+            const enterpriseVal = 0
+            const EBITDAMultiple = 0
+
+            const results = {
+              1: { result: Math.abs(enterpriseVal) > 1 ? enterpriseVal.toFixed(2) : enterpriseVal.toPrecision(2), type: "i11" },
+              2: { result: Math.abs(EBITDAMultiple) > 1 ? EBITDAMultiple.toFixed(2) : EBITDAMultiple.toPrecision(2), type: "i12" },
+            }
+            setResult(results)
+
+          } catch (error) {
+            alert("Something Went Wrong!!!");
+            resetResult()
+            return;
+          }
+      }
+
+      function resetForm() {
+        cashEquivEl.value = ""
+        mrktCapitalEl.value = ""
+        minInterestEl.value = ""
+        prefSharesEl.value = ""
+        loanTermEl.value = ""
+        ebitdaEl.value = ""
+      }
+
+      function resetResult() {
+        calcResultsEl.innerHTML = "<p>Result will appear here...</p>";
+      } 
+
+      function resethandler() {
+        resetForm();
+        resetResult();
+      }
+
+      resetBtnEl.addEventListener("click", resethandler);
+      calcBtnEl.addEventListener("click", calculateResults);
+      [cashEquivEl, mrktCapitalEl, minInterestEl, prefSharesEl, loanTermEl, ebitdaEl].forEach((el) => {
+        el.addEventListener("input", resetResult);
+      });  
+
+    </script>
+</body>
+</html>

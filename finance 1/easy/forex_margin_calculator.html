@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Forex Margin Calculator</title>
+</head>
+<body>
+    <h1>Forex Margin Calculator</h1>
+    <p>
+      <label>Account Currency:</label>
+      <select id="accCurrencySelect">
+        <option value="USD" selected>U.S. Dollar</option>
+        <option value="EUR">Euro</option>
+        <option value="GBP">British Pound</option>
+        <option value="CHF">Swiss Franc</option>
+        <option value="AUD">Australian Dollar</option>
+        <option value="CAD">Canadian Dollar</option>
+        <option value="NZD">New Zealand Dollar</option>
+        <option value="JPY">Japanese Yen</option>
+        <option value="NOK">Norwegian Krona</option>
+        <option value="SEK">Swedish Krona</option>
+      </select>
+    </p>
+    <p>
+      <label>Account Pair:</label>
+      <select id="accPairSelect">
+        <option value="EUR/USD">Euro/U.S. Dollar</option>
+        <option value="USD/CHF">U.S. Dollar/Swiss Franc</option>
+        <option value="GBP/USD" selected>British Pound/U.S. Dollar</option>
+        <option value="USD/JPY">U.S. Dollar/Japanese Yen</option>
+        <option value="EUR/GBP">Euro/British Pound</option>
+        <option value="EUR/JPY">Euro/Japanese Yen</option>
+        <option value="EUR/CAD">Euro/Canadian Dollar</option>
+        <option value="EUR/CHF">Euro/Swiss Franc</option>
+        <option value="GBP/JPY">British Pound/Japanese Yen</option>
+        <option value="GBP/CAD">British Pound/Canadian Dollar</option>
+        <option value="GBP/CHF">British Pound/Swiss Franc</option>
+        <option value="CAD/JPY">Canadian Dollar/Japanese Yen</option>
+        <option value="CHF/JPY">Swiss Franc/Japanese Yen</option>
+        <option value="USD/CAD">U.S. Dollar/Canadian Dollar</option>
+        <option value="CAD/CHF">Canadian Dollar/Swiss Franc</option>
+        <option value="AUD/USD">Australian Dollar/U.S. Dollar</option>
+        <option value="NZD/USD">New Zealand Dollar/U.S. Dollar</option>
+        <option value="AUD/JPY">Australian Dollar/Japanese Yen</option>
+        <option value="NZD/JPY">New Zealand Dollar/Japanese Yen</option>
+        <option value="USD/MXN">U.S. Dollar/Mexican Peso</option>
+        <option value="USD/BRL">U.S. Dollar/Brazilian Real</option>
+        <option value="USD/CNY">U.S. Dollar/Chinese Yuan</option>
+        <option value="USD/CNH">U.S. Dollar/Chinese offshore Renminbi</option>
+        <option value="USD/SGD">U.S. Dollar/Singaporean Dollar</option>
+        <option value="USD/HKD">U.S. Dollar/Hong Kong Dollar</option>
+        <option value="USD/KRW">U.S. Dollar/Korean Won</option>
+        <option value="USD/INR">U.S. Dollar/Indian Rupee</option>
+        <option value="USD/ZAR">U.S. Dollar/South African Rand</option>
+        <option value="EUR/SEK">Euro/Swedish Krona</option>
+        <option value="USD/SEK">U.S. Dollar/Swedish Krona</option>
+        <option value="EUR/NOK">Euro/Norwegian Krona</option>
+        <option value="USD/NOK">U.S. Dollar/Norwegian Krona</option>
+        <option value="USD/RUB">U.S. Dollar/Russian Rouble</option>
+        <option value="USD/CZK">U.S. Dollar/Czech Koruna</option>
+      </select>
+    </p>
+    <p>
+      <label>Current Rate:</label>
+      <input type="number" id="currRate" value="1.32">
+    </p>
+    <p>
+      <label>Margin Ratio:</label>
+      <select id="marginRatioSelect">
+        <option value="1">1:1</option>
+        <option value="10">10:1</option>
+        <option value="20" selected>20:1</option>
+        <option value="30">30:1</option>
+        <option value="40">40:1</option>
+        <option value="50">50:1</option>
+        <option value="100">100:1</option>
+        <option value="200">200:1</option>
+      </select>
+    </p>
+    <p>
+      <label>Number of Units:</label>
+      <input type="number" id="units" value="1000">
+    </p>
+
+    <button id="calcBtn">Calculate</button>
+    <button id="resetBtn">Reset</button>
+    <hr>
+    <div>
+      <h3>Result:</h3>
+      <h3 id="calcResults">Result will appear here...</h3>
+    </div>
+
+    <script>
+      // Get required elements from the HTML
+      const currRateEl = document.getElementById("currRate");
+      const unitsEl = document.getElementById("units");
+      const accCurrencySelectEl = document.getElementById("accCurrencySelect");
+      const accPairSelectEl = document.getElementById("accPairSelect");
+      const marginRatioSelectEl = document.getElementById("marginRatioSelect");
+
+      const calcBtnEl = document.getElementById('calcBtn');
+      const resetBtnEl = document.getElementById('resetBtn');
+      const calcResultsEl = document.getElementById('calcResults') 
+
+      function createElement() {
+        const newDiv = `
+            <p>
+              <label for="i11-span">Margin: &nbsp;</label>
+              $<span
+                data-id="i11"
+                step="any"
+                id="i11-span"
+                class="spans"
+              ></span>
+            </p>
+        `
+        return newDiv
+      }
+
+      function setResult(resultObj) {
+        for (key of Object.keys(resultObj)) {
+          let val = resultObj[key].result;
+          let id = resultObj[key].type;
+
+          if (isNaN(val)) {
+           alert("Your input resulted in NAN.\n 0/0 \n Try again with valid input.");
+            return;
+          }
+          if (Math.abs(val) === Infinity) {
+            alert("Your input resulted in Infinity. \nDivision by zero. \nTry again with valid input.");
+            return;
+          }
+          const span = document.getElementById(`${id}-span`);
+          span.textContent = `${val * 1}`;
+        }
+      }
+
+      function calculateResults() {
+          // Retrieve input values
+          const currRate = parseFloat(currRateEl.value);
+          const units = parseFloat(unitsEl.value);
+          const accCurrencySelect = accCurrencySelectEl.value;
+          const accPairSelect = accPairSelectEl.value;
+          const marginRatioSelect = marginRatioSelectEl.value;
+
+          if (isNaN(units) || units <= 0 || isNaN(currRate) || currRate <= 0 ) {
+            alert("Please Enter All Details.");
+            return;
+          }
+
+          try {
+            const resultElement = createElement()
+            calcResultsEl.innerHTML = resultElement 
+
+            console.log(typeof marginRatioSelect)
+            let margin = 0
+            if (marginRatioSelect === "1") {
+              margin = units * currRate
+            } else if (marginRatioSelect === "10") {
+              margin = (currRate * units) / 10
+            } else if (marginRatioSelect === "20") {
+              margin = (currRate * units) / 20
+            } else if (marginRatioSelect === "30") {
+              margin = (currRate * units) / 30
+            } else if (marginRatioSelect === "40") {
+              margin = (currRate * units) / 40
+            } else if (marginRatioSelect === "50") {
+              margin = (currRate * units) / 50
+            } else if (marginRatioSelect === "100") {
+              margin = (currRate * units) / 100
+            } else {
+              margin = (currRate * units) / 200
+            }
+
+            const results = {
+              1: { result: Math.abs(margin) > 1 ? margin.toFixed(1) : margin.toPrecision(1), type: "i11" },
+            }
+            setResult(results)
+
+          } catch (error) {
+            alert("Something Went Wrong!!!");
+            resetResult()
+            return;
+          }
+      }
+
+      function resetForm() {
+        currRateEl.value = "1.32"
+        unitsEl.value = "1000"
+        accCurrencySelectEl.selectedIndex = "0"
+        accPairSelectEl.selectedIndex = "2"
+        marginRatioSelectEl.selectedIndex = "2"
+      }
+
+      function resetResult() {
+        calcResultsEl.innerHTML = "<p>Result will appear here...</p>";
+      } 
+
+      function resethandler() {
+        resetForm();
+        resetResult();
+      }
+
+      resetBtnEl.addEventListener("click", resethandler);
+      calcBtnEl.addEventListener("click", calculateResults);
+      [currRateEl, unitsEl].forEach((el) => {
+        el.addEventListener("input", resetResult);
+      });  
+
+      [accCurrencySelectEl, accPairSelectEl, marginRatioSelectEl].forEach((el) => {
+        el.addEventListener("change", resetResult);
+      });  
+
+    </script>
+</body>
+</html>

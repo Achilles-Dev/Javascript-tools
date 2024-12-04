@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>TRIR Calculator</title>
+</head>
+<body>
+    <h1>TRIR Calculator</h1>
+    <p>
+      Hours worked:
+      <input type="number" id="hoursWorked">
+      <select id="hoursWorkedSelect">
+        <option value="0.01666666667">minutes (min)</option>
+        <option value="1" selected>hours (hrs)</option>
+        <option value="24">days (days)</option>
+        <option value="168">weeks (wks)</option>
+        <option value="730.5">months (mos)</option>
+        <option value="8766">years (yrs)</option>
+      </select>
+    </p>
+    <p>
+      Number of injuries:
+      <input type="number" id="injuries">
+    </p>
+
+    <button id="calcBtn">Calculate</button>
+    <button id="resetBtn">Reset</button>
+    <hr>
+    <div>
+      <h3>Result:</h3>
+      <h3 id="calcResults">Result will appear here...</h3>
+    </div>
+
+    <script>
+      // Get required elements from the HTML
+      const hoursWorkedEl = document.getElementById("hoursWorked");
+      const hoursWorkedSelectEl = document.getElementById("hoursWorkedSelect");
+      const injuriesEl = document.getElementById("injuries");
+
+      const calcBtnEl = document.getElementById('calcBtn');
+      const resetBtnEl = document.getElementById('resetBtn');
+      const calcResultsEl = document.getElementById('calcResults') 
+
+      function createElement() {
+        const newDiv = `
+            <p>
+              <label for="i11-span">TRIR: &nbsp;</label>
+              <span
+                data-id="i11"
+                step="any"
+                id="i11-span"
+                class="spans"
+              ></span>
+            </p>
+            <p>
+              <span
+                data-id="i12"
+                step="any"
+                id="i12-span"
+                class="spans"
+              ></span>
+            </p>
+        `
+        return newDiv
+      }
+
+      function setResult(resultObj) {
+        for (key of Object.keys(resultObj)) {
+          let val = resultObj[key].result;
+          let id = resultObj[key].type;
+
+          if (id === "i12") {
+            const span = document.getElementById(`${id}-span`);
+            span.textContent = val;
+          } else {
+            if (isNaN(val)) {
+              alert("Your input resulted in NAN.\n 0/0 \n Try again with valid input.");
+                return;
+            }
+            if (Math.abs(val) === Infinity) {
+              alert("Your input resulted in Infinity. \nDivision by zero. \nTry again with valid input.");
+              return;
+            }
+            const span = document.getElementById(`${id}-span`);
+            span.textContent = `${parseFloat(val)}`;
+          }
+        }
+      }
+
+      function calculateResults() {
+          // Retrieve input values
+          const hoursWorked = parseFloat(hoursWorkedEl.value);
+          const hoursWorkedSelect = parseFloat(hoursWorkedSelectEl.value);
+          const injuries = parseFloat(injuriesEl.value);
+
+          if (isNaN(hoursWorked) || hoursWorked <= 0 || isNaN(injuries) || injuries < 0 ) {
+            alert("Please Enter All Details.");
+            return;
+          } 
+
+          try {
+            const resultElement = createElement()
+            calcResultsEl.innerHTML = resultElement 
+
+            const TRIR =  (injuries * 200000) / (hoursWorked * hoursWorkedSelect)
+            let status = ""
+            if (TRIR < 3) {
+              status = "Your TRIR rate level is low."
+            } else if (TRIR >= 3 && TRIR < 8) {
+              status = "Your TRIR rate level is moderate."
+            } else {
+              status = "Your TRIR rate level is high!"
+            }
+
+            const results = {
+              1: { result: Math.abs(TRIR) > 1 ? TRIR.toFixed(3) : TRIR.toPrecision(4), type: "i11" },
+              2: { result: status, type: "i12" },
+            }
+            setResult(results)
+
+          } catch (error) {
+            alert("Something Went Wrong!!!");
+            resetResult()
+            return;
+          }
+      }
+
+      function resetForm() {
+        hoursWorkedEl.value = ""
+        injuriesEl.value = ""
+        hoursWorkedSelectEl.selectedIndex = "1"
+      }
+
+      function resetResult() {
+        calcResultsEl.innerHTML = "<p>Result will appear here...</p>";
+      } 
+
+      function resethandler() {
+        resetForm();
+        resetResult();
+      }
+
+      resetBtnEl.addEventListener("click", resethandler);
+      calcBtnEl.addEventListener("click", calculateResults);
+
+      hoursWorkedSelectEl.addEventListener("change", resetResult);
+
+      [hoursWorkedEl, injuriesEl].forEach((el) => {
+        el.addEventListener("input", resetResult);
+      });  
+    </script>
+</body>
+</html>

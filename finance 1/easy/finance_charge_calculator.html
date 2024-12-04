@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Finance Charge Calculator</title>
+</head>
+<body>
+    <h1>Finance Charge Calculator</h1>
+    <p>
+      Current balance owed:
+      <input type="number" id="currBalance" value="1000">
+    </p>
+    <p>
+      Annual Percentage Rate (APR): 
+      <input type="number" id="apr" value="18">%
+    </p>
+    <p>
+      Calculate for:
+      <select id="calculateSelect">
+        <option value="bc" selected>billing cycle</option>
+        <option value="gt">given term</option>
+      </select>
+    </p>
+    <p id="bcInput" class="inputs1">
+      Billing cycle length:
+      <input type="number" id="billCycleLen" value="30"> days
+    </p>
+    <p id="gtInput" style="display: none;" class="inputs1">
+      I would like to..:
+      <select id="termSelect">
+        <option value="man" selected>set it manually</option>
+        <option value="btn">estimates between dates</option>
+      </select>
+    </p>
+    <p id="manInput" style="display: none;" class="inputs2">
+      Finance charge for:
+      <input type="number" id="financeCharge" value="26">
+      <select id="financeChargeSelect">
+        <option value="1" selected>days (days)</option>
+        <option value="0.1428571428571">weeks (wks)</option>
+        <option value="0.0328542094456">months (mos)</option>
+      </select>
+    </p>
+    <div id="btnInputs" style="display: none;" class="inputs2">
+      <p>
+        First day:
+        <input type="date" id="firstDate"> 
+      </p>
+      <p>
+        Last day:
+        <input type="date" id="lastdDate"> 
+      </p>
+    </div>
+
+
+    <button id="calcBtn">Calculate</button>
+    <button id="resetBtn">Reset</button>
+    <hr>
+    <div>
+      <h3>Result:</h3>
+      <h3 id="calcResults">Result will appear here...</h3>
+    </div>
+
+    <script>
+      // Get required elements from the HTML
+      const currBalanceEl = document.getElementById("currBalance");
+      const aprEl = document.getElementById("apr");
+      const calculateSelectEl = document.getElementById("calculateSelect");
+      const billCycleLenEl = document.getElementById("billCycleLen");
+      const termSelectEl = document.getElementById("termSelect");
+      const financeChargeEl = document.getElementById("financeCharge");
+      const financeChargeSelectEl = document.getElementById("financeChargeSelect");
+      const firstDateEl = document.getElementById("firstDate");
+      const lastdDateEl = document.getElementById("lastdDate");
+
+      const inputs1El = document.querySelectorAll(".inputs1");
+      const inputs2El = document.querySelectorAll(".inputs2");
+
+      const calcBtnEl = document.getElementById('calcBtn');
+      const resetBtnEl = document.getElementById('resetBtn');
+      const calcResultsEl = document.getElementById('calcResults') 
+
+      let date = new Date()
+      // let fortnightAway = new Date(Date.now() + 12096e5);
+      firstDateEl.value = formatDate(date)
+      let fortnightAway = date.setDate(date.getDate() + 13);
+      lastdDateEl.value = formatDate(fortnightAway)
+
+      function formatDate(date) {
+        let d = new Date(date),
+            month = '' + (d.getMonth() + 1),
+            day = '' + d.getDate(),
+            year = d.getFullYear();
+
+        if (month.length < 2) 
+            month = '0' + month;
+        if (day.length < 2) 
+            day = '0' + day;
+
+        return [year, month, day].join('-');
+      }
+
+      function handleCalculateSelectChange(e) {
+        const value = e.target.value
+
+        inputs1El.forEach((input) => {
+          const idVal = input.id.slice(0,2)
+          if (idVal === value) {
+            input.style.display = "block"
+          } else {
+            input.style.display = "none"
+          }
+        })
+
+        
+        if (value === "gt") {
+          const termSelectVal = termSelectEl.value
+          inputs2El.forEach((input) => {
+            const idVal = input.id.slice(0,3)
+            if (idVal === termSelectVal) {
+              input.style.display = "block"
+            } else {
+              input.style.display = "none"
+            }
+          })
+        } else {
+          inputs2El.forEach((input) => {
+            input.style.display = "none"
+          })
+        }
+
+        resetResult()
+      }
+
+      function handleTermSelectChange(e) {
+        const value = e.target.value
+
+        inputs2El.forEach((input) => {
+          const idVal = input.id.slice(0,3)
+          if (idVal === value) {
+            input.style.display = "block"
+          } else {
+            input.style.display = "none"
+          }
+        })
+
+        resetResult()
+      }
+
+      function daysBetweenDates(date1, date2) {
+        // Convert date strings to Date objects
+        const d1 = new Date(date1);
+        const d2 = new Date(date2);
+
+        // Calculate the difference in time
+        const timeDifference = Math.abs(d2 - d1);
+
+        // Convert the time difference from milliseconds to days
+        const dayDifference = Math.ceil(timeDifference / (1000 * 60 * 60 * 24));
+
+        return dayDifference + 1;
+    }
+
+      function createElement() {
+        let givenTermSelect = `The finance charge for a given period is`
+        if (termSelectEl.value === "btn") {
+          const totalDays = daysBetweenDates(firstDateEl.value, lastdDateEl.value)
+          givenTermSelect = `The finance charge for the ${totalDays} days you carry the balance is`
+        }
+        const newDiv = `
+            <p>
+              <label for="i11-span">The finance charge for a billing cycle is: &nbsp;</label>
+              <span
+                data-id="i11"
+                step="any"
+                id="i11-span"
+                class="spans"
+              ></span>
+            </p>
+            <p>
+              <label for="i12-span">The new opening balance in the following billing cycle is: &nbsp;</label>
+              <span
+                data-id="i12"
+                step="any"
+                id="i12-span"
+                class="spans"
+              ></span>
+            </p>
+            
+        `
+        const newDiv2 = `
+          <p>
+            <label for="i13-span">${givenTermSelect}: &nbsp;</label>
+            <span
+              data-id="i13"
+              step="any"
+              id="i13-span"
+              class="spans"
+            ></span>
+          </p>
+        `
+        if (calculateSelectEl.value === "gt") {
+          return newDiv2
+        }
+        return newDiv
+      }
+
+      function setResult(resultObj) {
+        for (key of Object.keys(resultObj)) {
+          let val = resultObj[key].result;
+          let id = resultObj[key].type;
+
+          if (isNaN(val)) {
+           alert("Your input resulted in NAN.\n 0/0 \n Try again with valid input.");
+            return;
+          }
+          if (Math.abs(val) === Infinity) {
+            alert("Your input resulted in Infinity. \nDivision by zero. \nTry again with valid input.");
+            return;
+          }
+          const span = document.getElementById(`${id}-span`);
+          val = Math.abs(val) > 1 ? val.toFixed(2) : val.toPrecision(2)
+          span.textContent = val;
+        }
+      }
+
+      function calculateResults() {
+          // Retrieve input values
+          const currBalance = parseFloat(currBalanceEl.value);
+          const apr = parseFloat(aprEl.value);
+          const calculateSelect = calculateSelectEl.value;
+          const billCycleLen = parseFloat(billCycleLenEl.value);
+          const termSelect = termSelectEl.value;
+          const financeChargeSelect = parseFloat(financeChargeSelectEl.value);
+          const financeCharge = parseFloat(financeChargeEl.value) / financeChargeSelect;
+          const firstDate = firstDateEl.value;
+          const lastdDate = lastdDateEl.value;
+
+          if (isNaN(currBalance) || currBalance < 0 || isNaN(apr) || apr < 0 || 
+              (calculateSelect === "bc" && (isNaN(billCycleLen) || billCycleLen <= 0)) || 
+              (calculateSelect === "gt" && termSelect === "man" && (isNaN(financeCharge) || financeCharge < 0))
+          ) {
+            alert("Please Enter All Details.");
+            return;
+          }
+
+          try {
+            const resultElement = createElement()
+            calcResultsEl.innerHTML = resultElement 
+
+            let results = {}
+            let totalFinanceCharge = 0
+
+            const dailyIntRate = (apr / 100 ) / 365
+            if (calculateSelect === "bc") {
+              totalFinanceCharge = (currBalance * dailyIntRate) * billCycleLen
+              const openingBal = currBalance + totalFinanceCharge
+
+              results = {
+                1: { result: totalFinanceCharge, type: "i11" },
+                2: { result: openingBal, type: "i12" },
+              }
+            } else {
+              if (termSelect === "man") {
+                totalFinanceCharge = (currBalance * dailyIntRate) * financeCharge
+              
+              } else {
+                const totalDays = daysBetweenDates(firstDate, lastdDate)
+                totalFinanceCharge = (currBalance * dailyIntRate) * totalDays
+              }
+              results = {
+                3: { result: totalFinanceCharge, type: "i13" },
+              }
+
+            }
+            setResult(results)
+
+          } catch (error) {
+            alert("Something Went Wrong!!!");
+            resetResult()
+            return;
+          }
+      }
+
+      function resetForm() {
+        currBalanceEl.value = "1000"
+        aprEl.value = "18"
+        billCycleLenEl.value = "30"
+        financeChargeEl.value = "26"
+        firstDateEl.value = formatDate(date)
+        lastdDateEl.value = formatDate(fortnightAway)
+
+        calculateSelectEl.selectedIndex = "0"
+        termSelectEl.selectedIndex = "0"
+
+        inputs1El.forEach((input) => {
+          const idVal = input.id.slice(0,2)
+          if (idVal === "bc") {
+            input.style.display = "block"
+          } else {
+            input.style.display = "none"
+          }
+        })
+
+        inputs2El.forEach((input) => {
+          input.style.display = "none"
+        })
+      }
+
+      function resetResult() {
+        calcResultsEl.innerHTML = "<p>Result will appear here...</p>";
+      } 
+
+      function resethandler() {
+        resetForm();
+        resetResult();
+      }
+
+      resetBtnEl.addEventListener("click", resethandler);
+      calcBtnEl.addEventListener("click", calculateResults);
+      [currBalanceEl, aprEl, calculateSelectEl, billCycleLenEl, termSelectEl, financeChargeEl, firstDateEl, lastdDateEl].forEach((el) => {
+        el.addEventListener("input", resetResult);
+      }); 
+      
+      calculateSelectEl.addEventListener("change", handleCalculateSelectChange)
+      termSelectEl.addEventListener("change", handleTermSelectChange)
+
+    </script>
+</body>
+</html>

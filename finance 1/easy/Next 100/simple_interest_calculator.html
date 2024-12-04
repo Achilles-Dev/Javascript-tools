@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Simple Interest Calculator</title>
+</head>
+<body>
+    <h1>Simple Interest Calculator</h1>
+    <h3>Calculate the simple interest.</h3>
+    <p>
+      Principal:
+      <input type="number" id="principal" value="10000">
+    </p>
+    <p>
+      Annual Interest Rate:
+      <input type="number" id="intRate" value="5">%
+    </p>
+    <p>
+      Years:
+      <input type="number" id="years" value="10">
+    </p>
+    
+    <button id="calcBtn">Calculate</button>
+    <button id="resetBtn">Reset</button>
+    <hr>
+    <div>
+      <h3>Result:</h3>
+      <h3 id="calcResults">Result will appear here...</h3>
+    </div>
+
+    <script>
+      // Get required elements from the HTML
+      const principalEl = document.getElementById("principal");
+      const intRateEl = document.getElementById("intRate");
+      const yearsEl = document.getElementById("years");
+
+      const calcBtnEl = document.getElementById('calcBtn');
+      const resetBtnEl = document.getElementById('resetBtn');
+      const calcResultsEl = document.getElementById('calcResults') 
+
+      function createElement() {
+        const newDiv = `
+            <p>
+              <label for="i11-span">Total Interest Earned: &nbsp;</label>
+              <span
+                data-id="i11"
+                step="any"
+                id="i11-span"
+                class="spans"
+              ></span>
+            </p>
+            <p>
+              <label for="i12-span">Final amount: &nbsp;</label>
+              <span
+                data-id="i12"
+                step="any"
+                id="i12-span"
+                class="spans"
+              ></span>
+            </p>
+        `
+        return newDiv
+      }
+
+      function setResult(resultObj) {
+        for (key of Object.keys(resultObj)) {
+          let val = resultObj[key].result;
+          let id = resultObj[key].type;
+
+          if (isNaN(val)) {
+           alert("Your input resulted in NAN.\n 0/0 \n Try again with valid input.");
+            return;
+          }
+          if (Math.abs(val) === Infinity) {
+            alert("Your input resulted in Infinity. \nDivision by zero. \nTry again with valid input.");
+            return;
+          }
+          const span = document.getElementById(`${id}-span`);
+          span.textContent = `${parseFloat(val)}`;
+        }
+      }
+
+      function calculateResults() {
+          // Retrieve input values
+          const principal = parseFloat(principalEl.value);
+          const intRate = parseFloat(intRateEl.value);
+          const years = parseFloat(yearsEl.value);
+
+          if (isNaN(principal)  || principal < 0 || isNaN(intRate) || intRate < 1 ||
+            isNaN(years) || years < 1
+          ) {
+            alert("Please Enter All Details.");
+            return;
+          } 
+
+          try {
+            const resultElement = createElement()
+            calcResultsEl.innerHTML = resultElement 
+
+            const interest = principal * (intRate / 100) * years
+            const finalAmt = principal + interest
+
+            const results = {
+              1: { result: Math.abs(interest) > 1 ? interest.toFixed(2) : interest.toPrecision(2), type: "i11" },
+              2: { result: Math.abs(finalAmt) > 1 ? finalAmt.toFixed(2) : finalAmt.toPrecision(2), type: "i12" },
+            }
+            setResult(results)
+
+          } catch (error) {
+            alert("Something Went Wrong!!!");
+            resetResult()
+            return;
+          }
+      }
+
+      function resetForm() {
+        principalEl.value = "10000"
+        intRateEl.value = "5"
+        yearsEl.value = "10"
+      }
+
+      function resetResult() {
+        calcResultsEl.innerHTML = "<p>Result will appear here...</p>";
+      } 
+
+      function resethandler() {
+        resetForm();
+        resetResult();
+      }
+
+      resetBtnEl.addEventListener("click", resethandler);
+      calcBtnEl.addEventListener("click", calculateResults);
+
+      [principalEl, intRateEl, yearsEl].forEach((el) => {
+        el.addEventListener("input", resetResult);
+      });  
+    </script>
+</body>
+</html>

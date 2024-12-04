@@ -1,0 +1,702 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Mechanical Advantage Calculator</title>
+  </head>
+  <body>
+    <h1>Mechanical Advantage Calculator</h1>    
+      <p>
+        Method:
+        <select id="methodSelect">
+          <option value="lev">Lever</option>
+          <option value="pul">Pulley</option>
+          <option value="scr">Screw</option>
+          <option value="wed">Wedge</option>
+          <option value="ram">Ramp (inclined plane)</option>
+          <option value="whe">Wheel and axle</option>
+        </select>
+      </p>
+      <div id="leverInputs" class="containers">
+        <h3>Lever</h3>
+        <p>
+          <label for="i11-input">Effort arm: </label>
+          <input
+            type="number"
+            min="0"
+            autocomplete="off"
+            data-id="i11"
+            id="i11-input"
+            class="inputs"
+            step="any"
+            data-name="Effort arm"
+          />
+          <select
+            class="selects"
+            id="i11-select"
+            data-type="distance"
+            data-prev="m"
+            data-id="i11"
+          >
+            <option value="mm">millimeters (mm)</option>
+            <option value="cm">centimeters (cm)</option>
+            <option value="m" selected>meters (m)</option>
+            <option value="in">inches (in)</option>
+            <option value="ft">feet (ft)</option>
+            <option value="yd">yards (yd)</option>
+          </select>
+        </p>
+        <p>
+          <label for="i12-input">Load arm: </label>
+          <input
+            type="number"
+            min="0"
+            autocomplete="off"
+            data-id="i12"
+            id="i12-input"
+            class="inputs"
+            step="any"
+            data-name="Load arm"
+          />
+          <select
+            class="selects"
+            id="i12-select"
+            data-type="distance"
+            data-prev="m"
+            data-id="i12"
+          >
+            <option value="mm">millimeters (mm)</option>
+            <option value="cm">centimeters (cm)</option>
+            <option value="m" selected>meters (m)</option>
+            <option value="in">inches (in)</option>
+            <option value="ft">feet (ft)</option>
+            <option value="yd">yards (yd)</option>
+          </select>
+        </p>
+      </div>
+
+      <div id="pulleyInputs" class="containers" style="display: none;">
+        <h3>Pulley</h3>
+        <p>
+          <label for="i21-input">Number of pulleys </label>
+          <input
+            type="number"
+            min="0"
+            autocomplete="off"
+            data-id="i21"
+            id="i21-input"
+            class="inputs"
+            step="any"
+            data-name="Number of pulleys"
+          />
+          <select
+            class="selects"
+            id="i21-select"
+            data-type="exp"
+            data-prev="exp"
+            data-id="i21"
+            style="display: none;"
+          >
+            <option value="exp"></option>
+          </select>
+        </p>
+      </div>
+
+      <div id="screwInputs" class="containers" style="display: none;">
+        <h3>Screw</h3>
+        <p>
+          <label for="i31-input">Diameter </label>
+          <input
+            type="number"
+            min="0"
+            autocomplete="off"
+            data-id="i31"
+            id="i31-input"
+            class="inputs"
+            step="any"
+            data-name="Diameter"
+          />
+          <select
+            class="selects"
+            id="i31-select"
+            data-type="distance"
+            data-prev="mm"
+            data-id="i31"
+          >
+            <option value="mm" selected>millimeters (mm)</option>
+            <option value="cm">centimeters (cm)</option>
+            <option value="m">meters (m)</option>
+            <option value="in">inches (in)</option>
+            <option value="ft">feet (ft)</option>
+            <option value="yd">yards (yd)</option>
+          </select>
+        </p>
+        <p>
+          <label for="i32-input">Lead </label>
+          <input
+            type="number"
+            min="0"
+            autocomplete="off"
+            data-id="i32"
+            id="i32-input"
+            class="inputs"
+            step="any"
+            data-name="Lead"
+          />
+          <select
+            class="selects"
+            id="i32-select"
+            data-type="distance"
+            data-prev="mm"
+            data-id="i32"
+          >
+            <option value="mm" selected>millimeters (mm)</option>
+            <option value="cm">centimeters (cm)</option>
+            <option value="m">meters (m)</option>
+            <option value="in">inches (in)</option>
+            <option value="ft">feet (ft)</option>
+            <option value="yd">yards (yd)</option>
+          </select>
+        </p>
+      </div>
+
+      <div id="wedgeInputs" class="containers" style="display: none;">
+        <h3>Wedge</h3>
+        <p>
+          <label for="i41-input">Wedge length </label>
+          <input
+            type="number"
+            min="0"
+            autocomplete="off"
+            data-id="i41"
+            id="i41-input"
+            class="inputs"
+            step="any"
+            data-name="Wedge length"
+          />
+          <select
+            class="selects"
+            id="i41-select"
+            data-type="distance"
+            data-prev="cm"
+            data-id="i41"
+          >
+            <option value="mm">millimeters (mm)</option>
+            <option value="cm" selected>centimeters (cm)</option>
+            <option value="m">meters (m)</option>
+            <option value="in">inches (in)</option>
+            <option value="ft">feet (ft)</option>
+            <option value="yd">yards (yd)</option>
+          </select>
+        </p>
+        <p>
+          <label for="i42-input">Wedge thickness </label>
+          <input
+            type="number"
+            min="0"
+            autocomplete="off"
+            data-id="i42"
+            id="i42-input"
+            class="inputs"
+            step="any"
+            data-name="Wedge thickness"
+          />
+          <select
+            class="selects"
+            id="i42-select"
+            data-type="distance"
+            data-prev="cm"
+            data-id="i42"
+          >
+            <option value="mm">millimeters (mm)</option>
+            <option value="cm" selected>centimeters (cm)</option>
+            <option value="m">meters (m)</option>
+            <option value="in">inches (in)</option>
+            <option value="ft">feet (ft)</option>
+            <option value="yd">yards (yd)</option>
+          </select>
+        </p>
+      </div>
+
+      <div id="rampInputs" class="containers" style="display: none;">
+        <h3>Ramp (inclined plane)</h3>
+        <p>
+          <label for="i51-input">Ramp height </label>
+          <input
+            type="number"
+            min="0"
+            autocomplete="off"
+            data-id="i51"
+            id="i51-input"
+            class="inputs"
+            step="any"
+            data-name="Ramp height"
+          />
+          <select
+            class="selects"
+            id="i51-select"
+            data-type="distance"
+            data-prev="m"
+            data-id="i51"
+          >
+            <option value="mm">millimeters (mm)</option>
+            <option value="cm">centimeters (cm)</option>
+            <option value="m" selected>meters (m)</option>
+            <option value="in">inches (in)</option>
+            <option value="ft">feet (ft)</option>
+            <option value="yd">yards (yd)</option>
+          </select>
+        </p>
+        <p>
+          <label for="i52-input">Ramp length </label>
+          <input
+            type="number"
+            min="0"
+            autocomplete="off"
+            data-id="i52"
+            id="i52-input"
+            class="inputs"
+            step="any"
+            data-name="Ramp length"
+          />
+          <select
+            class="selects"
+            id="i52-select"
+            data-type="distance"
+            data-prev="m"
+            data-id="i52"
+          >
+            <option value="mm">millimeters (mm)</option>
+            <option value="cm">centimeters (cm)</option>
+            <option value="m" selected>meters (m)</option>
+            <option value="in">inches (in)</option>
+            <option value="ft">feet (ft)</option>
+            <option value="yd">yards (yd)</option>
+          </select>
+        </p>
+      </div>
+
+      <div id="wheelInputs" class="containers" style="display: none;">
+        <h3>Wheel and axle</h3>
+        <p>
+          <label for="i61-input">Wheel radius </label>
+          <input
+            type="number"
+            min="0"
+            autocomplete="off"
+            data-id="i61"
+            id="i61-input"
+            class="inputs"
+            step="any"
+            data-name="Wheel radius"
+          />
+          <select
+            class="selects"
+            id="i61-select"
+            data-type="distance"
+            data-prev="cm"
+            data-id="i61"
+          >
+            <option value="mm">millimeters (mm)</option>
+            <option value="cm" selected>centimeters (cm)</option>
+            <option value="m">meters (m)</option>
+            <option value="in">inches (in)</option>
+            <option value="ft">feet (ft)</option>
+            <option value="yd">yards (yd)</option>
+          </select>
+        </p>
+        <p>
+          <label for="i62-input">Axle radius </label>
+          <input
+            type="number"
+            min="0"
+            autocomplete="off"
+            data-id="i62"
+            id="i62-input"
+            class="inputs"
+            step="any"
+            data-name="Axle radius"
+          />
+          <select
+            class="selects"
+            id="i62-select"
+            data-type="distance"
+            data-prev="cm"
+            data-id="i62"
+          >
+            <option value="mm">millimeters (mm)</option>
+            <option value="cm" selected>centimeters (cm)</option>
+            <option value="m">meters (m)</option>
+            <option value="in">inches (in)</option>
+            <option value="ft">feet (ft)</option>
+            <option value="yd">yards (yd)</option>
+          </select>
+        </p>
+      </div>
+
+      <button id="calcBtn">Calculate</button>
+      <button id="resetBtn">Reset</button>
+      <hr>
+      <div>
+        <h3>Result:</h3>
+        <h3 id="calcResults">Result will appear here...</h3>
+      </div>
+    <script>
+      /*************** ELEMENTS ***************/
+      const inputs = document.querySelectorAll(".inputs");
+      const selects = document.querySelectorAll(".selects");
+      const containersEl = document.querySelectorAll(".containers");
+      const methodSelectEl = document.getElementById('methodSelect')
+
+      const calcBtnEl = document.getElementById('calcBtn');
+      const resetBtnEl = document.getElementById('resetBtn');
+      const calcResultsEl = document.getElementById('calcResults')
+
+      /*************** GLOBAL VARIBLES ***************/
+      const UNITS = {
+        distance: {
+          mm: 1e3,
+          cm: 1e2,
+          dm: 1e1,
+          m: 1,
+          in: 39.37007874015748,
+          ft: 3.2808398950131235,
+          yd: 1.0936132983377078,
+        },
+        angle: {
+          deg: 1,
+          rad: 0.017453292519943295,
+          tr: 0.0027777777777777775,
+        },
+        exp: {
+          exp: 1
+        }
+      };
+      /*************** FUNCTIONS ***************/
+      function toSIUnit(type, unit, value) {
+        return value / UNITS[type][unit];
+      }
+
+      function fromSIUnit(type, unit, value) {
+        return value * UNITS[type][unit];
+      }
+
+      function handleMethodSelectChange(e) {
+        const value = e.target.value;
+        containersEl.forEach((container) => {
+          const idVal = container.id.slice(0,3)
+          if (value === idVal) {
+            container.style.display = "block"
+          } else {
+            container.style.display = "none"
+          }
+        })
+
+        resetResult()
+      }
+
+      function createElement() {
+        const newDiv = `
+            <p>
+              <label for="i71-span">Mechanical advantage: &nbsp; </label>
+              <span
+                data-id="i71"
+                step="any"
+                id="i71-span"
+                class="spans"
+                data-name="Mechanical advantage"
+              ></span>
+              <select
+                class="selectsResult"
+                id="i71-select"
+                data-type="exp"
+                data-prev="exp"
+                data-id="i71"
+                style="display: none;"
+              >
+                <option value="exp"></option>
+              </select>
+            </p>
+        `
+        const newDiv2 = `
+            <p>
+              <label for="i81-span">Ramp inclination: &nbsp; </label>
+              <span
+                data-id="i81"
+                step="any"
+                id="i81-span"
+                class="spans"
+                data-name="Ramp inclination"
+              ></span>
+              <select
+                class="selectsResult"
+                id="i81-select"
+                data-type="angle"
+                data-prev="deg"
+                data-id="i81"
+              >
+                <option value="deg" selected>degrees (deg)</option>
+                <option value="rad">radians (rad)</option>
+                <option value="tr">turns (tr)</option>
+              </select>
+        `
+        if (methodSelectEl.value === "ram") {
+          return newDiv2 + newDiv 
+        }
+        return newDiv
+      }
+      
+      // related to caculation
+      function prepareUnit(...args) {
+        const resultArr = [];
+        for (id of args) {
+          const input = document.getElementById(`${id}-input`);
+          const select = document.getElementById(`${id}-select`);
+          const type = select.getAttribute("data-type");
+          let val = parseFloat(input.value);
+
+          val = isNaN(val) ? 0 : val;
+          let inUnit = select.value;
+
+          val = toSIUnit(type, inUnit, val);
+          resultArr.push(val);
+        }
+
+        return resultArr;
+      }
+
+      function setResult(resultObj) {
+        for (key of Object.keys(resultObj)) {
+          let val = resultObj[key].result;
+          let id = resultObj[key].type;
+
+          if (isNaN(val)) {
+           alert("Your input resulted in NAN.\n 0/0 \n Try again with valid input.");
+            return;
+          }
+          if (Math.abs(val) === Infinity) {
+            alert("Your input resulted in Infinity. \nDivision by zero. \nTry again with valid input.");
+            return;
+          }
+          const span = document.getElementById(`${id}-span`);
+          const select = document.getElementById(`${id}-select`);
+          const type = select.getAttribute("data-type");
+          let outUnit = select.value;
+          val = fromSIUnit(type, outUnit, val);
+
+          span.textContent = parseFloat(val);
+        }
+      }
+
+      function calculateResult(input) {             
+        function calculateLever() {
+          let [val1, val2] = prepareUnit("i11", "i12");
+          let result = val1 / val2
+          return {
+            1: { result: Math.abs(result) > 1 ? result.toFixed(3) * 1 : result, type: "i71" },
+          };
+        }
+        
+        function calculatePulley() {
+          let [val1] = prepareUnit("i21");
+          let result = 2 * val1
+          
+          return {
+            1: { result: Math.abs(result) > 1 ? result.toFixed(3) * 1 : result, type: "i71" },
+          };
+        }
+        
+        function calculateScrew() {
+          let [val1, val2] = prepareUnit("i31", "i32");
+          let result = Math.PI * (val1 / val2)
+          
+          return {
+            1: { result: Math.abs(result) > 1 ? result.toFixed(3) * 1 : result, type: "i71" },
+          };
+        }
+        
+        function calculateWedge() {
+          let [val1, val2] = prepareUnit("i41", "i42");
+          let result = val1 / val2
+          
+          return {
+            1: { result: Math.abs(result) > 1 ? result.toFixed(3) * 1 : result, type: "i71" },
+          };
+        }
+        
+        function calculateRamp() {
+          let [val1, val2] = prepareUnit("i51", "i52");
+          let result = val2 / val1
+          let result2 = val1 / val2
+          result2 = Math.asin(result2)
+          result2 = toSIUnit("angle", "rad", result2)
+          return {
+            1: { result: Math.abs(result) > 1 ? result.toFixed(3) * 1 : result, type: "i71" },
+            2: { result: Math.abs(result2) > 1 ? result2.toFixed(5) * 1 : result2, type: "i81" },
+          };
+        }
+        
+        function calculateWheel() {
+          let [val1, val2] = prepareUnit("i61", "i62");
+          let result = val1 / val2
+          
+          return {
+            1: { result: Math.abs(result) > 1 ? result.toFixed(3) * 1 : result, type: "i71" },
+          };
+        }
+        
+
+        switch (input) {
+          case "lev":
+            return calculateLever()
+          case "pul":
+            return calculatePulley()
+          case "scr":
+            return calculateScrew()
+          case "wed":
+            return calculateWedge()
+          case "ram":
+            return calculateRamp()
+          case "whe":
+            return calculateWheel()
+          default:
+            console.log("error in calculate result switch");
+        }
+      }
+
+      function validateInput(id) {
+        const input = document.getElementById(`${id}-input`);
+        const label = input.getAttribute("data-name").trim();
+        let value = parseFloat(input.value);
+        if (isNaN(value)) {
+          alert(`${label} value cannot be empty.`);
+          return false;
+        }
+
+        if (value < 0) {
+          alert(`${label} value cannot be negative.`);
+          return false;
+        }
+
+        return true;
+      }
+
+      function handleResultsChange(e) {
+        let select = e.target;
+        let id = select.getAttribute("data-id");
+        let span = document.getElementById(`${id}-span`);
+
+        let prevUnit = select.getAttribute("data-prev");
+        let currentUnit = select.value;
+        select.setAttribute("data-prev", currentUnit);
+
+        if (span.textContent === "") {
+          return;
+        }
+
+        let type = select.getAttribute("data-type");
+
+        let value = parseFloat(span.textContent);
+        value = parseFloat(value);
+        if (isNaN(value)) value = 0.0;
+
+        let si = toSIUnit(type, prevUnit, value);
+        let result = fromSIUnit(type, currentUnit, si);
+        span.textContent = parseFloat(result).toFixed(5) * 1;
+      }
+
+      function calculateResults() {
+        const method = methodSelectEl.value
+        if (method === "lev") {
+          for (el of ["i11", "i12"]) {
+            if (!validateInput(el)) return;
+          }
+        } else if (method === "pul") {
+          if (!validateInput("i21")) return;
+        } else if (method === "scr") {
+          for (el of ["i31", "i32"]) {
+            if (!validateInput(el)) return;
+          }
+        } else if (method === "wed") {
+          for (el of ["i41", "i42"]) {
+            if (!validateInput(el)) return;
+          }
+        } else if (method === "ram") {
+          for (el of ["i51", "i52"]) {
+            if (!validateInput(el)) return;
+          }
+        } else {
+          for (el of ["i61", "i62"]) {
+            if (!validateInput(el)) return;
+          }
+        }
+
+
+        try {
+          const resultElement = createElement()
+          
+          calcResultsEl.innerHTML = resultElement
+
+          const newSelects = document.querySelectorAll(".selectsResult");
+
+          newSelects.forEach((select) => {
+            select.addEventListener("change", handleResultsChange);
+          });
+
+          const result = calculateResult(method);
+          setResult(result)
+
+        } catch(error) {
+          alert("An error ocurred. Try again with valid input.");
+          resetResult()
+          return;
+        }
+      }
+
+      function resetForm() {
+        selects.forEach((select, index) => {
+          select.selectedIndex = '2'
+        });
+
+        inputs.forEach((input, index) => {
+          input.value = ""
+        });
+        
+        methodSelectEl.selectedIndex = "0"
+
+        containersEl.forEach((container) => {
+          const idVal = container.id.slice(0,3)
+          if (idVal === "lev") {
+            container.style.display = "block"
+          } else {
+            container.style.display = "none"
+          }
+        })
+      }
+
+      function resetResult() {
+        calcResultsEl.innerHTML = "<p>Result will appear here...</p>";
+      } 
+
+      function resethandler() {
+        resetForm();
+        resetResult();
+      }
+
+      /*************** EVENT LISTINERS ***************/
+      selects.forEach((select) => {
+        select.addEventListener("change", resetResult);
+      });
+      inputs.forEach((input) => {
+        input.addEventListener("input", resetResult);
+      });
+
+      methodSelectEl.addEventListener("change", handleMethodSelectChange)
+
+      resetBtnEl.addEventListener("click", resethandler);
+      calcBtnEl.addEventListener("click", calculateResults);
+
+    </script>
+  </body>
+</html>

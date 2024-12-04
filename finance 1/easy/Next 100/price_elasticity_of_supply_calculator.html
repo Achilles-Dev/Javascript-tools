@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Price Elasticity of Demand Calculator</title>
+</head>
+<body>
+    <h1>Price Elasticity of Demand Calculator</h1>
+    <p>
+      Method:
+      <select id="methodSelect">
+        <option value="std" selected>Standard</option>
+        <option value="mid">Midpoint</option>
+      </select>
+    </p>
+    <p>Price:</p>
+    <p>
+      Price in Period 1:
+      <input type="number" id="price1">
+    </p>
+    <p>
+      Price in Period 2:
+      <input type="number" id="price2">
+    </p>
+    <p>Supply:</p>
+    <p>
+      Quantity supplied in Period 1:
+      <input type="number" id="quantity1">
+    </p>
+    <p>
+      Quantity supplied in Period 2:
+      <input type="number" id="quantity2">
+    </p>
+
+    <button id="calcBtn">Calculate</button>
+    <button id="resetBtn">Reset</button>
+    <hr>
+    <div>
+      <h3>Result:</h3>
+      <h3 id="calcResults">Result will appear here...</h3>
+    </div>
+
+    <script>
+      // Get required elements from the HTML
+      const price1El = document.getElementById("price1");
+      const price2El = document.getElementById("price2");
+      const quantity1El = document.getElementById("quantity1");
+      const quantity2El = document.getElementById("quantity2");
+      const methodSelectEl = document.getElementById("methodSelect")
+
+      const calcBtnEl = document.getElementById('calcBtn');
+      const resetBtnEl = document.getElementById('resetBtn');
+      const calcResultsEl = document.getElementById('calcResults') 
+
+      function createElement() {
+        const newDiv = `
+            <p>
+              <label for="i11-span">Change in price: &nbsp;</label>
+              <span
+                data-id="i11"
+                step="any"
+                id="i11-span"
+                class="spans"
+              ></span>%
+            </p>
+            <p>
+              <label for="i12-span">Change in quantity: &nbsp;</label>
+              <span
+                data-id="i12"
+                step="any"
+                id="i12-span"
+                class="spans"
+              ></span>%
+            </p>
+            <p>
+              <label for="i13-span">Price elasticity of supply: &nbsp;</label>
+              <span
+                data-id="i13"
+                step="any"
+                id="i13-span"
+                class="spans"
+              ></span>
+            </p>
+            <p>
+              <span
+                data-id="i14"
+                step="any"
+                id="i14-span"
+                class="spans"
+              ></span>
+            </p>
+        `
+        return newDiv
+      }
+
+      function setResult(resultObj) {
+        for (key of Object.keys(resultObj)) {
+          let val = resultObj[key].result;
+          let id = resultObj[key].type;
+
+          if (id === "i14") {
+            const span = document.getElementById(`${id}-span`);
+            span.textContent = val;
+          } else {
+            if (isNaN(val)) {
+              alert("Your input resulted in NAN.\n 0/0 \n Try again with valid input.");
+              return;
+            }
+            if (Math.abs(val) === Infinity) {
+              alert("Your input resulted in Infinity. \nDivision by zero. \nTry again with valid input.");
+              return;
+            }
+            const span = document.getElementById(`${id}-span`);
+            span.textContent = `${parseFloat(val)}`;
+          }
+        }
+      }
+
+      function calculateResults() {
+          // Retrieve input values
+          const price1 = parseFloat(price1El.value);
+          const price2 = parseFloat(price2El.value);
+          const quantity1 = parseFloat(quantity1El.value);
+          const quantity2 = parseFloat(quantity2El.value);
+          const methodSelect = methodSelectEl.value
+
+          if (isNaN(price1)  || price1 <= 0 || isNaN(price2) || price2 <= 0 ||
+            isNaN(quantity1) || quantity1 <= 0 || isNaN(quantity2) || quantity2 <= 0
+          ) {
+            alert("Please Enter All Details.");
+            return;
+          } 
+
+          try {
+            const resultElement = createElement()
+            calcResultsEl.innerHTML = resultElement 
+
+            let priceChange = 0
+            let quantityChange = 0
+            if (methodSelect === "std") {
+              priceChange = ((price2 - price1) / price1) * 100
+              quantityChange = ((quantity2 - quantity1) / quantity1) * 100
+            } else {
+              priceChange = ((price2 - price1) / ((price2 + price1) / 2)) * 100
+              quantityChange = ((quantity2 - quantity1) / ((quantity2 + quantity1) / 2)) * 100
+            }
+            const PES = quantityChange / priceChange
+            let elasticity = ""
+            if (PES < 0) {
+              elasticity = "The price elasticity of supply is negative, an unusual case that might happen in the labor market."
+            } else if (PES === 0) {
+              elasticity = "A price change does not affect the supplied quantity — the supply is perfectly inelastic."
+            } else if (PES < 1) {
+              elasticity = "The supply is inelastic"
+            } else if (PES > 1) {
+              elasticity = "The supply is elastic."
+            } else if (PES === 1) {
+              elasticity = "The supply unit-elastic"
+            } else {
+              elasticity = "The supply is perfectly elastic."
+            }
+
+            const results = {
+              1: { result: Math.abs(priceChange) > 1 ? priceChange.toFixed(2) : priceChange.toPrecision(2), type: "i11" },
+              2: { result: Math.abs(quantityChange) > 1 ? quantityChange.toFixed(2) : quantityChange.toPrecision(2), type: "i12" },
+              3: { result: Math.abs(PES) > 1 ? PES.toFixed(4) : PES.toPrecision(5), type: "i13" },
+              4: { result: elasticity, type: "i14" },
+            }
+            setResult(results)
+
+          } catch (error) {
+            alert("Something Went Wrong!!!");
+            resetResult()
+            return;
+          }
+      }
+
+      function resetForm() {
+        price1El.value = ""
+        price2El.value = ""
+        quantity1El.value = ""
+        quantity2El.value = ""
+        methodSelectEl.selectedIndex = "0"
+      }
+
+      function resetResult() {
+        calcResultsEl.innerHTML = "<p>Result will appear here...</p>";
+      } 
+
+      function resethandler() {
+        resetForm();
+        resetResult();
+      }
+
+      resetBtnEl.addEventListener("click", resethandler);
+      calcBtnEl.addEventListener("click", calculateResults);
+
+      [price1El, price2El, quantity1El, quantity2El].forEach((el) => {
+        el.addEventListener("input", resetResult);
+      });  
+
+      methodSelectEl.addEventListener("change", resetResult);
+    </script>
+</body>
+</html>

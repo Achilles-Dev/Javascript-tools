@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weight Loss Calculator</title>
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.6.5/dist/sweetalert2.all.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11.6.5/dist/sweetalert2.min.css" rel="stylesheet">
+</head>
+<body>
+    <h1>Weight Loss Calculator</h1>
+    <div>
+
+        <p>
+            <label for="age">Age (in years):</label>
+            <input type="number" id="age" value="30" required>
+        </p>
+
+        <p>
+            <label for="gender">Gender</label>
+            <select id="gender" name="gender">
+                <option value="male">Male</option>
+                <option value="female">Female</option>
+            </select>
+        </p>
+
+        <p>
+            <label for="height">Height</label>
+            <input type="number" id="height" name="height" min="0" step="any">
+            <select id="heightUnit">
+                <option value="cm">cm</option>
+                <option value="inches">inches</option>
+            </select>
+        </p>
+
+        <p>
+            <label for="weight">Weight:</label>
+            <input type="number" id="weight" name="weight" required>
+            <select id="weightUnit" name="weightUnit">
+                <option value="kg">kg</option>
+                <option value="lbs">lbs</option>
+            </select>
+        </p>
+
+        <p>
+            <label for="neck">Neck:</label>
+            <input type="number" id="neck" value="48.26" required>
+            <select id="neckUnit">
+                <option value="cm">cm</option>
+                <option value="inches">inches</option>
+            </select>
+        </p>
+
+        <p>
+            <label for="waist">Waist:</label>
+            <input type="number" id="waist" value="60" required>
+            <select id="waistUnit">
+                <option value="cm">cm</option>
+                <option value="inches">inches</option>
+            </select>
+        </p>
+
+        <p id="hipDiv" style="display:none;">
+            <label for="hip">Hip:</label>
+            <input type="number" id="hip" value="88">
+            <select id="hipUnit">
+                <option value="cm">cm</option>
+                <option value="inches">inches</option>
+            </select>
+        </p>
+
+        <p>
+            <label for="activity">Current Activity Level:</label>
+            <select id="activity">
+                <option value="sedentary">Sedentary (little or no exercise)</option>
+                <option value="light" selected>Light (exercise 1-3 times a week)</option>
+                <option value="moderate">Moderate (exercise 3-5 times a week)</option>
+                <option value="high">High (heavy exercise 6-7 times a week)</option>
+                <option value="extreme">Extreme (very heavy exercise or physical job)</option>
+            </select>
+        </p>
+
+        <p>
+            <h3>Target Weight</h3>
+            <label for="targetWeight">Target Weight:</label>
+            <input type="number" id="targetWeight" value="70" required>
+            <select id="targetWeightUnit">
+                <option value="kg">kg</option>
+                <option value="lbs">lbs</option>
+            </select>
+        </p>
+
+        <p>
+            <label for="timeToAchieve">Time to Achieve Target:</label>
+            <input type="number" id="timeToAchieve" required>
+            <select id="timeUnit">
+                <option value="days">Days</option>
+                <option value="weeks" selected>Weeks</option>
+            </select>
+        </p>
+
+        <p>
+            <label for="futureActivity">Future Activity Level:</label>
+            <select id="futureActivity">
+                <option value="sedentary">Sedentary (little or no exercise)</option>
+                <option value="light" selected>Light (exercise 1-3 times a week)</option>
+                <option value="moderate">Moderate (exercise 3-5 times a week)</option>
+                <option value="high">High (heavy exercise 6-7 times a week)</option>
+                <option value="extreme">Extreme (very heavy exercise or physical job)</option>
+            </select>
+        </p>
+
+        <button id="calculate" class="page-button">Calculate</button>&nbsp;&nbsp;&nbsp;
+        <button id="reset" class="page-button white">Reset</button>
+
+        <hr>
+
+        <p id="result">
+            Results will appear here
+        </p>
+
+    <script>
+        /********************************** ELEMENTS **********************************/       
+        const ageEl = document.getElementById('age');
+        const genderEl = document.getElementById('gender');
+        const heightEl = document.getElementById('height');
+        const heightUnitEl = document.getElementById('heightUnit');
+        const weightEl = document.getElementById('weight');
+        const weightUnitEl = document.getElementById('weightUnit');
+        const neckEl = document.getElementById("neck");
+        const waistEl = document.getElementById("waist");
+        const neckUnitEl = document.getElementById("neckUnit");
+        const waistUnitEl = document.getElementById("waistUnit");
+        const hipEl = document.getElementById("hip");
+        const hipUnitEl = document.getElementById("hipUnit");
+        const hipDivEl = document.getElementById("hipDiv");
+        const currentActivityLevelEl = document.getElementById("activity");
+        const targetWeightEl = document.getElementById("targetWeight");
+        const timeToAchieveEl = document.getElementById("timeToAchieve");
+        const timeUnitEl = document.getElementById("timeUnit");
+        const futureActivityLevelEl = document.getElementById("futureActivity");
+        const resultEl = document.getElementById('result');
+        const calculateEl = document.getElementById('calculate');
+        const resetEl = document.getElementById('reset');
+
+        /********************************** FUNCTIONS **********************************/
+
+        const toggleHip = () => {
+            if (genderEl.value === "female") {
+                hipDivEl.style.display = "block";
+            } else {
+                hipDivEl.style.display = "none";
+            }
+        }
+
+        const convertUnits = (value, unit) => {
+            if (unit === "kg") {
+                return value; // No conversion needed
+            } else if (unit === "lbs") {
+                return value / 2.20462; // Convert lbs to kg
+            } else if (unit === "cm") {
+                return value; // No conversion needed
+            } else if (unit === "inches") {
+                return value * 2.54; // Convert inches to cm
+            }
+            return value;
+        }
+
+        function calculate() {
+            const age = parseFloat(ageEl.value);
+            const gender = genderEl.value;
+            const height = convertUnits(parseFloat(heightEl.value), heightUnitEl.value);
+            const weight = convertUnits(parseFloat(weightEl.value), weightUnitEl.value);
+            const neck = convertUnits(parseFloat(neckEl.value), neckUnitEl.value);
+            const waist = convertUnits(parseFloat(waistEl.value), waistUnitEl.value);
+            const hip = gender === "female" ? convertUnits(parseFloat(hipEl.value), hipUnitEl.value) : 0;
+            const currentActivityLevel = currentActivityLevelEl.value;
+            const targetWeight = convertUnits(parseFloat(targetWeightEl.value), targetWeightEl.value);
+            const timeToAchieve = parseFloat(timeToAchieveEl.value);
+            const futureActivityLevel = futureActivityLevelEl.value;
+
+            try {
+                if (isNaN(age) || age <= 0 || isNaN(height) || height <= 0 || isNaN(weight) || weight <= 0 ||
+                    isNaN(neck) || neck <= 0 || isNaN(waist) || waist <= 0 || (gender === 'female' && (isNaN(hip) || hip <= 0)) ||
+                    isNaN(targetWeight) || targetWeight <= 0 || isNaN(timeToAchieve) || timeToAchieve <= 0) {
+                    showError("Please enter valid inputs");
+                    return;
+                }
+
+                // BMR calculation for current weight
+                let BMR = (10 * weight) + (6.25 * height) - (5 * age) + (gender === "male" ? 5 : -161);
+
+                // Activity factors
+                const activityFactor = {
+                    "sedentary": 1.2,
+                    "light": 1.375,
+                    "moderate": 1.55,
+                    "high": 1.725,
+                    "extreme": 1.9
+                };
+
+                const currentFactor = activityFactor[currentActivityLevel];
+                const futureFactor = activityFactor[futureActivityLevel];
+
+                // Current caloric intake calculation
+                const currentCaloricIntake = BMR * currentFactor;
+
+                // Total caloric deficit required
+                const weightLoss = weight - targetWeight;
+                const totalDeficit = weightLoss * 7700;
+
+                // Daily caloric deficit needed
+                const dailyDeficit = totalDeficit / (timeToAchieve * (timeUnitEl.value === "weeks" ? 7 : 1)); // converting weeks to days
+
+                // Adjusted daily caloric intake
+                const adjustedDailyIntake = currentCaloricIntake - dailyDeficit;
+
+                // New caloric intake to maintain new weight
+                const newBMR = (10 * targetWeight) + (6.25 * height) - (5 * age) + (gender === "male" ? 5 : -161);
+                const maintenanceIntake = newBMR * futureFactor;
+
+                // Results
+                if (adjustedDailyIntake > 0) {
+                    resultEl.innerHTML = `
+                        <p><b>Current Caloric Intake: </b>${Math.round(currentCaloricIntake)} Calories/day<br>
+                        <b>You Should Consume:</b> ${Math.round(adjustedDailyIntake)} Calories/day for ${timeToAchieve} weeks to achieve your weight goal<br>
+                        <b>After ${timeToAchieve} weeks Consume: </b>${Math.round(maintenanceIntake)} Calories/day to maintain your new weight<br>
+                        <b>Initial BMI:</b> ${((weight / ((height / 100) ** 2)).toFixed(2))}<br>
+                        <b>Final BMI:</b> ${((targetWeight / ((height / 100) ** 2)).toFixed(2))}<br>
+                        <b>Initial Body Fat: </b>${((weight - (weight * 0.957)).toFixed(1))} kg (${(100 - 4.3).toFixed(1)}%)<br>
+                        <b>Final Body Fat:</b> ${((targetWeight - (targetWeight * 0.974)).toFixed(1))} kg (${(100 - 2.6).toFixed(1)}%)<br>
+                        <b>Initial Lean Body Mass:</b> ${((weight * 0.957).toFixed(1))} kg<br>
+                        <b>Final Lean Body Mass: </b>${((targetWeight * 0.974).toFixed(1))} kg</p>
+                    `;
+                } else {
+                    resultEl.innerHTML = `
+                        <p><b>Current Caloric Intake: </b>${Math.round(currentCaloricIntake)} Calories/day<br>
+                        <b>Please increase your time to lose weight to achieve realistic and healthy goals.</b><br>
+                        <b>Initial BMI:</b> ${((weight / ((height / 100) ** 2)).toFixed(2))}<br>
+                        <b>Final BMI:</b> ${((targetWeight / ((height / 100) ** 2)).toFixed(2))}<br>
+                        <b>Initial Body Fat: </b>${((weight - (weight * 0.957)).toFixed(1))} kg (4.3%)<br>
+                        <b>Final Body Fat:</b> ${((targetWeight - (targetWeight * 0.974)).toFixed(1))} kg (2.6%)<br>
+                        <b>Initial Lean Body Mass:</b> ${((weight * 0.957).toFixed(1))} kg (95.7%) <br>
+                        <b>Final Lean Body Mass: </b>${((targetWeight * 0.974).toFixed(1))} (97.4%)kg</p>
+                    `;
+                }
+
+            } catch (error) {
+                showError(error);
+            }
+        }
+
+        function showError(errorMessage) {
+            Swal.fire({
+                icon: "error",
+                title: "Error",
+                text: errorMessage,
+            });
+        }
+
+        function resetForm() {
+            ageEl.value = '';
+            genderEl.selectedIndex = 0;
+            heightEl.value = '';
+            weightEl.value = '';
+            heightUnitEl.selectedIndex = 0;
+            weightUnitEl.selectedIndex = 0;
+            currentActivityLevelEl.selectedIndex = 1;
+            neckEl.value = '';
+            waistEl.value = '';
+            hipEl.value = '';
+            neckUnitEl.selectedIndex = 0;
+            waistUnitEl.selectedIndex = 0;
+            hipUnitEl.selectedIndex = 0;
+            targetWeightEl.value = '';
+            timeToAchieveEl.value = 0;
+            futureActivityLevelEl.selectedIndex = 0;
+            hipDivEl.style.display = 'none';
+            resultEl.innerHTML = "<p> Results will appear here </p>";
+        }
+
+        function resetHandler() {
+            resetForm();
+        }
+
+        /********************************** EVENT LISTENERS **********************************/
+        genderEl.addEventListener("change", toggleHip);
+        calculateEl.addEventListener("click", calculate);
+        resetEl.addEventListener("click", resetHandler);
+
+        // Initialize the form
+        resetForm();
+    </script>
+</body>
+</html>

@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Credit Utilization Calculator</title>
+  </head>
+  <body>
+    <h1>Credit Utilization Calculator</h1>
+      <div id="components-container">
+        <div id="comp-1" data-pos="prev" data-place="1" class="comps">
+          <p>Credit line 1</p>
+          <p>
+            <label for="i1-1-input">Money used </label>
+            <input
+              type="number"
+              min="0"
+              autocomplete="off"
+              data-id="i1-1"
+              step="any"
+              id="i1-1-input"
+              class="inputs"
+              data-place="1"
+            />
+          </p>
+          <p>
+            <label for="i1-2-input">Credit limit</label>
+            <input
+              type="number"
+              min="0"
+              autocomplete="off"
+              data-id="i1-2"
+              step="any"
+              class="inputs"
+              id="i1-2-input"
+              data-place="1"
+            />
+          </p>
+        </div>
+        
+        <div id="comp-2" data-pos="last" data-place="2" class="comps">
+          <p>Credit line 2</p>
+          <p>
+            <label for="i2-1-input">Money used </label>
+            <input
+              type="number"
+              min="0"
+              autocomplete="off"
+              data-id="i2-1"
+              step="any"
+              id="i2-1-input"
+              class="inputs"
+              data-place="2"
+            />
+          </p>
+          <p>
+            <label for="i2-2-input">Credit limit</label>
+            <input
+              type="number"
+              min="0"
+              autocomplete="off"
+              data-id="i2-2"
+              step="any"
+              class="inputs"
+              id="i2-2-input"
+              data-place="2"
+            />
+          </p>
+        </div>
+      </div>
+      
+      <button id="calcBtn">Calculate</button>
+      <button id="resetBtn">Reset</button>
+      <hr>
+      <div>
+        <h3>Result:</h3>
+        <h3 id="calcResults">Result will appear here...</h3>
+      </div>
+
+    <script>
+      /*************** ELEMENTS ***************/
+      let inputs = document.querySelectorAll(".inputs");
+
+      let components = document.querySelectorAll(".comps");
+      const container = document.getElementById("components-container");
+
+      const calcBtnEl = document.getElementById('calcBtn');
+      const resetBtnEl = document.getElementById('resetBtn');
+      const calcResultsEl = document.getElementById('calcResults')
+
+      const queue2 = ["i1", "i2"];
+
+      /*************** FUNCTIONS ***************/
+
+      function customPercision(ans, to = 12) {
+        return parseFloat(parseFloat(ans).toPrecision(to));
+      }
+
+      function createElement2() {
+        const newDiv = `
+          <p>
+              <label for="i11-span">Outstanding balance: &nbsp;</label>
+              <span
+                data-id="i11"
+                step="any"
+                id="i11-span"
+                class="spans"
+              ></span>
+            </p>
+            <p>
+              <label for="i12-span">Total credit: &nbsp;</label>
+              <span
+                data-id="i12"
+                step="any"
+                id="i12-span"
+                class="spans"
+              ></span>
+            </p>
+            <p>
+              <label for="i13-span">Remaining credit: &nbsp;</label>
+              <span
+                data-id="i13"
+                step="any"
+                id="i13-span"
+                class="spans"
+              ></span>
+            </p>
+            <p>
+              <label for="i14-span">Credit utilization: &nbsp;</label>
+              <span
+                data-id="i14"
+                step="any"
+                id="i14-span"
+                class="spans"
+              ></span>
+            </p>
+        `
+        return newDiv
+      }
+
+      function inputHandler(e, inp = null) {
+        try {
+          let flag = true;
+          for (let inps of inputs) {
+            let id = inps.getAttribute("data-id");
+            if (!validateInput(id)) flag = false;
+          }
+          if (flag === false) {
+            return
+          }
+
+          const input = e.target;
+
+          const place = input.getAttribute("data-place");
+          const el = document.getElementById(`comp-${place}`);
+          
+          el.pos = el.getAttribute("data-pos");
+          el.place = parseInt(el.getAttribute("data-place"));
+
+          const val1 = document.getElementById(`i${place}-1-input`).value;
+          const val2 = document.getElementById(`i${place}-2-input`).value;
+
+          const bool1 = val1 !== "" && val2 !== "";
+          const bool2 = val1 === "" || val2 === "";
+
+          let scenario_one = el.place != 10 && el.pos == "last" && bool1;
+          let scenario_two = el.place != 1 && el.pos == "prev" && bool2;
+          let scenario_three = el.place == 10 && bool2;
+
+          if (scenario_one) {
+            scenarioOne(el);
+          } else if (scenario_two) {
+            scenarioTwo(el, bool2);
+          } else if (scenario_three) {
+            scenarioThree(el);
+          }
+
+        } catch (error) {
+          alert(
+            "An error occurred. Try again with valid input, or try contacting us."
+          );
+          console.log(error);
+        }
+      }
+
+      /* scenarios */
+      function scenarioOne(el) {
+        let prevEl = document.querySelector('[data-pos="prev"]');
+        prevEl.setAttribute("data-pos", "null");
+        el.setAttribute("data-pos", "prev");
+        let nextEl = createElement(el.place + 1);
+        container.append(nextEl);
+        updateNodeList();
+      }
+
+      function scenarioTwo(el) {
+        console.log(el)
+        const elPlace = el.getAttribute("data-place");
+        const nextEl = document.querySelector('[data-pos = "last"]');
+        const nextPlace = nextEl.getAttribute("data-place");
+        
+        const val1 = document.getElementById(`i${elPlace}-1-input`).value;
+        const val2 = document.getElementById(`i${elPlace}-2-input`).value;
+        const bool1 = val1 == "" || val2 == "";
+
+        const val1Next = document.getElementById(`i${nextPlace}-1-input`).value;
+        const val2next = document.getElementById(`i${nextPlace}-2-input`).value;
+        const bool2 = val1Next === "" || val2next === "";
+
+        if (el.place != 1 && el.pos == "prev" && bool1 && bool2) {
+          let tbd = document.getElementById(
+            `comp-${nextEl.getAttribute("data-place")}`
+          );
+
+          tbd.remove();
+
+          el.setAttribute("data-pos", "last");
+          const newPrev = document.querySelector(`[data-place ="${el.place - 1}"]`);
+          newPrev.setAttribute("data-pos", "prev");
+          newPrev.place = newPrev.getAttribute("data-place");
+          newPrev.pos = newPrev.getAttribute("data-pos");
+          updateNodeList();
+          el.focus();
+          scenarioTwo(newPrev);
+        }
+      }
+
+      function scenarioThree(el) {
+        const newPrev = document.getElementById(`comp-${el.place - 1}`);
+        const nextPlace = newPrev.getAttribute("data-place");
+        const elPlace = el.getAttribute("data-place");
+
+        const val1Next = document.getElementById(`i${nextPlace}-1-input`).value;
+        const val2next = document.getElementById(`i${nextPlace}-2-input`).value;
+        const bool2 = val1Next === "" || val2next === "";
+
+        const val1 = document.getElementById(`i${elPlace}-1-input`).value;
+        const val2 = document.getElementById(`i${elPlace}-2-input`).value;
+        const bool1 = val1 !== "" || val2 !== "";
+
+        newPrev.setAttribute("data-pos", "prev");
+        newPrev.place = newPrev.getAttribute("data-place");
+        newPrev.pos = newPrev.getAttribute("data-pos");
+        if (el.place == 10 && bool1 && bool2) {
+          scenarioTwo(newPrev);
+        }
+      }
+
+      function createElement(place) {
+        let templateStr = `<div id="comp-${place}" data-pos="last" data-place="${place}" class="comps">
+          <p>Credit line ${place}</p>
+          <p>
+            <label for="i${place}-1-input">Money used</label>
+            <input
+              type="number"
+              autocomplete="off"
+              data-id="i${place}-1"
+              data-name="Charge"
+              step="any"
+              id="i${place}-1-input"
+              class="inputs"
+              data-place="${place}"
+            />
+          </p>
+          <p>
+            <label for="i-${place}-2-input">Credit limit</label>
+            <input
+              type="number"
+              autocomplete="off"
+              data-id="i${place}-2"
+              data-name="Distance"
+              step="any"
+              id="i${place}-2-input"
+              class="inputs"
+              data-place="${place}"
+            />
+          </p>
+        </div>`;
+
+        let nextEl = document.createElement("div");
+        nextEl.innerHTML = templateStr;
+        return nextEl.firstChild;
+      }
+
+      function updateNodeList() {
+        inputs = document.querySelectorAll(".inputs");
+        components = document.querySelectorAll(".comps");
+
+        inputs.forEach((input) => {
+          input.addEventListener("input", inputHandler);
+        });
+
+        inputs.forEach((input) => {
+          input.addEventListener("input", resetResult);
+        });
+      }
+
+      function validateInput(id) {
+        const input = document.getElementById(`${id}-input`);
+        const input2 = document.getElementById(`${id.slice(0,2)}-2-input`)
+        let value = parseFloat(input.value);
+
+        if (isNaN(value)) {
+          return false
+        } else if (parseFloat(input.value) > parseFloat(input2.value)) {
+          alert("You cannot use more money than provided by the credit line")
+          return false
+        }
+        return true;
+      }
+
+      function calculateResult() {
+        let total = 0
+        for (let i = 0; i < components.length; i++) {
+          let el = components[i];
+
+          let place = parseInt(el.getAttribute("data-place"));
+
+          const input1 = document.getElementById(`i${place}-1-input`);
+          const id1 = input1.getAttribute("data-id");
+
+          const input2 = document.getElementById(`i${place}-2-input`);
+          const id2 = input2.getAttribute("data-id");
+
+          const val1 = parseFloat(input1.value);
+          const val2 = parseFloat(input2.value);
+
+          const bool1 = val1 == "" || val2 == "";
+          if (bool1) continue;
+
+          total += val1 / val2;
+        }
+      
+        const result = {
+          1: {
+            result: total,
+            type: "i1",
+          },
+          1: {
+            result: total,
+            type: "i2",
+          },
+          1: {
+            result: total,
+            type: "i3",
+          },
+          1: {
+            result: total,
+            type: "i4",
+          },
+        };
+        return result
+      }
+      
+
+      function setResult(resultObj) {
+        for (key of Object.keys(resultObj)) {     
+          let val = resultObj[key].result;
+          let id = resultObj[key].type;
+          if (isNaN(val)) {
+            alert("Your input resulted in NAN.\n 0/0 \n Try again with valid input.");
+            return;
+          }
+          if (Math.abs(val) === Infinity) {
+            alert(
+              "Your input resulted in Infinity. \nDivision by zero. \nTry again with valid input."
+            );
+            return;
+          }
+
+          
+          const span = document.getElementById(`${id}-span`);
+          const select = document.getElementById(`${id}-select`);
+          const type = select.getAttribute("data-type");
+          let outUnit = select.value;
+          val = fromSIUnit(type, outUnit, val);
+          span.textContent = customPercision(val, 13);
+        }
+      }
+
+      function calculateResults() {
+
+        try {
+          const resultElement = createElement2()
+          calcResultsEl.innerHTML = resultElement
+
+          const result = calculateResult()
+
+          setResult(result)
+
+        } catch(error) {
+          alert("An error ocurred. Try again with valid input.");
+          resetResult()
+          return;
+        }
+      }
+
+      function resetForm() {
+        components.forEach((comp) => {
+          const place = comp.getAttribute("data-place");
+          if (place != 1 && place != 2) {
+            comp.remove();
+          } else if (place ==1) {
+            comp.setAttribute("data-pos", "prev");
+          } else {
+            comp.setAttribute("data-pos", "last");
+          }
+          updateNodeList();
+        })
+        inputs.forEach((input) => {
+          input.value = ""
+        })
+      }
+
+      function resetResult() {
+        calcResultsEl.innerHTML = "<p>Result will appear here...</p>";
+      } 
+
+      function resethandler() {
+        resetForm();
+        resetResult();
+      }
+
+      /*************** EVENT LISTINERS ***************/
+
+      inputs.forEach((input) => {
+        input.addEventListener("input", inputHandler);
+      });
+
+      inputs.forEach((input) => {
+        input.addEventListener("input", resetResult);
+      });
+      
+      resetBtnEl.addEventListener("click", resethandler);
+      calcBtnEl.addEventListener("click", calculateResults);
+
+    </script>
+  </body>
+</html>

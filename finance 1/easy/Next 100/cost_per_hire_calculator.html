@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Cost Per Hire Calculator</title>
+</head>
+<body>
+    <h1>Cost Per Hire Calculator</h1>
+    <p>
+      Advertising Costs, AD:
+      <input type="number" id="advertCost" value="0">
+    </p>
+    <p>
+      Employee Referral Costs, ER:
+      <input type="number" id="referCost" value="0">
+    </p>
+    <p>
+      Agency Fees, AF:
+      <input type="number" id="agentFee" value="0">
+    </p>
+    <p>
+      Relocation Costs, Relo:
+      <input type="number" id="reloCost" value="0">
+    </p>
+    <p>
+      Travel Costs, T:
+      <input type="number" id="travelCost" value="0">
+    </p>
+    <p>
+      Recruiters Time, RC:
+      <input type="number" id="recruitTime" value="0">
+    </p>
+    <p>
+      Administrative Costs (%):
+      <input type="number" id="adminCost" value="10">
+    </p>
+    
+
+    <button id="calcBtn">Calculate</button>
+    <button id="resetBtn">Reset</button>
+    <hr>
+    <div>
+      <h3>Result:</h3>
+      <h3 id="calcResults">Result will appear here...</h3>
+    </div>
+
+    <script>
+      // Get required elements from the HTML
+      const advertCostEl = document.getElementById("advertCost");
+      const referCostEl = document.getElementById("referCost");
+      const agentFeeEl = document.getElementById("agentFee");
+      const reloCostEl = document.getElementById("reloCost");
+      const travelCostEl = document.getElementById("travelCost");
+      const recruitTimeEl = document.getElementById("recruitTime");
+      const adminCostEl = document.getElementById("adminCost");
+
+      const calcBtnEl = document.getElementById('calcBtn');
+      const resetBtnEl = document.getElementById('resetBtn');
+      const calcResultsEl = document.getElementById('calcResults') 
+
+      function createElement() {
+        const newDiv = `
+            <p>
+              <label for="i11-span">Cost Per Hire (CPH): &nbsp;</label>
+              <span
+                data-id="i11"
+                step="any"
+                id="i11-span"
+                class="spans"
+              ></span>
+            </p>
+        `
+        return newDiv
+      }
+
+      function setResult(resultObj) {
+        for (key of Object.keys(resultObj)) {
+          let val = resultObj[key].result;
+          let id = resultObj[key].type;
+
+          if (isNaN(val)) {
+           alert("Your input resulted in NAN.\n 0/0 \n Try again with valid input.");
+            return;
+          }
+          if (Math.abs(val) === Infinity) {
+            alert("Your input resulted in Infinity. \nDivision by zero. \nTry again with valid input.");
+            return;
+          }
+          const span = document.getElementById(`${id}-span`);
+          span.textContent = `${parseFloat(val)}`;
+        }
+      }
+
+      function calculateResults() {
+          // Retrieve input values
+          const advertCost = parseFloat(advertCostEl.value);
+          const referCost = parseFloat(referCostEl.value);
+          const agentFee = parseFloat(agentFeeEl.value);
+          const reloCost = parseFloat(reloCostEl.value);
+          const travelCost = parseFloat(travelCostEl.value);
+          const recruitTime = parseFloat(recruitTimeEl.value);
+          const adminCost = parseFloat(adminCostEl.value);
+
+          try {
+            const resultElement = createElement()
+            calcResultsEl.innerHTML = resultElement 
+
+            let CPH = advertCost + referCost + agentFee + reloCost + travelCost + recruitTime
+            CPH +=(CPH * (adminCost / 100)) 
+            
+            const results = {
+              1: { result: Math.abs(CPH) > 1 ? CPH.toFixed(2) : CPH.toPrecision(2), type: "i11" },
+            }
+            setResult(results)
+
+          } catch (error) {
+            alert("Something Went Wrong!!!");
+            resetResult()
+            return;
+          }
+      }
+
+      function resetForm() {
+        advertCostEl.value = "0"
+        referCostEl.value = "0"
+        agentFeeEl.value = "0"
+        reloCostEl.value = "0"
+        travelCostEl.value = "0"
+        recruitTimeEl.value = "0"
+        adminCostEl.value = "10"
+      }
+
+      function resetResult() {
+        calcResultsEl.innerHTML = "<p>Result will appear here...</p>";
+      } 
+
+      function resethandler() {
+        resetForm();
+        resetResult();
+      }
+
+      resetBtnEl.addEventListener("click", resethandler);
+      calcBtnEl.addEventListener("click", calculateResults);
+
+      [advertCostEl, referCostEl, agentFeeEl, reloCostEl, 
+      travelCostEl, recruitTimeEl, adminCostEl].forEach((el) => {
+        el.addEventListener("input", resetResult);
+      });  
+    </script>
+</body>
+</html>

@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Conversion Rate Calculator</title>
+</head>
+<body>
+    <h1>Conversion Rate Calculator</h1>
+    <h3>Use this calculator to easily calculate the conversion rate or event rate of a given process: marketing or sales conversions, <br />
+      conversion of visitors to customers, and different types of website or app conversion rates. Includes a conversion rate formula <br />
+      with explanation.
+    </h3>
+    <p>
+      Visitors:
+      <input type="number" id="visitors" value="1000">
+    </p>
+    <p>
+      Events:
+      <input type="number" id="events" value="20">
+    </p>
+
+    <button id="calcBtn">Calculate</button>
+    <button id="resetBtn">Reset</button>
+    <hr>
+    <div>
+      <h3>Result:</h3>
+      <h3 id="calcResults">Result will appear here...</h3>
+    </div>
+
+    <script>
+      // Get required elements from the HTML
+      const visitorsEl = document.getElementById("visitors");
+      const eventsEl = document.getElementById("events");
+
+      const calcBtnEl = document.getElementById('calcBtn');
+      const resetBtnEl = document.getElementById('resetBtn');
+      const calcResultsEl = document.getElementById('calcResults') 
+
+      function createElement() {
+        const newDiv = `
+            <p>
+              <label for="i11-span">Conversion Rate (%): &nbsp;</label>
+              <span
+                data-id="i11"
+                step="any"
+                id="i11-span"
+                class="spans"
+              ></span>%
+            </p>
+            <p>
+              <label for="i12-span">Conversion Rate	: &nbsp;</label>
+              <span
+                data-id="i12"
+                step="any"
+                id="i12-span"
+                class="spans"
+              ></span>
+            </p>
+        `
+        return newDiv
+      }
+
+      function setResult(resultObj) {
+        for (key of Object.keys(resultObj)) {
+          let val = resultObj[key].result;
+          let id = resultObj[key].type;
+
+          if (isNaN(val)) {
+           alert("Your input resulted in NAN.\n 0/0 \n Try again with valid input.");
+            return;
+          }
+          if (Math.abs(val) === Infinity) {
+            alert("Your input resulted in Infinity. \nDivision by zero. \nTry again with valid input.");
+            return;
+          }
+          const span = document.getElementById(`${id}-span`);
+          span.textContent = `${parseFloat(val)}`;
+        }
+      }
+
+      function calculateResults() {
+          // Retrieve input values
+          const visitors = parseFloat(visitorsEl.value);
+          const events = parseFloat(eventsEl.value);
+
+          if (isNaN(visitors) || visitors < 10 || isNaN(events) || events < 1 ) {
+            alert("Please Enter All Details.");
+            return;
+          }
+
+          try {
+            const resultElement = createElement()
+            calcResultsEl.innerHTML = resultElement 
+
+            const CR = (events / visitors)
+            
+            const results = {
+              1: { result: Math.abs(CR * 100) > 1 ? (CR * 100).toFixed(2) : (CR * 100).toPrecision(2), type: "i11" },
+              2: { result: Math.abs(CR) > 1 ? CR.toFixed(2) : CR.toPrecision(2), type: "i12" },
+            }
+            setResult(results)
+
+          } catch (error) {
+            alert("Something Went Wrong!!!");
+            resetResult()
+            return;
+          }
+      }
+
+      function resetForm() {
+        visitorsEl.value = "1000"
+        eventsEl.value = "20"
+      }
+
+      function resetResult() {
+        calcResultsEl.innerHTML = "<p>Result will appear here...</p>";
+      } 
+
+      function resethandler() {
+        resetForm();
+        resetResult();
+      }
+
+      resetBtnEl.addEventListener("click", resethandler);
+      calcBtnEl.addEventListener("click", calculateResults);
+
+      [visitorsEl, eventsEl].forEach((el) => {
+        el.addEventListener("input", resetResult);
+      });  
+    </script>
+</body>
+</html>

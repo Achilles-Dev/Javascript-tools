@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>DPO Calculator — Days Payable Outstanding</title>
+</head>
+<body>
+    <h1>DPO Calculator — Days Payable Outstanding</h1>
+    <p>
+      Beginning account payable:
+      <input type="number" id="beginAcct">
+    </p>
+    <p>
+      Ending accounts payable: 
+      <input type="number" id="endAcct">
+    </p>
+    <p>
+      Beginning inventory:
+      <input type="number" id="beginInvent">
+    </p>
+    <p>
+      Ending inventory:
+      <input type="number" id="endInvent">
+    </p>
+    <p>
+      Cost of goods sold:
+      <input type="number" id="goodsCost">
+    </p>
+    <p>
+      Days in accounting period:
+      <input type="number" id="accPeriod" value="365">
+      <select id="accPeriodSelect">
+        <option value="1">days (days)</option>
+        <option value="7">weeks (wks)</option>
+        <option value="30.4375">months (mos)</option>
+        <option value="365.25">years (yrs)</option>
+      </select>
+    </p>
+
+
+    <button id="calcBtn">Calculate</button>
+    <button id="resetBtn">Reset</button>
+    <hr>
+    <div>
+      <h3>Result:</h3>
+      <h3 id="calcResults">Result will appear here...</h3>
+    </div>
+
+    <script>
+      // Get required elements from the HTML
+      const beginAcctEl = document.getElementById("beginAcct");
+      const endAcctEl = document.getElementById("endAcct");
+      const beginInventEl = document.getElementById("beginInvent");
+      const endInventEl = document.getElementById("endInvent");
+      const goodsCostEl = document.getElementById("goodsCost");
+      const accPeriodEl = document.getElementById("accPeriod");
+      const accPeriodSelectEl = document.getElementById("accPeriodSelect");
+
+      const calcBtnEl = document.getElementById('calcBtn');
+      const resetBtnEl = document.getElementById('resetBtn');
+      const calcResultsEl = document.getElementById('calcResults') 
+
+      function createElement() {
+        const newDiv = `
+            <p>
+              <label for="i11-span">Average accounts payables: &nbsp;</label>
+              <span
+                data-id="i11"
+                step="any"
+                id="i11-span"
+                class="spans"
+              ></span>
+            </p>
+            <p>
+              <label for="i12-span">Purchases: &nbsp;</label>
+              <span
+                data-id="i12"
+                step="any"
+                id="i12-span"
+                class="spans"
+              ></span>
+            </p>
+            <p>
+              <label for="i13-span">Days payable outstanding: &nbsp;</label>
+              <span
+                data-id="i13"
+                step="any"
+                id="i13-span"
+                class="spans"
+              ></span>
+            </p>
+        `
+        return newDiv
+      }
+
+      function setResult(resultObj) {
+        for (key of Object.keys(resultObj)) {
+          let val = resultObj[key].result;
+          let id = resultObj[key].type;
+
+          if (isNaN(val)) {
+           alert("Your input resulted in NAN.\n 0/0 \n Try again with valid input.");
+            return;
+          }
+          if (Math.abs(val) === Infinity) {
+            alert("Your input resulted in Infinity. \nDivision by zero. \nTry again with valid input.");
+            return;
+          }
+          const span = document.getElementById(`${id}-span`);
+          span.textContent = `${val}`;
+        }
+      }
+
+      function calculateResults() {
+          // Retrieve input values
+          const beginAcct = parseFloat(beginAcctEl.value);
+          const endAcct = parseFloat(endAcctEl.value);
+          const beginInvent = parseFloat(beginInventEl.value);
+          const endInvent = parseFloat(endInventEl.value);
+          const goodsCost = parseFloat(goodsCostEl.value);
+          const accPeriodSelect = parseFloat(accPeriodSelectEl.value);
+          const accPeriod = parseFloat(accPeriodEl.value) * accPeriodSelect;
+
+          if (isNaN(beginAcct) || beginAcct < 0 || isNaN(endAcct) || endAcct < 0 || isNaN(beginInvent) || beginInvent < 0 ||
+            isNaN(endInvent) || endInvent <= 0 || isNaN(goodsCost) || goodsCost <= 0 || isNaN(accPeriod) || accPeriod <= 0
+          ) {
+            alert("Please Enter All Details.");
+            return;
+          }
+
+          try {
+            const resultElement = createElement()
+            calcResultsEl.innerHTML = resultElement 
+
+            const AAP = (beginAcct + endAcct) / 2
+            const purchases = (endInvent - beginInvent) + goodsCost
+            const DPO = AAP / purchases * accPeriod
+
+            const results = {
+              1: { result: Math.abs(AAP) > 1 ? AAP.toFixed(2) : AAP.toPrecision(2), type: "i11" },
+              2: { result: Math.abs(purchases) > 1 ? purchases.toFixed(2) : purchases.toPrecision(2), type: "i12" },
+              3: { result: Math.abs(DPO) > 1 ? DPO.toFixed(2) : DPO.toPrecision(2), type: "i13" },
+            }
+            setResult(results)
+
+          } catch (error) {
+            alert("Something Went Wrong!!!");
+            resetResult()
+            return;
+          }
+      }
+
+      function resetForm() {
+        beginAcctEl.value = ""
+        endAcctEl.value = ""
+        beginInventEl.value = ""
+        endInventEl.value = ""
+        goodsCostEl.value = ""
+        accPeriodEl.value = "365"
+        accPeriodSelectEl.selectedIndex = "0"
+      }
+
+      function resetResult() {
+        calcResultsEl.innerHTML = "<p>Result will appear here...</p>";
+      } 
+
+      function resethandler() {
+        resetForm();
+        resetResult();
+      }
+
+      resetBtnEl.addEventListener("click", resethandler);
+      calcBtnEl.addEventListener("click", calculateResults);
+      [beginAcctEl, endAcctEl, beginInventEl, endInventEl, goodsCostEl, accPeriodEl].forEach((el) => {
+        el.addEventListener("input", resetResult);
+      });  
+
+      accPeriodSelectEl.addEventListener("change", resetResult)
+
+    </script>
+</body>
+</html>

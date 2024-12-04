@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Contribution Margin Calculator</title>
+</head>
+<body>
+    <h1>Contribution Margin Calculator</h1>
+    <p>
+      Selling price per unit:
+      <input type="number" id="sellingPrice">
+    </p>
+    <p>
+      Variable cost per unit: 
+      <input type="number" id="variableCost">
+    </p>
+    <p>
+      Number of units:
+      <input type="number" id="unitsNum">
+    </p>
+    <p>
+      Fixed costs:
+      <input type="number" id="fixedCost">
+    </p>
+
+
+    <button id="calcBtn">Calculate</button>
+    <button id="resetBtn">Reset</button>
+    <hr>
+    <div>
+      <h3>Result:</h3>
+      <h3 id="calcResults">Result will appear here...</h3>
+    </div>
+
+    <script>
+      // Get required elements from the HTML
+      const sellingPriceEl = document.getElementById("sellingPrice");
+      const variableCostEl = document.getElementById("variableCost");
+      const unitsNumEl = document.getElementById("unitsNum");
+      const fixedCostEl = document.getElementById("fixedCost");
+
+      const calcBtnEl = document.getElementById('calcBtn');
+      const resetBtnEl = document.getElementById('resetBtn');
+      const calcResultsEl = document.getElementById('calcResults') 
+
+      function createElement() {
+        const newDiv = `
+            <p>
+              <label for="i11-span">Contribution margin: &nbsp;</label>
+              <span
+                data-id="i11"
+                step="any"
+                id="i11-span"
+                class="spans"
+              ></span>
+            </p>
+            <p>
+              <label for="i12-span">Contribution margin ratio: &nbsp;</label>
+              <span
+                data-id="i12"
+                step="any"
+                id="i12-span"
+                class="spans"
+              ></span>%
+            </p>
+            <p>
+              <label for="i13-span">Profit generated: &nbsp;</label>
+              <span
+                data-id="i13"
+                step="any"
+                id="i13-span"
+                class="spans"
+              ></span>
+            </p>
+        `
+        return newDiv
+      }
+
+      function setResult(resultObj) {
+        for (key of Object.keys(resultObj)) {
+          let val = resultObj[key].result;
+          let id = resultObj[key].type;
+
+          if (isNaN(val)) {
+           alert("Your input resulted in NAN.\n 0/0 \n Try again with valid input.");
+            return;
+          }
+          if (Math.abs(val) === Infinity) {
+            alert("Your input resulted in Infinity. \nDivision by zero. \nTry again with valid input.");
+            return;
+          }
+          const span = document.getElementById(`${id}-span`);
+          span.textContent = `${parseFloat(val)}`;
+        }
+      }
+
+      function calculateResults() {
+          // Retrieve input values
+          const sellingPrice = parseFloat(sellingPriceEl.value);
+          const variableCost = parseFloat(variableCostEl.value);
+          const unitsNum = parseFloat(unitsNumEl.value);
+          const fixedCost = parseFloat(fixedCostEl.value);
+
+          if (isNaN(sellingPrice) || sellingPrice < 1 || isNaN(variableCost) || variableCost < 0 || isNaN(unitsNum) || unitsNum < 1 ||
+            isNaN(fixedCost) || fixedCost < 0
+          ) {
+            alert("Please Enter All Details.");
+            return;
+          }
+
+          try {
+            const resultElement = createElement()
+            calcResultsEl.innerHTML = resultElement 
+
+            const CM = (sellingPrice * unitsNum) - (variableCost * unitsNum)
+            const CMR =( CM / (sellingPrice * unitsNum)) * 100
+
+            const results = {
+              1: { result: Math.abs(CM) > 1 ? CM.toFixed(2) : CM.toPrecision(2), type: "i11" },
+              2: { result: Math.abs(CMR) > 1 ? CMR.toFixed(2) : CMR.toPrecision(2), type: "i12" },
+              3: { result: Math.abs(CM - fixedCost) > 1 ? (CM - fixedCost).toFixed(2) : (CM - fixedCost).toPrecision(2), type: "i13" },
+            }
+            setResult(results)
+
+          } catch (error) {
+            alert("Something Went Wrong!!!");
+            resetResult()
+            return;
+          }
+      }
+
+      function resetForm() {
+        sellingPriceEl.value = ""
+        variableCostEl.value = ""
+        unitsNumEl.value = ""
+        fixedCostEl.value = ""
+      }
+
+      function resetResult() {
+        calcResultsEl.innerHTML = "<p>Result will appear here...</p>";
+      } 
+
+      function resethandler() {
+        resetForm();
+        resetResult();
+      }
+
+      resetBtnEl.addEventListener("click", resethandler);
+      calcBtnEl.addEventListener("click", calculateResults);
+      [sellingPriceEl, variableCostEl, unitsNumEl, fixedCostEl].forEach((el) => {
+        el.addEventListener("input", resetResult);
+      });  
+
+    </script>
+</body>
+</html>

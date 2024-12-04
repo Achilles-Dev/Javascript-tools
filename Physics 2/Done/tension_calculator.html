@@ -1,0 +1,775 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Tension Calculator</title>
+  </head>
+  <body>
+    <h1>Tension Calculator</h1>
+      <p>
+        Tension scenario:
+        <select id="secnarioUnit">
+          <option value="i1">Object is hanging</option>
+          <option value="i2">Pulling on a frictionless surface</option>
+        </select>
+      </p>
+      <p id="i1Unit">
+        <span>Number of ropes:</span>
+        <select id="num1Unit">
+          <option value="one1">1</option>
+          <option value="two1">2</option>
+        </select>
+      </p>  
+      <p id="i2Unit" style="display: none;">
+        <span>Number of objects pulled:</span>
+        <select id="num2Unit">
+          <option value="one2">1</option>
+          <option value="two2">2</option>
+          <option value="tre2">3</option>
+        </select>
+      </p>      
+      <div id="i1-container" class="containers">
+        <p>
+          <label for="i1-input">Object's mass (m) </label>
+          <input
+            type="number"
+            step="any"
+            id="i1-input"
+            class="inputs"
+            min="0"
+            autocomplete="off"
+            data-id="i1"
+            step="any"
+            data-name="Object's mass (m)"
+          />
+          <select
+            class="selects"
+            id="i1-select"
+            data-type="mass"
+            data-prev="kg"
+            data-id="i1"
+          >
+            <option value="mg">milligrams (mg)</option>
+            <option value="g">grams (g)</option>
+            <option value="kg" selected>kilograms (kg)</option>
+            <option value="t">metric tons (t)</option>
+            <option value="oz">ounces (oz)</option>
+            <option value="lb">pounds (lb)</option>
+            <option value="US ton">US short tons (US ton)</option>
+            <option value="long ton">imperial tons (long ton)</option>
+          </select>
+        </p>
+        <p>
+          <label for="i2-input">Gravitational acceleration</label>
+          <input
+            type="number"
+            min="0"
+            autocomplete="off"
+            data-id="i2"
+            step="any"
+            id="i2-input"
+            class="inputs"
+            data-name="Gravitational acceleration"
+            value="9.806"
+          />
+          <select 
+            class="selects"
+            id="i2-select"
+            data-type="acceleration"
+            data-prev="m/s²"
+            data-id="i2"
+          >
+            <option value="m/s²" selected>meters per second squared (m/s²)</option>
+            <option value="g">gravitational acc. on Earth (g)</option>
+          </select>
+        </p>
+        <div id="two1-container" class="containers2" style="display: none;">
+          <p>Angles of ropes:</p>
+          <p>
+            <label for="i3-input">Angle α </label>
+            <input
+              type="number"
+              min="0"
+              autocomplete="off"
+              data-id="i3"
+              step="any"
+              id="i3-input"
+              class="inputs"
+              data-name="Angle α"
+            />
+            <select 
+              class="selects"
+              id="i3-select"
+              data-type="angle"
+              data-prev="deg"
+              data-id="i3"
+            >
+              <option value="deg" selected>degrees (deg)</option>
+              <option value="rad">radians (rad)</option>
+              <option value="gon">gradians (gon)</option>
+              <option value="πrad">π radians (× π rad)</option>
+            </select>
+          </p>
+          <p>
+            <label for="i4-input">Angle β </label>
+            <input
+              type="number"
+              min="0"
+              autocomplete="off"
+              data-id="i4"
+              step="any"
+              id="i4-input"
+              class="inputs"
+              data-name="Angle β"
+            />
+            <select 
+              class="selects"
+              id="i4-select"
+              data-type="angle"
+              data-prev="deg"
+              data-id="i4"
+            >
+              <option value="deg" selected>degrees (deg)</option>
+              <option value="rad">radians (rad)</option>
+              <option value="gon">gradians (gon)</option>
+              <option value="πrad">π radians (× π rad)</option>
+            </select>
+          </p>
+        </div>
+      </div>
+      <div id="i2-container" class="containers" style="display: none;">
+        <p>
+          <label for="i21-input">Object's mass (m) </label>
+          <input
+            type="number"
+            min="0"
+            autocomplete="off"
+            data-id="i21"
+            step="any"
+            id="i21-input"
+            class="inputs"
+            data-name="Object's mass (m)"
+          />
+          <select
+            class="selects"
+            id="i21-select"
+            data-type="mass"
+            data-prev="kg"
+            data-id="i21"
+          >
+            <option value="mg">milligrams (mg)</option>
+            <option value="g">grams (g)</option>
+            <option value="kg" selected>kilograms (kg)</option>
+            <option value="t">metric tons (t)</option>
+            <option value="oz">ounces (oz)</option>
+            <option value="lb">pounds (lb)</option>
+            <option value="US ton">US short tons (US ton)</option>
+            <option value="long ton">imperial tons (long ton)</option>
+          </select>
+        </p>
+        <p id="two2-container" class="containers2" style="display: none;">
+          <label for="i212-input">Second object's mass (m2) </label>
+          <input
+            type="number"
+            min="0"
+            autocomplete="off"
+            data-id="i212"
+            step="any"
+            id="i212-input"
+            class="inputs"
+            data-name="Second object's mass (m2)"
+          />
+          <select
+            class="selects"
+            id="i212-select"
+            data-type="mass"
+            data-prev="kg"
+            data-id="i212"
+          >
+            <option value="mg">milligrams (mg)</option>
+            <option value="g">grams (g)</option>
+            <option value="kg" selected>kilograms (kg)</option>
+            <option value="t">metric tons (t)</option>
+            <option value="oz">ounces (oz)</option>
+            <option value="lb">pounds (lb)</option>
+            <option value="US ton">US short tons (US ton)</option>
+            <option value="long ton">imperial tons (long ton)</option>
+          </select>
+        </p>
+        <p id="tre2-container" class="containers2" style="display: none;">
+          <label for="i213-input">Third object's mass (m3) </label>
+          <input
+            type="number"
+            min="0"
+            autocomplete="off"
+            data-id="i213"
+            step="any"
+            id="i213-input"
+            class="inputs"
+            data-name="Third object's mass (m3)"
+          />
+          <select
+            class="selects"
+            id="i213-select"
+            data-type="mass"
+            data-prev="kg"
+            data-id="i213"
+          >
+            <option value="mg">milligrams (mg)</option>
+            <option value="g">grams (g)</option>
+            <option value="kg" selected>kilograms (kg)</option>
+            <option value="t">metric tons (t)</option>
+            <option value="oz">ounces (oz)</option>
+            <option value="lb">pounds (lb)</option>
+            <option value="US ton">US short tons (US ton)</option>
+            <option value="long ton">imperial tons (long ton)</option>
+          </select>
+        </p>
+        <p>
+          <label for="i22-input">Pulling force (T) </label>
+          <input
+            type="number"
+            min="0"
+            autocomplete="off"
+            data-id="i22"
+            step="any"
+            id="i22-input"
+            class="inputs"
+            data-name="Pulling force (T)"
+          />
+          <select 
+            class="selects"
+            id="i22-select"
+            data-type="force"
+            data-prev="N"
+            data-id="i22"
+          >
+            <option value="N" selected>newtons (N)</option>
+            <option value="kN">kilonewtons (kN)</option>
+            <option value="MN">meganewtons (MN)</option>
+            <option value="lbf">pounds-force (lbf)</option>
+            <option value="kip">kips (kip)</option>
+          </select>
+        </p>
+
+        <p>
+          <label for="i23-input">Angle θ </label>
+          <input
+            type="number"
+            min="0"
+            autocomplete="off"
+            data-id="i23"
+            step="any"
+            id="i23-input"
+            class="inputs"
+            data-name="Angle θ"
+          />
+          <select 
+              class="selects"
+              id="i23-select"
+              data-type="angle"
+              data-prev="deg"
+              data-id="i2 3"
+            >
+              <option value="deg" selected>degrees (deg)</option>
+              <option value="rad">radians (rad)</option>
+              <option value="gon">gradians (gon)</option>
+              <option value="πrad">π radians (× π rad)</option>
+            </select>
+        </p>
+      </div> 
+       
+      <button id="calcBtn">Calculate</button>
+      <button id="resetBtn">Reset</button>
+      <hr>
+      <div>
+        <h3>Result:</h3>
+        <h3 id="calcResults">Result will appear here...</h3>
+      </div>
+    <script>
+      /*************** ELEMENTS ***************/
+      const num1UnitEl = document.getElementById("num1Unit");
+      const num2UnitEl = document.getElementById("num2Unit");
+      const secnarioUnitEl = document.getElementById("secnarioUnit");
+      const containers = document.querySelectorAll(".containers");
+      const containers2 = document.querySelectorAll(".containers2");
+      const inputs = document.querySelectorAll(".inputs");
+      const selects = document.querySelectorAll(".selects");
+      const i2OptionEl = document.getElementById('i2Option')
+
+      const calcBtnEl = document.getElementById('calcBtn');
+      const resetBtnEl = document.getElementById('resetBtn');
+      const calcResultsEl = document.getElementById('calcResults')
+
+      /*************** GLOBAL VARIBLES ***************/
+      const UNITS = {
+        mass: {
+          mg: 1e6,
+          g: 1e3,
+          kg: 1,
+          t: 1e-3,
+          oz: 35.273961949580412915675808215204325416673,
+          lb: 2.204622621848776,
+          "US ton": 0.001102311310924388,
+          "long ton": 0.0009842065276110608,
+        },
+        distance: {
+          nm: 1e9,
+          μm: 1e6,
+          mm: 1e3,
+          cm: 1e2,
+          m: 1,
+          km: 1e-3,
+          in: 39.370078740157474,
+          ft: 3.280839895013123,
+          yd: 1.0936132983377078,
+          mi: 0.000621371192237334,
+          "R⊕": 1.569612305760477e-7,
+          "R☉": 1.4374011786689664e-9,
+          au: 6.684587122268446e-12,
+        },
+        force: {
+          N: 1,
+          kN: 0.001,
+          MN: 0.000001,
+          lbf: 0.224809,
+          kip: 0.000225,
+        },
+        angle: {
+          deg: 1,
+          rad: 0.017453292519943295,
+          gon: 1.111111111111111111111111111111112,
+          πrad: 0.0055555555555555556,
+        },
+        acceleration: {
+          "m/s²": 1,
+          "ft/s²": 3.28084,
+        },
+      };
+      /*************** FUNCTIONS ***************/
+      function toSIUnit(type, unit, value) {
+        return value / UNITS[type][unit];
+      }
+
+      function fromSIUnit(type, unit, value) {
+        return value * UNITS[type][unit];
+      }
+
+      function handleNumUnitChange(e) {
+        const value = e.target.value;
+        containers2.forEach((container) => {
+          let idVal = container.id.slice(0, 4)     
+          if (idVal == value) {
+            container.style.display = 'block'
+          } else {
+            container.style.display = 'none'
+          }
+          if (idVal === "two2" && value === "tre2") {
+            container.style.display = 'block'
+          }
+        })
+        if (secnarioUnitEl.value === "i2" && value !== "one2") {
+          let input = document.getElementById("i21-input")
+          let label = input.parentElement.firstElementChild
+          label.textContent = "First object's mass (m1)"
+        } else {
+          let input = document.getElementById("i21-input")
+          let label = input.parentElement.firstElementChild
+          label.textContent = "Object's mass (m)"
+        }
+
+        resetResult()
+      }
+
+      function handlesecnarioUnitChange(e) {
+        const value = e.target.value
+        containers.forEach((container) => {
+          let idVal = container.id.slice(0, 2)     
+          if (idVal == value) {
+            container.style.display = 'block'
+          } else {
+            container.style.display = 'none'
+          }
+        })
+        document.getElementById("i1Unit").style.display = value === 'i1' ? "block" : "none"
+        document.getElementById("i2Unit").style.display = value === 'i2' ? "block" : "none"
+
+        resetResult()
+      }
+
+      function createElement() {
+        const newDiv = (name = "Tension in the rope (T)", id = "1") => (`
+            <p>
+              <label for="i6${id}-span">${name}: &nbsp; </label>
+              <span
+                data-id="i6${id}"
+                step="any"
+                id="i6${id}-span"
+                class="spans"
+                data-name="Stopping distance"
+              ></span>
+              <select 
+                class="selectsResult"
+                id="i6${id}-select"
+                data-type="force"
+                data-prev="N"
+                data-id="i6${id}"
+              >
+                <option value="N" selected>newtons (N)</option>
+                <option value="kN">kilonewtons (kN)</option>
+                <option value="MN">meganewtons (MN)</option>
+                <option value="lbf">pounds-force (lbf)</option>
+                <option value="kip">kips (kip)</option>
+              </select>
+            </p>
+        `)
+        const newDiv2 = `
+          <p>
+            <label for="i7-span">Acceleration (a): &nbsp; </label>
+            <span
+              data-id="i7"
+              step="any"
+              id="i7-span"
+              class="spans"
+              data-name="Wind correction angle"
+            ></span>
+            <select
+                class="selectsResult"
+                id="i7-select"
+                data-type="acceleration"
+                data-prev="m/s²"
+                data-id="i7"
+              >
+                <option value="m/s²" selected> meters per second squared (m/s²)</option>
+                <option value="ft/s²"> feet per second squared (ft/s²)</option>
+              </select>
+          </p>
+        `
+        const newDiv3 = `
+            <p>
+              <label for="i8-span">Weight (W) </label>
+              <span
+                type="number"
+                min="0"
+                autocomplete="off"
+                data-id="i8"
+                step="any"
+                id="i8-span"
+                class="spans"
+                data-name="Weight (W)"
+              ></span>
+              <select
+                class="selectsResult"
+                id="i8-select"
+                data-type="force"
+                data-prev="N"
+                data-id="i8"
+              >
+                <option value="N" selected>newtons (N)</option>
+                <option value="kN">kilonewtons (kN)</option>
+                <option value="MN">meganewtons (MN)</option>
+                <option value="lbf">pounds-force (lbf)</option>
+                <option value="kip">kips (kip)</option>
+              </select>
+            </p>
+        `
+        if (secnarioUnitEl.value === "i1") {
+          if (num1UnitEl.value === "two1") {
+            return (newDiv3 + newDiv(name = "Tension in rope 1 (T1)", id = 1)
+              + newDiv(name = "Tension in rope 2 (T2)", id = 2))
+          } else {
+            return newDiv3 + newDiv()
+          }
+        } else {
+          if (num2UnitEl.value === "two2") {
+            return (newDiv2 + newDiv(name = "Tension in rope 1 (T1)", id = 1)
+              + newDiv(name = "Tension in rope 2 (T2)", id = 2))
+          } else if (num2UnitEl.value === "tre2") {
+            return (newDiv2 + newDiv(name = "Tension in rope 1 (T1)", id = 1)
+              + newDiv(name = "Tension in rope 2 (T2)", id = 2) +
+              newDiv(name = "Tension in rope 3 (T3)", id = 3))
+          } else {
+            return newDiv2 + newDiv() 
+          }
+        }
+      }
+
+       // related to caculation
+      function prepareUnit(...args) {
+        const resultArr = [];
+        for (id of args) {
+          const input = document.getElementById(`${id}-input`);
+          const select = document.getElementById(`${id}-select`);
+          const type = select.getAttribute("data-type");
+          let val = parseFloat(input.value);
+
+          val = isNaN(val) ? 0 : val;
+          let inUnit = select.value;
+
+          val = toSIUnit(type, inUnit, val);
+
+          resultArr.push(val);
+        }
+        return resultArr;
+      }
+
+      function setResult(resultObj) {
+        for (key of Object.keys(resultObj)) {
+          let val = resultObj[key].result;
+          let id = resultObj[key].type;
+          
+          if (isNaN(val)) {
+           alert("Your input resulted in NAN.\n 0/0 \n Try again with valid input.");
+            return;
+          }
+          if (Math.abs(val) === Infinity) {
+            alert("Your input resulted in Infinity. \nDivision by zero. \nTry again with valid input.");
+            return;
+          }
+          
+          const span = document.getElementById(`${id}-span`);
+          const select = document.getElementById(`${id}-select`);
+          const type = select.getAttribute("data-type");
+          let outUnit = select.value;
+          val = fromSIUnit(type, outUnit, val);
+          span.textContent = parseFloat(val);
+        }
+      }
+
+      function calculateResult(input) {     
+        function calculatei1() {
+          const ropeNum = num1UnitEl.value 
+          if (ropeNum === 'one1') {
+            let [val1, val2] = prepareUnit("i1", "i2");
+            let result = (val1 * val2).toFixed(4) * 1
+            return {
+              1: { result, type: "i8" },
+              2: { result, type: "i61" },
+            };
+          } else {
+            let [val1, val2, val3, val4] = prepareUnit("i1", "i2", "i3", "i4");
+            val3 = fromSIUnit('angle', "rad", val3)
+            val4 = fromSIUnit('angle', "rad", val4)
+            let weight = (val1 * val2).toFixed(4) * 1
+            let result1 = weight / (((Math.cos(val3) * Math.sin(val4)) / Math.cos(val4)) + Math.sin(val3))
+            let result2 = weight / (((Math.cos(val4) * Math.sin(val3)) / Math.cos(val3)) + Math.sin(val4))
+            
+            return {
+              1: { result: weight, type: "i8" },
+              2: { result: result1 > 0 ? result1.toFixed(4) * 1 : result1, type: "i61" },
+              3: { result: result2 > 0 ? result2.toFixed(4) * 1 : result2, type: "i62" },
+            };
+          }
+        }
+
+        function calculatei2() {
+          const pullNum = num2UnitEl.value 
+          if (pullNum === 'one2') {
+            let [val1, val2, val3] = prepareUnit("i21", "i22", "i23");
+            val3 = fromSIUnit('angle', "rad", val3)
+            let result = (val2 * Math.cos(val3)) / val1
+            let result1 = val2
+            return {
+              1: { result: result > 1 ? result.toFixed(4) * 1 : result, type: "i7" },
+              2: { result: result1 > 1 ? result1.toFixed(4) * 1 : result1, type: "i61" },
+            };
+          } else if (pullNum === 'two2') {
+            let [val1, val2, val3, val4] = prepareUnit("i21", "i212", "i22", "i23");
+            val4 = fromSIUnit('angle', "rad", val4)
+            let result = (val3 * Math.cos(val4)) / (val1 + val2)
+            let result1 = val3
+            let result2 = result * val2
+  
+            return {
+              1: { result: result > 1 ? result.toFixed(4) * 1 : result , type: "i7" },
+              2: { result: result1 > 1 ? result1.toFixed(4) * 1 : result1 , type: "i61" },
+              3: { result: result2 > 1 ? result2.toFixed(4) * 1 : result2 , type: "i62" },
+            };
+          } else {
+            let [val1, val2, val3, val4, val5] = prepareUnit("i21", "i212", "i213", "i22", "i23");
+            val5 = fromSIUnit('angle', "rad", val5)
+            let result = (val4 * Math.cos(val5)) / (val1 + val2 + val3)
+            let result1 = val4
+            let result2 = result * (val2 + val3)
+            let result3 = result * val3
+
+            return {
+              1: { result: result > 1 ? result.toFixed(4) * 1 : result , type: "i7" },
+              2: { result: result1 > 1 ? result1.toFixed(4) * 1 : result1 , type: "i61" },
+              3: { result: result2 > 1 ? result2.toFixed(4) * 1 : result2 , type: "i62" },
+              4: { result: result3 > 1 ? result3.toFixed(4) * 1 : result3 , type: "i63" },
+            };
+          }
+        }
+
+        switch(input) {
+          case "i1":
+            return calculatei1()
+          case "i2":
+            return calculatei2()
+          default:
+          console.log("error in calculate result switch");
+        }
+      }
+
+      function validateInput(id) {
+        const input = document.getElementById(`${id}-input`);
+        const label = input.getAttribute("data-name").trim();
+        let value = parseFloat(input.value);
+        if (isNaN(value)) {
+          alert(`${label} value cannot be empty.`);
+          return false;
+        } 
+        if (id === "i3" || id === "i4" || id === "i23") {
+          value = fromSIUnit("angle", 'deg', value)
+          if ((id === "i3" || id === "i4") && value <= 0) {
+            alert(`Please input a positive value for ${label}.`)
+            return false
+          }
+          if (value >= 90) {
+            alert(`${label} must be less than 90 degrees but not less than 0 degrees.`)
+            return false
+          }
+        }
+
+        if (value < 0) {
+          alert(`${label} value cannot be negative.`);
+          return false;
+        }
+
+        return true;
+      }
+
+      function handleResultsChange(e) {
+        let select = e.target;
+        let id = select.getAttribute("data-id");
+        let span = document.getElementById(`${id}-span`);
+
+        let prevUnit = select.getAttribute("data-prev");
+        let currentUnit = select.value;
+        select.setAttribute("data-prev", currentUnit);
+
+        if (span.textContent === "") {
+          return;
+        }
+
+        let type = select.getAttribute("data-type");
+
+        let value = parseFloat(span.textContent);
+        value = parseFloat(value);
+        if (isNaN(value)) value = 0.0;
+
+        let si = toSIUnit(type, prevUnit, value);
+        let result = fromSIUnit(type, currentUnit, si);
+        result = parseFloat(result) > 1 ? (parseFloat(result)).toFixed(4) * 1 : parseFloat(result);
+        span.textContent = result
+      }
+
+      function calculateResults() {
+        const scenario = secnarioUnitEl.value
+        if (scenario === "i1") {
+          const ropeNum = num1UnitEl.value
+          for (el of ["i1", "i2"]) {
+            if (!validateInput(el)) return;
+          }
+          if (ropeNum === "two1") {
+            for (el of ["i3", "i4"]) {
+            if (!validateInput(el)) return;
+          }
+          }         
+        } else {
+          const pullNum = num2UnitEl.value
+          for (el of ["i21", "i22", "i23"]) {
+            if (!validateInput(el)) return;
+          }
+          if (pullNum === "two2") {
+            for (el of ["i212"]) {
+              if (!validateInput(el)) return;
+            } 
+          } else if (pullNum === "tre2") {
+            for (el of ["i212", "i213"]) {
+              if (!validateInput(el)) return;
+            } 
+          }
+        }
+        
+        try {
+          const resultElement = createElement()
+          calcResultsEl.innerHTML = resultElement
+          const newSelects = document.querySelectorAll(".selectsResult");
+
+          newSelects.forEach((select) => {
+            select.addEventListener("change", handleResultsChange);
+          });
+          
+          const result = calculateResult(scenario);
+          setResult(result)
+
+        } catch(error) {
+          alert("An error ocurred. Try again with valid input.");
+          resetResult()
+          return;
+        }
+      }
+      
+      function resetForm() {
+        selects.forEach((select) => {
+          if (select.getAttribute("data-type") === "mass") {
+            select.selectedIndex = '2'
+          } else {
+            select.selectedIndex = '0'
+          }
+        });
+
+        inputs.forEach((input, index) => {
+          if (index === 1) {
+            input.value = "9.806"
+          } else {
+             input.value = ""
+          }      
+        });
+        secnarioUnitEl.selectedIndex = '0';
+        num1UnitEl.selectedIndex = '0'
+        num2UnitEl.selectedIndex = '0'
+
+        containers.forEach((container) => {
+          let idVal = container.id.slice(0, 2)
+          if (idVal == "i2") {
+            container.style.display = 'none'
+          } else {
+            container.style.display = 'block'
+          }
+        })
+        document.getElementById("i1Unit").style.display = "block"
+        document.getElementById("i2Unit").style.display = "none"
+        
+      }
+
+      function resetResult() {
+        calcResultsEl.innerHTML = "<p>Result will appear here...</p>";
+      } 
+
+      function resethandler() {
+        resetForm();
+        resetResult();
+      }
+
+
+      /*************** EVENT LISTINERS ***************/
+      selects.forEach((select) => {
+        select.addEventListener("change", resetResult);
+      });
+      inputs.forEach((input) => {
+        input.addEventListener("input", resetResult);
+      });
+      secnarioUnitEl.addEventListener("change", handlesecnarioUnitChange);
+      num1UnitEl.addEventListener("change", handleNumUnitChange);
+      num2UnitEl.addEventListener("change", handleNumUnitChange);
+      
+      resetBtnEl.addEventListener("click", resethandler);
+      calcBtnEl.addEventListener("click", calculateResults);
+
+    </script>
+  </body>
+</html>

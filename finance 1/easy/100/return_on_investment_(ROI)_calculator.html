@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>ROI Calculator</title>
+</head>
+<body>
+    <h1>ROI Calculator</h1>
+    <h3>Calculate the Return on Investment.</h3>
+    <p>
+      Original investment:
+      <input type="number" id="originInvest">
+    </p>
+    <p>
+      Investment start date:
+      <input type="date" id="startDate" value="2023-01-01">
+    </p>
+    <p>
+      Returned value:
+      <input type="number" id="returnVal">
+    </p>
+    <p>
+      Investment end date:
+      <input type="date" id="endDate">
+    </p>
+    
+
+    <button id="calcBtn">Calculate</button>
+    <button id="resetBtn">Reset</button>
+    <hr>
+    <div>
+      <h3>Result:</h3>
+      <h3 id="calcResults">Result will appear here...</h3>
+    </div>
+
+    <script>
+      // Get required elements from the HTML
+      const originInvestEl = document.getElementById("originInvest");
+      const startDateEl = document.getElementById("startDate");
+      const returnValEl = document.getElementById("returnVal");
+      const endDateEl = document.getElementById("endDate");
+
+      const calcBtnEl = document.getElementById('calcBtn');
+      const resetBtnEl = document.getElementById('resetBtn');
+      const calcResultsEl = document.getElementById('calcResults') 
+
+      let date = new Date()
+      endDateEl.value = formatDate(date)
+
+      function formatDate(date) {
+        let d = new Date(date),
+            month = '' + (d.getMonth() + 1),
+            day = '' + d.getDate() - 1,
+            year = d.getFullYear();
+
+        if (month.length < 2) 
+            month = '0' + month;
+        if (day.length < 2) 
+            day = '0' + day;
+
+        return [year, month, day].join('-');
+      }
+
+      function createElement() {
+        const newDiv = `
+            <p>
+              <label for="i11-span">Gain or Loss on Investment: &nbsp;</label>
+              <span
+                data-id="i11"
+                step="any"
+                id="i11-span"
+                class="spans"
+              ></span>
+            </p>
+            <p>
+              <label for="i12-span">Investment Term: &nbsp;</label>
+              <span
+                data-id="i12"
+                step="any"
+                id="i12-span"
+                class="spans"
+              ></span> years
+              <span
+                data-id="i122"
+                step="any"
+                id="i122-span"
+                class="spans"
+              ></span> months
+              <span
+                data-id="i123"
+                step="any"
+                id="i123-span"
+                class="spans"
+              ></span> days
+            </p>
+            <p>
+              <label for="i13-span">ROI (Return on Investment): &nbsp;</label>
+              <span
+                data-id="i13"
+                step="any"
+                id="i13-span"
+                class="spans"
+              ></span>%
+            </p>
+            <p>
+              <label for="i14-span">Simple Annualized ROI: &nbsp;</label>
+              <span
+                data-id="i14"
+                step="any"
+                id="i14-span"
+                class="spans"
+              ></span>%
+            </p>
+        `
+        return newDiv
+      }
+
+      function setResult(resultObj) {
+        for (key of Object.keys(resultObj)) {
+          let val = resultObj[key].result;
+          let id = resultObj[key].type;
+
+          if (isNaN(val)) {
+           alert("Your input resulted in NAN.\n 0/0 \n Try again with valid input.");
+            return;
+          }
+          if (Math.abs(val) === Infinity) {
+            alert("Your input resulted in Infinity. \nDivision by zero. \nTry again with valid input.");
+            return;
+          }
+          const span = document.getElementById(`${id}-span`);
+          val = parseFloat(val)
+          val = Math.abs(val) > 1 ? val.toFixed(2) * 1 : val.toPrecision(2) * 1
+          span.textContent = val;
+        }
+      }
+
+      function lengthOfTime(prevDate, endDate) {
+        let datePrev = new Date(prevDate)
+        let dateCurr = new Date(endDate)
+        let yearsNum = dateCurr.getFullYear() - datePrev.getFullYear()
+        let monthNum = dateCurr.getMonth() - datePrev.getMonth()
+        let dayNum = dateCurr.getDate() - datePrev.getDate()
+        if (monthNum < 0) {
+          yearsNum -= 1
+          monthNum = 12 + monthNum 
+        } 
+        if (dayNum < 0) {
+          monthNum -= 1
+          let previousMonth = new Date(dateCurr.getFullYear(), dateCurr.getMonth(), 0).getDate()
+          dayNum += previousMonth
+        }
+        return {
+          yearsNum,
+          monthNum,
+          dayNum
+        }
+      }
+
+      function calculateResults() {
+          // Retrieve input values
+          const originInvest = parseFloat(originInvestEl.value);
+          const returnVal = parseFloat(returnValEl.value);
+          const startDate = startDateEl.value;
+          const endDate = endDateEl.value;
+
+          if (isNaN(originInvest)  || originInvest < 1 ||
+            isNaN(returnVal) || returnVal < 1
+          ) {
+            alert("Please Enter All Details.");
+            return;
+          }
+
+          try {
+            const resultElement = createElement()
+            calcResultsEl.innerHTML = resultElement 
+
+            const time = lengthOfTime(startDate, endDate)
+            const gainLoss = returnVal - originInvest
+            const ROI = (gainLoss / originInvest) * 100
+            let period =  parseFloat(time.yearsNum) + (parseFloat(time.monthNum) / 12) + (parseFloat(time.dayNum) / 365)
+            const AROI = ((((1 + (ROI / 100))) ** (1 / period)) - 1) * 100
+
+            const results = {
+              1: { result: gainLoss, type: "i11" },
+              2: { result: time.yearsNum, type: "i12" },
+              5: { result: time.monthNum, type: "i122" },
+              6: { result: time.dayNum, type: "i123" },
+              3: { result: ROI, type: "i13" },
+              4: { result: AROI, type: "i14" },
+            }
+            setResult(results)
+
+          } catch (error) {
+            alert("Something Went Wrong!!!");
+            resetResult()
+            return;
+          }
+      }
+
+      function resetForm() {
+        originInvestEl.value = ""
+        startDateEl.value = "2023-01-01"
+        returnValEl.value = ""
+        endDateEl.value = formatDate(date)
+      }
+
+      function resetResult() {
+        calcResultsEl.innerHTML = "<p>Result will appear here...</p>";
+      } 
+
+      function resethandler() {
+        resetForm();
+        resetResult();
+      }
+
+      resetBtnEl.addEventListener("click", resethandler);
+      calcBtnEl.addEventListener("click", calculateResults);
+
+      [originInvestEl, startDateEl, returnValEl, endDateEl].forEach((el) => {
+        el.addEventListener("input", resetResult);
+      });  
+    </script>
+</body>
+</html>

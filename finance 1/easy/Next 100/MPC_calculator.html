@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>MPC Calculator</title>
+</head>
+<body>
+    <h1>MPC Calculator</h1>
+    <p>
+      Increase in disposable income:
+      <input type="number" id="dispIncomeIncr" value="1000">
+    </p>
+    <p>
+      Increase in consumer spending: 
+      <input type="number" id="consumerSpendInc" value="600">
+    </p>
+    <p>
+      Autonomous consumer spending:
+      <input type="number" id="autoConsSpend" value="18000">
+    </p>
+    <p>
+      Disposable income:
+      <input type="number" id="dispIncome" value="40000">
+    </p>
+
+    <button id="calcBtn">Calculate</button>
+    <button id="resetBtn">Reset</button>
+    <hr>
+    <div>
+      <h3>Result:</h3>
+      <h3 id="calcResults">Result will appear here...</h3>
+    </div>
+
+    <script>
+      // Get required elements from the HTML
+      const dispIncomeIncrEl = document.getElementById("dispIncomeIncr");
+      const consumerSpendIncEl = document.getElementById("consumerSpendInc");
+      const dispIncomeEl = document.getElementById("dispIncome");
+      const autoConsSpendEl = document.getElementById("autoConsSpend");
+
+      const calcBtnEl = document.getElementById('calcBtn');
+      const resetBtnEl = document.getElementById('resetBtn');
+      const calcResultsEl = document.getElementById('calcResults') 
+
+      function createElement() {
+        const newDiv = `
+            <p>
+              <label for="i11-span">Consumer spending: &nbsp;</label>
+              <span
+                data-id="i11"
+                step="any"
+                id="i11-span"
+                class="spans"
+              ></span>
+            </p>
+            <p>
+              <label for="i12-span">MPC: &nbsp;</label>
+              <span
+                data-id="i12"
+                step="any"
+                id="i12-span"
+                class="spans"
+              ></span>
+            </p>
+        `
+        return newDiv
+      }
+
+      function setResult(resultObj) {
+        for (key of Object.keys(resultObj)) {
+          let val = resultObj[key].result;
+          let id = resultObj[key].type;
+
+          if (isNaN(val)) {
+           alert("Your input resulted in NAN.\n 0/0 \n Try again with valid input.");
+            return;
+          }
+          if (Math.abs(val) === Infinity) {
+            alert("Your input resulted in Infinity. \nDivision by zero. \nTry again with valid input.");
+            return;
+          }
+          const span = document.getElementById(`${id}-span`);
+          span.textContent = `${parseFloat(val)}`;
+        }
+      }
+
+      function calculateResults() {
+          // Retrieve input values
+          const dispIncomeIncr = parseFloat(dispIncomeIncrEl.value);
+          const consumerSpendInc = parseFloat(consumerSpendIncEl.value);
+          const dispIncome = parseFloat(dispIncomeEl.value);
+          const autoConsSpend = parseFloat(autoConsSpendEl.value);
+
+          if (isNaN(dispIncomeIncr) || dispIncomeIncr <= 0 || isNaN(consumerSpendInc) || consumerSpendInc <= 0 || 
+            isNaN(dispIncome) || dispIncome <= 0 || isNaN(autoConsSpend) || autoConsSpend <= 0
+          ) {
+            alert("Please Enter All Details.");
+            return;
+          } else if (dispIncomeIncr <= consumerSpendInc) {
+            alert("The change in consumer spending must be smaller than the amount of the additional disposable income.");
+            return;
+          }
+
+          try {
+            const resultElement = createElement()
+            calcResultsEl.innerHTML = resultElement 
+
+            const MPC = consumerSpendInc / dispIncomeIncr
+            const CS = autoConsSpend + (MPC * dispIncome)
+
+            const results = {
+              1: { result: Math.abs(CS) > 1 ? CS.toFixed(2) : CS.toPrecision(2), type: "i11" },
+              2: { result: Math.abs(MPC) > 1 ? MPC.toFixed(2) : MPC.toPrecision(2), type: "i12" },
+            }
+            setResult(results)
+
+          } catch (error) {
+            alert("Something Went Wrong!!!");
+            resetResult()
+            return;
+          }
+      }
+
+      function resetForm() {
+        dispIncomeIncrEl.value = "1000"
+        consumerSpendIncEl.value = "600"
+        dispIncomeEl.value = "18000"
+        autoConsSpendEl.value = "40000"
+      }
+
+      function resetResult() {
+        calcResultsEl.innerHTML = "<p>Result will appear here...</p>";
+      } 
+
+      function resethandler() {
+        resetForm();
+        resetResult();
+      }
+
+      resetBtnEl.addEventListener("click", resethandler);
+      calcBtnEl.addEventListener("click", calculateResults);
+      [dispIncomeIncrEl, consumerSpendIncEl, dispIncomeEl, autoConsSpendEl].forEach((el) => {
+        el.addEventListener("input", resetResult);
+      });  
+
+    </script>
+</body>
+</html>

@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>IRS Interest Calculator</title>
+</head>
+<body>
+    <h1>IRS Interest Calculator</h1>
+    <p>
+      Due Date:
+      <input type="date" id="dueDate" value="2023-04-15">
+    </p>
+    <p>
+      Payment Date:
+      <input type="date" id="payDate" value="2023-04-15">
+    </p>
+    <p>
+      Amount Owed::
+      <input type="number" id="amtOwed" value="5000">
+    </p>
+    
+
+    <button id="calcBtn">Calculate</button>
+    <button id="resetBtn">Reset</button>
+    <hr>
+    <div>
+      <h3>Result:</h3>
+      <h3 id="calcResults">Result will appear here...</h3>
+    </div>
+
+    <script>
+      // Get required elements from the HTML
+      const dueDateEl = document.getElementById("dueDate");
+      const payDateEl = document.getElementById("payDate");
+      const amtOwedEl = document.getElementById("amtOwed");
+      const currDateEl = document.getElementById("currDate");
+
+      const calcBtnEl = document.getElementById('calcBtn');
+      const resetBtnEl = document.getElementById('resetBtn');
+      const calcResultsEl = document.getElementById('calcResults') 
+
+      let date = new Date()
+      currDateEl.value = formatDate(date)
+
+      function formatDate(date) {
+        let d = new Date(date),
+            month = '' + (d.getMonth() + 1),
+            day = '' + d.getDate() - 1,
+            year = d.getFullYear();
+
+        if (month.length < 2) 
+            month = '0' + month;
+        if (day.length < 2) 
+            day = '0' + day;
+
+        return [year, month, day].join('-');
+      }
+
+      function createElement() {
+        const newDiv = `
+            <p>
+              <label for="i11-span">Time you have owned your house: &nbsp;</label>
+              <span
+                data-id="i11"
+                step="any"
+                id="i11-span"
+                class="spans"
+              ></span> years
+              <span
+                data-id="i112"
+                step="any"
+                id="i112-span"
+                class="spans"
+              ></span> months
+            </p>
+            <p>
+              <label for="i12-span">Price change over this period: &nbsp;</label>
+              <span
+                data-id="i12"
+                step="any"
+                id="i12-span"
+                class="spans"
+              ></span>
+            </p>
+            <p>
+              <label for="i13-span">Percent of price change over this period: &nbsp;</label>
+              <span
+                data-id="i13"
+                step="any"
+                id="i13-span"
+                class="spans"
+              ></span>%
+            </p>
+            <p>
+              <label for="i14-span">Annual price change rate over this period: &nbsp;</label>
+              <span
+                data-id="i14"
+                step="any"
+                id="i14-span"
+                class="spans"
+              ></span>%
+            </p>
+        `
+        return newDiv
+      }
+
+      function setResult(resultObj) {
+        for (key of Object.keys(resultObj)) {
+          let val = resultObj[key].result;
+          let id = resultObj[key].type;
+
+          if (isNaN(val)) {
+           alert("Your input resulted in NAN.\n 0/0 \n Try again with valid input.");
+            return;
+          }
+          if (Math.abs(val) === Infinity) {
+            alert("Your input resulted in Infinity. \nDivision by zero. \nTry again with valid input.");
+            return;
+          }
+          const span = document.getElementById(`${id}-span`);
+          val = parseFloat(val)
+          val = Math.abs(val) > 1 ? val.toFixed(2) * 1 : val.toPrecision(2) * 1
+          span.textContent = val;
+        }
+      }
+
+      function lengthOfTime(prevDate, currDate) {
+        let datePrev = new Date(prevDate)
+        let dateCurr = new Date(currDate)
+        let yearsNum = dateCurr.getFullYear() - datePrev.getFullYear()
+        let monthNum = dateCurr.getMonth() - datePrev.getMonth()
+        if (monthNum < 0) {
+          yearsNum -= 1
+          monthNum = 12 + monthNum 
+        }
+        return {
+          yearsNum,
+          monthNum
+        }
+      }
+
+      function calculateResults() {
+          // Retrieve input values
+          const dueDate = parseFloat(dueDateEl.value);
+          const amtOwed = parseFloat(amtOwedEl.value);
+          const payDate = payDateEl.value;
+          const currDate = currDateEl.value;
+
+          if (isNaN(dueDate)  || dueDate < 1 ||
+            isNaN(amtOwed) || amtOwed < 1
+          ) {
+            alert("Please Enter All Details.");
+            return;
+          }
+
+          try {
+            const resultElement = createElement()
+            calcResultsEl.innerHTML = resultElement 
+
+            const time = lengthOfTime(payDate, currDate)
+            const priceChange = amtOwed - dueDate
+            const percentChange = (priceChange / dueDate) * 100
+            let period =  parseFloat(time.yearsNum) + (parseFloat(time.monthNum) / 12)
+            const APC = (((amtOwed / dueDate) ** (1 / period)) - 1) * 100
+
+            const results = {
+              1: { result: time.yearsNum, type: "i11" },
+              5: { result: time.monthNum, type: "i112" },
+              2: { result: priceChange, type: "i12" },
+              3: { result: percentChange, type: "i13" },
+              4: { result: APC, type: "i14" },
+            }
+            setResult(results)
+
+          } catch (error) {
+            alert("Something Went Wrong!!!");
+            resetResult()
+            return;
+          }
+      }
+
+      function resetForm() {
+        dueDateEl.value = "100000"
+        payDateEl.value = "2014-01-01"
+        amtOwedEl.value = "5000"
+        currDateEl.value = formatDate(date)
+      }
+
+      function resetResult() {
+        calcResultsEl.innerHTML = "<p>Result will appear here...</p>";
+      } 
+
+      function resethandler() {
+        resetForm();
+        resetResult();
+      }
+
+      resetBtnEl.addEventListener("click", resethandler);
+      calcBtnEl.addEventListener("click", calculateResults);
+
+      [dueDateEl, payDateEl, amtOwedEl, currDateEl].forEach((el) => {
+        el.addEventListener("input", resetResult);
+      });  
+    </script>
+</body>
+</html>

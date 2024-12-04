@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>College Cost Calculator</title>
+</head>
+<body>
+    <h1>College Cost Calculator</h1>
+    <h3>How Much Does College Cost?</h3>
+    <p>
+      Today's annual college costs:
+      <input type="number" id="collegeCost" value="28840"> or
+      <select id="collegeCostSelect">
+        <option value="28840">Select an Average</option>
+        <option value="60420">4-year private: $60,420</option>
+        <option value="28840" selected>4-year in-state public: $28,840</option>
+        <option value="46730">4-year out-of-state public: $46,730</option>
+        <option value="19860">2-year public: $19,860</option>
+      </select>
+    </p>
+    <p>
+      College cost increase rate: 
+      <input type="number" id="costIncRate" value="5"> 5% recommended
+    </p>
+    <p>
+      Expected college attendance duration:
+      <input type="number" id="attendDuration" value="4"> years
+    </p>
+    <p>
+      Percent of costs from savings:
+      <input type="number" id="savingsCostPercent" value="35"> %
+    </p>
+    <p>
+      College savings balance now:
+      <input type="number" id="savingBalance" value="0">amount saved so far
+    </p>
+    <p>
+      Interest or investment return rate:
+      <input type="number" id="invReturnRate" value="5">%
+    </p>
+    <p>
+      Tax rate on interest or investment return:
+      <input type="number" id="returnRateTax" value="25">% Including federal, state, and local tax
+      use 0% for 529 plan savings
+    </p>
+    <p>
+      College will start in:
+      <input type="number" id="startTime" value="3"> years
+    </p>
+
+    <button id="calcBtn">Calculate</button>
+    <button id="resetBtn">Reset</button>
+    <hr>
+    <div>
+      <h3>Result:</h3>
+      <h3 id="calcResults">Result will appear here...</h3>
+    </div>
+
+    <script>
+      // Get required elements from the HTML
+      const collegeCostEl = document.getElementById("collegeCost");
+      const costIncRateEl = document.getElementById("costIncRate");
+      const attendDurationEl = document.getElementById("attendDuration");
+      const savingsCostPercentEl = document.getElementById("savingsCostPercent");
+      const savingBalanceEl = document.getElementById("savingBalance");
+      const invReturnRateEl = document.getElementById("invReturnRate");
+      const returnRateTaxEl = document.getElementById("returnRateTax");
+      const startTimeEl = document.getElementById("startTime");
+      const collegeCostSelectEl = document.getElementById("collegeCostSelect");
+
+      const calcBtnEl = document.getElementById('calcBtn');
+      const resetBtnEl = document.getElementById('resetBtn');
+      const calcResultsEl = document.getElementById('calcResults') 
+
+      function handleCollegeCostSelectChange(e) {
+        collegeCostEl.value = e.target.value
+        resetResult()
+      }
+
+      function createElement() {
+        const savingsCost = savingsCostPercentEl.value
+        const newDiv = `
+            <h3>If paying college costs in full:</h3>
+            <p>
+              <label for="i11-span">Total college cost: &nbsp;</label>
+              <span
+                data-id="i11"
+                step="any"
+                id="i11-span"
+                class="spans"
+              ></span>
+            </p>
+            <p>
+              <label for="i12-span">Total college cost in today's money: &nbsp;</label>
+              <span
+                data-id="i12"
+                step="any"
+                id="i12-span"
+                class="spans"
+              ></span>
+            </p>
+            <p>
+              <label for="i13-span">Equivalent monthly saving: &nbsp;</label>
+              <span
+                data-id="i13"
+                step="any"
+                id="i13-span"
+                class="spans"
+              ></span>
+            </p>
+            <p>
+              <label for="i14-span">Freshman year cost (rise 5% for 3 years): &nbsp;</label>
+              <span
+                data-id="i14"
+                step="any"
+                id="i14-span"
+                class="spans"
+              ></span>
+            </p>
+            <h3>If ${savingsCost}% of college costs come from savings:</h3>
+            <p>
+              <label for="i121-span">You will need to save: &nbsp;</label>
+              <span
+                data-id="i121"
+                step="any"
+                id="i121-span"
+                class="spans"
+              ></span>
+            </p>
+            <p>
+              <label for="i122-span">Your target saving amount in today's money: &nbsp;</label>
+              <span
+                data-id="i122"
+                step="any"
+                id="i122-span"
+                class="spans"
+              ></span>
+            </p>
+            <p>
+              <label for="i123-span">Equivalent monthly saving: &nbsp;</label>
+              <span
+                data-id="i123"
+                step="any"
+                id="i123-span"
+                class="spans"
+              ></span>
+            </p>
+            <p>
+              <label for="i124-span">Amount needed in freshman year: &nbsp;</label>
+              <span
+                data-id="i124"
+                step="any"
+                id="i124-span"
+                class="spans"
+              ></span>
+            </p>
+        `
+        return newDiv
+      }
+
+      function setResult(resultObj) {
+        for (key of Object.keys(resultObj)) {
+          let val = resultObj[key].result;
+          let id = resultObj[key].type;
+
+          if (isNaN(val)) {
+           alert("Your input resulted in NAN.\n 0/0 \n Try again with valid input.");
+            return;
+          }
+          if (Math.abs(val) === Infinity) {
+            alert("Your input resulted in Infinity. \nDivision by zero. \nTry again with valid input.");
+            return;
+          }
+          const span = document.getElementById(`${id}-span`);
+          span.textContent = `${val * 1}`;
+        }
+      }
+
+      function calculateResults() {
+          // Retrieve input values
+          const collegeCost = parseFloat(collegeCostEl.value);
+          const costIncRate = parseFloat(costIncRateEl.value);
+          const attendDuration = parseFloat(attendDurationEl.value);
+          const savingsCostPercent = parseFloat(savingsCostPercentEl.value);
+          const savingBalance = parseFloat(savingBalanceEl.value);
+          const invReturnRate = parseFloat(invReturnRateEl.value);
+          const returnRateTax = parseFloat(returnRateTaxEl.value);
+          const startTime = parseFloat(startTimeEl.value);
+          const collegeCostSelect = collegeCostSelectEl.value
+
+          if (isNaN(collegeCost) || collegeCost <= 0 || isNaN(attendDuration) || attendDuration <= 0 ||
+            isNaN(savingsCostPercent) || savingsCostPercent <= 0 || isNaN(savingBalance) || savingBalance < 0 || 
+            isNaN(startTime) || startTime < 0 || isNaN(invReturnRate) || invReturnRate < 0 || isNaN(returnRateTax) || returnRateTax < 0
+          ) {
+            alert("Please Enter All Details.");
+            return;
+          }
+
+          try {
+            const resultElement = createElement()
+            calcResultsEl.innerHTML = resultElement 
+
+            const totalCost = 0
+            const totalCostToday = 0
+            const monthlySaving = 0
+            const freshmanYrCost = 0
+            const toSave = 0
+            const targetSavingToday = 0
+            const monthlySaving2 = 0
+            const freshmanYrAmt = 0
+            console.log(111)
+
+            const results = {
+              1: { result: Math.abs(totalCost) > 1 ? totalCost.toFixed(2) : totalCost.toPrecision(2), type: "i11" },
+              2: { result: Math.abs(totalCostToday) > 1 ? totalCostToday.toFixed(2) : totalCostToday.toPrecision(2), type: "i12" },
+              3: { result: Math.abs(monthlySaving) > 1 ? monthlySaving.toFixed(2) : monthlySaving.toPrecision(2), type: "i13" },
+              4: { result: Math.abs(freshmanYrCost) > 1 ? freshmanYrCost.toFixed(2) : freshmanYrCost.toPrecision(2), type: "i14" },
+              5: { result: Math.abs(toSave) > 1 ? toSave.toFixed(2) : toSave.toPrecision(2), type: "i121" },
+              6: { result: Math.abs(targetSavingToday) > 1 ? targetSavingToday.toFixed(2) : targetSavingToday.toPrecision(2), type: "i122" },
+              7: { result: Math.abs(monthlySaving2) > 1 ? monthlySaving2.toFixed(2) : monthlySaving2.toPrecision(2), type: "i123" },
+              8: { result: Math.abs(freshmanYrAmt) > 1 ? freshmanYrAmt.toFixed(2) : freshmanYrAmt.toPrecision(2), type: "i124" },
+              
+            }
+            setResult(results)
+
+          } catch (error) {
+            alert("Something Went Wrong!!!");
+            resetResult()
+            return;
+          }
+      }
+
+      function resetForm() {
+        collegeCostEl.value = "28840"
+        costIncRateEl.value = "5"
+        attendDurationEl.value = "4"
+        savingsCostPercentEl.value = "35"
+        savingBalanceEl.value = "0"
+        invReturnRateEl.value = "5"
+        returnRateTaxEl.value = "25"
+        startTimeEl.value = "3"
+        collegeCostSelectEl.selectedIndex = "2"
+      }
+
+      function resetResult() {
+        calcResultsEl.innerHTML = "<p>Result will appear here...</p>";
+      } 
+
+      function resethandler() {
+        resetForm();
+        resetResult();
+      }
+
+      resetBtnEl.addEventListener("click", resethandler);
+      calcBtnEl.addEventListener("click", calculateResults);
+      [collegeCostEl, costIncRateEl, attendDurationEl, savingsCostPercentEl, 
+         startTimeEl, invReturnRateEl, returnRateTaxEl, savingBalanceEl
+      ].forEach((el) => {
+        el.addEventListener("input", resetResult);
+      });  
+
+      collegeCostSelectEl.addEventListener("change", handleCollegeCostSelectChange);
+
+    </script>
+</body>
+</html>

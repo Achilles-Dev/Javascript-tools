@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>College Savings Calculator</title>
+</head>
+<body>
+    <h1>College Savings Calculator</h1>
+    <h3>Estimate the added value of a college degree, high-school degree or professional education. <br />
+      Marginal value calculation for education to determine if college is worth it for you. <br />
+      Takes into account college loans (optional)
+    </h3>
+    <p>
+      Revenue Without Degre:
+      <input type="number" id="noDegreeRevenue">$ per year
+    </p>
+    <p>
+      Revenue With Degree: 
+      <input type="number" id="degreeRevenue">$ per year
+    </p>
+    <p>
+      Current Age:
+      <input type="number" id="currAge" value="18">years
+    </p>
+    <p>
+      Retirement Age:
+      <input type="number" id="retireAge" value="65"> years
+    </p>
+    <p>Education Costs & Duration:</p>
+    <p>
+      Tuition:
+      <input type="number" id="tuition">$ per year
+    </p>
+    <p>
+      Duration:
+      <input type="number" id="duration"> years
+    </p>
+    <p>
+      Loan:
+      <input type="number" id="loan" placeholder="Optional">
+    </p>
+    <p>
+      Interest Rate:
+      <input type="number" id="intRate" placeholder="Optional">%
+    </p>
+    <p>
+      Revenue During Studying:
+      <input type="number" id="studyRevenue" placeholder="Optional">$ per year
+    </p>
+    
+
+    <button id="calcBtn">Calculate</button>
+    <button id="resetBtn">Reset</button>
+    <hr>
+    <div>
+      <h3>Result:</h3>
+      <h3 id="calcResults">Result will appear here...</h3>
+    </div>
+
+    <script>
+      // Get required elements from the HTML
+      const noDegreeRevenueEl = document.getElementById("noDegreeRevenue");
+      const degreeRevenueEl = document.getElementById("degreeRevenue");
+      const currAgeEl = document.getElementById("currAge");
+      const retireAgeEl = document.getElementById("retireAge");
+      const tuitionEl = document.getElementById("tuition");
+      const durationEl = document.getElementById("duration");
+      const loanEl = document.getElementById("loan");
+      const intRateEl = document.getElementById("intRate");
+      const studyRevenueEl = document.getElementById("studyRevenue");
+
+      const calcBtnEl = document.getElementById('calcBtn');
+      const resetBtnEl = document.getElementById('resetBtn');
+      const calcResultsEl = document.getElementById('calcResults') 
+
+      function createElement() {
+        const newDiv = `
+            <p>
+              <label for="i11-span">Marginal Value of Education: &nbsp;</label>
+              <span
+                data-id="i11"
+                step="any"
+                id="i11-span"
+                class="spans"
+              ></span>
+            </p>
+            <p>
+              <label for="i12-span">Cost of Education: &nbsp;</label>
+              <span
+                data-id="i12"
+                step="any"
+                id="i12-span"
+                class="spans"
+              ></span>
+            </p>
+            ${loanEl.value !== "" ?
+              `
+                <p>
+                  <label for="i15-span">Monthly Loan Pay Back (10 y): &nbsp;</label>
+                  <span
+                    data-id="i15"
+                    step="any"
+                    id="i15-span"
+                    class="spans"
+                  ></span>
+                </p>
+              `
+            : ""
+            }
+            <p>
+              <label for="i13-span">Revenue With Education: &nbsp;</label>
+              <span
+                data-id="i13"
+                step="any"
+                id="i13-span"
+                class="spans"
+              ></span>
+            </p>
+            <p>
+              <label for="i14-span">Revenue Without Education: &nbsp;</label>
+              <span
+                data-id="i14"
+                step="any"
+                id="i14-span"
+                class="spans"
+              ></span>
+            </p>
+        `
+        return newDiv
+      }
+
+      function setResult(resultObj) {
+        for (key of Object.keys(resultObj)) {
+          let val = resultObj[key].result;
+          let id = resultObj[key].type;
+
+          if (isNaN(val)) {
+           alert("Your input resulted in NAN.\n 0/0 \n Try again with valid input.");
+            return;
+          }
+          if (Math.abs(val) === Infinity) {
+            alert("Your input resulted in Infinity. \nDivision by zero. \nTry again with valid input.");
+            return;
+          }
+          const span = document.getElementById(`${id}-span`);
+          span.textContent = `${val * 1}`;
+        }
+      }
+
+      function calculateResults() {
+          // Retrieve input values
+          const noDegreeRevenue = parseFloat(noDegreeRevenueEl.value);
+          const degreeRevenue = parseFloat(degreeRevenueEl.value);
+          const currAge = parseFloat(currAgeEl.value);
+          const retireAge = parseFloat(retireAgeEl.value);
+          const tuition = parseFloat(tuitionEl.value);
+          const duration = parseFloat(durationEl.value);
+          const loan = parseFloat(loanEl.value);
+          const intRate = parseFloat(intRateEl.value);
+          const studyRevenue = parseFloat(studyRevenueEl.value);
+
+          if (isNaN(noDegreeRevenue) || noDegreeRevenue < 1 || isNaN(currAge) || currAge < 1 ||
+            isNaN(retireAge) || retireAge < 1 || isNaN(tuition) || tuition < 1 || 
+            isNaN(duration) || duration < 1 || (!isNaN(loan) && loan < 1) || (!isNaN(intRate) && intRate < 0.1) ||
+            (!isNaN(studyRevenue) && studyRevenue < 1)
+          ) {
+            alert("Please Enter All Details.");
+            return;
+          } else if ((!isNaN(loan) && isNaN(intRate)) || (!isNaN(intRate) && isNaN(loan))) {
+            alert("Loan and interest rate can be both positive or both zero.");
+            return;
+          }
+
+          try {
+            const resultElement = createElement()
+            calcResultsEl.innerHTML = resultElement 
+
+            const MVoE = 0
+            const CoE = 0
+            const RwE = 0
+            const RwoE = 0
+
+            const results = {
+              1: { result: Math.abs(MVoE) > 1 ? MVoE.toFixed(2) : MVoE.toPrecision(2), type: "i11" },
+              2: { result: Math.abs(CoE) > 1 ? CoE.toFixed(2) : CoE.toPrecision(2), type: "i12" },
+              3: { result: Math.abs(RwE) > 1 ? RwE.toFixed(2) : RwE.toPrecision(2), type: "i13" },
+              4: { result: Math.abs(RwoE) > 1 ? RwoE.toFixed(2) : RwoE.toPrecision(2), type: "i14" },
+            }
+            setResult(results)
+
+          } catch (error) {
+            alert("Something Went Wrong!!!");
+            resetResult()
+            return;
+          }
+      }
+
+      function resetForm() {
+        noDegreeRevenueEl.value = ""
+        degreeRevenueEl.value = ""
+        currAgeEl.value = "18"
+        retireAgeEl.value = "65"
+        tuitionEl.value = ""
+        durationEl.value = ""
+        loanEl.value = ""
+        intRateEl.value = ""
+        studyRevenueEl.value = ""
+      }
+
+      function resetResult() {
+        calcResultsEl.innerHTML = "<p>Result will appear here...</p>";
+      } 
+
+      function resethandler() {
+        resetForm();
+        resetResult();
+      }
+
+      resetBtnEl.addEventListener("click", resethandler);
+      calcBtnEl.addEventListener("click", calculateResults);
+      [noDegreeRevenueEl, degreeRevenueEl, currAgeEl, retireAgeEl, 
+        tuitionEl, durationEl, loanEl, intRateEl, studyRevenueEl
+      ].forEach((el) => {
+        el.addEventListener("input", resetResult);
+      });  
+
+    </script>
+</body>
+</html>

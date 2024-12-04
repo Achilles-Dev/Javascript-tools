@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Estate Tax Calculator</title>
+</head>
+<body>
+    <h1>Estate Tax Calculator</h1>
+    <h4>Assets:</h4>
+    <p>
+      Residence & Other Real Estate:
+      <input type="number" id="residence" value="0">
+    </p>
+    <p>
+      Stocks, Bonds, and Other Investments: 
+      <input type="number" id="stocks" value="0">
+    </p>
+    <p>
+      Savings, CDs, and Checking Account Balance:
+      <input type="number" id="savings" value="0">
+    </p>
+    <p>
+      Vehicles, Boats, and Other Properties:
+      <input type="number" id="vehicles" value="0">
+    </p>
+    <p>
+      Retirement Plans: 
+      <input type="number" id="retirePlans" value="0">
+    </p>
+    <p>
+      Life Insurance Benefit:
+      <input type="number" id="insureBenefit" value="0">
+    </p>
+    <p>
+      Other Assets:
+      <input type="number" id="otherAssets" value="0">
+    </p>
+    <h4>Liability, Costs, and Deductibles:</h4>
+    <p>
+      Debts (mortgages, loan, credit cards, etc):
+      <input type="number" id="debts" value="0">
+    </p>
+    <p>
+      Funeral, Administration, and Claims savings:
+      <input type="number" id="funeral" value="0">
+    </p>
+    <p>
+      Charitable Contributions:
+      <input type="number" id="charityContrib" value="0">
+    </p>
+    <p>
+      State Inheritance or Estate Taxes:
+      <input type="number" id="stateTaxes" value="0">
+    </p>
+    <h4>Lifetime Gifted Amount:</h4>
+    <p>
+      Total amount you've gifted tax free in your lifetime:
+      <input type="number" id="totGift" value="0">
+    </p>
+
+
+    <button id="calcBtn">Calculate</button>
+    <button id="resetBtn">Reset</button>
+    <hr>
+    <div>
+      <h3>Result:</h3>
+      <h3 id="calcResults">Result will appear here...</h3>
+    </div>
+
+    <script>
+      // Get required elements from the HTML
+      const residenceEl = document.getElementById("residence");
+      const stocksEl = document.getElementById("stocks");
+      const savingsEl = document.getElementById("savings");
+      const vehiclesEl = document.getElementById("vehicles");
+      const debtsEl = document.getElementById("debts");
+      const funeralEl = document.getElementById("funeral");
+      const retirePlansEl = document.getElementById("retirePlans");
+      const insureBenefitEl = document.getElementById("insureBenefit");
+      const otherAssetsEl = document.getElementById("otherAssets");
+      const charityContribEl = document.getElementById("charityContrib");
+      const stateTaxesEl = document.getElementById("stateTaxes");
+      const totGiftEl = document.getElementById("totGift");
+      const lifeTimeExempt = 13610000
+
+      const calcBtnEl = document.getElementById('calcBtn');
+      const resetBtnEl = document.getElementById('resetBtn');
+      const calcResultsEl = document.getElementById('calcResults') 
+
+      function createElement(taxableEstate) {
+        const newDiv = `
+            <p>
+              <label for="i11-span">Net taxable estate is: &nbsp;</label>
+              <span
+                data-id="i11"
+                step="any"
+                id="i11-span"
+                class="spans"
+              ></span>
+            </p>
+            ${taxableEstate > lifeTimeExempt ? 
+              `
+                <p>
+                  <label for="i12-span">For 2024, the taxable estate after exemption is: &nbsp;</label>
+                  <span
+                    data-id="i12"
+                    step="any"
+                    id="i12-span"
+                    class="spans"
+                  ></span>
+                </p>
+                <p>
+                  <label for="i13-span">The federal estate tax is: &nbsp;</label>
+                  <span
+                    data-id="i13"
+                    step="any"
+                    id="i13-span"
+                    class="spans"
+                  ></span>
+                </p>
+                <p>
+                  <label for="i14-span">The after tax value is: &nbsp;</label>
+                  <span
+                    data-id="i14"
+                    step="any"
+                    id="i14-span"
+                    class="spans"
+                  ></span>
+                </p>
+              ` 
+            : 
+              `
+              <p>
+                Because the taxable estate value is within the exemption, the federal estate tax due is $0 for 2024
+              </p>
+              `
+            }
+            
+            
+        `
+        return newDiv
+      }
+
+      function setResult(resultObj) {
+        for (key of Object.keys(resultObj)) {
+          let val = resultObj[key].result;
+          let id = resultObj[key].type;
+
+          if (isNaN(val)) {
+           alert("Your input resulted in NAN.\n 0/0 \n Try again with valid input.");
+            return;
+          }
+          if (Math.abs(val) === Infinity) {
+            alert("Your input resulted in Infinity. \nDivision by zero. \nTry again with valid input.");
+            return;
+          }
+          const span = document.getElementById(`${id}-span`);
+          span.textContent = `${val * 1}`;
+        }
+      }
+
+      function calculateResults() {
+          // Retrieve input values
+          const residence = parseFloat(residenceEl.value);
+          const stocks = parseFloat(stocksEl.value);
+          const savings = parseFloat(savingsEl.value);
+          const vehicles = parseFloat(vehiclesEl.value);
+          const debts = parseFloat(debtsEl.value);
+          const funeral = parseFloat(funeralEl.value);
+          const retirePlans = parseFloat(retirePlansEl.value);
+          const insureBenefit = parseFloat(insureBenefitEl.value);
+          const otherAssets = parseFloat(otherAssetsEl.value);
+          const charityContrib = parseFloat(charityContribEl.value);
+          const totGift = parseFloat(totGiftEl.value);
+          const stateTaxes = parseFloat(stateTaxesEl.value);
+
+          if (isNaN(residence) || residence < 0 || isNaN(stocks) || stocks < 0 || isNaN(savings) || savings < 0 ||
+            isNaN(vehicles) || vehicles < 0 || isNaN(debts) || debts < 0 || isNaN(funeral) || funeral < 0 ||
+            isNaN(retirePlans) || retirePlans < 0 || isNaN(insureBenefit) || insureBenefit < 0 || isNaN(totGift) || totGift < 0 ||
+            isNaN(stateTaxes) || stateTaxes < 0 || isNaN(otherAssets) || otherAssets < 0 || isNaN(charityContrib) || charityContrib < 0
+          ) {
+            alert("Please Enter All Details.");
+            return;
+          }
+
+          try {
+
+            const taxableEstate = (residence + stocks + savings + vehicles + retirePlans + insureBenefit + otherAssets + totGift) - 
+                                  (debts + funeral + charityContrib + stateTaxes)
+            
+            const resultElement = createElement(taxableEstate)
+            calcResultsEl.innerHTML = resultElement  
+            
+            const netTaxableEstate = taxableEstate - totGift
+            let results = {
+              1: { result: Math.abs(netTaxableEstate) > 1 ? netTaxableEstate.toFixed(2) : netTaxableEstate.toPrecision(2), type: "i11" },
+            }
+            if (taxableEstate > lifeTimeExempt) {
+              const afterExempTaxable = taxableEstate - lifeTimeExempt
+              const tax = 0.4 * afterExempTaxable
+              const afterTaxValue = netTaxableEstate - tax
+              results = {
+                ...results,
+                2: { result: Math.abs(afterExempTaxable) > 1 ? afterExempTaxable.toFixed(2) : afterExempTaxable.toPrecision(2), type: "i12" },
+                3: { result: Math.abs(tax) > 1 ? tax.toFixed(2) : tax.toPrecision(2), type: "i13" },
+                4: { result: Math.abs(afterTaxValue) > 1 ? afterTaxValue.toFixed(2) : afterTaxValue.toPrecision(2), type: "i14" },
+              }
+            }
+            setResult(results)
+
+          } catch (error) {
+            alert("Something Went Wrong!!!");
+            resetResult()
+            return;
+          }
+      }
+
+      function resetForm() {
+        residenceEl.value = "0"
+        stocksEl.value = "0"
+        savingsEl.value = "0"
+        vehiclesEl.value = "0"
+        debtsEl.value = "0"
+        funeralEl.value = "0"
+        retirePlansEl.value = "0"
+        insureBenefitEl.value = "0"
+        otherAssetsEl.value = "0"
+        charityContribEl.value = "0"
+        stateTaxesEl.value = "0"
+        totGiftEl.value = "0"
+      }
+
+      function resetResult() {
+        calcResultsEl.innerHTML = "<p>Result will appear here...</p>";
+      } 
+
+      function resethandler() {
+        resetForm();
+        resetResult();
+      }
+
+      resetBtnEl.addEventListener("click", resethandler);
+      calcBtnEl.addEventListener("click", calculateResults);
+      [residenceEl, stocksEl, savingsEl, vehiclesEl, debtsEl, funeralEl,
+        retirePlansEl, insureBenefitEl, otherAssetsEl, charityContribEl, stateTaxesEl, totGiftEl
+      ].forEach((el) => {
+        el.addEventListener("input", resetResult);
+      });  
+
+    </script>
+</body>
+</html>

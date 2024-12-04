@@ -1,0 +1,600 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>dB Calculator</title>
+  </head>
+  <body>
+    <h1>dB Calculator</h1>
+      <p>
+        Calculate
+        <select id="calcUnit">
+          <option value="i1" selected>Sound pressure level</option>
+          <option value="i2">Sound intensity level</option>
+        </select>
+      </p>
+      <div id="i1-container" class="containers">
+        <p>
+          <label for="i1-input">Reference pressure</label>
+          <input
+            type="number"
+            min="0"
+            autocomplete="off"
+            data-id="i1"
+            step="any"
+            id="i1-input"
+            class="inputs"
+            value="0.00002"
+            data-name="Reference pressure"
+          />
+          <select
+            class="selects"
+            id="i1-select"
+            data-type="pressure"
+            data-prev="Pa"
+            data-id="i1"
+          >
+            <option value="Pa" selected>pascals (Pa)</option>
+            <option value="bar">bars (bar)</option>
+            <option value="psi">pounds per square inch (psi)</option>
+            <option value="at">technical atmospheres (at)</option>
+            <option value="atm">standard atmospheres (atm)</option>
+            <option value="Torr">torr (Torr)</option>
+            <option value="hPa">hectopascals (hPa)</option>
+            <option value="kPa">kilopascals (kPa)</option>
+            <option value="MPa">megapascals (MPa)</option>
+            <option value="GPa">gigapascals (GPa)</option>
+            <option value="inHg">inches of mercury (inHg)</option>
+            <option value="mmHg">millimeters of mercury (mmHg)</option>
+          </select>
+        </p>
+        <p>
+          <label for="i2-input">Sound wave pressure</label>
+          <input
+            type="number"
+            min="0"
+            autocomplete="off"
+            data-id="i2"
+            step="any"
+            id="i2-input"
+            class="inputs"
+            data-name="Sound wave pressure"
+          />
+          <select
+            class="selects"
+            id="i2-select"
+            data-type="pressure"
+            data-prev="Pa"
+            data-id="i2"
+          >
+            <option value="Pa" selected>pascals (Pa)</option>
+            <option value="bar">bars (bar)</option>
+            <option value="psi">pounds per square inch (psi)</option>
+            <option value="at">technical atmospheres (at)</option>
+            <option value="atm">standard atmospheres (atm)</option>
+            <option value="Torr">torr (Torr)</option>
+            <option value="hPa">hectopascals (hPa)</option>
+            <option value="kPa">kilopascals (kPa)</option>
+            <option value="MPa">megapascals (MPa)</option>
+            <option value="GPa">gigapascals (GPa)</option>
+            <option value="inHg">inches of mercury (inHg)</option>
+            <option value="mmHg">millimeters of mercury (mmHg)</option>
+          </select>
+        </p>
+      </div>
+      <div id="i2-container" class="containers" style="display: none;">
+        <p>
+          <label for="i21-input">Reference intensity </label>
+          <input
+            type="number"
+            min="0"
+            value="0.000000000001"
+            autocomplete="off"
+            data-id="i21"
+            step="any"
+            id="i21-input"
+            class="inputs"
+            data-name="Reference intensity"
+          />
+          <select
+            class="selects"
+            id="i21-select"
+            data-type="power"
+            data-prev="W"
+            data-id="i21"
+          >
+            <option value="mW">milliwatts (mW)</option>
+            <option value="W" selected>watts (W)</option>
+            <option value="kW">kilowatts (kW)</option>
+            <option value="MW">megawatts (MW)</option>
+            <option value="GW">gigawatts (GW)</option>
+            <option value="BTU/h">British thermal units per hour (BTU/h)</option>
+            <option value="hp(l)">mechanical horsepowers (hp(l))</option>
+          </select>
+          <select
+            class="selects"
+            id="i211-select"
+            data-type="area"
+            data-prev="m²"
+            data-id="i21"
+          >
+            <option value="mm²">square millimeters (mm²)</option>
+            <option value="cm²">square centimeters (cm²)</option>
+            <option value="m²" selected>square meters (m²)</option>
+            <option value="in²">square inches (in²)</option>
+            <option value="ft²">square feet (ft²)</option>
+            <option value="yd²">square yards (yd²)</option>
+          </select>
+        </p>
+
+        <p>
+          <label for="i22-input">Intensity of sound</label>
+          <input
+            type="number"
+            min="0"
+            autocomplete="off"
+            data-id="i22"
+            step="any"
+            id="i22-input"
+            class="inputs"
+            data-name="Intensity of sound"
+          />
+          <select
+            class="selects"
+            id="i22-select"
+            data-type="power"
+            data-prev="W"
+            data-id="i22"
+          >
+            <option value="mW">milliwatts (mW)</option>
+            <option value="W" selected>watts (W)</option>
+            <option value="kW">kilowatts (kW)</option>
+            <option value="MW">megawatts (MW)</option>
+            <option value="GW">gigawatts (GW)</option>
+            <option value="BTU/h">British thermal units per hour (BTU/h)</option>
+            <option value="hp(l)">mechanical horsepowers (hp(l))</option>
+          </select>
+          <select
+            class="selects"
+            id="i221-select"
+            data-type="area"
+            data-prev="m²"
+            data-id="i22"
+          >
+          <option value="mm²">square millimeters (mm²)</option>
+          <option value="cm²">square centimeters (cm²)</option>
+          <option value="m²" selected>square meters (m²)</option>
+          <option value="in²">square inches (in²)</option>
+          <option value="ft²">square feet (ft²)</option>
+          <option value="yd²">square yards (yd²)</option>
+          </select>
+        </p>
+        <p>
+          <label for="i23-input">Sound wave pressure</label>
+          <input
+            type="number"
+            min="0"
+            autocomplete="off"
+            data-id="i23"
+            step="any"
+            id="i23-input"
+            class="inputs"
+            data-name="Sound wave pressure"
+          />
+          <select
+            class="selects"
+            id="i23-select"
+            data-type="pressure"
+            data-prev="Pa"
+            data-id="i23"
+          >
+            <option value="Pa" selected>pascals (Pa)</option>
+            <option value="bar">bars (bar)</option>
+            <option value="psi">pounds per square inch (psi)</option>
+            <option value="at">technical atmospheres (at)</option>
+            <option value="atm">standard atmospheres (atm)</option>
+            <option value="Torr">torr (Torr)</option>
+            <option value="hPa">hectopascals (hPa)</option>
+            <option value="kPa">kilopascals (kPa)</option>
+            <option value="MPa">megapascals (MPa)</option>
+            <option value="GPa">gigapascals (GPa)</option>
+            <option value="inHg">inches of mercury (inHg)</option>
+            <option value="mmHg">millimeters of mercury (mmHg)</option>
+          </select>
+        </p>
+      </div>
+
+      <button id="calcBtn">Calculate</button>
+      <button id="resetBtn">Reset</button>
+      <hr>
+      <div>
+        <h3>Result:</h3>
+        <h3 id="calcResults">Result will appear here...</h3>
+      </div>
+
+    <script>
+      /*************** ELEMENTS ***************/
+      const calcUnitEl = document.getElementById("calcUnit");
+      const selects = document.querySelectorAll(".selects");
+      const inputs = document.querySelectorAll(".inputs");
+      const containersEl = document.querySelectorAll(".containers");
+
+      const calcBtnEl = document.getElementById('calcBtn');
+      const resetBtnEl = document.getElementById('resetBtn');
+      const calcResultsEl = document.getElementById('calcResults')
+
+      /*************** GLOBAL VARIBLES ***************/
+      const UNITS = {
+        distance: {
+          mm: 1e3,
+          cm: 1e2,
+          m: 1,
+          km: 1e-3,
+          in: 39.370078740157474,
+          ft: 3.2808398950131235,
+          yd: 1.0936132983377078,
+          mi: 0.0006213711922373339,
+          nmi: 0.0005399568034557235,
+        },
+        pressure: {
+          Pa: 1,
+          bar: 0.00001,
+          psi: 0.0001450377,
+          at: 0.0000101972,
+          atm: 0.0000098692,
+          Torr: 0.0075006168,
+          hPa: 0.01,
+          kPa: 0.001,
+          MPa: 0.000001,
+          GPa: 1e-9,
+          inHg: 0.0002953006,
+          mmHg: 0.0075006376,
+        },
+        power: {
+          mW: 1e3,
+          W: 1,
+          kW: 1e-3,
+          MW: 1e-6,
+          GW: 1e-9,
+          "BTU/h": 3.412141633,
+          "hp(l)": 0.00134102,
+        },
+        area: {
+          "mm²": 1000000,
+          "cm²": 10000,
+          "m²": 1,
+          "in²": 1550.003100006200012400024800049600099200198400396800793601587,
+          "ft²": 10.763910416709722308333505555900000688890266669422227733344,
+          "yd²": 1.195990046301080256481500617322222298765585185491358637038,
+        },
+        exp: {
+          exp: 1
+        }
+      };
+
+      /*************** FUNCTIONS ***************/
+      function toSIUnit(type, unit, value) {
+        if (type === "temperature") {
+          return UNITS[type][unit](value, "+");
+        }
+        return value / UNITS[type][unit];
+      }
+
+      function fromSIUnit(type, unit, value) {
+        if (type === "temperature") {
+          return UNITS[type][unit](value, "-");
+        }
+        return value * UNITS[type][unit];
+      }
+
+      function handlecalcUnitChange(e) {
+        const value = e.target.value
+
+        containersEl.forEach((container) => {
+          let idVal = container.id.slice(0, 2)
+          if (value == idVal) {
+            container.style.display = 'block'
+          } else {
+            container.style.display = 'none'
+          }
+        })
+        resetResult()
+      }
+
+
+      function createElement() {
+        const newDiv = `
+            <p>
+              <label for="i4-span">SPL (sound pressure level): &nbsp;</label>
+              <span
+                data-id="i4"
+                step="any"
+                id="i4-span"
+                class="spans"
+                data-name="SPL (sound pressure level)"
+              ></span>
+              <select
+                class="selectsResult"
+                id="i4-select"
+                data-type="exp"
+                data-prev="exp"
+                data-id="i4"
+                style="display: none;"
+              >
+                <option value="exp" selected></option>
+              </select>
+            </p>
+        `
+        const newDiv2 = `
+            <p>
+              <label for="i5-span">SIL (sound intensity level): &nbsp;</label>
+              <span
+                data-id="i5"
+                step="any"
+                id="i5-span"
+                class="spans"
+                data-name="SIL (sound intensity level)"
+              ></span>
+              <select
+                class="selectsResult"
+                id="i5-select"
+                data-type="exp"
+                data-prev="exp"
+                data-id="i5"
+                style="display: none;"
+              >
+                <option value="exp" selected></option>
+              </select>
+            </p>
+            <p>
+              <label for="i6-span">Distance: &nbsp;</label>
+              <span
+                data-id="i6
+                step="any"
+                id="i6-span"
+                class="spans"
+                data-name="Distance"
+              ></span>
+              <select
+                class="selectsResult"
+                id="i6-select"
+                data-type="distance"
+                data-prev="m"
+                data-id="i6"
+              >
+                <option value="mm">millimeters (mm)</option>
+                <option value="cm">centimeters (cm)</option>
+                <option value="m" selected>meters (m)</option>
+                <option value="km">kilometers (km)</option>
+                <option value="in">inches (in)</option>
+                <option value="ft">feet (ft)</option>
+                <option value="yd">yards (yd)</option>
+                <option value="mi">miles (mi)</option>
+              </select>
+            </p>
+        `
+        if (calcUnitEl.value === "i1") {
+          return newDiv
+        } else {
+          return newDiv2
+        }
+        
+      }
+
+      // related to caculation
+      function prepareUnit(...args) {
+        const resultArr = [];
+        for (id of args) {
+          const input = document.getElementById(`${id}-input`);
+          const select = document.getElementById(`${id}-select`);
+          const type = select.getAttribute("data-type");
+          let val = parseFloat(input.value);
+
+          val = isNaN(val) ? 0 : val;
+          let inUnit = select.value;
+
+          val = toSIUnit(type, inUnit, val);
+          if (type === "power") {
+            const select = document.getElementById(`${id}1-select`);
+            const type = select.getAttribute("data-type");
+            let inUnit = select.value;
+            val = toSIUnit(type, inUnit, val);
+          }
+          
+
+          resultArr.push(val);
+        }
+
+        return resultArr;
+      }
+
+      function setResult(resultObj) {
+        for (key of Object.keys(resultObj)) {
+          let val = resultObj[key].result;
+          let id = resultObj[key].type;
+
+          if (isNaN(val)) {
+           alert("Your input resulted in NAN.\n 0/0 \n Try again with valid input.");
+            return;
+          }
+          if (Math.abs(val) === Infinity) {
+            alert("Your input resulted in Infinity. \nDivision by zero. \nTry again with valid input.");
+            return;
+          }
+          const span = document.getElementById(`${id}-span`);
+          const select = document.getElementById(`${id}-select`);
+          const type = select.getAttribute("data-type");
+          let outUnit = select.value;
+          val = fromSIUnit(type, outUnit, val);
+
+          span.textContent = parseFloat(val);
+        }
+      }
+
+      function calculateResult(input) {       
+        function calculateSPL() {
+          let [val1, val2] = prepareUnit("i1", "i2");
+          let divisn = val2 / val1
+          let result = 20 * (Math.log(divisn) / Math.log(10))
+          
+          return {
+            1: { result: result > 1 ? result.toFixed(4) * 1 : result, type: "i4" },
+          };
+        }
+
+        function calculateSIL() {
+          let [val1, val2, val3] = prepareUnit("i21", "i22", "i23");
+          let divisn = val2 / val1
+          let result = 10 * (Math.log(divisn) / Math.log(10))
+          let result2 = Math.sqrt(val3 / (val2 * 4 * Math.PI))
+
+          return {
+            1: { result: result > 1 ? result.toFixed(4) * 1 : result, type: "i5" },
+            2: { result: result2 > 1 ? result2.toFixed(4) * 1 : result2, type: "i6" },
+          };
+        }
+
+        switch(input) {
+          case "i1":
+            return calculateSPL()
+          case "i2":
+            return calculateSIL()
+          default:
+          console.log("error in calculate result switch");
+        }
+      }
+
+      function validateInput(id) {
+        const input = document.getElementById(`${id}-input`);
+        const label = input.getAttribute("data-name").trim();
+        let value = parseFloat(input.value);
+        if (isNaN(value)) {
+          alert(`${label} value cannot be empty.`);
+          return false;
+        } 
+
+        if (value < 0) {
+          alert(`${label} value cannot be negative.`);
+          return false;
+        }
+
+        return true;
+      }
+
+      function handleResultsChange(e) {
+        let select = e.target;
+        let id = select.getAttribute("data-id");
+        let span = document.getElementById(`${id}-span`);
+
+        let prevUnit = select.getAttribute("data-prev");
+        let currentUnit = select.value;
+        select.setAttribute("data-prev", currentUnit);
+
+        if (span.textContent === "") {
+          return;
+        }
+
+        let type = select.getAttribute("data-type");
+
+        let value = parseFloat(span.textContent);
+        value = parseFloat(value);
+        if (isNaN(value)) value = 0.0;
+
+        let si = toSIUnit(type, prevUnit, value);
+        let result = fromSIUnit(type, currentUnit, si);
+        span.textContent = parseFloat(result).toFixed(5) * 1;
+      }
+
+      function calculateResults() {
+        const calcUnit = calcUnitEl.value
+        if (calcUnit === "i1") {
+          for (el of ["i1", "i2"]) {
+            if (!validateInput(el)) return;
+          }
+        } else {
+          for (el of ["i21", "i22", "i23"]) {
+            if (!validateInput(el)) return;
+          }
+        }
+        
+        try {
+          const resultElement = createElement()
+          calcResultsEl.innerHTML = resultElement
+
+          const newSelects = document.querySelectorAll(".selectsResult");
+
+          newSelects.forEach((select) => {
+            select.addEventListener("change", handleResultsChange);
+          });
+
+          const result = calculateResult(calcUnit);
+          setResult(result)
+
+        } catch(error) {
+          alert("An error ocurred. Try again with valid input.");
+          resetResult()
+          return;
+        }
+      }
+
+      function resetForm() {
+        selects.forEach((select) => {
+          if (select.getAttribute("data-type") === "pressure") {
+            select.selectedIndex = '0'
+          } else if (select.getAttribute("data-type") === "power") {
+            select.selectedIndex = '1'
+          } else if (select.getAttribute("data-type") === "area") {
+            select.selectedIndex = '2'
+          }
+        });
+
+        inputs.forEach((input) => {
+          if (input.getAttribute("data-name") === "Reference pressure") {
+            input.value = "0.00002"
+          } else if (input.getAttribute("data-name") === "Reference intensity") {
+            input.value = "0.000000000001"
+          } else {
+            input.value = ""
+          }
+        });
+
+        calcUnitEl.selectedIndex = '0'
+
+        containersEl.forEach((container) => {
+          let idVal = container.id.slice(0, 2)
+          if (idVal === "i1") {
+            container.style.display = 'block'
+          } else {
+            container.style.display = 'none'
+          }
+        })
+      }
+
+      function resetResult() {
+        calcResultsEl.innerHTML = "<p>Result will appear here...</p>";
+      } 
+
+      function resethandler() {
+        resetForm();
+        resetResult();
+      }
+
+      /*************** EVENT LISTINERS ***************/
+
+      selects.forEach((select) => {
+        select.addEventListener("change", resetResult);
+      });
+
+      inputs.forEach((input) => {
+        input.addEventListener("input", resetResult);
+      });
+
+      calcUnitEl.addEventListener("change", handlecalcUnitChange)
+
+      resetBtnEl.addEventListener("click", resethandler);
+      calcBtnEl.addEventListener("click", calculateResults);
+
+    </script>
+  </body>
+</html>

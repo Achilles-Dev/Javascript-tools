@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Real Estate Commission Calculator</title>
+</head>
+<body>
+    <h1>Real Estate Commission Calculator</h1>
+    <p>
+      House price:
+      <input type="number" id="housePrice">
+    </p>
+    <p>
+      Commission:
+      <input type="number" id="commission">%
+    </p>
+
+    <button id="calcBtn">Calculate</button>
+    <button id="resetBtn">Reset</button>
+    <hr>
+    <div>
+      <h3>Result:</h3>
+      <h3 id="calcResults">Result will appear here...</h3>
+    </div>
+
+    <script>
+      // Get required elements from the HTML
+      const housePriceEl = document.getElementById("housePrice");
+      const commissionEl = document.getElementById("commission");
+
+      const calcBtnEl = document.getElementById('calcBtn');
+      const resetBtnEl = document.getElementById('resetBtn');
+      const calcResultsEl = document.getElementById('calcResults') 
+
+      function createElement() {
+        const newDiv = `
+            <p>
+              <label for="i11-span">Commission amount: &nbsp;</label>
+              <span
+                data-id="i11"
+                step="any"
+                id="i11-span"
+                class="spans"
+              ></span>
+            </p>
+            <p>
+              <label for="i12-span">Owner receives: &nbsp;</label>
+              <span
+                data-id="i12"
+                step="any"
+                id="i12-span"
+                class="spans"
+              ></span>
+            </p>
+        `
+        return newDiv
+      }
+
+      function setResult(resultObj) {
+        for (key of Object.keys(resultObj)) {
+          let val = resultObj[key].result;
+          let id = resultObj[key].type;
+
+          if (isNaN(val)) {
+           alert("Your input resulted in NAN.\n 0/0 \n Try again with valid input.");
+            return;
+          }
+          if (Math.abs(val) === Infinity) {
+            alert("Your input resulted in Infinity. \nDivision by zero. \nTry again with valid input.");
+            return;
+          }
+          const span = document.getElementById(`${id}-span`);
+          span.textContent = `${parseFloat(val)}`;
+        }
+      }
+
+      function calculateResults() {
+          // Retrieve input values
+          const housePrice = parseFloat(housePriceEl.value);
+          const commission = parseFloat(commissionEl.value);
+
+          if (isNaN(housePrice)  || housePrice < 0 || isNaN(commission) || commission < 0
+          ) {
+            alert("Please Enter All Details.");
+            return;
+          } else if (commission > 100) {
+            alert("commission must be between 0 and 100%");
+            return;
+          }
+
+          try {
+            const resultElement = createElement()
+            calcResultsEl.innerHTML = resultElement 
+
+            const commAmt = housePrice * (commission / 100)
+            const ownerAmt =  housePrice - commAmt
+
+            const results = {
+              1: { result: Math.abs(commAmt) > 1 ? commAmt.toFixed(2) : commAmt.toPrecision(2), type: "i11" },
+              2: { result: Math.abs(ownerAmt) > 1 ? ownerAmt.toFixed(2) : ownerAmt.toPrecision(2), type: "i12" },
+            }
+            setResult(results)
+
+          } catch (error) {
+            alert("Something Went Wrong!!!");
+            resetResult()
+            return;
+          }
+      }
+
+      function resetForm() {
+        housePriceEl.value = ""
+        commissionEl.value = ""
+      }
+
+      function resetResult() {
+        calcResultsEl.innerHTML = "<p>Result will appear here...</p>";
+      } 
+
+      function resethandler() {
+        resetForm();
+        resetResult();
+      }
+
+      resetBtnEl.addEventListener("click", resethandler);
+      calcBtnEl.addEventListener("click", calculateResults);
+
+      [housePriceEl, commissionEl].forEach((el) => {
+        el.addEventListener("input", resetResult);
+      });  
+    </script>
+</body>
+</html>

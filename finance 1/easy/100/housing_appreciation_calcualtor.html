@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Housing Appreciation Calculator</title>
+</head>
+<body>
+    <h1>Housing Appreciation Calculator</h1>
+    <h3>Calculate housing appreciation rates.</h3>
+    <p>
+      Purchase price:
+      <input type="number" id="purchPrice" value="100000">
+    </p>
+    <p>
+      Purchase date:
+      <input type="date" id="purchDate" value="2014-01-01">
+    </p>
+    <p>
+      Current price:
+      <input type="number" id="currPrice" value="200000">
+    </p>
+    <p>
+      Current date:
+      <input type="date" id="currDate">
+    </p>
+    
+
+    <button id="calcBtn">Calculate</button>
+    <button id="resetBtn">Reset</button>
+    <hr>
+    <div>
+      <h3>Result:</h3>
+      <h3 id="calcResults">Result will appear here...</h3>
+    </div>
+
+    <script>
+      // Get required elements from the HTML
+      const purchPriceEl = document.getElementById("purchPrice");
+      const purchDateEl = document.getElementById("purchDate");
+      const currPriceEl = document.getElementById("currPrice");
+      const currDateEl = document.getElementById("currDate");
+
+      const calcBtnEl = document.getElementById('calcBtn');
+      const resetBtnEl = document.getElementById('resetBtn');
+      const calcResultsEl = document.getElementById('calcResults') 
+
+      let date = new Date()
+      currDateEl.value = formatDate(date)
+
+      function formatDate(date) {
+        let d = new Date(date),
+            month = '' + (d.getMonth() + 1),
+            day = '' + d.getDate() - 1,
+            year = d.getFullYear();
+
+        if (month.length < 2) 
+            month = '0' + month;
+        if (day.length < 2) 
+            day = '0' + day;
+
+        return [year, month, day].join('-');
+      }
+
+      function createElement() {
+        const newDiv = `
+            <p>
+              <label for="i11-span">Time you have owned your house: &nbsp;</label>
+              <span
+                data-id="i11"
+                step="any"
+                id="i11-span"
+                class="spans"
+              ></span> years
+              <span
+                data-id="i112"
+                step="any"
+                id="i112-span"
+                class="spans"
+              ></span> months
+            </p>
+            <p>
+              <label for="i12-span">Price change over this period: &nbsp;</label>
+              <span
+                data-id="i12"
+                step="any"
+                id="i12-span"
+                class="spans"
+              ></span>
+            </p>
+            <p>
+              <label for="i13-span">Percent of price change over this period: &nbsp;</label>
+              <span
+                data-id="i13"
+                step="any"
+                id="i13-span"
+                class="spans"
+              ></span>%
+            </p>
+            <p>
+              <label for="i14-span">Annual price change rate over this period: &nbsp;</label>
+              <span
+                data-id="i14"
+                step="any"
+                id="i14-span"
+                class="spans"
+              ></span>%
+            </p>
+        `
+        return newDiv
+      }
+
+      function setResult(resultObj) {
+        for (key of Object.keys(resultObj)) {
+          let val = resultObj[key].result;
+          let id = resultObj[key].type;
+
+          if (isNaN(val)) {
+           alert("Your input resulted in NAN.\n 0/0 \n Try again with valid input.");
+            return;
+          }
+          if (Math.abs(val) === Infinity) {
+            alert("Your input resulted in Infinity. \nDivision by zero. \nTry again with valid input.");
+            return;
+          }
+          const span = document.getElementById(`${id}-span`);
+          val = parseFloat(val)
+          val = Math.abs(val) > 1 ? val.toFixed(2) * 1 : val.toPrecision(2) * 1
+          span.textContent = val;
+        }
+      }
+
+      function lengthOfTime(prevDate, currDate) {
+        let datePrev = new Date(prevDate)
+        let dateCurr = new Date(currDate)
+        let yearsNum = dateCurr.getFullYear() - datePrev.getFullYear()
+        let monthNum = dateCurr.getMonth() - datePrev.getMonth()
+        if (monthNum < 0) {
+          yearsNum -= 1
+          monthNum = 12 + monthNum 
+        }
+        return {
+          yearsNum,
+          monthNum
+        }
+      }
+
+      function calculateResults() {
+          // Retrieve input values
+          const purchPrice = parseFloat(purchPriceEl.value);
+          const currPrice = parseFloat(currPriceEl.value);
+          const purchDate = purchDateEl.value;
+          const currDate = currDateEl.value;
+
+          if (isNaN(purchPrice)  || purchPrice < 1 ||
+            isNaN(currPrice) || currPrice < 1
+          ) {
+            alert("Please Enter All Details.");
+            return;
+          }
+
+          try {
+            const resultElement = createElement()
+            calcResultsEl.innerHTML = resultElement 
+
+            const time = lengthOfTime(purchDate, currDate)
+            const priceChange = currPrice - purchPrice
+            const percentChange = (priceChange / purchPrice) * 100
+            let period =  parseFloat(time.yearsNum) + (parseFloat(time.monthNum) / 12)
+            const APC = (((currPrice / purchPrice) ** (1 / period)) - 1) * 100
+
+            const results = {
+              1: { result: time.yearsNum, type: "i11" },
+              5: { result: time.monthNum, type: "i112" },
+              2: { result: priceChange, type: "i12" },
+              3: { result: percentChange, type: "i13" },
+              4: { result: APC, type: "i14" },
+            }
+            setResult(results)
+
+          } catch (error) {
+            alert("Something Went Wrong!!!");
+            resetResult()
+            return;
+          }
+      }
+
+      function resetForm() {
+        purchPriceEl.value = "100000"
+        purchDateEl.value = "2014-01-01"
+        currPriceEl.value = "200000"
+        currDateEl.value = formatDate(date)
+      }
+
+      function resetResult() {
+        calcResultsEl.innerHTML = "<p>Result will appear here...</p>";
+      } 
+
+      function resethandler() {
+        resetForm();
+        resetResult();
+      }
+
+      resetBtnEl.addEventListener("click", resethandler);
+      calcBtnEl.addEventListener("click", calculateResults);
+
+      [purchPriceEl, purchDateEl, currPriceEl, currDateEl].forEach((el) => {
+        el.addEventListener("input", resetResult);
+      });  
+    </script>
+</body>
+</html>

@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Balance Transfer Calculator</title>
+</head>
+<body>
+    <h1>Balance Transfer Calculator</h1>
+    <h4>If you are contemplating a balance transfer with a plan to pay off the card within the promotional period, <br />
+       choose promotional period. If, however, you will not complete your payments within the promotional period <br />
+        you should choose long-term use.
+    </h4>
+    <p>
+      Proposed period of use:
+      <select id="periodSelect">
+        <option value="prom" selected>Promotional period</option>
+        <option value="long">Long-term use</option>
+      </select>
+    </p>
+    <p><strong>Old card cost:</strong></p>
+    <p>
+      Old rate:
+      <input type="number" id="oldRate">%
+    </p>
+    <p>
+      Monthly payment: 
+      <input type="number" id="monthPmt">
+    </p>
+    <p><strong> New card cost:</strong></p>
+    <p>
+      Amount to transfer:
+      <input type="number" id="transferAmt">
+    </p>
+    <p>
+      Transfer fee: 
+      <input type="number" id="transferFee">%
+    </p>
+    <p id="promInput" class="inputs">
+      Promotional rate: 
+      <input type="number" id="promoRate1">%
+    </p>
+    <p>
+      Time required: 
+      <input type="number" id="time"> months
+    </p>
+    <div id="longInputs" style="display: none;" class="inputs">
+      <p>
+        Promotional period: 
+        <input type="number" id="promoPeriod"> months
+      </p>
+      <p>
+        Promotional rate: 
+        <input type="number" id="promoRate2">%
+      </p>
+      <p>
+        Final rate: 
+        <input type="number" id="finalRate">%
+      </p>
+    </div>
+
+    <button id="calcBtn">Calculate</button>
+    <button id="resetBtn">Reset</button>
+    <hr>
+    <div>
+      <h3>Result:</h3>
+      <h3 id="calcResults">Result will appear here...</h3>
+    </div>
+
+    <script>
+      // Get required elements from the HTML
+      const periodSelectEl = document.getElementById("periodSelect");
+      const oldRateEl = document.getElementById("oldRate");
+      const monthPmtEl = document.getElementById("monthPmt");
+      const transferAmtEl = document.getElementById("transferAmt");
+      const promoRate1El = document.getElementById("promoRate1");
+      const timeEl = document.getElementById("time");
+      const transferFeeEl = document.getElementById("transferFee");
+      const promoPeriodEl = document.getElementById("promoPeriod");
+      const promoRate2El = document.getElementById("promoRate2");
+      const finalRateEl = document.getElementById("finalRate");
+      const inputsEl = document.querySelectorAll(".inputs");
+      
+
+      const calcBtnEl = document.getElementById('calcBtn');
+      const resetBtnEl = document.getElementById('resetBtn');
+      const calcResultsEl = document.getElementById('calcResults') 
+
+      function handlePeriodSelectChange(e) {
+        const value = e.target.value
+
+        inputsEl.forEach((input) => {
+          const idVal = input.id.slice(0, 4)
+          if (idVal === value) {
+            input.style.display = "block"
+          } else {
+            input.style.display = "none"
+          }
+        })
+
+        resetResult()
+      }
+
+      function createElement() {
+        const newDiv = `
+            <p>
+              <label for="i11-span">Old credit card cost: &nbsp;</label>
+              <span
+                data-id="i11"
+                step="any"
+                id="i11-span"
+                class="spans"
+              ></span>
+            </p>
+            <p>
+              <label for="i12-span">New credit card cost: &nbsp;</label>
+              <span
+                data-id="i12"
+                step="any"
+                id="i12-span"
+                class="spans"
+              ></span>
+            </p>
+            <p>
+              <span
+                data-id="i13"
+                step="any"
+                id="i13-span"
+                class="spans"
+              ></span>
+            </p>
+        `
+        return newDiv
+      }
+
+      function setResult(resultObj) {
+        for (key of Object.keys(resultObj)) {
+          let val = resultObj[key].result;
+          let id = resultObj[key].type;
+
+          const span = document.getElementById(`${id}-span`);
+          if (id === "i13") {
+            span.textContent = val;
+            return;
+          }
+
+          if (isNaN(val)) {
+           alert("Your input resulted in NAN.\n 0/0 \n Try again with valid input.");
+            return;
+          }
+          if (Math.abs(val) === Infinity) {
+            alert("Your input resulted in Infinity. \nDivision by zero. \nTry again with valid input.");
+            return;
+          }
+          
+          val = Math.abs(val) > 1 ? val.toFixed(2) : val.toPrecision(2)
+          span.textContent = val;
+        }
+      }
+
+      function calculateResults() {
+          // Retrieve input values
+          const oldRate = parseFloat(oldRateEl.value);
+          const monthPmt = parseFloat(monthPmtEl.value);
+          const transferAmt = parseFloat(transferAmtEl.value);
+          const promoRate1 = promoRate1El.value;
+          const time = parseFloat(timeEl.value)
+          const transferFee = parseFloat(transferFeeEl.value);
+          const promoRate2 = promoRate2El.value;
+          const promoPeriod = parseFloat(promoPeriodEl.value)
+          const finalRate = parseFloat(finalRateEl.value);
+
+          const periodSelect = periodSelectEl.value;
+
+          if (isNaN(oldRate) || oldRate <= 0 || isNaN(monthPmt) || monthPmt < 0 || isNaN(transferAmt) || transferAmt < 0 ||
+            isNaN(transferFee) || transferFee < 0 || isNaN(time) || time <= 0 ||
+            (promoRate1El.checkVisibility() === true && (isNaN(promoRate1) || promoRate1 < 0)) ||
+            (promoRate2El.checkVisibility() === true && (isNaN(promoRate2) || promoRate2 < 0)) ||
+            (promoPeriodEl.checkVisibility() === true && (isNaN(promoPeriod) || promoPeriod <= 0)) ||
+            (finalRateEl.checkVisibility() === true && (isNaN(finalRate) || finalRate <= 0))
+          ) {
+            alert("Please Enter All Details.");
+            return;
+          }
+
+          try {
+            const resultElement = createElement()
+            calcResultsEl.innerHTML = resultElement 
+
+            let oldCost = 0
+            let newCost = 0
+            let detail = ""
+            let diff = 0
+
+            if (periodSelect === "prom") {
+              oldCost = (oldRate / 100) * transferAmt * (time / 12)
+              newCost = ((transferFee / 100) * transferAmt) + ((promoRate1 / 100) * transferAmt * time / 12)
+              diff = newCost - oldCost
+            } else {
+              const finalPeriod = time - promoPeriod
+              oldCost = (oldRate / 100) * transferAmt * (time / 12)
+              newCost = ((transferFee / 100) * transferAmt) + ((promoRate2 / 100) * transferAmt * promoPeriod / 12) + 
+                  ((finalRate / 100) * transferAmt * finalPeriod / 12)
+              diff = newCost - oldCost
+            }
+            if (diff < 0) {
+              const monthPay = ((transferAmt + newCost) / time).toFixed(2)
+              detail = `This new rate will suit your pocket better and save you ${Math.abs(diff)} in the ${time} month period. 
+                To pay off your card in this time frame you will need to pay ${monthPay} per month. `
+            } else if (diff > 0) {
+              const monthPay = ((transferAmt + newCost) / time).toFixed(2)
+              detail = `This is not a good deal. You will lose ${Math.abs(diff)} in the ${time} month period. 
+                To pay off your card in this time frame you will need to pay ${monthPay} per month. `
+            } else {
+              detail = "This is more effort than it is worth. You will not profit from this deal. "
+            }
+
+            const results = {
+              1: { result: oldCost, type: "i11" },
+              2: { result: newCost, type: "i12" },
+              3: { result: detail, type: "i13" },
+            }
+            setResult(results)
+
+          } catch (error) {
+            alert("Something Went Wrong!!!");
+            resetResult()
+            return;
+          }
+      }
+
+      function resetForm() {
+        oldRateEl.value = ""
+        monthPmtEl.value = ""
+        transferAmtEl.value = ""
+        promoRate1El.value = ""
+        transferFeeEl.value = ""
+        timeEl.value = ""
+        promoRate2El.value = ""
+        promoPeriodEl.value = ""
+        finalRateEl.value = ""
+
+        periodSelectEl.selectedIndex = "0"
+      }
+
+      function resetResult() {
+        calcResultsEl.innerHTML = "<p>Result will appear here...</p>";
+      } 
+
+      function resethandler() {
+        resetForm();
+        resetResult();
+      }
+
+      resetBtnEl.addEventListener("click", resethandler);
+      calcBtnEl.addEventListener("click", calculateResults);
+      [oldRateEl, monthPmtEl, transferAmtEl, timeEl, finalRateEl,
+        promoRate1El, promoRate2El, transferFeeEl, promoPeriodEl
+      ].forEach((el) => {
+        el.addEventListener("input", resetResult);
+      }); 
+      
+      periodSelectEl.addEventListener("change", handlePeriodSelectChange);
+
+    </script>
+</body>
+</html>

@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Credit Card Interest Calculator</title>
+  </head>
+  <body>
+    <h1>Credit Card Interest Calculator</h1>
+    <p>Calculate your credit card interest.</p>
+    <p>
+      Credit card balance:
+      <input type="number" id="balance" value="3000" />
+    </p>
+    <p>
+      Annual interest rate (APR):
+      <input type="number" id="apr" value="17" />%
+    </p>
+    <p>
+      Minimum payment percentage:
+      <input type="number" id="minPmtPercent" value="30" />%
+    </p>
+    <p>
+      Minimum payment amount:
+      <input type="number" id="minPmtAmt" value="100" />
+    </p>
+
+    <button id="calcBtn">Calculate</button>
+    <button id="resetBtn">Reset</button>
+    <hr />
+    <div>
+      <h3>Result:</h3>
+      <h3 id="calcResults">Result will appear here...</h3>
+    </div>
+
+    <script>
+      // Get required elements from the HTML
+      const balanceEl = document.getElementById("balance");
+      const minPmtPercentEl = document.getElementById("minPmtPercent");
+      const aprEl = document.getElementById("apr");
+      const minPmtAmtEl = document.getElementById("minPmtAmt");
+
+      const calcBtnEl = document.getElementById("calcBtn");
+      const resetBtnEl = document.getElementById("resetBtn");
+      const calcResultsEl = document.getElementById("calcResults");
+
+      function createElement() {
+        const newDiv = `
+            <p>
+              <label for="i11-span">Total Interest Paid: &nbsp;</label>
+              <span
+                data-id="i11"
+                step="any"
+                id="i11-span"
+                class="spans"
+              ></span>
+            </p>
+            <p>
+              <label for="i12-span">Number of Payments: &nbsp;</label>
+              <span
+                data-id="i12"
+                step="any"
+                id="i12-span"
+                class="spans"
+              ></span>
+            </p>
+            <p>
+              <label for="i13-span">Total Number of Years: &nbsp;</label>
+              <span
+                data-id="i13"
+                step="any"
+                id="i13-span"
+                class="spans"
+              ></span>
+            </p>  
+        `;
+        return newDiv;
+      }
+
+      function setResult(resultObj) {
+        for (key of Object.keys(resultObj)) {
+          let val = resultObj[key].result;
+          let id = resultObj[key].type;
+
+          if (isNaN(val)) {
+            alert(
+              "Your input resulted in NAN.\n 0/0 \n Try again with valid input."
+            );
+            return;
+          }
+          if (Math.abs(val) === Infinity) {
+            alert(
+              "Your input resulted in Infinity. \nDivision by zero. \nTry again with valid input."
+            );
+            return;
+          }
+          const span = document.getElementById(`${id}-span`);
+          span.textContent = `${val}`;
+        }
+      }
+
+      function calculateCreditCardRepayment(balance, annualInterestRate, minPaymentPercentage, minPaymentAmount) {
+        const monthlyInterestRate = annualInterestRate / 12;
+        let totalInterestPaid = 0;
+        let month = 0;
+
+        while (balance > 0) {
+          const interest = balance * monthlyInterestRate;
+
+          const paymentByPercentage = balance * minPaymentPercentage;
+          const minimumPayment = Math.max(paymentByPercentage, minPaymentAmount);
+          const actualPayment = Math.min(balance + interest, minimumPayment);
+
+          const principalPayment = actualPayment - interest;
+          balance -= principalPayment;
+          month += 1
+          totalInterestPaid += interest;
+          if (balance <= 0) break;
+        }
+
+        return {
+            totalInt: totalInterestPaid,
+            paymentNum: month,
+        };
+      }
+
+      function calculateResults() {
+        // Retrieve input values
+        const balance = parseFloat(balanceEl.value);
+        const minPmtPercent = parseFloat(minPmtPercentEl.value);
+        const apr = parseFloat(aprEl.value);
+        const minPmtAmt = parseFloat(minPmtAmtEl.value);
+
+        if (
+          isNaN(balance) ||
+          balance <= 0 ||
+          isNaN(minPmtPercent) ||
+          minPmtPercent <= 0 ||
+          isNaN(apr) ||
+          apr < 0 ||
+          isNaN(minPmtAmt) ||
+          minPmtAmt <= 0
+        ) {
+          alert("Please Enter All Details.");
+          return;
+        } else if (apr > 99 || minPmtPercent > 99) {
+          alert("Ensure this value is less than 99");
+          return;
+        }
+
+        try {
+          const resultElement = createElement();
+          calcResultsEl.innerHTML = resultElement;
+
+          const {totalInt, paymentNum} = calculateCreditCardRepayment(balance, (apr / 100), (minPmtPercent / 100), minPmtAmt)
+          const totalYears = paymentNum / 12;
+
+          const results = {
+            1: {
+              result:
+                Math.abs(totalInt) > 1
+                  ? totalInt.toFixed(2)
+                  : totalInt.toPrecision(2),
+              type: "i11",
+            },
+            2: {
+              result:
+                Math.abs(paymentNum) > 1
+                  ? paymentNum.toFixed()
+                  : paymentNum.toPrecision(2),
+              type: "i12",
+            },
+            3: {
+              result:
+                Math.abs(totalYears) > 1
+                  ? totalYears.toFixed(2)
+                  : totalYears.toPrecision(2),
+              type: "i13",
+            }
+          };
+          setResult(results);
+        } catch (error) {
+          alert("Something Went Wrong!!!");
+          resetResult();
+          return;
+        }
+      }
+
+      function resetForm() {
+        balanceEl.value = "3000";
+        minPmtPercentEl.value = "30";
+        aprEl.value = "17";
+        minPmtAmtEl.value = "100";
+      }
+
+      function resetResult() {
+        calcResultsEl.innerHTML = "<p>Result will appear here...</p>";
+      }
+
+      function resethandler() {
+        resetForm();
+        resetResult();
+      }
+
+      resetBtnEl.addEventListener("click", resethandler);
+      calcBtnEl.addEventListener("click", calculateResults);
+
+      [balanceEl, minPmtPercentEl, aprEl, minPmtAmtEl].forEach(
+        (el) => {
+          el.addEventListener("input", resetResult);
+        }
+      );
+    </script>
+  </body>
+</html>

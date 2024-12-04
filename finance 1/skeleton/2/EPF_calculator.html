@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>EPF Calculator</title>
+</head>
+<body>
+    <h1>EPF Calculator</h1>
+    <p>
+      Basic pay:
+      <input type="number" id="basicPay" value="15000">
+      <select id="basicPaySelect">
+        <option value="1">month (mo)</option>
+        <option value="12">year (yr)</option>
+      </select>
+    </p>
+    <p>
+      Dearness allowance: 
+      <input type="number" id="allowance" value="0">
+      <select id="allowanceSelect">
+        <option value="1">month (mo)</option>
+        <option value="12">year (yr)</option>
+      </select>
+    </p>
+    <p>
+      Employee contribution percent:
+      <input type="number" id="contribPercent" value="12">%
+    </p>
+    <p>
+      Present age:
+      <input type="number" id="presentAge" value="25"> years
+    </p>
+    <p>
+      Retirement age:
+      <input type="number" id="retireAge" value="58"> years
+    </p>
+    <p>
+      EPF interest rate:
+      <input type="number" id="intRate" value="8.5">% / year
+    </p>
+    <p>
+      Expected salary hike rate:
+      <input type="number" id="hikeRate" value="5">% / year
+    </p>
+    <p>
+      Current EPF balance:
+      <input type="number" id="epfBalance" value="0">
+    </p>
+
+
+    <button id="calcBtn">Calculate</button>
+    <button id="resetBtn">Reset</button>
+    <hr>
+    <div>
+      <h3>Result:</h3>
+      <h3 id="calcResults">Result will appear here...</h3>
+    </div>
+
+    <script>
+      // Get required elements from the HTML
+      const basicPayEl = document.getElementById("basicPay");
+      const allowanceEl = document.getElementById("allowance");
+      const contribPercentEl = document.getElementById("contribPercent");
+      const presentAgeEl = document.getElementById("presentAge");
+      const retireAgeEl = document.getElementById("retireAge");
+      const intRateEl = document.getElementById("intRate");
+      const hikeRateEl = document.getElementById("hikeRate");
+      const epfBalanceEl = document.getElementById("epfBalance");
+
+      const basicPaySelectEl = document.getElementById("basicPaySelect");
+      const allowanceSelectEl = document.getElementById("allowanceSelect");
+
+      const calcBtnEl = document.getElementById('calcBtn');
+      const resetBtnEl = document.getElementById('resetBtn');
+      const calcResultsEl = document.getElementById('calcResults') 
+
+      function createElement() {
+        const newDiv = `
+            <p>
+              <label for="i11-span">Employee contribution: &nbsp;</label>
+              <span
+                data-id="i11"
+                step="any"
+                id="i11-span"
+                class="spans"
+              ></span>
+            </p>
+            <p>
+              <label for="i12-span">Employer contribution: &nbsp;</label>
+              <span
+                data-id="i12"
+                step="any"
+                id="i12-span"
+                class="spans"
+              ></span>
+            </p>
+            <p>
+              <label for="i13-span">Total employee contribution: &nbsp;</label>
+              <span
+                data-id="i13"
+                step="any"
+                id="i13-span"
+                class="spans"
+              ></span>
+            </p>
+            <p>
+              <label for="i14-span">Total employer contribution: &nbsp;</label>
+              <span
+                data-id="i14"
+                step="any"
+                id="i14-span"
+                class="spans"
+              ></span>
+            </p>
+            <p>
+              <label for="i15-span">EPF maturity amount: &nbsp;</label>
+              <span
+                data-id="i15"
+                step="any"
+                id="i15-span"
+                class="spans"
+              ></span>
+            </p>
+        `
+        return newDiv
+      }
+
+      function setResult(resultObj) {
+        for (key of Object.keys(resultObj)) {
+          let val = resultObj[key].result;
+          let id = resultObj[key].type;
+
+          if (isNaN(val)) {
+           alert("Your input resulted in NAN.\n 0/0 \n Try again with valid input.");
+            return;
+          }
+          if (Math.abs(val) === Infinity) {
+            alert("Your input resulted in Infinity. \nDivision by zero. \nTry again with valid input.");
+            return;
+          }
+          const span = document.getElementById(`${id}-span`);
+          span.textContent = `${val}`;
+        }
+      }
+
+      function calculateResults() {
+          // Retrieve input values
+          const basicPay = parseFloat(basicPayEl.value);
+          const allowance = parseFloat(allowanceEl.value);
+          const contribPercent = parseFloat(contribPercentEl.value);
+          const presentAge = parseFloat(presentAgeEl.value);
+          const retireAge = parseFloat(retireAgeEl.value);
+          const intRate = parseFloat(intRateEl.value);
+          const hikeRate = parseFloat(hikeRateEl.value);
+          const epfBalance = parseFloat(epfBalanceEl.value);
+
+          if (isNaN(basicPay) || basicPay <= 0 || isNaN(allowance) || allowance < 0 || isNaN(contribPercent) || contribPercent <= 0 ||
+            isNaN(presentAge) || presentAge <= 0 || isNaN(retireAge) || retireAge <= 0 || isNaN(intRate) || intRate < 0 ||
+            isNaN(hikeRate) || hikeRate < 0 || isNaN(epfBalance) || epfBalance < 0
+          ) {
+            alert("Please Enter All Details.");
+            return;
+          } else if (contribPercent > 100 || intRate > 100 || hikeRate > 100) {
+            alert("Percentage can't be greater than 100%!");
+            return;
+          } else if (contribPercent < 12) {
+            alert("Employee contribution must be at least 12%!");
+            return;
+          } else if (presentAge >= retireAge) {
+            alert("Retirement age must be greater than the present age!");
+            return;
+          }
+
+          try {
+            const resultElement = createElement()
+            calcResultsEl.innerHTML = resultElement 
+
+            const employeeCont = (contribPercent / 100) * basicPay
+            const epsPercent = (8.33 / 100) * basicPay
+            const employerCont = employeeCont - epsPercent
+            const totalContEmployee = 0
+            const totalContEmployer = 0
+            let n = (retireAge - presentAge) * 12
+            let t = (retireAge - presentAge)
+            const epf = employeeCont * ((1 + ((intRate / 100) / n)) ** (n * t))
+
+            const results = {
+              1: { result: Math.abs(employeeCont) > 1 ? employeeCont.toFixed(2) : employeeCont.toPrecision(2), type: "i11" },
+              2: { result: Math.abs(employerCont) > 1 ? employerCont.toFixed(2) : employerCont.toPrecision(2), type: "i12" },
+              3: { result: Math.abs(totalContEmployee) > 1 ? totalContEmployee.toFixed(2) : totalContEmployee.toPrecision(2), type: "i13" },
+              4: { result: Math.abs(totalContEmployer) > 1 ? totalContEmployer.toFixed(2) : totalContEmployer.toPrecision(2), type: "i14" },
+              5: { result: Math.abs(epf) > 1 ? epf.toFixed(2) : epf.toPrecision(2), type: "i15" },
+            }
+            setResult(results)
+
+          } catch (error) {
+            alert("Something Went Wrong!!!");
+            resetResult()
+            return;
+          }
+      }
+
+      function resetForm() {
+        basicPayEl.value = "15000"
+        allowanceEl.value = "0"
+        contribPercentEl.value = "12"
+        presentAgeEl.value = "25"
+        retireAgeEl.value = "58"
+        intRateEl.value = "8.5"
+        retireAgeEl.value = "5"
+        intRateEl.value = "0"
+      }
+
+      function resetResult() {
+        calcResultsEl.innerHTML = "<p>Result will appear here...</p>";
+      } 
+
+      function resethandler() {
+        resetForm();
+        resetResult();
+      }
+
+      resetBtnEl.addEventListener("click", resethandler);
+      calcBtnEl.addEventListener("click", calculateResults);
+
+      [basicPayEl, allowanceEl, contribPercentEl, 
+        presentAgeEl, retireAgeEl, intRateEl, retireAgeEl, intRateEl
+      ].forEach((el) => {
+        el.addEventListener("input", resetResult);
+      });
+      
+      [basicPaySelectEl, allowanceSelectEl].forEach((el) => {
+        el.addEventListener("change", resetResult);
+      });  
+
+    </script>
+</body>
+</html>

@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Commercial Loan Calculator</title>
+</head>
+<body>
+    <h1>Commercial Loan Calculator</h1>
+    <p>
+      Loan Amount:
+      <input type="number" id="loanAmt">
+    </p>
+    <p>
+      Annual Interest Rate:
+      <input type="number" id="intRate">% per year
+    </p>
+    <p>
+      Loan Term:
+      <input type="number" id="loanTermYear"> Years
+      <input type="number" id="loanTermMonth"> Months
+    </p>
+    <p>
+      Loan Due Term in Month(s):
+      <input type="number" id="loanDueTerm">
+    </p>
+    <p>
+      Compounding Method:
+      <select
+        class="selects"
+        id="freqSelect"
+      >
+        <option value="0.0027397260274">Daily</option>
+        <option value="0.0027397260274">Weekly</option>
+        <option value="0.0027397260274">Biweekly</option>
+        <option value="0.0027397260274">Semimonthly</option>
+        <option value="0.08333333333" selected>Monthly</option>
+        <option value="0.25">Quarterly</option>
+        <option value="0.5">Semiannually</option>
+        <option value="1">Annually</option>
+        
+      </select>
+    </p>
+    <p>
+      Payment Period:
+      <select
+        class="selects"
+        id="periodSelect"
+      >
+        <option value="0.0027397260274">Daily</option>
+        <option value="0.0027397260274">Weekly</option>
+        <option value="0.0027397260274">Biweekly</option>
+        <option value="0.0027397260274">Semimonthly</option>
+        <option value="0.08333333333" selected>Monthly</option>
+        <option value="0.25">Quarterly</option>
+        <option value="0.5">Semiannually</option>
+        <option value="1">Annually</option>
+      </select>
+    </p>
+   
+    <button id="calcBtn">Calculate</button>
+    <button id="resetBtn">Reset</button>
+    <hr>
+    <div>
+      <h3>Result:</h3>
+      <h3 id="calcResults">Result will appear here...</h3>
+    </div>
+
+    <script>
+      // Get required elements from the HTML
+      const loanAmtEl = document.getElementById("loanAmt");
+      const loanTermYearEl = document.getElementById("loanTermYear");
+      const intRateEl = document.getElementById("intRate");
+      const loanTermMonthEl = document.getElementById("loanTermMonth");
+      const loanDueTermEl = document.getElementById("loanDueTerm");
+      const periodSelectEl = document.getElementById("periodSelect");
+      const freqSelectEl = document.getElementById("freqSelect");
+
+      const calcBtnEl = document.getElementById('calcBtn');
+      const resetBtnEl = document.getElementById('resetBtn');
+      const calcResultsEl = document.getElementById('calcResults') 
+
+      function createElement() {
+        const newDiv = `
+            <p>
+              <label for="i11-span">Monthly Payment: &nbsp;</label>
+              <span
+                data-id="i11"
+                step="any"
+                id="i11-span"
+                class="spans"
+              ></span>
+            </p>
+            <p>
+              <label for="i12-span">Total Payment: &nbsp;</label>
+              <span
+                data-id="i12"
+                step="any"
+                id="i12-span"
+                class="spans"
+              ></span>
+            </p>
+            <p>
+              <label for="i13-span">Total Interest: &nbsp;</label>
+              <span
+                data-id="i13"
+                step="any"
+                id="i13-span"
+                class="spans"
+              ></span>
+            </p>
+            <p>
+              <label for="i14-span">Annual Payment: &nbsp;</label>
+              <span
+                data-id="i14"
+                step="any"
+                id="i14-span"
+                class="spans"
+              ></span>%
+            </p>
+            <p>
+              <label for="i15-span">Balloon Payment: &nbsp;</label>
+              <span
+                data-id="i15"
+                step="any"
+                id="i15-span"
+                class="spans"
+              ></span>
+            </p>
+        `
+        return newDiv
+      }
+
+      function setResult(resultObj) {
+        for (key of Object.keys(resultObj)) {
+          let val = resultObj[key].result;
+          let id = resultObj[key].type;
+
+          if (isNaN(val)) {
+           alert("Your input resulted in NAN.\n 0/0 \n Try again with valid input.");
+            return;
+          }
+          if (Math.abs(val) === Infinity) {
+            alert("Your input resulted in Infinity. \nDivision by zero. \nTry again with valid input.");
+            return;
+          }
+          const span = document.getElementById(`${id}-span`);
+          span.textContent = `${val * 1}`;
+        }
+      }
+
+      function calculateResults() {
+          // Retrieve input values
+          const loanAmt = parseFloat(loanAmtEl.value);
+          const loanTermYear = parseFloat(loanTermYearEl.value);
+          const intRate = parseFloat(intRateEl.value);
+          const loanTermMonth = parseFloat(loanTermMonthEl.value);
+          const loanDueTerm = parseFloat(loanDueTermEl.value);
+          const freqSelect = parseFloat(freqSelectEl.value);
+          const periodSelect = parseFloat(periodSelectEl.value);
+
+          if (isNaN(loanAmt) || loanAmt <= 0 || isNaN(loanTermYear) || loanTermYear <= 0 || isNaN(intRate) || intRate < 0 ||
+            isNaN(loanTermMonth) || loanTermMonth <= 0 || isNaN(loanDueTerm) || loanDueTerm <= 0 
+          ) {
+            alert("Please Enter All Details.");
+            return;
+          } else if (intRate >= 100 || loanTermMonth >= 100) {
+            alert("Ensure this value is less than 100");
+            return;
+          }
+
+          try {
+            const resultElement = createElement()
+            calcResultsEl.innerHTML = resultElement 
+
+            const monthlyPmt = 0
+            const totalPmt = 0
+            const totalInt = 0
+            const annualPmt = 0
+            const ballonPmt = 0
+
+            const results = {
+              1: { result: Math.abs(monthlyPmt) > 1 ? monthlyPmt.toFixed(2) : monthlyPmt.toPrecision(2), type: "i11" },
+              2: { result: Math.abs(totalPmt) > 1 ? totalPmt.toFixed(2) : totalPmt.toPrecision(2), type: "i12" },
+              3: { result: Math.abs(totalInt) > 1 ? totalInt.toFixed(2) : totalInt.toPrecision(2), type: "i13" },
+              4: { result: Math.abs(annualPmt) > 1 ? annualPmt.toFixed(2) : annualPmt.toPrecision(2), type: "i14" },
+              5: { result: Math.abs(ballonPmt) > 1 ? ballonPmt.toFixed(2) : ballonPmt.toPrecision(2), type: "i15" },
+            }
+            setResult(results)
+
+          } catch (error) {
+            alert("Something Went Wrong!!!");
+            resetResult()
+            return;
+          }
+      }
+
+      function resetForm() {
+        loanAmtEl.value = ""
+        loanTermYearEl.value = ""
+        intRateEl.value = ""
+        loanTermMonthEl.value = ""
+        loanDueTermEl.value = ""
+        periodSelectEl.selectedIndex = "4"
+        freqSelectEl.selectedIndex = "4"
+      }
+
+      function resetResult() {
+        calcResultsEl.innerHTML = "<p>Result will appear here...</p>";
+      } 
+
+      function resethandler() {
+        resetForm();
+        resetResult();
+      }
+
+      resetBtnEl.addEventListener("click", resethandler);
+      calcBtnEl.addEventListener("click", calculateResults);
+
+      [loanAmtEl, loanTermYearEl, intRateEl, loanTermMonthEl, 
+        loanDueTermEl].forEach((el) => {
+        el.addEventListener("input", resetResult);
+      }); 
+      
+      [freqSelectEl, periodSelectEl].forEach((el) => {
+        el.addEventListener("change", resetResult);
+      });
+
+    </script>
+</body>
+</html>

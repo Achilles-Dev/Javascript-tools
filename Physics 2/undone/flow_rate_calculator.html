@@ -1,0 +1,554 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Flow Rate Calculator</title>
+</head>
+<body>
+    <h1>Flow Rate Calculator</h1>
+    <p>Easily calculate the volumetric flow rate of a pipe (a.k.a. discharge rate) given its dimensions and either a pressure difference <br />
+       between its ends or the velocity of the liquid or gas flowing through it. The flow rate calculator can also calculate the mass <br />
+       flow rate of a fluid given its density is known. Input and output support metric and imperial measurement units.
+    </p>
+    <p>
+      Unit system:
+      <select id="unitSysSelect">
+        <option value="imp" selected>Imperial (in, ft or yd, lbs and tons)</option>
+        <option value="met">Metric (cm or m, kg and tonnes)</option>
+      </select>
+    </p>
+    <p>
+      Solve via:
+      <select id="solveSelect">
+        <option value="pd" selected>Pressure difference</option>
+        <option value="fv">Flow velocity</option>
+      </select>
+    </p>
+    <p id="fvContainer" class="containers" style="display: none;">
+      The pipe is:
+      <select id="pipeSelect">
+        <option value="rnd" selected>Round</option>
+        <option value="rec">Rectangular</option>
+      </select>
+    </p>
+    <p id="pdContainer" class="containers">
+      Pressure at start:
+      <input type="number" id="pressureSVal">
+      <select id="pressureSSelect" name="pressureS">
+        <option value="Pa" selected>Pa</option>
+        <option value="kPa">kPa</option>
+        <option value="MPa">MPa</option>
+        <option value="GPa">GPa</option>
+        <option value="mbar">mbar</option>
+        <option value="bar">bar</option>
+        <option value="atm">atm</option>
+        <option value="mmHg">mm Hg (Torr)</option>
+        <option value="mmH2O">mm H20</option>
+        <option value="psi">psi</option>
+      </select>
+    </p>
+    <p id="pdContainer" class="containers">
+      Pressure at end:
+      <input type="number" id="pressureEVal">
+      <select id="pressureESelect" name="pressureE">
+        <option value="Pa" selected>Pa</option>
+        <option value="kPa">kPa</option>
+        <option value="MPa">MPa</option>
+        <option value="GPa">GPa</option>
+        <option value="mbar">mbar</option>
+        <option value="bar">bar</option>
+        <option value="atm">atm</option>
+        <option value="mmHg">mm Hg (Torr)</option>
+        <option value="mmH2O">mm H20</option>
+        <option value="psi">psi</option>
+      </select>
+    </p>
+    <p id="btContainer" class="containers">
+      Diameter: 
+      <input type="number" id="diamVal">
+      <select id="diamSelect" name="diameter">
+        <option value="mm">mm</option>
+        <option value="cm">cm</option>
+        <option value="m">m</option>
+        <option value="in" selected>in</option>
+        <option value="ft">ft</option>
+        <option value="yd">yd</option>
+      </select>
+    </p>
+    <p id="pdContainer" class="containers">
+      Pipe length: 
+      <input type="number" id="ppLenVal">
+      <select id="ppLenSelect" name="pipeLen">
+        <option value="mm">mm</option>
+        <option value="cm">cm</option>
+        <option value="m">m</option>
+        <option value="in" selected>in</option>
+        <option value="ft">ft</option>
+        <option value="yd">yd</option>
+      </select>
+    </p>
+
+    <p id="pdContainer" class="containers">
+      Dynamic viscosity: 
+      <input type="number" id="dynVscVal">
+      <select id="dynVscSelect" name="dynamicVsc" >
+        <option value="kgms" selected="selected">kg/m·s</option>
+        <option value="nsm2">N·s/m2</option>
+        <option value="pas">Pa·s</option>
+        <option value="cp">cP</option>
+      </select>
+    </p>
+    <div id="recContainer" class="containers" style="display: none;">
+      <p>
+        Width:
+        <input type="number" id="widthVal">
+        <select id="widthSelect" name="width">
+          <option value="mm">mm</option>
+          <option value="cm">cm</option>
+          <option value="m">m</option>
+          <option value="in" selected>in</option>
+          <option value="ft">ft</option>
+          <option value="yd">yd</option>
+        </select>
+      </p>
+      <p>
+        Height:
+        <input type="number" id="heigthVal">
+        <select id="heigthSelect" name="height">
+          <option value="mm">mm</option>
+          <option value="cm">cm</option>
+          <option value="m">m</option>
+          <option value="in" selected>in</option>
+          <option value="ft">ft</option>
+          <option value="yd">yd</option>
+        </select>
+      </p>
+    </div>
+    <p id="fvContainer" class="containers" style="display: none;">
+      Flow velocity:
+      <input type="number" id="flowVVal">
+      <select id="flowVSelect" name="flowVelocity">
+        <option value="mph">miles/h</option>
+        <option value="kmh">km/h</option>
+        <option value="mps">miles/s</option>
+        <option value="kms">km/s</option>
+        <option value="ms">m/s</option>
+        <option value="ins">in/s</option>
+        <option value="yds">yd/s</option>
+        <option value="fts" selected>ft/s</option>
+        <option value="knots">knots</option>
+      </select>
+    </p>
+    <p>
+      Liquid density: 
+      <input type="number" id="lqDenVal" placeholder="(optional, liquids only)">
+      <select id="lqDenSelect" name="liquidDen">
+        <option value="g/m³">g/m3</option>
+        <option value="g/cm³">g/cm3</option>
+        <option value="kg/m³">kg/m3</option>
+        <option value="kg/cm³">kg/cm3</option>
+        <option value="oz/in³">oz/cu in</option>
+        <option value="lb/ft³" selected>lb/cu ft</option>
+        <option value="lb/yd³">lb/cu yd</option>
+        <option value="g/litre">g/litre</option>
+      </select>
+    </p>
+    <button id="calcBtn">Calculate</button>
+    <button id="resetBtn">Reset</button>
+    <hr>
+    <div>
+      <h3>Result:</h3>
+      <h3 id="calcResults">Result will appear here...</h3>
+    </div>
+
+    <script>
+      // Get required elements from the HTML
+      const unitSysSelectEl = document.getElementById("unitSysSelect");
+      const solveSelectEl = document.getElementById("solveSelect");
+      const pipeSelectEl = document.getElementById("pipeSelect");
+
+      const pressureSValEl = document.getElementById("pressureSVal");
+      const pressureEValEl = document.getElementById("pressureEVal");
+      const diamValEl = document.getElementById("diamVal");
+      const ppLenValEl = document.getElementById("ppLenVal");
+      const dynVscValEl = document.getElementById("dynVscVal");
+      const widthValEl = document.getElementById("widthVal");
+      const heigthValEl = document.getElementById("heigthVal");
+      const flowVValEl = document.getElementById("flowVVal");
+      const lqDenValEl = document.getElementById("lqDenVal");
+
+      const pressureSSelectEl = document.getElementById("pressureSSelect");
+      const pressureESelectEl = document.getElementById("pressureESelect");
+      const diamSelectEl = document.getElementById("diamSelect");
+      const ppLenSelectEl = document.getElementById("ppLenSelect");
+      const dynVscSelectEl = document.getElementById("dynVscSelect");
+      const widthSelectEl = document.getElementById("widthSelect");
+      const heigthSelectEl = document.getElementById("heigthSelect");
+      const flowVSelectEl = document.getElementById("flowVSelect");
+      const lqDenSelectEl = document.getElementById("lqDenSelect");
+
+      const containtersEl = document.querySelectorAll(".containers");
+
+      const calcBtnEl = document.getElementById('calcBtn');
+      const resetBtnEl = document.getElementById('resetBtn');
+      const calcResultsEl = document.getElementById('calcResults') 
+
+      const UNITS = {
+        distance: {
+          mm: 1e3,
+          cm: 1e2,
+          m: 1,
+          in: 39.37007874015748,
+          ft: 3.2808398950131235,
+          yd: 1.0936132983377078,
+        },
+        pressure: {
+          Pa: 1,
+          bar: 0.000009999999999999999,
+          mbar: 0.01,
+          psi: 0.00014503769999999998,
+          atm: 0.000009869232667160129,
+          kPa: 0.001,
+          MPa: 0.000001,
+          GPa: 9.999999999999999e-10,
+          mmHg: 0.007500615758456562,
+          mmH2O: 0.10197162129779283,
+        },
+        speed: {
+          "mph": 2.2369362920544,
+          "kmh": 3.6,
+          "mps": 0.000621371,
+          "kms": 0.001,
+          "ms": 1,
+          "ins": 39.3701,
+          "yds": 1.09361,
+          "fts": 3.28084,
+          knots: 1.94384,
+        },
+        density: {
+          "g/m³": 1000,
+          "g/cm³": 0.001,
+          "kg/m³": 1,
+          "kg/cm³": 0.000001,
+          "oz/in³": 0.000578037,
+          "lb/ft³": 0.0624279606,
+          "lb/yd³": 1.6855549356,
+          "g/litre": 1,
+        },
+        viscosity: {
+          "kgms": 1,
+          "nsm2": 1,
+          "pas": 1,
+          "cp": 10
+        },
+        flowrate1: {
+          "f³/h": 1,
+          "f³/min": 0.01666666666667,
+          "yd³/h": 0.03703698259756,
+          "yd³/min": 0.0006172830432927,
+          "gal/h": 7.480515625,
+          "gal/min": 0.1246752604167,
+        },
+        flowrate2: {
+          "m³/h": 1,
+          "m³/min": 0.01666666666667,
+          "l/h": 0.03703698259756,
+          "l/min": 0.0006172830432927,
+        }
+
+      }
+
+      /*************** FUNCTIONS ***************/
+      function toSIUnit(type, unit, value) {
+        return value / UNITS[type][unit];
+      }
+
+      function fromSIUnit(type, unit, value) {
+        return value * UNITS[type][unit];
+      }
+
+      function handleUnitSysSelectChange(e) {
+        const value = e.target.value
+        diamSelectEl.selectedIndex = value === 'imp' ? '3' : '0'
+        ppLenSelectEl.selectedIndex = value === 'imp' ? '3' : '2'
+        lqDenSelectEl.selectedIndex = value === 'imp' ? '5' : '2'
+        flowVSelectEl.selectedIndex = value === 'imp' ? '7' : '4'
+        widthSelectEl.selectedIndex = value === 'imp' ? '3' : '0'
+        heigthSelectEl.selectedIndex = value === 'imp' ? '3' : '0'
+      }
+
+      function handleSolveSelectChange(e) {
+        const value = e.target.value
+        const pipe = pipeSelectEl.value
+        if (value == "fv") {
+          pipeSelectEl.selectedIndex = "0"
+        }
+
+        containtersEl.forEach((container) => {
+          let idVal = container.id.slice(0, 2)
+          if (idVal === "bt" && 
+            ((value == "pd") || (value == "fv" && pipe === "rnd"))) {
+            container.style.display = 'block'
+          } else if (value == idVal) {
+            container.style.display = 'block'
+          } else if (idVal == "re" && value == "fv" && pipe == "rec") {
+            container.style.display = 'block'
+          } else {
+            container.style.display = 'none'
+          }
+        })
+      }
+
+      function handlePipeSelectChange(e) {
+        const value = e.target.value
+        containtersEl.forEach((container) => {
+          let idVal = container.id.slice(0, 2)
+          let idVal2 = container.id.slice(0, 3)
+          if (idVal === "bt" && value == 'rnd') {
+            container.style.display = 'block'
+          } else if (value === idVal2 || idVal === "fv" ) {
+            container.style.display = 'block'
+          } else  {
+            container.style.display = 'none'
+          }
+        })
+      }
+
+      function prepareUnits() {
+        let psv = parseFloat(pressureSValEl.value) ?? 0;
+        let pev = parseFloat(pressureEValEl.value) ?? 0;
+        let dv = parseFloat(diamValEl.value) ?? 0;
+        let plv = parseFloat(ppLenValEl.value) ?? 0;
+        let dvv = parseFloat(dynVscValEl.value) ?? 0;
+        let wv = parseFloat(widthValEl.value) ?? 0;
+        let hv = parseFloat(heigthValEl.value) ?? 0;
+        let fvv = parseFloat(flowVValEl.value) ?? 0;
+        let ldv = parseFloat(lqDenValEl.value) ?? 0;
+
+        let psvUnit = pressureSSelectEl.value;
+        let pevUnit = pressureESelectEl.value;
+        let dvUnit = diamSelectEl.value;
+        let plvUnit = ppLenSelectEl.value;
+        let dvvUnit = dynVscSelectEl.value;
+        let wvUnit = widthSelectEl.value;
+        let hvUnit = heigthSelectEl.value;
+        let fvvUnit = flowVSelectEl.value;
+        let ldvUnit = lqDenSelectEl.value;
+
+        psv = toSIUnit("pressure", psvUnit, psv);
+        pev = toSIUnit("pressure", pevUnit, pev);
+        dv = toSIUnit("distance", dvUnit, dv);
+        plv = toSIUnit("distance", plvUnit, plv);
+        dvv = toSIUnit("viscosity", dvvUnit, dvv);
+        wv = toSIUnit("distance", wvUnit, wv);
+        hv = toSIUnit("distance", hvUnit, hv);
+        fvv = toSIUnit("speed", fvvUnit, fvv);
+        ldv = toSIUnit("density", ldvUnit, ldv);
+        
+
+        return { psv, pev, dv , plv, dvv, wv, hv, fvv, ldv};
+      }
+
+      function prepareResults(result, type, name) {
+        let resultObj = {};
+        Object.keys(UNITS[type]).forEach((key) => {
+          let ans = fromSIUnit(type, key, result);
+
+          resultObj[key] = {
+            title: `${name} (${key}): `,
+            value: ` ${ans.toFixed(3) * 1} ${key}`,
+          };
+        });
+        return resultObj;
+      }
+
+      function calculateResult(input) {
+        const PI = 3.14159 
+        const unit = unitSysSelectEl.value
+        const calculatePD = () => {
+          const { psv, pev, dv, plv, dvv, ldv } = prepareUnits();
+          let result;
+          let newldv = ldv
+          if (unit === "imp") {
+            let newdv = fromSIUnit("distance", "in", dv)
+            let newplv = fromSIUnit("distance", "in", plv)
+            newldv = fromSIUnit("density", "lb/ft³", ldv)
+            result = (PI * ((newdv / 2) ** 4) * (psv - pev)) / (8 * dvv * newplv)
+          } else {
+            result = (PI * ((dv / 2) ** 4) * (psv - pev)) / (8 * dvv * plv)
+          }
+          
+          let result2;
+          if (ldv) {
+            result2 = result * newldv
+          }
+          return {
+            result: result.toFixed(6) * 1,
+            result2,
+            type: "pd",
+            name: "Volumetric Flow Rate",
+          };
+        };
+
+        const calculateFV = () => {
+          const pipe = pipeSelectEl.value
+          let result;
+          let result2;
+          if (pipe === "rnd") {
+            const { dv, fvv, ldv } = prepareUnits();
+            let newldv = ldv
+            if (unit === "imp") {
+              let newdv = fromSIUnit("distance", "in", dv)
+              let newfvv = fromSIUnit("speed", "fts", fvv)
+              newldv = fromSIUnit("density", "lb/ft³", ldv)
+              let area = 2 * PI * newdv
+              result = area * newfvv
+            } else {
+              let area = 2 * PI * dv
+              result = area * fvv 
+            }
+            
+            if (ldv) {
+              result2 = result * newldv
+            }
+          } else {
+            const { wv, hv, fvv, ldv } = prepareUnits();
+            let newldv = ldv
+            if (unit === "imp") {
+              let newwv = fromSIUnit("distance", "in", wv)
+              let newhv = fromSIUnit("distance", "in", hv)
+              let newfvv = fromSIUnit("speed", "fts", fvv)
+              newldv = fromSIUnit("density", "lb/ft³", ldv)
+              let area = newwv * newhv
+              result = area * newfvv
+            } else {
+              let area = wv * hv
+              result = area * fvv
+            }
+            
+            if (ldv) {
+              result2 = result * newldv
+            }
+          }
+              
+          return {
+            result: result.toFixed(6) * 1,
+            result2,
+            type: unit === "imp" ? "flowrate1" : "flowrate2",
+            name: `Volumetric Flow Rate`,
+          };
+        };
+    
+        switch (input) {
+          case "pd":
+            return calculatePD();
+          case "fv":
+            return calculateFV();
+          default:
+            console.log("error in calculate result switch");
+        }
+      }
+
+      function calculateResults() {
+        const calcUnit = solveSelectEl.value
+
+        try {
+          const { result, result2, type, name } = calculateResult(calcUnit);
+          if (isNaN(result)) {
+            alert("Your input resulted in NAN.\n 0/0 \n Try again with valid input.");
+            resetResult()
+            return;
+          }
+          if (Math.abs(result) === Infinity) {
+            alert(
+              "Your input resulted in Infinity. \nDivision by zero. \nTry again with valid input."
+            );
+            resetResult()
+            return;
+          }
+          
+          console.log(result, result2)
+          // const resultObj = prepareResults(result, type, name);
+          // const elementNodes = createElements(resultObj);
+          // calcResultsEl.innerHTML = "";
+
+          // elementNodes.forEach((element) => {
+          //   calcResultsEl.append(element);
+          // });      
+        } catch (error) {
+          console.log(error);
+          alert("An error ocurred. Try again with valid input.");
+          resetResult()
+          return;
+        }
+      }
+
+      function resetForm() {
+        pressureSValEl.value = ""
+        pressureEValEl.value = ""
+        diamValEl.value = ""
+        ppLenValEl.value = ""
+        dynVscValEl.value = ""
+        widthValEl.value = ""
+        heigthValEl.value = ""
+        flowVValEl.value = ""
+        lqDenValEl.value = ""
+
+        pressureSSelectEl.selectedIndex = '0'
+        pressureESelectEl.selectedIndex = '0'
+        diamSelectEl.selectedIndex = '3'
+        ppLenSelectEl.selectedIndex = '3'
+        dynVscSelectEl.selectedIndex = '0'
+        widthSelectEl.selectedIndex = '4'
+        heigthSelectEl.selectedIndex = '3'
+        flowVSelectEl.selectedIndex = '7'
+        lqDenSelectEl.selectedIndex = '5'
+
+        solveSelectEl.selectedIndex = '0'
+        pipeSelectEl.selectedIndex = "0"
+        unitSysSelectEl.selectedIndex = "0"
+
+        containtersEl.forEach((container) => {
+          let idVal = container.id.slice(0, 2)
+          if (idVal === "bt" && 
+            ((solveSelectEl.value == "pd") || (solveSelectEl.value == "fv" && pipeSelectEl.value === "rnd"))) {
+            container.style.display = 'block'
+          } else if (idVal == "pd") {
+            container.style.display = 'block'
+          } else {
+            container.style.display = 'none'
+          }
+        })
+      }
+
+      function resetResult() {
+        calcResultsEl.innerHTML = "<p>Result will appear here...</p>";
+      } 
+
+      function resethandler() {
+        resetForm();
+        resetResult();
+      }
+
+      /*************** EVENTLISTINERS ***************/
+      [pressureSValEl, pressureEValEl, diamValEl, ppLenValEl, 
+        dynVscValEl, widthValEl, heigthValEl, flowVValEl, lqDenValEl
+      ].forEach((el) => {
+        el.addEventListener("input", resetResult);
+      }); 
+            
+      [pressureSSelectEl, pressureESelectEl, diamSelectEl, ppLenSelectEl, 
+      dynVscSelectEl, widthSelectEl, heigthSelectEl, flowVSelectEl, lqDenSelectEl
+      ].forEach((el) => {
+        el.addEventListener("change", resetResult);
+      }); 
+
+      unitSysSelectEl.addEventListener("change", handleUnitSysSelectChange)
+      solveSelectEl.addEventListener("change", handleSolveSelectChange)
+      pipeSelectEl.addEventListener("change", handlePipeSelectChange)
+
+      resetBtnEl.addEventListener("click", resethandler);
+      calcBtnEl.addEventListener("click", calculateResults);
+
+    </script>
+</body>
+</html>

@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Fixed Charge Coverage Ratio Calculator</title>
+</head>
+<body>
+    <h1>Fixed Charge Coverage Ratio Calculator</h1>
+    <h3>Calculate the fixed charge coverage ratio.</h3>
+    <p>
+      EBIT:
+      <input type="number" id="ebit">
+    </p>
+    <p>
+      Interest Expense:
+      <input type="number" id="intExpense">
+    </p>
+    <p>
+      Lease Payments:
+      <input type="number" id="leasePaymnt">
+    </p>
+    
+
+    <button id="calcBtn">Calculate</button>
+    <button id="resetBtn">Reset</button>
+    <hr>
+    <div>
+      <h3>Result:</h3>
+      <h3 id="calcResults">Result will appear here...</h3>
+    </div>
+
+    <script>
+      // Get required elements from the HTML
+      const ebitEl = document.getElementById("ebit");
+      const intExpenseEl = document.getElementById("intExpense");
+      const leasePaymntEl = document.getElementById("leasePaymnt");
+
+      const calcBtnEl = document.getElementById('calcBtn');
+      const resetBtnEl = document.getElementById('resetBtn');
+      const calcResultsEl = document.getElementById('calcResults') 
+
+      function createElement() {
+        const newDiv = `
+            <p>
+              <label for="i11-span">Fixed Charge Coverage Ratio: &nbsp;</label>
+              <span
+                data-id="i11"
+                step="any"
+                id="i11-span"
+                class="spans"
+              ></span>%
+            </p>
+        `
+        return newDiv
+      }
+
+      function setResult(resultObj) {
+        for (key of Object.keys(resultObj)) {
+          let val = resultObj[key].result;
+          let id = resultObj[key].type;
+
+          if (isNaN(val)) {
+           alert("Your input resulted in NAN.\n 0/0 \n Try again with valid input.");
+            return;
+          }
+          if (Math.abs(val) === Infinity) {
+            alert("Your input resulted in Infinity. \nDivision by zero. \nTry again with valid input.");
+            return;
+          }
+          const span = document.getElementById(`${id}-span`);
+          span.textContent = `${parseFloat(val)}`;
+        }
+      }
+
+      function calculateResults() {
+          // Retrieve input values
+          const ebit = parseFloat(ebitEl.value);
+          const intExpense = parseFloat(intExpenseEl.value);
+          const leasePaymnt = parseFloat(leasePaymntEl.value);
+
+          if (isNaN(ebit) || isNaN(intExpense) ||
+            isNaN(leasePaymnt) || ((intExpense + leasePaymnt) === 0)
+          ) {
+            alert("Please Enter All Details.");
+            return;
+          } 
+
+          try {
+            const resultElement = createElement()
+            calcResultsEl.innerHTML = resultElement 
+
+            const FCCR = ((ebit + leasePaymnt) / (intExpense + leasePaymnt)) * 100
+
+            const results = {
+              1: { result: Math.abs(FCCR) > 1 ? FCCR.toFixed(2) : FCCR.toPrecision(2), type: "i11" },
+            }
+            setResult(results)
+
+          } catch (error) {
+            alert("Something Went Wrong!!!");
+            resetResult()
+            return;
+          }
+      }
+
+      function resetForm() {
+        ebitEl.value = "100000"
+        intExpenseEl.value = "5"
+        leasePaymntEl.value = "24"
+      }
+
+      function resetResult() {
+        calcResultsEl.innerHTML = "<p>Result will appear here...</p>";
+      } 
+
+      function resethandler() {
+        resetForm();
+        resetResult();
+      }
+
+      resetBtnEl.addEventListener("click", resethandler);
+      calcBtnEl.addEventListener("click", calculateResults);
+
+      [ebitEl, intExpenseEl, leasePaymntEl].forEach((el) => {
+        el.addEventListener("input", resetResult);
+      });  
+    </script>
+</body>
+</html>

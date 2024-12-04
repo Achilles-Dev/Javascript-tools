@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Break-Even Calculator</title>
+</head>
+<body>
+    <h1>Break-Even Calculator</h1>
+    <h4>Use this calculator to easily calculate the break even point for any product or service. <br />
+      Estimate how many units you need to sell before you break even, covering both your fixed and <br />
+      variable costs, and how long it would take you.
+    </h4>
+    <p>
+      Fixed costs:
+      <input type="number" id="fixedCosts">
+    </p>
+    <p>
+      Cost per unit: 
+      <input type="number" id="unitCost">
+    </p>
+    <p>
+      Use:
+      <select id="useSelect">
+        <option value="reve" selected>Enter Revenue per unit</option>
+        <option value="marg">Use Margin</option>
+        <option value="mark">Use Markup</option>
+      </select>
+    </p>
+    <p>
+      Revenue per unit:
+      <input type="number" id="revenue">
+    </p>
+    <p id="margInput" class="inputs" style="display: none;">
+      Margin: 
+      <input type="number" id="margin">%
+    </p>
+    <p id="markInput" class="inputs" style="display: none;">
+      Markup: 
+      <input type="number" id="markup">%
+    </p>
+    <p>
+      Units sold: 
+      <input type="number" id="unitsSold" placeholder="Optional"> / month
+    </p>
+
+    <button id="calcBtn">Calculate</button>
+    <button id="resetBtn">Reset</button>
+    <hr>
+    <div>
+      <h3>Result:</h3>
+      <h3 id="calcResults">Result will appear here...</h3>
+    </div>
+
+    <script>
+      // Get required elements from the HTML
+      const useSelectEl = document.getElementById("useSelect");
+      const fixedCostsEl = document.getElementById("fixedCosts");
+      const unitCostEl = document.getElementById("unitCost");
+      const revenueEl = document.getElementById("revenue");
+      const markupEl = document.getElementById("markup");
+      const unitsSoldEl = document.getElementById("unitsSold");
+      const marginEl = document.getElementById("margin");
+      const inputsEl = document.querySelectorAll(".inputs");
+      
+
+      const calcBtnEl = document.getElementById('calcBtn');
+      const resetBtnEl = document.getElementById('resetBtn');
+      const calcResultsEl = document.getElementById('calcResults') 
+
+      function handleUseSelectChange(e) {
+        const value = e.target.value
+
+        inputsEl.forEach((input) => {
+          const idVal = input.id.slice(0, 4)
+          if (idVal === value) {
+            input.style.display = "block"
+          } else {
+            input.style.display = "none"
+          }
+        })
+        revenueEl.disabled = value === "reve" ? false : true
+
+        resetResult()
+      }
+
+      function handleInputChange(e) {
+        const value = e.target.value
+
+        if (value !== "") {
+          if (e.target.id === "margin" && !isNaN(parseFloat(unitCostEl.value))) {
+            const result = (parseFloat(unitCostEl.value) / (1 - (parseFloat(marginEl.value) / 100)))
+            revenueEl.value = result > 1 ? result.toFixed(2) * 1 : result.toPrecision(2) * 1
+
+          } else if (e.target.id === "markup" && !isNaN(parseFloat(unitCostEl.value))) {
+            const result = (parseFloat(unitCostEl.value) * (1 + (parseFloat(markupEl.value) / 100)))
+            revenueEl.value = result > 1 ? result.toFixed(2) * 1 : result.toPrecision(2) * 1
+          }
+        }
+
+        resetResult()
+      }
+
+      function createElement(unitsSold) {
+        const newDiv = `
+            <p>
+              <label for="i11-span">You have to sell: &nbsp;</label>
+              <span
+                data-id="i11"
+                step="any"
+                id="i11-span"
+                class="spans"
+              ></span> units
+            </p>
+            <p>
+              <label for="i12-span">You have to make: &nbsp;</label>
+              <span
+                data-id="i12"
+                step="any"
+                id="i12-span"
+                class="spans"
+              ></span> in revenue
+            </p>
+            ${!isNaN(unitsSold) ?
+            `
+              <p>
+                <label for="i15-span">Break even after: &nbsp;</label>
+                <span
+                  data-id="i15"
+                  step="any"
+                  id="i15-span"
+                  class="spans"
+                ></span> months
+              </p>
+            ` : ""
+            }
+             
+            <p>
+              <label for="i13-span">Your margin: &nbsp;</label>
+              <span
+                data-id="i13"
+                step="any"
+                id="i13-span"
+                class="spans"
+              ></span>%
+            </p>
+            <p>
+              <label for="i14-span">Your markup: &nbsp;</label>
+              <span
+                data-id="i14"
+                step="any"
+                id="i14-span"
+                class="spans"
+              ></span>%
+            </p>
+        `
+        return newDiv
+      }
+
+      function setResult(resultObj) {
+        for (key of Object.keys(resultObj)) {
+          let val = resultObj[key].result;
+          let id = resultObj[key].type;
+
+          if (isNaN(val)) {
+           alert("Your input resulted in NAN.\n 0/0 \n Try again with valid input.");
+            return;
+          }
+          if (Math.abs(val) === Infinity) {
+            alert("Your input resulted in Infinity. \nDivision by zero. \nTry again with valid input.");
+            return;
+          }
+          const span = document.getElementById(`${id}-span`);
+          val = Math.abs(val) > 1 ? val.toFixed(2) : val.toPrecision(2)
+          span.textContent = val * 1;
+        }
+      }
+
+      function calculateResults() {
+          // Retrieve input values
+          const fixedCosts = parseFloat(fixedCostsEl.value);
+          const unitCost = parseFloat(unitCostEl.value);
+          const revenue = parseFloat(revenueEl.value);
+          const markup = parseFloat(markupEl.value);
+          const unitsSold = parseFloat(unitsSoldEl.value)
+          const margin = parseFloat(marginEl.value);
+
+          if (isNaN(fixedCosts) || fixedCosts <= 0 || isNaN(unitCost) || unitCost <= 0 || isNaN(revenue) || revenue <= 0
+          ) {
+            alert("Please Enter All Details.");
+            return;
+          }
+
+          try {
+            const resultElement = createElement(unitsSold)
+            calcResultsEl.innerHTML = resultElement 
+
+            const toSell = fixedCosts / (revenue - unitCost)
+            const totalRevenue = revenue * toSell
+            const marginPercent = marginEl.checkVisibility() === true ? margin : ((revenue - unitCost) / revenue) * 100
+            const markupPercent = markupEl.checkVisibility() === true ? markup : ((revenue - unitCost) / unitCost) * 100
+
+            if (!isNaN(unitsSold)) {
+              let breakEven = 0
+              let totalRevenueMonth = revenue * unitsSold
+              while (totalRevenueMonth <= totalRevenue) {
+                breakEven += 1
+                totalRevenueMonth += revenue * unitsSold
+              }
+              const results = {
+                5: { result: breakEven, type: "i15" },
+              }
+              setResult(results)
+            }
+
+            const results = {
+              1: { result: toSell, type: "i11" },
+              2: { result: totalRevenue, type: "i12" },
+              3: { result: marginPercent, type: "i13" },
+              4: { result: markupPercent, type: "i14" },
+            }
+            setResult(results)
+
+          } catch (error) {
+            alert("Something Went Wrong!!!");
+            resetResult()
+            return;
+          }
+      }
+
+      function resetForm() {
+        fixedCostsEl.value = ""
+        unitCostEl.value = ""
+        revenueEl.value = ""
+        markupEl.value = ""
+        marginEl.value = ""
+        unitsSoldEl.value = ""
+
+        useSelectEl.selectedIndex = "0"
+      }
+
+      function resetResult() {
+        calcResultsEl.innerHTML = "<p>Result will appear here...</p>";
+      } 
+
+      function resethandler() {
+        resetForm();
+        resetResult();
+      }
+
+      resetBtnEl.addEventListener("click", resethandler);
+      calcBtnEl.addEventListener("click", calculateResults);
+      
+      [fixedCostsEl, unitCostEl, revenueEl, marginEl, markupEl, unitsSoldEl].forEach((el) => {
+        el.addEventListener("input", handleInputChange);
+      }); 
+      
+      useSelectEl.addEventListener("change", handleUseSelectChange);
+
+    </script>
+</body>
+</html>

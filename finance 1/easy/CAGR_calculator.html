@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>CAGR Calculator</title>
+</head>
+<body>
+    <h1>CAGR Calculator</h1>
+    <h3>Calculate Compound Annual Growth Rate and its components.</h3>
+    <p>
+      Calculate:
+      <select id="calcSelect">
+        <option value="init">Initial Value</option>
+        <option value="fina">Final Value</option>
+        <option value="dura">Duration</option>
+        <option value="carg" selected>CARG</option>
+      </select>
+    </p>
+    <p id="initInput" class="inputs">
+      Initial Value:
+      <input type="number" name="Initial Value" id="initialValue" value="100000">
+    </p>
+    <p id="finaInput" class="inputs">
+      Final Value: 
+      <input type="number" name="Final Value" id="finalValue" value="1000000">
+    </p>
+    <p id="duraInput" class="inputs">
+      Duration:
+      <input type="number" name="Duration" id="duration" value="15">  
+    </p>
+    <p id="cargInput" class="inputs" style="display: none;">
+      CARG (Growth Rate) %:
+      <input type="number" name="CARG (Growth Rate) %" id="carg" value="16.591">
+    </p>
+
+
+    <button id="calcBtn">Calculate</button>
+    <button id="resetBtn">Reset</button>
+    <hr>
+    <div>
+      <h3>Result:</h3>
+      <h3 id="calcResults">Result will appear here...</h3>
+    </div>
+
+    <script>
+      // Get required elements from the HTML
+      const calcSelectEl = document.getElementById("calcSelect");
+      const initialValueEl = document.getElementById("initialValue");
+      const finalValueEl = document.getElementById("finalValue");
+      const durationEl = document.getElementById("duration");
+      const cargEl = document.getElementById("carg");
+      const inputsEl = document.querySelectorAll(".inputs");
+
+      let calculateName = "CARG (Growth Rate) %"
+
+      const calcBtnEl = document.getElementById('calcBtn');
+      const resetBtnEl = document.getElementById('resetBtn');
+      const calcResultsEl = document.getElementById('calcResults') 
+
+      function handleCalcSelectChange(e) {
+        const value = e.target.value
+
+        inputsEl.forEach((input) => {
+          const idVal = input.id.slice(0, 4)
+          if (idVal === value) {
+            input.style.display = "none"
+            calculateName = input.lastElementChild.name
+          } else {
+            input.style.display = "block"
+          }
+        })
+
+        resetResult()
+      }
+
+      function createElement() {
+        const newDiv = `
+            <p>
+              <label for="i11-span">${calculateName}: &nbsp;</label>
+              <span
+                data-id="i11"
+                step="any"
+                id="i11-span"
+                class="spans"
+              ></span>${calculateName === "CARG (Growth Rate) %" ? "%" : ""}
+            </p>
+        `
+        return newDiv
+      }
+
+      function setResult(resultObj) {
+        for (key of Object.keys(resultObj)) {
+          let val = resultObj[key].result;
+          let id = resultObj[key].type;
+
+          if (isNaN(val)) {
+           alert("Your input resulted in NAN.\n 0/0 \n Try again with valid input.");
+            return;
+          }
+          if (Math.abs(val) === Infinity) {
+            alert("Your input resulted in Infinity. \nDivision by zero. \nTry again with valid input.");
+            return;
+          }
+          const span = document.getElementById(`${id}-span`);
+          span.textContent = `${parseFloat(val)}`;
+        }
+      }
+
+      function calculateResults() {
+          // Retrieve input values
+          const initialValue = parseFloat(initialValueEl.value);
+          const finalValue = parseFloat(finalValueEl.value);
+          const duration = parseFloat(durationEl.value);
+          const carg = parseFloat(cargEl.value);
+          const calcSelect = calcSelectEl.value
+
+          if ((initialValueEl.checkVisibility() === true && isNaN(initialValue) || initialValue <= 0) || 
+           (finalValueEl.checkVisibility() === true && isNaN(finalValue) || finalValue <= 0) || 
+           (durationEl.checkVisibility() === true && isNaN(duration) || duration <= 0) ||
+           (cargEl.checkVisibility() === true && isNaN(carg) || carg <= 0)
+          ) {
+            alert("Please Enter All Details.");
+            return;
+          }
+
+          try {
+            const resultElement = createElement()
+            calcResultsEl.innerHTML = resultElement 
+
+            let result = 0
+            if (calcSelect === "init") {
+              result = finalValue / ((1 + (carg / 100)) ** duration)
+            } else if (calcSelect === "fina") {
+              result = initialValue * ((1 + (carg / 100)) ** duration)
+            } else if (calcSelect === "dura") {
+              result = Math.log(finalValue / initialValue) / Math.log(1 + (carg / 100))
+            } else {
+              result = ((finalValue / initialValue) ** (1 / duration) - 1) * 100
+            }
+
+            const results = {
+              1: { result: Math.abs(result) > 1 ? result.toFixed(3) : result.toPrecision(3), type: "i11" },
+            }
+            setResult(results)
+
+          } catch (error) {
+            alert("Something Went Wrong!!!");
+            resetResult()
+            return;
+          }
+      }
+
+      function resetForm() {
+        initialValueEl.value = "100000"
+        finalValueEl.value = "1000000"
+        durationEl.value = "15"
+        cargEl.value = "16.591"
+        calcSelectEl.selectedIndex = "3"
+        calculateName = "CARG (Growth Rate) %"
+
+        inputsEl.forEach((input) => {
+          const idVal = input.id.slice(0, 4)
+          if (idVal === "carg") {
+            input.style.display = "none"
+          } else {
+            input.style.display = "block"
+          }
+        })
+
+      }
+
+      function resetResult() {
+        calcResultsEl.innerHTML = "<p>Result will appear here...</p>";
+      } 
+
+      function resethandler() {
+        resetForm();
+        resetResult();
+      }
+
+      resetBtnEl.addEventListener("click", resethandler);
+      calcBtnEl.addEventListener("click", calculateResults);
+      [initialValueEl, finalValueEl, durationEl, cargEl].forEach((el) => {
+        el.addEventListener("input", resetResult);
+      });  
+
+      calcSelectEl.addEventListener("change", handleCalcSelectChange);
+
+    </script>
+</body>
+</html>

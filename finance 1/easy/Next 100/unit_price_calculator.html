@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Unit Price Calculator</title>
+</head>
+<body>
+    <h1>Unit Price Calculator</h1>
+    <p>
+      Total Price ($):
+      <input type="number" id="totalPrice" value="10">
+    </p>
+    <p>
+      Count in Pack:
+      <input type="number" id="count" value="1">
+    </p>
+    <p>
+      Size:
+      <input type="number" id="size" value="2">pound
+    </p>
+    
+
+    <button id="calcBtn">Calculate</button>
+    <button id="resetBtn">Reset</button>
+    <hr>
+    <div>
+      <h3>Result:</h3>
+      <h3 id="calcResults">Result will appear here...</h3>
+    </div>
+
+    <script>
+      // Get required elements from the HTML
+      const totalPriceEl = document.getElementById("totalPrice");
+      const countEl = document.getElementById("count");
+      const sizeEl = document.getElementById("size");
+
+      const calcBtnEl = document.getElementById('calcBtn');
+      const resetBtnEl = document.getElementById('resetBtn');
+      const calcResultsEl = document.getElementById('calcResults') 
+
+      function createElement() {
+        const newDiv = `
+            <p>
+              <label for="i11-span">Unit Price: &nbsp;</label>
+              $<span
+                data-id="i11"
+                step="any"
+                id="i11-span"
+                class="spans"
+              ></span> per pound
+            </p>
+        `
+        return newDiv
+      }
+
+      function setResult(resultObj) {
+        for (key of Object.keys(resultObj)) {
+          let val = resultObj[key].result;
+          let id = resultObj[key].type;
+
+          if (isNaN(val)) {
+           alert("Your input resulted in NAN.\n 0/0 \n Try again with valid input.");
+            return;
+          }
+          if (Math.abs(val) === Infinity) {
+            alert("Your input resulted in Infinity. \nDivision by zero. \nTry again with valid input.");
+            return;
+          }
+          const span = document.getElementById(`${id}-span`);
+          span.textContent = `${parseFloat(val)}`;
+        }
+      }
+
+      function calculateResults() {
+          // Retrieve input values
+          const totalPrice = parseFloat(totalPriceEl.value);
+          const count = parseFloat(countEl.value);
+          const size = parseFloat(sizeEl.value);
+
+          if (isNaN(totalPrice)  || totalPrice < 1 || isNaN(count) || count < 1 ||
+            isNaN(size) || size < 1
+          ) {
+            alert("Please Enter All Details.");
+            return;
+          }
+
+          try {
+            const resultElement = createElement()
+            calcResultsEl.innerHTML = resultElement 
+
+            const unitPrice = (totalPrice / count) / size 
+
+            const results = {
+              1: { result: Math.abs(unitPrice) > 1 ? unitPrice.toFixed(2) : unitPrice.toPrecision(2), type: "i11" },
+            }
+            setResult(results)
+
+          } catch (error) {
+            alert("Something Went Wrong!!!");
+            resetResult()
+            return;
+          }
+      }
+
+      function resetForm() {
+        totalPriceEl.value = "10"
+        countEl.value = "1"
+        sizeEl.value = "2"
+      }
+
+      function resetResult() {
+        calcResultsEl.innerHTML = "<p>Result will appear here...</p>";
+      } 
+
+      function resethandler() {
+        resetForm();
+        resetResult();
+      }
+
+      resetBtnEl.addEventListener("click", resethandler);
+      calcBtnEl.addEventListener("click", calculateResults);
+
+      [totalPriceEl, countEl, sizeEl].forEach((el) => {
+        el.addEventListener("input", resetResult);
+      });  
+    </script>
+</body>
+</html>

@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Rent Increase Calculator</title>
+</head>
+<body>
+    <h1>Rent Increase Calculator</h1>
+    <p>
+      Current annual rent:
+      <input type="number" id="annRent">
+    </p>
+    <p>
+      Average rent change per year:
+      <input type="number" id="rentChange">%
+    </p>
+    <p>
+      Number of years:
+      <input type="number" id="years">
+      <select id="yearsSelect">
+        <option value="52.1857142857">Weeks</option>
+        <option value="12">Months</option>
+        <option value="1" selected>Years</option>
+      </select>
+    </p>
+    
+
+    <button id="calcBtn">Calculate</button>
+    <button id="resetBtn">Reset</button>
+    <hr>
+    <div>
+      <h3>Result:</h3>
+      <h3 id="calcResults">Result will appear here...</h3>
+    </div>
+
+    <script>
+      // Get required elements from the HTML
+      const annRentEl = document.getElementById("annRent");
+      const rentChangeEl = document.getElementById("rentChange");
+      const yearsEl = document.getElementById("years");
+      const yearsSelectEl = document.getElementById("yearsSelect");
+
+      const calcBtnEl = document.getElementById('calcBtn');
+      const resetBtnEl = document.getElementById('resetBtn');
+      const calcResultsEl = document.getElementById('calcResults') 
+
+      function createElement() {
+        const newDiv = `
+            <p>
+              <label for="i11-span">Expected future annual rent: &nbsp;</label>
+              $<span
+                data-id="i11"
+                step="any"
+                id="i11-span"
+                class="spans"
+              ></span>
+            </p>
+        `
+        return newDiv
+      }
+
+      function setResult(resultObj) {
+        for (key of Object.keys(resultObj)) {
+          let val = resultObj[key].result;
+          let id = resultObj[key].type;
+
+          if (isNaN(val)) {
+           alert("Your input resulted in NAN.\n 0/0 \n Try again with valid input.");
+            return;
+          }
+          if (Math.abs(val) === Infinity) {
+            alert("Your input resulted in Infinity. \nDivision by zero. \nTry again with valid input.");
+            return;
+          }
+          const span = document.getElementById(`${id}-span`);
+          span.textContent = `${parseFloat(val)}`;
+        }
+      }
+
+      function calculateResults() {
+          // Retrieve input values
+          const annRent = parseFloat(annRentEl.value);
+          const rentChange = parseFloat(rentChangeEl.value);
+          const yearsSelect = parseFloat(yearsSelectEl.value);
+          const years = parseFloat(yearsEl.value) / yearsSelect;
+          
+
+          if (isNaN(annRent)  || annRent < 0.01 || isNaN(rentChange) || rentChange < 0 ||
+            isNaN(years) || years < 0
+          ) {
+            alert("Please Enter All Details.");
+            return;
+          } 
+
+          try {
+            const resultElement = createElement()
+            calcResultsEl.innerHTML = resultElement 
+
+            const EFAR = annRent * ((1 + (rentChange / 100)) ** years)
+
+            const results = {
+              1: { result: Math.abs(EFAR) > 1 ? EFAR.toFixed(2) : EFAR.toPrecision(2), type: "i11" },
+            }
+            setResult(results)
+
+          } catch (error) {
+            alert("Something Went Wrong!!!");
+            resetResult()
+            return;
+          }
+      }
+
+      function resetForm() {
+        annRentEl.value = ""
+        rentChangeEl.value = ""
+        yearsEl.value = ""
+        yearsSelectEl.selectIndex = "2"
+      }
+
+      function resetResult() {
+        calcResultsEl.innerHTML = "<p>Result will appear here...</p>";
+      } 
+
+      function resethandler() {
+        resetForm();
+        resetResult();
+      }
+
+      resetBtnEl.addEventListener("click", resethandler);
+      calcBtnEl.addEventListener("click", calculateResults);
+
+      [annRentEl, rentChangeEl, yearsEl].forEach((el) => {
+        el.addEventListener("input", resetResult);
+      });  
+
+      yearsSelectEl.addEventListener("change", resetResult);
+    </script>
+</body>
+</html>

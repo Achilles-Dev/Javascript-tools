@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>CD Ladder Calculator</title>
+</head>
+<body>
+    <h1>CD Ladder Calculator</h1>
+    <h3>Calculate the amount of interest earned on a CD ladder when all of its component CDs <br />
+       reach maturity at the ends of their terms.
+    </h3>
+    <p>
+      Initial Deposit:
+      <input type="number" id="initDeposit" value="10000">
+    </p>
+    <p>
+      Maturity Frequency:
+      <select
+        class="selects"
+        id="matureFreqSelect"
+      >
+        <option value="three">3 months</option>
+        <option value="six" selected>6 Months</option>
+        <option value="twelve">12 Months</option>
+      </select>
+    </p>
+    <p>Interest Rates:</p>
+    <p id="three" class="inputs" style="display: none;">
+      3 Month CD:
+      <input type="number" id="threeMonth" value="1.5">
+    </p>
+    <p id="both" class="inputs">
+      6 Month CD:
+      <input type="number" id="sixMonth" value="1.9">
+    </p>
+    <p id="three" class="inputs" style="display: none;">
+      9 Month CD:
+      <input type="number" id="nineMonth" value="1.95">
+    </p>
+    <p>
+      12 Month CD:
+      <input type="number" id="twelveMonth" value="2.1">
+    </p>
+    <p id="both" class="inputs">
+      18 Month CD:
+      <input type="number" id="eighteenMonth" value="2.3">
+    </p>
+    <p>
+      24 Month CD:
+      <input type="number" id="twentyfourMonth" value="2.5">
+    </p>
+
+    <button id="calcBtn">Calculate</button>
+    <button id="resetBtn">Reset</button>
+    <hr>
+    <div>
+      <h3>Result:</h3>
+      <h3 id="calcResults">Result will appear here...</h3>
+    </div>
+
+    <script>
+      // Get required elements from the HTML
+      const initDepositEl = document.getElementById("initDeposit");
+      const matureFreqSelectEl = document.getElementById("matureFreqSelect");
+      const threeMonthEl = document.getElementById("threeMonth");
+      const sixMonthEl = document.getElementById("sixMonth");
+      const nineMonthEl = document.getElementById("nineMonth");
+      const twelveMonthEl = document.getElementById("twelveMonth");
+      const eighteenMonthEl = document.getElementById("eighteenMonth");
+      const twentyfourMonthEl = document.getElementById("twentyfourMonth");
+
+      const inputsEl = document.querySelectorAll(".inputs");
+
+      const calcBtnEl = document.getElementById('calcBtn');
+      const resetBtnEl = document.getElementById('resetBtn');
+      const calcResultsEl = document.getElementById('calcResults') 
+
+      function handleMatureFreqSelectChange(e) {
+        const value = e.target.value
+
+        inputsEl.forEach((input) => {
+          const idVal = input.id
+          if (idVal === value) {
+            input.style.display = "block"
+          } else {
+            input.style.display = "none"
+          }
+          if ((value === "three" || value === "six") && idVal === "both") {
+            input.style.display = "block"
+          } else {
+            
+          }
+        })
+
+        resetResult()
+      }
+
+      function createElement() {
+        const newDiv = `
+            <p>CD Ladder 5-Year Return:</p>
+            <p>
+              <label for="i11-span">Total Value: &nbsp;</label>
+              <span
+                data-id="i11"
+                step="any"
+                id="i11-span"
+                class="spans"
+              ></span>
+            </p>
+            <p>
+              <label for="i12-span">Interest Earned: &nbsp;</label>
+              <span
+                data-id="i12"
+                step="any"
+                id="i12-span"
+                class="spans"
+              ></span>
+            </p>
+            <p>Single CD Comparison:</p>
+            <p>
+              <label for="i13-span">Total Value: &nbsp;</label>
+              <span
+                data-id="i13"
+                step="any"
+                id="i13-span"
+                class="spans"
+              ></span>
+            </p>
+            <p>
+              <label for="i14-span">Interest Earned: &nbsp;</label>
+              <span
+                data-id="i14"
+                step="any"
+                id="i14-span"
+                class="spans"
+              ></span>
+            </p>
+            <span>*fixed-term, 12-month CDs rolled over annually over 60 months</span>
+        `
+        return newDiv
+      }
+
+      function setResult(resultObj) {
+        for (key of Object.keys(resultObj)) {
+          let val = resultObj[key].result;
+          let id = resultObj[key].type;
+
+          if (isNaN(val)) {
+           alert("Your input resulted in NAN.\n 0/0 \n Try again with valid input.");
+            return;
+          }
+          if (Math.abs(val) === Infinity) {
+            alert("Your input resulted in Infinity. \nDivision by zero. \nTry again with valid input.");
+            return;
+          }
+          const span = document.getElementById(`${id}-span`);
+          span.textContent = `${val * 1}`;
+        }
+      }
+
+      function calculateResults() {
+          // Retrieve input values
+          const initDeposit = parseFloat(initDepositEl.value);
+          const twentyfourMonth = parseFloat(twentyfourMonthEl.value);
+          const sixMonth = parseFloat(sixMonthEl.value);
+          const twelveMonth = parseFloat(twelveMonthEl.value);
+          const eighteenMonth = parseFloat(eighteenMonthEl.value);
+          const threeMonth = parseFloat(threeMonthEl.value);
+          const nineMonth = parseFloat(nineMonthEl.value);
+          const matureFreqSelect = matureFreqSelectEl.value;
+
+          if (isNaN(initDeposit) || initDeposit <= 0 || (matureFreqSelect === "three" && (isNaN(threeMonth) || threeMonth <= 0 || 
+            isNaN(nineMonth) || nineMonth <= 0)) || 
+            ((matureFreqSelect === "three" || matureFreqSelect === "six") && 
+            (isNaN(sixMonth) || sixMonth <= 0 || isNaN(eighteenMonth) || eighteenMonth <= 0 )) ||
+            isNaN(twelveMonth) || twelveMonth <= 0 || isNaN(twentyfourMonth) || twentyfourMonth <= 0
+          ) {
+            alert("Please Enter All Details.");
+            return;
+          } else if (twentyfourMonth >= 100 || sixMonth >= 100) {
+            alert("Ensure this value is less than 100");
+            return;
+          }
+
+          try {
+            const resultElement = createElement()
+            calcResultsEl.innerHTML = resultElement 
+
+            const totalVal1 = 0
+            const totalInt1 = 0
+            const totalVal2 = 0
+            const totalInt2 = 0
+
+            const results = {
+              1: { result: Math.abs(totalVal1) > 1 ? totalVal1.toFixed(2) : totalVal1.toPrecision(2), type: "i11" },
+              2: { result: Math.abs(totalInt1) > 1 ? totalInt1.toFixed(2) : totalInt1.toPrecision(2), type: "i12" },
+              3: { result: Math.abs(totalVal2) > 1 ? totalVal2.toFixed(2) : totalVal2.toPrecision(2), type: "i13" },
+              4: { result: Math.abs(totalInt2) > 1 ? totalInt2.toFixed(2) : totalInt2.toPrecision(2), type: "i14" },
+            }
+            setResult(results)
+
+          } catch (error) {
+            alert("Something Went Wrong!!!");
+            resetResult()
+            return;
+          }
+      }
+
+      function resetForm() {
+        initDepositEl.value = "10000"
+        matureFreqSelectEl.selectedIndex = "1"
+        threeMonthEl.value = "1.5"
+        sixMonthEl.value = "1.9"
+        nineMonthEl.value = "1.95"
+        twelveMonthEl.value = "2.1"
+        eighteenMonthEl.value = "2.3"
+        twentyfourMonthEl.value = "2.5"
+      }
+
+      function resetResult() {
+        calcResultsEl.innerHTML = "<p>Result will appear here...</p>";
+      } 
+
+      function resethandler() {
+        resetForm();
+        resetResult();
+      }
+
+      resetBtnEl.addEventListener("click", resethandler);
+      calcBtnEl.addEventListener("click", calculateResults);
+      [initDepositEl, twentyfourMonthEl, threeMonthEl, sixMonthEl, 
+        nineMonthEl, twelveMonthEl, eighteenMonthEl].forEach((el) => {
+        el.addEventListener("input", resetResult);
+      });  
+
+      matureFreqSelectEl.addEventListener("change", handleMatureFreqSelectChange);
+
+    </script>
+</body>
+</html>

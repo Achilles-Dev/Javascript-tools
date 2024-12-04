@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Sharpe Ratio Calculator</title>
+</head>
+<body>
+    <h1>Sharpe Ratio Calculator</h1>
+    <h3>Calculate the sharpe ratio.</h3>
+    <p>
+      Expected portfolio return (%):
+      <input type="number" id="portReturn">
+    </p>
+    <p>
+      Risk free rate (%):
+      <input type="number" id="riskFreeRate">
+    </p>
+    <p>
+      Portfolio standard deviation (%):
+      <input type="number" id="portSD">
+    </p>
+    
+    <button id="calcBtn">Calculate</button>
+    <button id="resetBtn">Reset</button>
+    <hr>
+    <div>
+      <h3>Result:</h3>
+      <h3 id="calcResults">Result will appear here...</h3>
+    </div>
+
+    <script>
+      // Get required elements from the HTML
+      const portReturnEl = document.getElementById("portReturn");
+      const riskFreeRateEl = document.getElementById("riskFreeRate");
+      const portSDEl = document.getElementById("portSD");
+
+      const calcBtnEl = document.getElementById('calcBtn');
+      const resetBtnEl = document.getElementById('resetBtn');
+      const calcResultsEl = document.getElementById('calcResults') 
+
+      function createElement() {
+        const newDiv = `
+            <p>
+              <label for="i11-span">Sharpe Ratio: &nbsp;</label>
+              <span
+                data-id="i11"
+                step="any"
+                id="i11-span"
+                class="spans"
+              ></span>
+            </p>
+        `
+        return newDiv
+      }
+
+      function setResult(resultObj) {
+        for (key of Object.keys(resultObj)) {
+          let val = resultObj[key].result;
+          let id = resultObj[key].type;
+
+          if (isNaN(val)) {
+           alert("Your input resulted in NAN.\n 0/0 \n Try again with valid input.");
+            return;
+          }
+          if (Math.abs(val) === Infinity) {
+            alert("Your input resulted in Infinity. \nDivision by zero. \nTry again with valid input.");
+            return;
+          }
+          const span = document.getElementById(`${id}-span`);
+          span.textContent = `${parseFloat(val)}`;
+        }
+      }
+
+      function calculateResults() {
+          // Retrieve input values
+          const portReturn = parseFloat(portReturnEl.value);
+          const riskFreeRate = parseFloat(riskFreeRateEl.value);
+          const portSD = parseFloat(portSDEl.value);
+
+          if (isNaN(portReturn)  || portReturn < 0.001 || isNaN(riskFreeRate) || riskFreeRate < 0.001 ||
+            isNaN(portSD) || portSD < 0.001
+          ) {
+            alert("Please Enter All Details.");
+            return;
+          } 
+
+          try {
+            const resultElement = createElement()
+            calcResultsEl.innerHTML = resultElement 
+
+            const SR = (portReturn - riskFreeRate) / portSD
+
+            const results = {
+              1: { result: Math.abs(SR) > 1 ? SR.toFixed(2) : SR.toPrecision(2), type: "i11" },
+            }
+            setResult(results)
+
+          } catch (error) {
+            alert("Something Went Wrong!!!");
+            resetResult()
+            return;
+          }
+      }
+
+      function resetForm() {
+        portReturnEl.value = ""
+        riskFreeRateEl.value = ""
+        portSDEl.value = ""
+      }
+
+      function resetResult() {
+        calcResultsEl.innerHTML = "<p>Result will appear here...</p>";
+      } 
+
+      function resethandler() {
+        resetForm();
+        resetResult();
+      }
+
+      resetBtnEl.addEventListener("click", resethandler);
+      calcBtnEl.addEventListener("click", calculateResults);
+
+      [portReturnEl, riskFreeRateEl, portSDEl].forEach((el) => {
+        el.addEventListener("input", resetResult);
+      });  
+    </script>
+</body>
+</html>

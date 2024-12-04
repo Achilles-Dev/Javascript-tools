@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>12-Hour Shift Pay Calculator</title>
+</head>
+<body>
+    <h1>12-Hour Shift Pay Calculator</h1>
+    <p>
+      Hourly wage:
+      <input type="number" id="hourWage">
+    </p>
+    <p>
+      Overtime hourly wage: 
+      <input type="number" id="overtimeWage">
+    </p>
+    <p>
+      Number of regular hours: 
+      <input type="number" id="regHoursNum" value="8"> hours
+    </p>
+
+    <button id="calcBtn">Calculate</button>
+    <button id="resetBtn">Reset</button>
+    <hr>
+    <div>
+      <h3>Result:</h3>
+      <h3 id="calcResults">Result will appear here...</h3>
+    </div>
+
+    <script>
+      // Get required elements from the HTML
+      const hourWageEl = document.getElementById("hourWage");
+      const overtimeWageEl = document.getElementById("overtimeWage");
+      const regHoursNumEl = document.getElementById("regHoursNum");
+
+      const calcBtnEl = document.getElementById('calcBtn');
+      const resetBtnEl = document.getElementById('resetBtn');
+      const calcResultsEl = document.getElementById('calcResults') 
+
+      function createElement() {
+        const newDiv = `
+            <p>
+              <label for="i11-span">Average wage per hour: &nbsp;</label>
+              <span
+                data-id="i11"
+                step="any"
+                id="i11-span"
+                class="spans"
+                data-name="Average wage per hour"
+              ></span>
+            </p>
+            <p>
+              <label for="i12-span">Pay per day: &nbsp;</label>
+              <span
+                data-id="i12"
+                step="any"
+                id="i12-span"
+                class="spans"
+                data-name="Pay per day"
+              ></span>
+            </p>
+            <p>
+              <label for="i13-span">Pay per week: &nbsp;</label>
+              <span
+                data-id="i13"
+                step="any"
+                id="i13-span"
+                class="spans"
+                data-name="Pay per week"
+              ></span>
+            </p>
+            <p>
+              <label for="i14-span">Pay per month: &nbsp;</label>
+              <span
+                data-id="i14"
+                step="any"
+                id="i14-span"
+                class="spans"
+                data-name="Pay per month"
+              ></span>
+            </p>
+            <p>
+              <label for="i15-span">Pay per year: &nbsp;</label>
+              <span
+                data-id="i15"
+                step="any"
+                id="i15-span"
+                class="spans"
+                data-name="Pay per year"
+              ></span>
+            </p>
+        `
+        return newDiv
+      }
+
+      function setResult(resultObj) {
+        for (key of Object.keys(resultObj)) {
+          let val = resultObj[key].result;
+          let id = resultObj[key].type;
+
+          if (isNaN(val)) {
+           alert("Your input resulted in NAN.\n 0/0 \n Try again with valid input.");
+            return;
+          }
+          if (Math.abs(val) === Infinity) {
+            alert("Your input resulted in Infinity. \nDivision by zero. \nTry again with valid input.");
+            return;
+          }
+          const span = document.getElementById(`${id}-span`);
+          span.textContent = parseFloat(val);
+        }
+      }
+
+
+      function calculateResults() {
+          // Retrieve input values
+          const hourWage = parseFloat(hourWageEl.value);
+          const overtimeWage = parseFloat(overtimeWageEl.value);
+          const regHoursNum = parseFloat(regHoursNumEl.value);
+
+          if (isNaN(hourWage) || hourWage < 0 || isNaN(overtimeWage) || overtimeWage < 0 || isNaN(regHoursNum) || regHoursNum < 0 ) {
+            alert("Please Enter All Details.");
+            return;
+          } else if (regHoursNum > 12  ) {
+            alert("Insert 12 or less!");
+            return;
+          }
+
+          try {
+            const resultElement = createElement()
+            calcResultsEl.innerHTML = resultElement
+
+            const avgWage = ((hourWage * regHoursNum) + ((12 - regHoursNum) * overtimeWage )) / 12
+
+            const results = {
+              1: { result: Math.abs(avgWage) > 1 ? avgWage.toFixed(2) : avgWage.toPrecision(2), type: "i11" },
+              2: { result: Math.abs(avgWage * 12) > 1 ? (avgWage * 12).toFixed(2) : (avgWage * 12).toPrecision(2) , type: "i12" },
+              3: { result: Math.abs(avgWage * 12 * 5) > 1 ? (avgWage * 12 * 5).toFixed(2) : (avgWage * 12 * 5).toPrecision(2) , type: "i13" },
+              4: { result: Math.abs(avgWage * 12 * 22) > 1 ? (avgWage * 12 * 22).toFixed(2) : (avgWage * 12 * 22).toPrecision(2), type: "i14" },
+              5: { result: Math.abs(avgWage * 12 * 260) > 1 ? (avgWage * 12 * 260).toFixed(2) : (avgWage * 12 * 260).toPrecision(2) , type: "i15" },
+            }
+            setResult(results)
+
+          } catch (error) {
+            alert("Something Went Wrong!!!");
+            resetResult()
+            return;
+          }
+      }
+
+      function resetForm() {
+        hourWageEl.value = ""
+        overtimeWageEl.value = ""
+        regHoursNumEl.value = "8"
+      }
+
+      function resetResult() {
+        calcResultsEl.innerHTML = "<p>Result will appear here...</p>";
+      } 
+
+      function resethandler() {
+        resetForm();
+        resetResult();
+      }
+
+      resetBtnEl.addEventListener("click", resethandler);
+      calcBtnEl.addEventListener("click", calculateResults);
+
+      [hourWageEl, overtimeWageEl, regHoursNumEl].forEach((el) => {
+        el.addEventListener("input", resetResult);
+      });  
+    </script>
+</body>
+</html>

@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Thermal Expansion Calculator</title>
+</head>
+<body>
+    <h1>Thermal Expansion Calculator</h1>
+    <p>Easily calculate the thermal expansion in length, volume or the change in density with a change in temperature. This thermal <br >
+       expansion calculator can be used to calculate linear or volumetric expansion of a material. Supports a variety of input metrics <br />
+        such as Celsius, Fahrenheit, Kelvin, length and volume in both metric and imperial units.
+    </p>
+    <p>
+      Calculate:
+      <select id="calcSelect">
+        <option value="le" selected>Linear Expansion</option>
+        <option value="ve">Volumetric Expansion</option>
+        <option value="dc">Density Change</option>
+      </select>
+    </p>
+    <p>
+      CLTE:
+      <input type="number" id="clteVal">
+      <select name="clte" id="clteSelect">
+        <option value="ppmk" selected="selected">ppm/K</option>
+        <option value="k">/K</option>
+      </select>
+    </p>
+    <p>
+      Initial Temperature: 
+      <input type="number" id="initialTempVal">
+      <select name="initialTemp" id="initialTempSelect">
+        <option value="K" selected="selected">K</option>
+        <option value="°C">°C</option>
+        <option value="°F">°F</option>
+        <option value="°R">°R</option>
+        <option value="°Re">°Re</option>
+      </select> 
+    </p>
+    <p>
+      Final Temperature: 
+      <input type="number" id="finalTempVal">
+      <select name="finalTemp" id="finalTempSelect">
+        <option value="K" selected="selected">K</option>
+        <option value="°C">°C</option>
+        <option value="°F">°F</option>
+        <option value="°R">°R</option>
+        <option value="°Re">°Re</option>
+      </select> 
+    </p>
+    <p id="leContainer" class="containers">
+      Initial Length: 
+      <input type="number" id="initialLenVal">
+      <select id="initialLenSelect" name="initialLenth" >
+        <option value="nm">nm</option>
+        <option value="μm">μm</option>
+        <option value="mm">mm</option>
+        <option value="cm">cm</option>
+        <option value="m" selected="selected">m</option>
+        <option value="km">km</option>
+        <option value="in">in</option>
+        <option value="ft">ft</option>
+        <option value="yd">yd</option>
+        <option value="mi">mi</option>
+      </select>
+    </p>
+    <p id="veContainer" class="containers" style="display: none;">
+      Initial Volume: 
+      <input type="number" id="initialVolVal">
+      <select id="initialVolSelect" name="initialVolume">
+        <option value="mm³">mm3</option>
+        <option value="cm³">cm3</option>
+        <option value="m³" selected="selected">m3</option>
+        <option value="ml">ml</option>
+        <option value="L">L</option>
+        <option value="Gallons">Gallons</option>
+        <option value="fl oz">fl oz</option>
+        <option value="cu in">cu in</option>
+        <option value="cu ft">cu ft</option>
+        <option value="cu yd">cu yd</option>
+      </select>
+    </p>
+    <p id="dcContainer" class="containers" style="display: none;">
+      Initial Density: 
+      <input type="number" id="initialDenVal">
+      <select id="initialDenSelect" name="initialDensity">
+        <option value="g/m³">g/m3</option>
+        <option value="g/cm³">g/cm3</option>
+        <option value="kg/m³" selected="selected">kg/m3</option>
+        <option value="kg/cm³">kg/cm3</option>
+        <option value="ozin³">oz/cu in</option>
+        <option value="lbft³">lb/cu ft</option>
+        <option value="lbyd³">lb/cu yd</option>
+        <option value="g/litre">g/litre</option>
+      </select>
+    </p>
+
+    <button id="calcBtn">Calculate</button>
+    <button id="resetBtn">Reset</button>
+    <hr>
+    <div>
+      <h3>Result:</h3>
+      <h3 id="calcResults">Result will appear here...</h3>
+    </div>
+
+    <script>
+      // Get required elements from the HTML
+      const calcSelectEl = document.getElementById("calcSelect");
+      const clteValEl = document.getElementById("clteVal");
+      const initialTempValEl = document.getElementById("initialTempVal");
+      const finalTempValEl = document.getElementById("finalTempVal");
+      const initialLenValEl = document.getElementById("initialLenVal");
+      const initialVolValEl = document.getElementById("initialVolVal");
+      const initialDenValEl = document.getElementById("initialDenVal");
+
+      const clteSelectEl = document.getElementById("clteSelect");
+      const initialTempSelectEl = document.getElementById("initialTempSelect");
+      const finalTempSelectEl = document.getElementById("finalTempSelect");
+      const initialLenSelectEl = document.getElementById("initialLenSelect");
+      const initialVolSelectEl = document.getElementById("initialVolSelect");
+      const initialDenSelectEl = document.getElementById("initialDenSelect");
+
+      const containtersEl = document.querySelectorAll(".containers");
+
+      const calcBtnEl = document.getElementById('calcBtn');
+      const resetBtnEl = document.getElementById('resetBtn');
+      const calcResultsEl = document.getElementById('calcResults') 
+
+      const UNITS = {
+        volume: {
+          "mm³": 1000000000,
+          "cm³": 1000000,
+          "m³": 1,
+          "L": 1000,
+          "ml": 1000000,
+          "Gallons": 264.17217686,
+          "fl oz": 35195.079728,
+          "cu in": 61023.744095,
+          "cu ft": 35.314666721,
+          "cu yd": 1.3079506193,
+        },
+        temperature: {
+          "°C": (value, op) => (op === "+" ? value + 273.15 : value - 273.15),
+          "°F": (value, op) =>
+            op === "+" ? (value * (5 / 9)) + 255.372222222 : value * (9 / 5) - 459.67,
+          K: (value, op) => value,
+          "°R": (value, op) => op === "+" ? value * (5 / 9) : value * (9 / 5),
+          "°Re": (value, op) => op === "+" ? (value * (5 / 4)) + 273.15 : (value * (4 / 5)) - 218.52,
+        },
+        distance: {
+          nm: 999999999.9999999,
+          μm: 1000000,
+          mm: 1000,
+          cm: 100,
+          m: 1,
+          km: 0.001,
+          in: 39.37007874015748,
+          ft: 3.2808398950131235,
+          yd: 1.0936132983377078,
+          mi: 0.0006213711922373339,
+        },
+        density: {
+          "g/m³": 1000,
+          "g/cm³": 0.001,
+          "kg/m³": 1,
+          "kg/cm³": 0.000001,
+          "ozin³": 0.000578037,
+          "lbft³": 0.0624279606,
+          "lbyd³": 1.6855549356,
+          "g/litre": 1,
+        },
+        clte: {
+          "ppmk": 1e6,
+          "k": 1
+        }
+      }
+
+      /*************** FUNCTIONS ***************/
+      function toSIUnit(type, unit, value) {
+        if (type === "temperature") {
+          return UNITS[type][unit](value, "+");
+        }
+        return value / UNITS[type][unit];
+      }
+
+      function fromSIUnit(type, unit, value) {
+        if (type === "temperature") {
+          return UNITS[type][unit](value, "-");
+        }
+        return value * UNITS[type][unit];
+      }
+
+      function handlecalcSelectChange(e) {
+        const value = e.target.value
+
+        containtersEl.forEach((container) => {
+          let idVal = container.id.slice(0, 2)
+          if (value == idVal) {
+            container.style.display = 'block'
+          } else {
+            container.style.display = 'none'
+          }
+        })
+      }
+
+      function prepareUnits() {
+        let ctle = parseFloat(clteValEl.value) ?? 0;
+        let itmp = parseFloat(initialTempValEl.value) ?? 0;
+        let ftmp = parseFloat(finalTempValEl.value) ?? 0;
+        let ilen = parseFloat(initialLenValEl.value) ?? 0;
+        let ivol = parseFloat(initialVolValEl.value) ?? 0;
+        let iden = parseFloat(initialDenValEl.value) ?? 0;
+
+        let ctleUnit = clteSelectEl.value;
+        let iTmpUnit = initialTempSelectEl.value;
+        let ftmpUnit = finalTempSelectEl.value;
+        let ilentleUnit = initialLenSelectEl.value;
+        let ivolUnit = initialVolSelectEl.value;
+        let idenUnit = initialDenSelectEl.value;
+
+        ctle = toSIUnit("clte", ctleUnit, ctle);
+        itmp = toSIUnit("temperature", iTmpUnit, itmp);
+        ftmp = toSIUnit("temperature", ftmpUnit, ftmp);
+        ilen = toSIUnit("distance", 'm', ilen);
+        ivol = toSIUnit("volume", 'm³', ivol);
+        iden = toSIUnit("density", 'kg/m³', iden);
+
+        return { ctle, itmp, ftmp, ilen, ivol, iden };
+      }
+
+      function calculateResult(input) {
+        const calculateLE = () => {
+          const {ctle, itmp, ftmp, ilen} = prepareUnits();
+          let result = ctle * ilen * (ftmp - itmp)
+          return {
+            result,
+            unit: initialLenSelectEl.value,
+            type: "distance",
+            name: `Length Increase`,
+          };
+        };
+        const calculateVE = () => {
+          const { ctle, itmp, ftmp, ivol  } = prepareUnits();
+          let result = (3 * ctle) * ivol * (ftmp - itmp)
+          return {
+            result,
+            unit: initialVolSelectEl.value,
+            type: "volume",
+            name: "Volume Increase",
+          };
+        };
+        const calculateDC = () => {
+          const { ctle, itmp, ftmp, iden  } = prepareUnits();
+          let result = (iden / (1 + ((3 * ctle) * (ftmp - itmp)))) - iden
+          return {
+            result,
+            unit: initialDenSelectEl.value,
+            type: "density",
+            name: "Density Change",
+          };
+        };
+
+        switch (input) {
+          case "le":
+            return calculateLE();
+          case "ve":
+            return calculateVE();
+          case "dc":
+            return calculateDC();
+          default:
+            console.log("error in calculate result switch");
+        }
+      }
+
+      function calculateResults() {
+        const calcVal = calcSelectEl.value
+
+          try {
+            const { result, type, name , unit} = calculateResult(calcVal);
+
+            if (isNaN(result)) {
+            alert("Your input resulted in NAN.\n 0/0 \n Try again with valid input.");
+            resetResult()
+            return;
+          }
+          if (Math.abs(result) === Infinity) {
+            alert(
+              "Your input resulted in Infinity. \nDivision by zero. \nTry again with valid input."
+            );
+            resetResult()
+            return;
+          }
+          let finalName = '';
+          let finalValue;
+          let leUnit = '';
+          let leVal;
+          if (calcVal === "le") {
+            let index = initialLenSelectEl.selectedIndex - 1
+            if (index >= 0 ) {
+              const newVal = toSIUnit("distance", initialLenSelectEl.value, result)
+              leUnit = initialLenSelectEl[index].value  
+              leVal = fromSIUnit("distance", leUnit, newVal)
+            }      
+            finalName = "Final Length"
+            finalValue = parseFloat(initialLenValEl.value) + result
+          } else if (calcVal === "ve") {
+            let index = initialVolSelectEl.selectedIndex - 1
+            if (index >= 0) {
+              const newVal = toSIUnit("volume", initialVolSelectEl.value, result)
+              leUnit = initialVolSelectEl[index].value 
+              leVal = fromSIUnit("volume", leUnit, newVal)
+            }
+            finalName = "Final Volume"
+            finalValue = parseFloat(initialVolValEl.value) + result
+          } else {
+            finalName = "Final Density"
+            finalValue = parseFloat(initialDenValEl.value) + result
+          }
+            
+          calcResultsEl.innerHTML = `<p>${name} = ${result.toFixed(6) * 1} ${unit} ${leUnit !== '' ? `(${leVal.toFixed(6) * 1} ${leUnit})`: ''}</p>
+                                    <p> ${finalName} = ${finalValue.toFixed(10) * 1} ${unit} </p>
+          `;    
+          } catch (error) {
+            alert("Something Went Wrong!!!");
+            resethandler()
+          }
+      }
+
+      function resetForm() {
+        [clteValEl, initialTempValEl, finalTempValEl, initialLenSelectEl, initialVolSelectEl].forEach((input) => {
+          input.value = ""
+        });
+        clteSelectEl.selectedIndex = '0'
+        initialTempSelectEl.selectedIndex = '0'
+        finalTempSelectEl.selectedIndex = '0'
+        initialLenSelectEl.selectedIndex = '4'
+        initialVolSelectEl.selectedIndex = '0'
+
+        calcSelectEl.selectedIndex = '0'
+
+        containtersEl.forEach((container) => {
+          let idVal = container.id.slice(0, 2)
+          if (idVal == 'le') {
+            container.style.display = 'block'
+          } else {
+            container.style.display = 'none'
+          }
+        })
+      }
+
+      function resetResult() {
+        calcResultsEl.innerHTML = "<p>Result will appear here...</p>";
+      } 
+
+      function resethandler() {
+        resetForm();
+        resetResult();
+      }
+
+      /*************** EVENTLISTINERS ***************/
+      [clteValEl, initialTempValEl, finalTempValEl, initialLenValEl, initialVolValEl, initialDenValEl].forEach((el) => {
+        el.addEventListener("input", resetResult);
+      }); 
+            
+      [clteSelectEl, initialTempSelectEl, finalTempSelectEl, initialLenSelectEl, initialVolSelectEl, initialDenSelectEl].forEach((el) => {
+        el.addEventListener("change", resetResult);
+      }); 
+
+      calcSelectEl.addEventListener("change", handlecalcSelectChange)
+
+      resetBtnEl.addEventListener("click", resethandler);
+      calcBtnEl.addEventListener("click", calculateResults);
+
+    </script>
+</body>
+</html>

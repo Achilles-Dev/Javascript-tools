@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Future Value of Growing Annuity Calculator</title>
+</head>
+<body>
+    <h1>Future Value of Growing Annuity Calculator</h1>
+    <h3>Calculate the future value of growing annuity.</h3>
+    <p>
+      First payment:
+      <input type="number" id="paymntAmt">
+    </p>
+    <p>
+      Interest rate per period:
+      <input type="number" id="intRate">%
+    </p>
+    <p>
+      Growth rate per period:
+      <input type="number" id="growthRate">%
+    </p>
+    <p>
+      Number of periods:
+      <input type="number" id="periodNum">
+    </p>
+    
+
+    <button id="calcBtn">Calculate</button>
+    <button id="resetBtn">Reset</button>
+    <hr>
+    <div>
+      <h3>Result:</h3>
+      <h3 id="calcResults">Result will appear here...</h3>
+    </div>
+
+    <script>
+      // Get required elements from the HTML
+      const paymntAmtEl = document.getElementById("paymntAmt");
+      const intRateEl = document.getElementById("intRate");
+      const growthRateEl = document.getElementById("growthRate");
+      const periodNumEl = document.getElementById("periodNum");
+
+      const calcBtnEl = document.getElementById('calcBtn');
+      const resetBtnEl = document.getElementById('resetBtn');
+      const calcResultsEl = document.getElementById('calcResults') 
+
+      function createElement() {
+        const newDiv = `
+            <p>
+              <label for="i11-span">Future Value of Growing Annuity: &nbsp;</label>
+              <span
+                data-id="i11"
+                step="any"
+                id="i11-span"
+                class="spans"
+              ></span>
+            </p>
+        `
+        return newDiv
+      }
+
+      function setResult(resultObj) {
+        for (key of Object.keys(resultObj)) {
+          let val = resultObj[key].result;
+          let id = resultObj[key].type;
+
+          if (isNaN(val)) {
+           alert("Your input resulted in NAN.\n 0/0 \n Try again with valid input.");
+            return;
+          }
+          if (Math.abs(val) === Infinity) {
+            alert("Your input resulted in Infinity. \nDivision by zero. \nTry again with valid input.");
+            return;
+          }
+          const span = document.getElementById(`${id}-span`);
+          span.textContent = `${parseFloat(val)}`;
+        }
+      }
+
+      function calculateResults() {
+          // Retrieve input values
+          const paymntAmt = parseFloat(paymntAmtEl.value);
+          const intRate = parseFloat(intRateEl.value);
+          const growthRate = parseFloat(growthRateEl.value);
+          const periodNum = parseFloat(periodNumEl.value);
+
+          if (isNaN(paymntAmt)  || paymntAmt < 0 || isNaN(intRate) || intRate < 0 ||
+            isNaN(growthRate) || growthRate < 0 || isNaN(periodNum) || periodNum < 1
+          ) {
+            alert("Please Enter All Details.");
+            return;
+          } else if (intRate > 100 || growthRate > 100) {
+            alert("Ensure this value is less than or equal to 100.");
+            return;
+          }
+
+          try {
+            const resultElement = createElement()
+            calcResultsEl.innerHTML = resultElement 
+
+            const FVGA = paymntAmt * (((1 + (intRate / 100)) ** periodNum) - ((1 + (growthRate / 100)) ** periodNum)) / 
+                    ((intRate / 100) - (growthRate / 100))
+
+            const results = {
+              1: { result: Math.abs(FVGA) > 1 ? FVGA.toFixed(2) : FVGA.toPrecision(2), type: "i11" },
+            }
+            setResult(results)
+
+          } catch (error) {
+            alert("Something Went Wrong!!!");
+            resetResult()
+            return;
+          }
+      }
+
+      function resetForm() {
+        paymntAmtEl.value = ""
+        intRateEl.value = ""
+        periodNumEl.value = ""
+        growthRateEl.value = ""
+      }
+
+      function resetResult() {
+        calcResultsEl.innerHTML = "<p>Result will appear here...</p>";
+      } 
+
+      function resethandler() {
+        resetForm();
+        resetResult();
+      }
+
+      resetBtnEl.addEventListener("click", resethandler);
+      calcBtnEl.addEventListener("click", calculateResults);
+
+      [paymntAmtEl, intRateEl, periodNumEl, growthRateEl].forEach((el) => {
+        el.addEventListener("input", resetResult);
+      });  
+    </script>
+</body>
+</html>

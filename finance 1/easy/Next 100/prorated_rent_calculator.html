@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Prorated Rent Calculator</title>
+</head>
+<body>
+    <h1>Prorated Rent Calculator</h1>
+    <p>
+      Moving in or out?:
+      <select id="moveSelect">
+        <option value="in" selected>move in</option>
+        <option value="out">move out</option>
+      </select>
+    </p>
+    <p>
+      Moving date:
+      <input type="date" id="movingDate">
+    </p>
+    <p>
+      Basic monthly rent:
+      <input type="number" id="monthlyRent">
+    </p>
+
+    <button id="calcBtn">Calculate</button>
+    <button id="resetBtn">Reset</button>
+    <hr>
+    <div>
+      <h3>Result:</h3>
+      <h3 id="calcResults">Result will appear here...</h3>
+    </div>
+
+    <script>
+      // Get required elements from the HTML
+      const movingDateEl = document.getElementById("movingDate");
+      const monthlyRentEl = document.getElementById("monthlyRent");
+      const moveSelectEl = document.getElementById("moveSelect")
+
+      const calcBtnEl = document.getElementById('calcBtn');
+      const resetBtnEl = document.getElementById('resetBtn');
+      const calcResultsEl = document.getElementById('calcResults') 
+
+      let date = new Date()
+      movingDateEl.value = formatDate(date)
+
+      function formatDate(date) {
+        let d = new Date(date),
+            month = '' + (d.getMonth() + 1),
+            day = '' + d.getDate(),
+            year = d.getFullYear();
+
+        if (month.length < 2) 
+            month = '0' + month;
+        if (day.length < 2) 
+            day = '0' + day;
+
+        return [year, month, day].join('-');
+      }
+
+      function createElement() {
+        const newDiv = `
+            <p>
+              <label for="i11-span">Prorated rent: &nbsp;</label>
+              <span
+                data-id="i11"
+                step="any"
+                id="i11-span"
+                class="spans"
+              ></span>
+            </p>
+        `
+        return newDiv
+      }
+
+      function setResult(resultObj) {
+        for (key of Object.keys(resultObj)) {
+          let val = resultObj[key].result;
+          let id = resultObj[key].type;
+
+          if (isNaN(val)) {
+           alert("Your input resulted in NAN.\n 0/0 \n Try again with valid input.");
+            return;
+          }
+          if (Math.abs(val) === Infinity) {
+            alert("Your input resulted in Infinity. \nDivision by zero. \nTry again with valid input.");
+            return;
+          }
+          const span = document.getElementById(`${id}-span`);
+          val = parseFloat(val)
+          val = Math.abs(val) > 1 ? val.toFixed(2) * 1 : val.toPrecision(2) * 1
+          span.textContent = val;
+        }
+      }
+
+      function lengthOfTime(prevDate, currDate) {
+        let datePrev = new Date(prevDate)
+        let dateCurr = new Date(currDate)
+        let yearsNum = dateCurr.getFullYear() - datePrev.getFullYear()
+        let monthNum = dateCurr.getMonth() - datePrev.getMonth()
+        if (monthNum < 0) {
+          yearsNum -= 1
+          monthNum = 12 + monthNum 
+        }
+        return {
+          yearsNum,
+          monthNum
+        }
+      }
+
+      function calculateResults() {
+          // Retrieve input values
+          const monthlyRent = parseFloat(monthlyRentEl.value);
+          const movingDate = movingDateEl.value;
+          const moveSelect = moveSelectEl.value;
+
+          if (isNaN(monthlyRent) || monthlyRent < 0) {
+            alert("Please Enter All Details.");
+            return;
+          }
+
+          try {
+            const resultElement = createElement()
+            calcResultsEl.innerHTML = resultElement 
+
+            let PR = 0
+            let date = new Date(movingDate)
+            const totalDays = new Date(date.getFullYear(), date.getMonth() + 1, 0).getDate()
+            date = date.getDate()
+            
+            console.log(date, totalDays, totalDays - date)
+
+            if (moveSelect === "out") {
+              PR = (date / totalDays) * monthlyRent
+            } else {
+              PR = ((totalDays - (date - 1)) / totalDays) * monthlyRent
+            }
+
+            const results = {
+              1: { result: PR, type: "i11" },
+            }
+            setResult(results)
+
+          } catch (error) {
+            alert("Something Went Wrong!!!");
+            resetResult()
+            return;
+          }
+      }
+
+      function resetForm() {
+        monthlyRentEl.value = ""
+        movingDateEl.value = formatDate(date)
+        moveSelectEl.selectedIndex = "0"
+      }
+
+      function resetResult() {
+        calcResultsEl.innerHTML = "<p>Result will appear here...</p>";
+      } 
+
+      function resethandler() {
+        resetForm();
+        resetResult();
+      }
+
+      resetBtnEl.addEventListener("click", resethandler);
+      calcBtnEl.addEventListener("click", calculateResults);
+
+      [movingDateEl, monthlyRentEl].forEach((el) => {
+        el.addEventListener("input", resetResult);
+      });  
+
+      moveSelectEl.addEventListener("change", resetResult);
+    </script>
+</body>
+</html>

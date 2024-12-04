@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Debtor Days Calculator</title>
+</head>
+<body>
+    <h1>Debtor Days Calculator</h1>
+    <h3>Calculate the debtor days.</h3>
+    <p>
+      Year end trade debtors:
+      <input type="number" id="debtors">
+    </p>
+    <p>
+      Total sales:
+      <input type="number" id="totSales">
+    </p>
+    <p>
+      Total Days in financial year:
+      <input type="number" id="totalDays" value="365">
+    </p>
+    
+
+    <button id="calcBtn">Calculate</button>
+    <button id="resetBtn">Reset</button>
+    <hr>
+    <div>
+      <h3>Result:</h3>
+      <h3 id="calcResults">Result will appear here...</h3>
+    </div>
+
+    <script>
+      // Get required elements from the HTML
+      const debtorsEl = document.getElementById("debtors");
+      const totSalesEl = document.getElementById("totSales");
+      const totalDaysEl = document.getElementById("totalDays");
+
+      const calcBtnEl = document.getElementById('calcBtn');
+      const resetBtnEl = document.getElementById('resetBtn');
+      const calcResultsEl = document.getElementById('calcResults') 
+
+      function createElement() {
+        const newDiv = `
+            <p>
+              <label for="i11-span">Debtor Days: &nbsp;</label>
+              <span
+                data-id="i11"
+                step="any"
+                id="i11-span"
+                class="spans"
+              ></span> days
+            </p>
+        `
+        return newDiv
+      }
+
+      function setResult(resultObj) {
+        for (key of Object.keys(resultObj)) {
+          let val = resultObj[key].result;
+          let id = resultObj[key].type;
+
+          if (isNaN(val)) {
+           alert("Your input resulted in NAN.\n 0/0 \n Try again with valid input.");
+            return;
+          }
+          if (Math.abs(val) === Infinity) {
+            alert("Your input resulted in Infinity. \nDivision by zero. \nTry again with valid input.");
+            return;
+          }
+          const span = document.getElementById(`${id}-span`);
+          span.textContent = `${parseFloat(val)}`;
+        }
+      }
+
+      function calculateResults() {
+          // Retrieve input values
+          const debtors = parseFloat(debtorsEl.value);
+          const totSales = parseFloat(totSalesEl.value);
+          const totalDays = parseFloat(totalDaysEl.value);
+
+          if (isNaN(debtors) || debtors < 0.001 || isNaN(totSales) || totSales < 0.001 ||
+            isNaN(totalDays) || totalDays < 1
+          ) {
+            alert("Please Enter All Details.");
+            return;
+          }
+
+          try {
+            const resultElement = createElement()
+            calcResultsEl.innerHTML = resultElement 
+
+            const DD = (debtors / totSales) * totalDays
+
+            const results = {
+              1: { result: Math.abs(DD) > 1 ? DD.toFixed(1) : DD.toPrecision(1), type: "i11" },
+            }
+            setResult(results)
+
+          } catch (error) {
+            alert("Something Went Wrong!!!");
+            resetResult()
+            return;
+          }
+      }
+
+      function resetForm() {
+        debtorsEl.value = ""
+        totSalesEl.value = ""
+        totalDaysEl.value = "365"
+      }
+
+      function resetResult() {
+        calcResultsEl.innerHTML = "<p>Result will appear here...</p>";
+      } 
+
+      function resethandler() {
+        resetForm();
+        resetResult();
+      }
+
+      resetBtnEl.addEventListener("click", resethandler);
+      calcBtnEl.addEventListener("click", calculateResults);
+
+      [debtorsEl, totSalesEl, totalDaysEl].forEach((el) => {
+        el.addEventListener("input", resetResult);
+      });  
+    </script>
+</body>
+</html>

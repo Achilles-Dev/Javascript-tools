@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Debt Service Coverage Ratio (DSCR) Calculator</title>
+</head>
+<body>
+    <h1>Debt Service Coverage Ratio (DSCR) Calculator</h1>
+    <p>Net Operating Income (NOI):</p>
+    <p>
+      Gross Operating Income ($/year):
+      <input type="number" id="income" value="40000">
+    </p>
+    <p>
+      Vacancy Loss ($/year): 
+      <input type="number" id="loss" value="5000">
+    </p>
+    <p>
+      Operating Expenses ($/year):
+      <input type="number" id="expenses" value="7500">
+    </p>
+    <p>Debt Service:</p>
+    <p>
+      Loan Amount:
+      <input type="number" id="loanAmt" value="100000">
+    </p>
+    <p>
+      Loan Term (years):
+      <input type="number" id="loanTerm" value="5">
+    </p>
+    <p>
+      Interest Rate (%):
+      <input type="number" id="intRate" value="3.5">%
+    </p>
+
+
+    <button id="calcBtn">Calculate</button>
+    <button id="resetBtn">Reset</button>
+    <hr>
+    <div>
+      <h3>Result:</h3>
+      <h3 id="calcResults">Result will appear here...</h3>
+    </div>
+
+    <script>
+      // Get required elements from the HTML
+      const incomeEl = document.getElementById("income");
+      const lossEl = document.getElementById("loss");
+      const expensesEl = document.getElementById("expenses");
+      const loanAmtEl = document.getElementById("loanAmt");
+      const loanTermEl = document.getElementById("loanTerm");
+      const intRateEl = document.getElementById("intRate");
+
+      const calcBtnEl = document.getElementById('calcBtn');
+      const resetBtnEl = document.getElementById('resetBtn');
+      const calcResultsEl = document.getElementById('calcResults') 
+
+      function createElement() {
+        const newDiv = `
+            <p>
+              <label for="i11-span">NOI: &nbsp;</label>
+              <span
+                data-id="i11"
+                step="any"
+                id="i11-span"
+                class="spans"
+              ></span> per year
+            </p>
+            <p>
+              <label for="i12-span">Debt Service: &nbsp;</label>
+              <span
+                data-id="i12"
+                step="any"
+                id="i12-span"
+                class="spans"
+              ></span> per year
+            </p>
+            <p>
+              <label for="i13-span">Debt Service Coverage Ratio: &nbsp;</label>
+              <span
+                data-id="i13"
+                step="any"
+                id="i13-span"
+                class="spans"
+              ></span> x
+            </p>
+        `
+        return newDiv
+      }
+
+      function setResult(resultObj) {
+        for (key of Object.keys(resultObj)) {
+          let val = resultObj[key].result;
+          let id = resultObj[key].type;
+
+          if (isNaN(val)) {
+           alert("Your input resulted in NAN.\n 0/0 \n Try again with valid input.");
+            return;
+          }
+          if (Math.abs(val) === Infinity) {
+            alert("Your input resulted in Infinity. \nDivision by zero. \nTry again with valid input.");
+            return;
+          }
+          const span = document.getElementById(`${id}-span`);
+          span.textContent = `${val}`;
+        }
+      }
+
+      function calculateResults() {
+          // Retrieve input values
+          const income = parseFloat(incomeEl.value);
+          const loss = parseFloat(lossEl.value);
+          const expenses = parseFloat(expensesEl.value);
+          const loanAmt = parseFloat(loanAmtEl.value);
+          const loanTerm = parseFloat(loanTermEl.value);
+          const intRate = parseFloat(intRateEl.value);
+
+          if (isNaN(income) || income < 0 || isNaN(loss) || loss < 0 || isNaN(expenses) || expenses < 0 ||
+            isNaN(loanAmt) || loanAmt <= 0 || isNaN(loanTerm) || loanTerm <= 0 || isNaN(intRate) || intRate <= 0
+          ) {
+            alert("Please Enter All Details.");
+            return;
+          }
+
+          try {
+            const resultElement = createElement()
+            calcResultsEl.innerHTML = resultElement 
+
+            const NOI = income - (loss + expenses)
+            const debtService = loanAmt * ((intRate / 100) / (1 - ((1 + ((intRate / 100) / 12)) ** (loanTerm * (-12)))))
+            const DSCR = NOI / debtService
+
+            const results = {
+              1: { result: Math.abs(NOI) > 1 ? NOI.toFixed(2) : NOI.toPrecision(2), type: "i11" },
+              2: { result: Math.abs(debtService) > 1 ? debtService.toFixed(2) : debtService.toPrecision(2), type: "i12" },
+              3: { result: Math.abs(DSCR) > 1 ? DSCR.toFixed(2) : DSCR.toPrecision(2), type: "i13" },
+            }
+            setResult(results)
+
+          } catch (error) {
+            alert("Something Went Wrong!!!");
+            resetResult()
+            return;
+          }
+      }
+
+      function resetForm() {
+        incomeEl.value = "40000"
+        lossEl.value = "5000"
+        expensesEl.value = "7500"
+        loanAmtEl.value = "100000"
+        loanTermEl.value = "5"
+        intRateEl.value = "3.5"
+      }
+
+      function resetResult() {
+        calcResultsEl.innerHTML = "<p>Result will appear here...</p>";
+      } 
+
+      function resethandler() {
+        resetForm();
+        resetResult();
+      }
+
+      resetBtnEl.addEventListener("click", resethandler);
+      calcBtnEl.addEventListener("click", calculateResults);
+      [incomeEl, lossEl, expensesEl, loanAmtEl, loanTermEl, intRateEl].forEach((el) => {
+        el.addEventListener("input", resetResult);
+      });  
+
+    </script>
+</body>
+</html>

@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Loan Balance Calculator</title>
+</head>
+<body>
+    <h1>Loan Balance Calculator</h1>
+    <p>
+      Loan:
+      <input type="number" id="loan">
+    </p>
+    <p>
+      Interest rate: 
+      <input type="number" id="intRate">%
+    </p>
+    <p>
+      Loan term:
+      <input type="number" id="loanTerm">
+      <select id="loanTermSelect">
+        <option value="31557600">Seconds</option>
+        <option value="525960">Minutes</option>
+        <option value="8766">Hours</option>
+        <option value="365.25">Days</option>
+        <option value="52.1857142857">Weeks</option>
+        <option value="12">Months</option>
+        <option value="1" selected>Years</option>
+      </select>
+    </p>
+    <p>
+      Period:
+      <input type="number" id="period">
+      <select id="periodSelect">
+        <option value="31557600">Seconds</option>
+        <option value="525960">Minutes</option>
+        <option value="8766">Hours</option>
+        <option value="365.25">Days</option>
+        <option value="52.1857142857">Weeks</option>
+        <option value="12">Months</option>
+        <option value="1" selected>Years</option>
+      </select>
+    </p>
+    
+    <button id="calcBtn">Calculate</button>
+    <button id="resetBtn">Reset</button>
+    <hr>
+    <div>
+      <h3>Result:</h3>
+      <h3 id="calcResults">Result will appear here...</h3>
+    </div>
+
+    <script>
+      // Get required elements from the HTML
+      const loanEl = document.getElementById("loan");
+      const intRateEl = document.getElementById("intRate");
+      const loanTermEl = document.getElementById("loanTerm");
+      const periodEl = document.getElementById("period");
+      const loanTermSelectEl = document.getElementById("loanTermSelect");
+      const periodSelectEl = document.getElementById("periodSelect");
+
+      const calcBtnEl = document.getElementById('calcBtn');
+      const resetBtnEl = document.getElementById('resetBtn');
+      const calcResultsEl = document.getElementById('calcResults') 
+
+      function createElement() {
+        const newDiv = `
+            <p>
+              <label for="i11-span">Loan remaining: &nbsp;</label>
+              <span
+                data-id="i11"
+                step="any"
+                id="i11-span"
+                class="spans"
+              ></span>
+            </p>
+        `
+        return newDiv
+      }
+
+      function setResult(resultObj) {
+        for (key of Object.keys(resultObj)) {
+          let val = resultObj[key].result;
+          let id = resultObj[key].type;
+
+          if (isNaN(val)) {
+           alert("Your input resulted in NAN.\n 0/0 \n Try again with valid input.");
+            return;
+          }
+          if (Math.abs(val) === Infinity) {
+            alert("Your input resulted in Infinity. \nDivision by zero. \nTry again with valid input.");
+            return;
+          }
+          const span = document.getElementById(`${id}-span`);
+          span.textContent = `${parseFloat(val)}`;
+        }
+      }
+
+      function calculateRemainingBalance(loanAmount, annualInterestRate, loanTermYears, yearsPassed) {
+        const monthlyInterestRate = annualInterestRate / 12;
+
+        const totalPayments = loanTermYears * 12;
+
+        const paymentsMade = yearsPassed * 12;
+
+        const monthlyPayment = loanAmount * (monthlyInterestRate * Math.pow(1 + monthlyInterestRate, totalPayments)) / (Math.pow(1 + monthlyInterestRate, totalPayments) - 1);
+
+        const remainingBalance = loanAmount * Math.pow(1 + monthlyInterestRate, paymentsMade) - 
+                                (monthlyPayment * (Math.pow(1 + monthlyInterestRate, paymentsMade) - 1) / monthlyInterestRate);
+
+        return remainingBalance; 
+      }
+
+
+      function calculateResults() {
+          // Retrieve input values
+          const loan = parseFloat(loanEl.value);
+          const intRate = parseFloat(intRateEl.value);
+          const loanTerm = parseFloat(loanTermEl.value);
+          const period = parseFloat(periodEl.value);
+          const loanTermSelect = parseFloat(loanTermSelectEl.value);
+          const periodSelect = parseFloat(periodSelectEl.value);
+
+          if (isNaN(loan) || loan < 0 || isNaN(intRate) || intRate <= 0 || 
+          isNaN(loanTerm) || loanTerm <= 0 || isNaN(period) || period <= 0
+          ) {
+            alert("Please Enter All Details.");
+            return;
+          } else if (loanTerm < period) {
+            alert("The loan term should be longer than or equal to the period!");
+            return;
+          }
+
+          try {
+            const resultElement = createElement()
+            calcResultsEl.innerHTML = resultElement 
+            
+            const LoanRem = calculateRemainingBalance(loan, (intRate / 100), (loanTerm / loanTermSelect), period / periodSelect)
+            
+            const results = {
+              1: { result: Math.abs(LoanRem) > 1 ? LoanRem.toFixed(2) : LoanRem.toPrecision(2), type: "i11" },
+            }
+            setResult(results)
+
+          } catch (error) {
+            alert("Something Went Wrong!!!");
+            resetResult()
+            return;
+          }
+      }
+
+      function resetForm() {
+        loanEl.value = ""
+        intRateEl.value = ""
+        loanTermEl.value = ""
+        periodEl.value = ""
+        loanTermSelectEl.selectedIndex = "6"
+        periodSelectEl.selectedIndex = "6"
+      }
+
+      function resetResult() {
+        calcResultsEl.innerHTML = "<p>Result will appear here...</p>";
+      } 
+
+      function resethandler() {
+        resetForm();
+        resetResult();
+      }
+
+      resetBtnEl.addEventListener("click", resethandler);
+      calcBtnEl.addEventListener("click", calculateResults);
+      [loanEl, intRateEl, loanTermEl, periodEl].forEach((el) => {
+        el.addEventListener("input", resetResult);
+      });  
+      [loanTermSelectEl, periodSelectEl].forEach((el) => {
+        el.addEventListener("change", resetResult);
+      });  
+
+    </script>
+</body>
+</html>

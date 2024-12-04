@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Intrinsic Value Calculator</title>
+</head>
+<body>
+    <h1>Intrinsic Value Calculator</h1>
+    <p>
+      Earnings per share (EPS):
+      <input type="number" id="earnPerShare">
+    </p>
+    <p>
+      Expected annual growth rate (g): 
+      <input type="number" id="grothRate">%
+    </p>
+    <p>
+      Corporate bond yield (Y):
+      <input type="number" id="bondYield" >%
+    </p>
+    <p>
+      Current market price (CMP):
+      <input type="number" id="marktPrice">
+    </p>
+
+
+    <button id="calcBtn">Calculate</button>
+    <button id="resetBtn">Reset</button>
+    <hr>
+    <div>
+      <h3>Result:</h3>
+      <h3 id="calcResults">Result will appear here...</h3>
+    </div>
+
+    <script>
+      // Get required elements from the HTML
+      const earnPerShareEl = document.getElementById("earnPerShare");
+      const grothRateEl = document.getElementById("grothRate");
+      const bondYieldEl = document.getElementById("bondYield");
+      const marktPriceEl = document.getElementById("marktPrice");
+
+      const calcBtnEl = document.getElementById('calcBtn');
+      const resetBtnEl = document.getElementById('resetBtn');
+      const calcResultsEl = document.getElementById('calcResults') 
+
+      function createElement() {
+        const newDiv = `
+            <p>
+              <label for="i11-span">Intrinsic value per share (V): &nbsp;</label>
+              <span
+                data-id="i11"
+                step="any"
+                id="i11-span"
+                class="spans"
+              ></span>
+            </p>
+            <p>
+              <label for="i12-span">Margin of safety (MS): &nbsp;</label>
+              <span
+                data-id="i12"
+                step="any"
+                id="i12-span"
+                class="spans"
+              ></span>%
+            </p>
+        `
+        return newDiv
+      }
+
+      function setResult(resultObj) {
+        for (key of Object.keys(resultObj)) {
+          let val = resultObj[key].result;
+          let id = resultObj[key].type;
+
+          if (isNaN(val)) {
+           alert("Your input resulted in NAN.\n 0/0 \n Try again with valid input.");
+            return;
+          }
+          if (Math.abs(val) === Infinity) {
+            alert("Your input resulted in Infinity. \nDivision by zero. \nTry again with valid input.");
+            return;
+          }
+          const span = document.getElementById(`${id}-span`);
+          span.textContent = `${parseFloat(val)}`;
+        }
+      }
+
+      function calculateResults() {
+          // Retrieve input values
+          const earnPerShare = parseFloat(earnPerShareEl.value);
+          const grothRate = parseFloat(grothRateEl.value);
+          const bondYield = parseFloat(bondYieldEl.value);
+          const marktPrice = parseFloat(marktPriceEl.value);
+
+          if (isNaN(earnPerShare) || earnPerShare < 0 || isNaN(grothRate) || grothRate < 0 || isNaN(bondYield) || bondYield <= 0 ||
+            isNaN(marktPrice) || marktPrice < 0
+          ) {
+            alert("Please Enter All Details.");
+            return;
+          }
+
+          try {
+            const resultElement = createElement()
+            calcResultsEl.innerHTML = resultElement 
+
+            const IVPS = earnPerShare * (8.5 + (2 * grothRate)) * (4.4 / bondYield)
+            const MS = ((IVPS - marktPrice) / IVPS) * 100
+
+            const results = {
+              1: { result: Math.abs(IVPS) > 1 ? IVPS.toFixed(2) : IVPS.toPrecision(2), type: "i11" },
+              2: { result: Math.abs(MS) > 1 ? MS.toFixed(2) : MS.toPrecision(2), type: "i12" },
+            }
+            setResult(results)
+
+          } catch (error) {
+            alert("Something Went Wrong!!!");
+            resetResult()
+            return;
+          }
+      }
+
+      function resetForm() {
+        earnPerShareEl.value = ""
+        grothRateEl.value = ""
+        bondYieldEl.value = ""
+        marktPriceEl.value = ""
+      }
+
+      function resetResult() {
+        calcResultsEl.innerHTML = "<p>Result will appear here...</p>";
+      } 
+
+      function resethandler() {
+        resetForm();
+        resetResult();
+      }
+
+      resetBtnEl.addEventListener("click", resethandler);
+      calcBtnEl.addEventListener("click", calculateResults);
+      [earnPerShareEl, grothRateEl, bondYieldEl, marktPriceEl].forEach((el) => {
+        el.addEventListener("input", resetResult);
+      });  
+
+    </script>
+</body>
+</html>

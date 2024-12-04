@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Percentage Discount Calculator</title>
+</head>
+<body>
+    <h1>Percentage Discount Calculator</h1>
+    <p>
+      Price before discount:
+      <input type="number" id="bforeDisPrice">
+    </p>
+    <p>
+      Discount:
+      <input type="number" id="discount" value="12">%
+    </p>
+
+    <button id="calcBtn">Calculate</button>
+    <button id="resetBtn">Reset</button>
+    <hr>
+    <div>
+      <h3>Result:</h3>
+      <h3 id="calcResults">Result will appear here...</h3>
+    </div>
+
+    <script>
+      // Get required elements from the HTML
+      const bforeDisPriceEl = document.getElementById("bforeDisPrice");
+      const discountEl = document.getElementById("discount");
+
+      const calcBtnEl = document.getElementById('calcBtn');
+      const resetBtnEl = document.getElementById('resetBtn');
+      const calcResultsEl = document.getElementById('calcResults') 
+
+      function createElement() {
+        const newDiv = `
+            <p>
+              <label for="i11-span">Price after discount: &nbsp;</label>
+              <span
+                data-id="i11"
+                step="any"
+                id="i11-span"
+                class="spans"
+              ></span>
+            </p>
+            <p>
+              <label for="i12-span">You save: &nbsp;</label>
+              <span
+                data-id="i12"
+                step="any"
+                id="i12-span"
+                class="spans"
+              ></span>
+            </p>
+        `
+        return newDiv
+      }
+
+      function setResult(resultObj) {
+        for (key of Object.keys(resultObj)) {
+          let val = resultObj[key].result;
+          let id = resultObj[key].type;
+
+          if (isNaN(val)) {
+           alert("Your input resulted in NAN.\n 0/0 \n Try again with valid input.");
+            return;
+          }
+          if (Math.abs(val) === Infinity) {
+            alert("Your input resulted in Infinity. \nDivision by zero. \nTry again with valid input.");
+            return;
+          }
+          const span = document.getElementById(`${id}-span`);
+          span.textContent = `${parseFloat(val)}`;
+        }
+      }
+
+      function calculateResults() {
+          // Retrieve input values
+          const bforeDisPrice = parseFloat(bforeDisPriceEl.value);
+          const discount = parseFloat(discountEl.value);
+
+          if (isNaN(bforeDisPrice)  || bforeDisPrice <= 0 || isNaN(discount) || discount < 0
+          ) {
+            alert("Please Enter All Details.");
+            return;
+          } else if (discount > 100) {
+            alert("Discount must be between 0 and 100%");
+            return;
+          }
+
+          try {
+            const resultElement = createElement()
+            calcResultsEl.innerHTML = resultElement 
+
+            const PAD = bforeDisPrice * (1 - (discount / 100))
+            const savings =  bforeDisPrice - PAD
+
+            const results = {
+              1: { result: Math.abs(PAD) > 1 ? PAD.toFixed(2) : PAD.toPrecision(2), type: "i11" },
+              2: { result: Math.abs(savings) > 1 ? savings.toFixed(2) : savings.toPrecision(2), type: "i12" },
+            }
+            setResult(results)
+
+          } catch (error) {
+            alert("Something Went Wrong!!!");
+            resetResult()
+            return;
+          }
+      }
+
+      function resetForm() {
+        bforeDisPriceEl.value = ""
+        discountEl.value = "12"
+      }
+
+      function resetResult() {
+        calcResultsEl.innerHTML = "<p>Result will appear here...</p>";
+      } 
+
+      function resethandler() {
+        resetForm();
+        resetResult();
+      }
+
+      resetBtnEl.addEventListener("click", resethandler);
+      calcBtnEl.addEventListener("click", calculateResults);
+
+      [bforeDisPriceEl, discountEl].forEach((el) => {
+        el.addEventListener("input", resetResult);
+      });  
+    </script>
+</body>
+</html>

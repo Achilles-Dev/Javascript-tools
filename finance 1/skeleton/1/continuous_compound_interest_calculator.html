@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Continuous Compound Interest Calculator</title>
+</head>
+<body>
+    <h1>Continuous Compound Interest Calculator</h1>
+    <p>
+      Initial balance:
+      <input type="number" id="initBalance" value="1000">
+    </p>
+    <p>
+      Interest rate:
+      <input type="number" id="intRate" value="8">%
+    </p>
+    <p>
+      Term:
+      <input type="number" id="term" value="20">
+      <select id="termSelect">
+        <option value="12">months</option>
+        <option value="1" selected>years</option>
+      </select>
+    </p>
+    <p>Additional deposits</p>
+    <p id="depositsInput1" class="inputs" style="display: none;">
+      How much?:
+      <input type="number" id="deposits" value="0">
+    </p>
+    <p>
+      How often?:
+      <select
+        class="selects"
+        id="depositSelect"
+      >
+        <option value="1">yearly</option>
+        <option value="2">semi-annually</option>
+        <option value="4">quarterly</option>
+        <option value="12">monthly</option>
+        <option value="26">bi-weekly (26/Yr)</option>
+        <option value="52">weekly (52/Yr)</option>
+        <option value="365">daily (365/Yr)</option>
+        <option value="0" selected>never</option>
+        
+      </select>
+    </p>
+    <div id="depositsInputs2" class="inputs" style="display: none;">
+      <p>
+        When?:
+        <select id="periodSelect">
+          <option value="end">end of period</option>
+          <option value="begin" selected>beginning of period</option>
+        </select>
+      </p>
+      <p>
+        Annual growth rate:
+        <input type="number" id="annGrowthRate" value="0">%
+      </p>
+    </div>
+    <p id="depositsInputs3" class="inputs" style="display: none;">
+      Periodic growth rate:
+      <input type="number" id="periodGrowthRate" value="0">%
+    </p>
+  
+    <button id="calcBtn">Calculate</button>
+    <button id="resetBtn">Reset</button>
+    <hr>
+    <div>
+      <h3>Result:</h3>
+      <h3 id="calcResults">Result will appear here...</h3>
+    </div>
+
+    <script>
+      // Get required elements from the HTML
+      const initBalanceEl = document.getElementById("initBalance");
+      const termEl = document.getElementById("term");
+      const intRateEl = document.getElementById("intRate");
+      const depositsEl = document.getElementById("deposits");
+      const annGrowthRateEl = document.getElementById("annGrowthRate");
+      const periodGrowthRateEl = document.getElementById("periodGrowthRate");
+      const termSelectEl = document.getElementById("termSelect");
+      const periodSelectEl = document.getElementById("periodSelect");
+      const depositSelectEl = document.getElementById("depositSelect");
+
+      const inputsEl = document.querySelectorAll(".inputs");
+
+      const calcBtnEl = document.getElementById('calcBtn');
+      const resetBtnEl = document.getElementById('resetBtn');
+      const calcResultsEl = document.getElementById('calcResults') 
+
+      function handleDepositSelectChange(e) {
+        const value = e.target.value
+
+        inputsEl.forEach((input) => {
+          if (value != "0") {
+            if (input.id === "depositsInputs3" && value == "1") {
+              input.style.display = "none"
+            } else {
+              input.style.display = "block"
+            }
+          } else {
+            input.style.display = "none"
+          }
+        })
+
+        resetResult()
+      }
+
+      function createElement() {
+        const newDiv = `
+            <p>
+              <label for="i11-span">Final balance: &nbsp;</label>
+              <span
+                data-id="i11"
+                step="any"
+                id="i11-span"
+                class="spans"
+              ></span>
+            </p>
+            <p>
+              <label for="i12-span">Compounded interest: &nbsp;</label>
+              <span
+                data-id="i12"
+                step="any"
+                id="i12-span"
+                class="spans"
+              ></span>
+            </p>
+        `
+        const newDiv2 = `
+            <p>
+              <label for="i13-span">Total deposit: &nbsp;</label>
+              <span
+                data-id="i13"
+                step="any"
+                id="i13-span"
+                class="spans"
+              ></span>
+            </p>
+            <p>
+              <label for="i14-span">Interest on deposit: &nbsp;</label>
+              <span
+                data-id="i14"
+                step="any"
+                id="i14-span"
+                class="spans"
+              ></span>%
+            </p>
+            <p>
+              <label for="i15-span">Interest on initial balance: &nbsp;</label>
+              <span
+                data-id="i15"
+                step="any"
+                id="i15-span"
+                class="spans"
+              ></span>
+            </p>
+        `
+        if (depositSelectEl.value !== "0") {
+          return newDiv + newDiv2
+        }
+        return newDiv
+      }
+
+      function setResult(resultObj) {
+        for (key of Object.keys(resultObj)) {
+          let val = resultObj[key].result;
+          let id = resultObj[key].type;
+
+          if (isNaN(val)) {
+           alert("Your input resulted in NAN.\n 0/0 \n Try again with valid input.");
+            return;
+          }
+          if (Math.abs(val) === Infinity) {
+            alert("Your input resulted in Infinity. \nDivision by zero. \nTry again with valid input.");
+            return;
+          }
+          const span = document.getElementById(`${id}-span`);
+          span.textContent = `${val * 1}`;
+        }
+      }
+
+      function calculateResults() {
+          // Retrieve input values
+          const initBalance = parseFloat(initBalanceEl.value);
+          const term = parseFloat(termEl.value);
+          const intRate = parseFloat(intRateEl.value);
+          const annGrowthRate = parseFloat(annGrowthRateEl.value);
+          const deposits = parseFloat(depositsEl.value);
+          const periodGrowthRate = parseFloat(periodGrowthRateEl.value);
+          const depositSelect = parseFloat(depositSelectEl.value);
+          const periodSelect = parseFloat(periodSelectEl.value);
+          const termSelect = parseFloat(termSelectEl.value);
+
+          if (isNaN(initBalance) || initBalance <= 0 || isNaN(term) || term <= 0 || isNaN(intRate) || intRate <= 0 ||
+            (depositSelect != 0 && (isNaN(annGrowthRate) || annGrowthRate < 0 || isNaN(deposits) || deposits < 0)) || 
+            ((depositSelect != 0 && depositSelect != 1) && (isNaN(periodGrowthRate) || periodGrowthRate < 0 ))
+          ) {
+            alert("Please Enter All Details.");
+            return;
+          }
+
+          try {
+            const resultElement = createElement()
+            calcResultsEl.innerHTML = resultElement 
+
+            let finalBalnace = 0
+            let compoundInt = 0
+            if (depositSelect === 0) {
+              finalBalnace = 0
+              compoundInt = 0
+              const results = {
+                1: { result: Math.abs(finalBalnace) > 1 ? finalBalnace.toFixed(2) : finalBalnace.toPrecision(2), type: "i11" },
+                2: { result: Math.abs(compoundInt) > 1 ? compoundInt.toFixed(2) : compoundInt.toPrecision(2), type: "i12" },
+              }
+              setResult(results)
+            } else {
+              finalBalnace = 0
+              compoundInt = 0
+              const totalDeposit = 0
+              const depositInt = 0
+              const initBalInt = 0
+
+              const results = {
+                1: { result: Math.abs(finalBalnace) > 1 ? finalBalnace.toFixed(2) : finalBalnace.toPrecision(2), type: "i11" },
+                2: { result: Math.abs(compoundInt) > 1 ? compoundInt.toFixed(2) : compoundInt.toPrecision(2), type: "i12" },
+                3: { result: Math.abs(totalDeposit) > 1 ? totalDeposit.toFixed(2) : totalDeposit.toPrecision(2), type: "i13" },
+                4: { result: Math.abs(depositInt) > 1 ? depositInt.toFixed(2) : depositInt.toPrecision(2), type: "i14" },
+                5: { result: Math.abs(initBalInt) > 1 ? initBalInt.toFixed(2) : initBalInt.toPrecision(2), type: "i15" },
+              }
+              setResult(results)
+            }
+
+          } catch (error) {
+            alert("Something Went Wrong!!!");
+            resetResult()
+            return;
+          }
+      }
+
+      function resetForm() {
+        initBalanceEl.value = "1000"
+        termEl.value = "20"
+        intRateEl.value = "8"
+        depositsEl.value = "0"
+        periodGrowthRateEl.value = "0"
+        annGrowthRateEl.value = "0"
+        periodSelectEl.selectedIndex = "1"
+        termSelectEl.selectedIndex = "1"
+        depositSelectEl.selectedIndex = "7"
+
+        inputsEl.forEach((input) => {
+          input.style.display = "none"
+        })
+      }
+
+      function resetResult() {
+        calcResultsEl.innerHTML = "<p>Result will appear here...</p>";
+      } 
+
+      function resethandler() {
+        resetForm();
+        resetResult();
+      }
+
+      resetBtnEl.addEventListener("click", resethandler);
+      calcBtnEl.addEventListener("click", calculateResults);
+
+      [initBalanceEl, annGrowthRateEl, intRateEl, termEl, depositsEl,
+        periodGrowthRateEl
+      ].forEach((el) => {
+        el.addEventListener("input", resetResult);
+      }); 
+      
+      [termSelectEl, periodSelectEl].forEach((el) => {
+        el.addEventListener("change", resetResult);
+      });
+
+      depositSelectEl.addEventListener("change", handleDepositSelectChange);
+
+    </script>
+</body>
+</html>

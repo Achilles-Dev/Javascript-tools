@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Free Cash Flow Calculator</title>
+</head>
+<body>
+    <h1>Free Cash Flow Calculator</h1>
+    <p>
+      Operating cash flow:
+      <input type="number" id="cashFlow">
+    </p>
+    <p>
+      Capital expeditures: 
+      <input type="number" id="capExp">
+    </p>
+    <p>
+      Number of shares outstanding:
+      <input type="number" id="sharesNum">
+    </p>
+    <p>
+      Stock price:
+      <input type="number" id="stockPrice">
+    </p>
+    <p>
+      Revenue:
+      <input type="number" id="revenue">
+    </p>
+
+    <button id="calcBtn">Calculate</button>
+    <button id="resetBtn">Reset</button>
+    <hr>
+    <div>
+      <h3>Result:</h3>
+      <h3 id="calcResults">Result will appear here...</h3>
+    </div>
+
+    <script>
+      // Get required elements from the HTML
+      const cashFlowEl = document.getElementById("cashFlow");
+      const capExpEl = document.getElementById("capExp");
+      const sharesNumEl = document.getElementById("sharesNum");
+      const stockPriceEl = document.getElementById("stockPrice");
+      const revenueEl = document.getElementById("revenue");
+
+      const calcBtnEl = document.getElementById('calcBtn');
+      const resetBtnEl = document.getElementById('resetBtn');
+      const calcResultsEl = document.getElementById('calcResults') 
+
+      function createElement() {
+        const newDiv = `
+            <p>
+              <label for="i11-span">Free cash flow: &nbsp;</label>
+              <span
+                data-id="i11"
+                step="any"
+                id="i11-span"
+                class="spans"
+              ></span>
+            </p>
+            <p>
+              <label for="i12-span">Annual net income: &nbsp;</label>
+              <span
+                data-id="i12"
+                step="any"
+                id="i12-span"
+                class="spans"
+              ></span>
+            </p>
+            <p>
+              <label for="i13-span">Market capitalization: &nbsp;</label>
+              <span
+                data-id="i13"
+                step="any"
+                id="i13-span"
+                class="spans"
+              ></span>
+            </p>
+            <p>
+              <label for="i14-span">Free cash flow yield: &nbsp;</label>
+              <span
+                data-id="i14"
+                step="any"
+                id="i14-span"
+                class="spans"
+              ></span>%
+            </p>
+            <p>
+              <label for="i15-span">Free cash flow margin: &nbsp;</label>
+              <span
+                data-id="i15"
+                step="any"
+                id="i15-span"
+                class="spans"
+              ></span>%
+            </p>
+        `
+        return newDiv
+      }
+
+      function setResult(resultObj) {
+        for (key of Object.keys(resultObj)) {
+          let val = resultObj[key].result;
+          let id = resultObj[key].type;
+
+          if (isNaN(val)) {
+           alert("Your input resulted in NAN.\n 0/0 \n Try again with valid input.");
+            return;
+          }
+          if (Math.abs(val) === Infinity) {
+            alert("Your input resulted in Infinity. \nDivision by zero. \nTry again with valid input.");
+            return;
+          }
+          const span = document.getElementById(`${id}-span`);
+          span.textContent = `${val}`;
+        }
+      }
+
+      function calculateResults() {
+          // Retrieve input values
+          const cashFlow = parseFloat(cashFlowEl.value);
+          const capExp = parseFloat(capExpEl.value);
+          const sharesNum = parseFloat(sharesNumEl.value);
+          const stockPrice = parseFloat(stockPriceEl.value);
+          const revenue = parseFloat(revenueEl.value);
+
+          if (isNaN(cashFlow) || cashFlow <= 0 || isNaN(capExp) || capExp <= 0 || isNaN(sharesNum) || sharesNum <= 0 ||
+            isNaN(stockPrice) || stockPrice <= 0 || isNaN(revenue) || revenue <= 0
+          ) {
+            alert("Please Enter All Details.");
+            return;
+          }
+
+          try {
+            const resultElement = createElement()
+            calcResultsEl.innerHTML = resultElement 
+
+            const freeCashFlow = 0
+            const annNetIncome = 0
+            const markCap = 0
+            const cashFlowYield = 0
+            const cashFlowMargin = 0
+
+            const results = {
+              1: { result: Math.abs(freeCashFlow) > 1 ? freeCashFlow.toFixed(2) : freeCashFlow.toPrecision(2), type: "i11" },
+              2: { result: Math.abs(annNetIncome) > 1 ? annNetIncome.toFixed(2) : annNetIncome.toPrecision(2), type: "i12" },
+              3: { result: Math.abs(markCap) > 1 ? markCap.toFixed(2) : markCap.toPrecision(2), type: "i13" },
+              4: { result: Math.abs(cashFlowYield) > 1 ? cashFlowYield.toFixed(2) : cashFlowYield.toPrecision(2), type: "i14" },
+              5: { result: Math.abs(cashFlowMargin) > 1 ? cashFlowMargin.toFixed(2) : cashFlowMargin.toPrecision(2), type: "i15" },
+            }
+            setResult(results)
+
+          } catch (error) {
+            alert("Something Went Wrong!!!");
+            resetResult()
+            return;
+          }
+      }
+
+      function resetForm() {
+        cashFlowEl.value = ""
+        capExpEl.value = ""
+        sharesNumEl.value = ""
+        stockPriceEl.value = ""
+        revenueEl.value = ""
+      }
+
+      function resetResult() {
+        calcResultsEl.innerHTML = "<p>Result will appear here...</p>";
+      } 
+
+      function resethandler() {
+        resetForm();
+        resetResult();
+      }
+
+      resetBtnEl.addEventListener("click", resethandler);
+      calcBtnEl.addEventListener("click", calculateResults);
+      [cashFlowEl, capExpEl, sharesNumEl, stockPriceEl, revenueEl].forEach((el) => {
+        el.addEventListener("input", resetResult);
+      });  
+
+    </script>
+</body>
+</html>

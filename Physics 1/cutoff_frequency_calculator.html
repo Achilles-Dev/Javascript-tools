@@ -171,6 +171,19 @@
         inductOptionEl.style.display = value === "rc" ? 'none' : 'block'
         capOptionEl.style.display = value === "rl" ? 'none' : 'block'
         calcUnitEl.selectedIndex = '3'
+
+        containers.forEach((container) => {
+          let idVal = container.id.slice(0, 2)
+          if (idVal === 'ic' && value === 'rc') {
+            container.style.display = 'none'
+          } else if (idVal === 'cp' && value === 'rl') {
+            container.style.display = 'none'
+          } else if (idVal === calcUnitEl.value) {
+            container.style.display = 'none'
+          } else {
+            container.style.display = 'block'
+          }
+        })
         resetResult()
       }
 
@@ -223,7 +236,6 @@
       function calculateResult(input) {
         const calculateIc = () => {
           const { rt, cf } = prepareUnits();
-
           let result = rt / (2 * Math.PI * cf);
           return {
             result,

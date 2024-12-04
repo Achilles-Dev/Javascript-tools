@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Expense Ratio Calculator</title>
+</head>
+<body>
+    <h1>Expense Ratio Calculator</h1>
+    <p>
+      Initial investment:
+      <input type="number" id="iniInvest">
+    </p>
+    <p>
+      Yearly investment: 
+      <input type="number" id="yearInvest">
+    </p>
+    <p>
+      Duration:
+      <input type="number" id="duration"> yrs
+    </p>
+    <p>
+      Expected return:
+      <input type="number" id="expectReturn">%
+    </p>
+    <p>
+      Expense Ratio :
+      <input type="number" id="expRatio">%
+    </p>
+
+
+    <button id="calcBtn">Calculate</button>
+    <button id="resetBtn">Reset</button>
+    <hr>
+    <div>
+      <h3>Result:</h3>
+      <h3 id="calcResults">Result will appear here...</h3>
+    </div>
+
+    <script>
+      // Get required elements from the HTML
+      const iniInvestEl = document.getElementById("iniInvest");
+      const yearInvestEl = document.getElementById("yearInvest");
+      const durationEl = document.getElementById("duration");
+      const expectReturnEl = document.getElementById("expectReturn");
+      const expRatioEl = document.getElementById("expRatio");
+
+      const calcBtnEl = document.getElementById('calcBtn');
+      const resetBtnEl = document.getElementById('resetBtn');
+      const calcResultsEl = document.getElementById('calcResults') 
+
+      function createElement() {
+        const newDiv = `
+            <p>
+              <label for="i11-span">Future value of total investment: &nbsp;</label>
+              <span
+                data-id="i11"
+                step="any"
+                id="i11-span"
+                class="spans"
+              ></span>
+            </p>
+            <p>
+              <label for="i12-span">Total cost of ETF: &nbsp;</label>
+              <span
+                data-id="i12"
+                step="any"
+                id="i12-span"
+                class="spans"
+              ></span>
+            </p>
+        `
+        return newDiv
+      }
+
+      function setResult(resultObj) {
+        for (key of Object.keys(resultObj)) {
+          let val = resultObj[key].result;
+          let id = resultObj[key].type;
+
+          if (isNaN(val)) {
+           alert("Your input resulted in NAN.\n 0/0 \n Try again with valid input.");
+            return;
+          }
+          if (Math.abs(val) === Infinity) {
+            alert("Your input resulted in Infinity. \nDivision by zero. \nTry again with valid input.");
+            return;
+          }
+          const span = document.getElementById(`${id}-span`);
+          span.textContent = `${parseFloat(val)}`;
+        }
+      }
+
+      function calculateResults() {
+          // Retrieve input values
+          const iniInvest = parseFloat(iniInvestEl.value);
+          const yearInvest = parseFloat(yearInvestEl.value);
+          const duration = parseFloat(durationEl.value);
+          const expectReturn = parseFloat(expectReturnEl.value);
+          const expRatio = parseFloat(expRatioEl.value);
+
+          if (isNaN(iniInvest) || iniInvest < 0 || isNaN(yearInvest) || yearInvest < 0 || isNaN(duration) || duration < 1 ||
+            isNaN(expectReturn) || expectReturn < 1 || isNaN(expRatio) || expRatio < 0
+          ) {
+            alert("Please Enter All Details.");
+            return;
+          } else if (expectReturn <= expRatio) {
+            alert(`If your yearly expected return is exactly as your expense ratio or even lower, 
+            then there is no point in investing in this ETF/trust fund; you will not make money.`);
+            return;
+          }
+
+          try {
+            const resultElement = createElement()
+            calcResultsEl.innerHTML = resultElement 
+            
+            let r = expectReturn - expRatio 
+            const FVTI = (iniInvest * ((1 + (r / 100)) ** duration)) + (yearInvest * ((((1 + (r / 100)) ** duration) - 1) / (r / 100)))
+            const FVTINEr = (iniInvest * ((1 + (expectReturn / 100)) ** duration)) + (yearInvest * ((((1 + (expectReturn / 100)) ** duration) - 1) / (expectReturn / 100)))
+            const ETF = FVTINEr - FVTI
+            
+            const results = {
+              1: { result: Math.abs(FVTI) > 1 ? FVTI.toFixed(2) : FVTI.toPrecision(2), type: "i11" },
+              2: { result: Math.abs(ETF) > 1 ? ETF.toFixed(2) : ETF.toPrecision(2), type: "i12" },
+            }
+            setResult(results)
+
+          } catch (error) {
+            alert("Something Went Wrong!!!");
+            resetResult()
+            return;
+          }
+      }
+
+      function resetForm() {
+        iniInvestEl.value = ""
+        yearInvestEl.value = ""
+        durationEl.value = ""
+        expectReturnEl.value = ""
+        expRatioEl.value = ""
+      }
+
+      function resetResult() {
+        calcResultsEl.innerHTML = "<p>Result will appear here...</p>";
+      } 
+
+      function resethandler() {
+        resetForm();
+        resetResult();
+      }
+      
+      [iniInvestEl, yearInvestEl, durationEl, expectReturnEl, expRatioEl].forEach((el) => {
+        el.addEventListener("input", resetResult);
+      });  
+      
+      resetBtnEl.addEventListener("click", resethandler);
+      calcBtnEl.addEventListener("click", calculateResults);
+
+    </script>
+</body>
+</html>

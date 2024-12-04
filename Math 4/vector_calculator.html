@@ -113,7 +113,19 @@
         vectBXEl = '';
         vectBYEl = '';
         vectBZEl = '';
-      } 
+      } else if (dimSelected == '3d') {
+        vectAXEl = document.getElementById('vectAX');
+        vectAYEl = document.getElementById('vectAY');
+        vectAZEl = document.getElementById('vectAZ');
+        vectBXEl = document.getElementById('vectBX');
+        vectBYEl = document.getElementById('vectBY');
+        vectBZEl = document.getElementById('vectBZ');
+      } else if (dimSelected == '2d') {
+        vectAXEl = document.getElementById('vectAX');
+        vectAYEl = document.getElementById('vectAY');
+        vectBXEl = document.getElementById('vectBX');
+        vectBYEl = document.getElementById('vectBY');
+      }
     }
 
     function handleDimensionChange(e) {
@@ -342,12 +354,12 @@
     }
 
     function resetForm() {
-      vectAXEl.value = ""
-      vectAZEl.value = ""
-      vectBYEl.value = ""
-      vectAYEl.value = ""
-      vectBXEl.value = ""
-      vectBZEl.value = ""
+      vectAXEl.value = "";
+      vectAYEl.value = "";
+      if (vectAZEl) vectAZEl.value = ""; // Clear if exists
+      if (vectBXEl) vectBXEl.value = ""; // Clear if exists
+      if (vectBYEl) vectBYEl.value = ""; // Clear if exists
+      if (vectBZEl) vectBZEl.value = ""; // Clear if exists
     }
 
     function resetResult() {

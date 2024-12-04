@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Spring Rate Calculator</title>
+  </head>
+  <body>
+    <h1>Spring Rate Calculator</h1>    
+      <p>
+        <label for="i1-input">Shear modulus (G) </label>
+        <input
+          type="number"
+          min="0"
+          autocomplete="off"
+          data-id="i1"
+          id="i1-input"
+          class="inputs"
+          step="any"
+          data-name="Shear modulus (G)"
+        />
+        <select
+          class="selects"
+          id="i1-select"
+          data-type="pressure"
+          data-prev="Pa"
+          data-id="i1"
+        >
+        <option value="Pa" selected>pascals (Pa)</option>
+        <option value="kgf/mm²">kilograms-force per square nillimeters (kgf/mm²)</option>
+        <option value="bar">bars (bar)</option>
+        <option value="psi">pounds per square inch (psi)</option>
+        <option value="ksi">kilopounds per square inch (ksi)</option>
+        <option value="hPa">hectopascals (hPa)</option>
+        <option value="lb/ft²">pounds per square foot (lb/ft²)</option>
+        <option value="t/m²">tons per square meter (t/m²)</option>
+        </select>
+      </p>
+
+      <p>
+        <label for="i2-input">Wire diameter: </label>
+        <input
+          type="number"
+          min="0"
+          autocomplete="off"
+          data-id="i2"
+          id="i2-input"
+          class="inputs"
+          step="any"
+          data-name="Wire diameter"
+        />
+        <select
+          class="selects"
+          id="i2-select"
+          data-type="distance"
+          data-prev="mm"
+          data-id="i2"
+        >
+          <option value="mm" selected>millimeters (mm)</option>
+          <option value="cm">centimeters (cm)</option>
+          <option value="m">meters (m)</option>
+          <option value="in">inches (in)</option>
+          <option value="ft">feet (ft)</option>
+        </select>
+      </p>
+
+      <p>
+        <label for="i3-input">External diameter </label>
+        <input
+          type="number"
+          min="0"
+          autocomplete="off"
+          data-id="i3"
+          id="i3-input"
+          class="inputs"
+          step="any"
+          data-name="External diameter"
+        />
+        <select
+          class="selects"
+          id="i3-select"
+          data-type="distance"
+          data-prev="mm"
+          data-id="i3"
+        >
+          <option value="mm" selected>millimeters (mm)</option>
+          <option value="cm">centimeters (cm)</option>
+          <option value="m">meters (m)</option>
+          <option value="in">inches (in)</option>
+          <option value="ft">feet (ft)</option>
+        </select>
+      </p>
+
+      <p>
+        <label for="i4-input">Active coils: </label>
+        <input
+          type="number"
+          min="0"
+          autocomplete="off"
+          data-id="i4"
+          id="i4-input"
+          class="inputs"
+          step="any"
+          data-name="Active coils"
+        /> coils
+        <select
+          class="selects"
+          id="i4-select"
+          data-type="exp"
+          data-prev="exp"
+          data-id="i4"
+          style="display: none;"
+        >
+          <option value="exp" selected></option>
+        </select>
+      </p>
+
+      <p>
+        Spring ends:
+        <select id="endsSelect">
+          <option value="closed">Closed and squared/ground</option>
+          <option value="double">Double closed</option>
+          <option value="open" selected>Open</option>
+        </select>
+      </p>
+
+      <button id="calcBtn">Calculate</button>
+      <button id="resetBtn">Reset</button>
+      <hr>
+      <div>
+        <h3>Result:</h3>
+        <h3 id="calcResults">Result will appear here...</h3>
+      </div>
+    <script>
+      /*************** ELEMENTS ***************/
+      const inputs = document.querySelectorAll(".inputs");
+      const selects = document.querySelectorAll(".selects");
+      const endsSelectEl = document.getElementById("endsSelect")
+
+      const calcBtnEl = document.getElementById('calcBtn');
+      const resetBtnEl = document.getElementById('resetBtn');
+      const calcResultsEl = document.getElementById('calcResults')
+
+      /*************** GLOBAL VARIBLES ***************/
+      const UNITS = {
+        force: {
+          "N/m": 1,
+          "N/cm": 0.01,
+          "N/mm": 0.001,
+          "lbf/in": 0.00571,
+        },
+        pressure: {
+          Pa: 1,
+          "kgf/mm²": 1,
+          bar: 0.00001,
+          psi: 0.0001450377,
+          ksi: 1.450377377E-7,
+          hPa: 0.01,
+          "lb/ft²": 0.0208854342,
+          "t/m²": 1
+        },
+        distance: {
+          mm: 1,
+          cm: 0.1,
+          m: 0.001,
+          in: 0.0393700787,
+          ft: 0.0032808399,
+        },
+        exp: {
+          exp: 1
+        }
+      };
+      /*************** FUNCTIONS ***************/
+      function toSIUnit(type, unit, value) {
+        return value / UNITS[type][unit];
+      }
+
+      function fromSIUnit(type, unit, value) {
+        return value * UNITS[type][unit];
+      }
+
+      function createElement() {
+        const newDiv = `
+            <p>
+              <label for="i11-span">Internal diameter: &nbsp; </label>
+              <span
+                data-id="i11"
+                step="any"
+                id="i11-span"
+                class="spans"
+                data-name="Internal diameter"
+              ></span>
+              <select
+                class="selectsResult"
+                id="i11-select"
+                data-type="distance"
+                data-prev="mm"
+                data-id="i11"
+              >
+                 <option value="mm" selected>millimeters (mm)</option>
+                  <option value="cm">centimeters (cm)</option>
+                  <option value="m">meters (m)</option>
+                  <option value="in">inches (in)</option>
+                  <option value="ft">feet (ft)</option>
+              </select>
+            </p>
+            <p>
+              <label for="i12-span">Total coils: &nbsp; </label>
+              <span
+                data-id="i12"
+                step="any"
+                id="i12-span"
+                class="spans"
+                data-name="Total coils"
+              ></span>
+              <select
+                class="selectsResult"
+                id="i12-select"
+                data-type="exp"
+                data-prev="exp"
+                data-id="i12"
+                style="display: none;"
+              >
+                <option value="exp"></option>
+              </select>
+            </p>
+
+            <p>
+              <label for="i13-span">Spring rate: &nbsp; </label>
+              <span
+                data-id="i13"
+                step="any"
+                id="i13-span"
+                class="spans"
+                data-name="Spring rate"
+              ></span>
+              <select
+                class="selectsResult"
+                id="i13-select"
+                data-type="force"
+                data-prev="N/m"
+                data-id="i13"
+              >
+                <option value="N/m" selected>newtons per meter (N/m)</option>
+                <option value="N/cm">newtons per centimeter (N/cm)</option>
+                <option value="N/mm">newtons per millimeter (N/mm)</option>
+                <option value="lbf/in">pound-force per inch (lbf/in)</option>
+              </select>
+            </p>
+        `
+        return newDiv
+        
+      }
+      
+      // related to caculation
+      function prepareUnit(...args) {
+        const resultArr = [];
+        for (id of args) {
+          const input = document.getElementById(`${id}-input`);
+          const select = document.getElementById(`${id}-select`);
+          const type = select.getAttribute("data-type");
+          let val = parseFloat(input.value);
+
+          val = isNaN(val) ? 0 : val;
+          let inUnit = select.value;
+
+          val = toSIUnit(type, inUnit, val);
+          resultArr.push(val);
+        }
+
+        return resultArr;
+      }
+
+      function setResult(resultObj) {
+        for (key of Object.keys(resultObj)) {
+          let val = resultObj[key].result;
+          let id = resultObj[key].type;
+
+          if (isNaN(val)) {
+           alert("Your input resulted in NAN.\n 0/0 \n Try again with valid input.");
+            return;
+          }
+          if (Math.abs(val) === Infinity) {
+            alert("Your input resulted in Infinity. \nDivision by zero. \nTry again with valid input.");
+            return;
+          }
+          const span = document.getElementById(`${id}-span`);
+          const select = document.getElementById(`${id}-select`);
+          const type = select.getAttribute("data-type");
+          let outUnit = select.value;
+          val = fromSIUnit(type, outUnit, val);
+
+          span.textContent = parseFloat(val);
+        }
+      }
+
+      function calculateResult() {             
+        function calculateRes() {
+          let [val1, val2, val3, val4] = prepareUnit("i1", "i2", "i3", "i4");
+          let intDiam = val3 - (val2 * 2)
+          let totCoil = val4
+          if (endsSelectEl.value === "closed") {
+            totCoil += 2
+          } else if (endsSelectEl.value === "double") {
+            totCoil += 4
+          }
+          let result = (val1 * (val2 ** 4)) / (8 * ((val3 - val2) ** 3) * val4)
+          result = fromSIUnit("distance", "m", result)
+          return {
+            1: { result: Math.abs(intDiam) > 1 ? intDiam.toFixed(3) * 1 : intDiam, type: "i11" },
+            2: { result: Math.abs(totCoil) > 1 ? totCoil.toFixed(3) * 1 : totCoil, type: "i12" },
+            3: { result: Math.abs(result) > 1 ? result.toFixed(3) * 1 : result, type: "i13" },
+          };
+        }
+        return calculateRes()
+      }
+
+      function validateInput(id) {
+        const input = document.getElementById(`${id}-input`);
+        const label = input.getAttribute("data-name").trim();
+        let value = parseFloat(input.value);
+        if (isNaN(value)) {
+          alert(`${label} value cannot be empty.`);
+          return false;
+        }
+
+        if (label === "External diameter") {
+          const input2 = document.getElementById(`i2-input`);
+          let value2 = parseFloat(input2.value)
+          if (value < (value2 * 2  + 1)) {
+            alert('External diameter should be greater than 2 * diameter')
+            return false
+          }
+
+        }
+
+        if (value <= 0) {
+          alert(`${label} value cannot be negative or zero.`);
+          return false;
+        }
+
+        return true;
+      }
+
+      function handleResultsChange(e) {
+        let select = e.target;
+        let id = select.getAttribute("data-id");
+        let span = document.getElementById(`${id}-span`);
+
+        let prevUnit = select.getAttribute("data-prev");
+        let currentUnit = select.value;
+        select.setAttribute("data-prev", currentUnit);
+
+        if (span.textContent === "") {
+          return;
+        }
+
+        let type = select.getAttribute("data-type");
+
+        let value = parseFloat(span.textContent);
+        value = parseFloat(value);
+        if (isNaN(value)) value = 0.0;
+
+        let si = toSIUnit(type, prevUnit, value);
+        let result = fromSIUnit(type, currentUnit, si);
+        span.textContent = parseFloat(result).toFixed(5) * 1;
+      }
+
+      function calculateResults() {
+        for (el of ["i1", "i2", "i3", "i4"]) {
+          if (!validateInput(el)) return;
+        }
+        
+
+        try {
+          const resultElement = createElement()
+          
+          calcResultsEl.innerHTML = resultElement
+
+          const newSelects = document.querySelectorAll(".selectsResult");
+
+          newSelects.forEach((select) => {
+            select.addEventListener("change", handleResultsChange);
+          });
+
+          const result = calculateResult();
+          setResult(result)
+
+        } catch(error) {
+          alert("An error ocurred. Try again with valid input.");
+          resetResult()
+          return;
+        }
+      }
+
+      function resetForm() {
+        selects.forEach((select, index) => {
+          select.selectedIndex = '0'
+        });
+
+        inputs.forEach((input, index) => {
+          input.value = ""
+        });
+
+        endsSelectEl.selectedIndex = "2"
+        
+      }
+
+      function resetResult() {
+        calcResultsEl.innerHTML = "<p>Result will appear here...</p>";
+      } 
+
+      function resethandler() {
+        resetForm();
+        resetResult();
+      }
+
+      /*************** EVENT LISTINERS ***************/
+      selects.forEach((select) => {
+        select.addEventListener("change", resetResult);
+      });
+      inputs.forEach((input) => {
+        input.addEventListener("input", resetResult);
+      });
+
+      resetBtnEl.addEventListener("click", resethandler);
+      calcBtnEl.addEventListener("click", calculateResults);
+
+    </script>
+  </body>
+</html>

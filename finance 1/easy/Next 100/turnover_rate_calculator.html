@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Turnover Rate Calculator</title>
+</head>
+<body>
+    <h1>Turnover Rate Calculator</h1>
+    <p>
+      Calculate average number of employees?:
+      <select id="avgSelect">
+        <option value="no">No</option>
+        <option value="ye">Yes</option>
+      </select>
+    </p>
+    <div id="yesInputs" class="inputs" style="display: none;">
+      <p>
+        Employess at the beginning:
+        <input type="number" id="beginEmploy">
+      </p>
+      <p>
+        Employees at the end: 
+        <input type="number" id="endEmploy">
+      </p>
+    </div>
+    <p id="noInput" class="inputs">
+      Average number of employees:
+      <input type="number" id="avgEmploy">
+    </p>
+    <p>
+      Number of employees who left:
+      <input type="number" id="employsLeft">
+    </p>
+
+
+    <button id="calcBtn">Calculate</button>
+    <button id="resetBtn">Reset</button>
+    <hr>
+    <div>
+      <h3>Result:</h3>
+      <h3 id="calcResults">Result will appear here...</h3>
+    </div>
+
+    <script>
+      // Get required elements from the HTML
+      const beginEmployEl = document.getElementById("beginEmploy");
+      const endEmployEl = document.getElementById("endEmploy");
+      const avgEmployEl = document.getElementById("avgEmploy");
+      const employsLeftEl = document.getElementById("employsLeft");
+      const avgSelectEl = document.getElementById("avgSelect");
+      const inputsEl = document.querySelectorAll(".inputs");
+
+      const calcBtnEl = document.getElementById('calcBtn');
+      const resetBtnEl = document.getElementById('resetBtn');
+      const calcResultsEl = document.getElementById('calcResults')
+      
+      function handleAvgSelectChange(e) {
+        const value = e.target.value
+
+        inputsEl.forEach((input) => {
+          const idVal = input.id.slice(0, 2)
+          if (idVal === value) {
+            input.style.display = "block"
+          } else {
+            input.style.display = "none"
+          }
+        })
+
+        resetResult()
+      }
+
+      function createElement() {
+        const newDiv = `
+            <p>
+              <label for="i11-span">Turnover rate: &nbsp;</label>
+              <span
+                data-id="i11"
+                step="any"
+                id="i11-span"
+                class="spans"
+              ></span>%
+            </p>
+        `
+        return newDiv
+      }
+
+      function setResult(resultObj) {
+        for (key of Object.keys(resultObj)) {
+          let val = resultObj[key].result;
+          let id = resultObj[key].type;
+
+          if (isNaN(val)) {
+           alert("Your input resulted in NAN.\n 0/0 \n Try again with valid input.");
+            return;
+          }
+          if (Math.abs(val) === Infinity) {
+            alert("Your input resulted in Infinity. \nDivision by zero. \nTry again with valid input.");
+            return;
+          }
+          const span = document.getElementById(`${id}-span`);
+          span.textContent = `${parseFloat(val)}`;
+        }
+      }
+
+     function calculateResults() {
+          // Retrieve input values
+          const beginEmploy = parseFloat(beginEmployEl.value);
+          const endEmploy = parseFloat(endEmployEl.value);
+          const avgEmploy = parseFloat(avgEmployEl.value);
+          const employsLeft = parseFloat(employsLeftEl.value);
+          const avgSelect = avgSelectEl.value
+
+          if ((avgSelect === "ye" && (isNaN(beginEmploy) || beginEmploy <= 0 || isNaN(endEmploy) || endEmploy <= 0)) || 
+         (avgSelect === "no" && ( isNaN(avgEmploy) || avgEmploy <= 0)) || isNaN(employsLeft) || employsLeft <= 0
+          ) {
+            alert("Please Enter All Details.");
+            return;
+          }
+
+          try {
+            const resultElement = createElement()
+            calcResultsEl.innerHTML = resultElement 
+
+            let TR = 0
+            if (avgSelect === "no") {
+              TR = (employsLeft / avgEmploy) * 100
+            } else {
+              TR = (employsLeft / ((beginEmploy + endEmploy) / 2)) * 100
+            }
+
+            const results = {
+              1: { result: Math.abs(TR) > 1 ? TR.toFixed(2) : TR.toPrecision(2), type: "i11" },
+            }
+            setResult(results)
+
+          } catch (error) {
+            alert("Something Went Wrong!!!");
+            resetResult()
+            return;
+          }
+      }
+
+      function resetForm() {
+        beginEmployEl.value = ""
+        endEmployEl.value = ""
+        avgEmployEl.value = ""
+        employsLeftEl.value = ""
+
+        avgSelectEl.selectedIndex = "0"
+
+        inputsEl.forEach((input) => {
+          const idVal = input.id.slice(0, 2)
+          if (idVal === "no") {
+            input.style.display = "block"
+          } else {
+            input.style.display = "none"
+          }
+        })
+      }
+
+      function resetResult() {
+        calcResultsEl.innerHTML = "<p>Result will appear here...</p>";
+      } 
+
+      function resethandler() {
+        resetForm();
+        resetResult();
+      }
+
+      resetBtnEl.addEventListener("click", resethandler);
+      calcBtnEl.addEventListener("click", calculateResults);
+      [beginEmployEl, endEmployEl, avgEmployEl, employsLeftEl].forEach((el) => {
+        el.addEventListener("input", resetResult);
+      });  
+
+      avgSelectEl.addEventListener("change", handleAvgSelectChange)
+
+    </script>
+</body>
+</html>

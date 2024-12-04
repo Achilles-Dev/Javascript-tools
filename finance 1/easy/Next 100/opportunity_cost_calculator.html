@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Opportunity Cost Calculator</title>
+</head>
+<body>
+    <h1>Opportunity Cost Calculator</h1>
+    <p>
+      Money to spend:
+      <input type="number" id="moneyToSpend">
+    </p>
+    <p>If I invest the money:</p>
+    <p>
+      Annual return on savings: 
+      <input type="number" id="annualReturn" value="3">%
+    </p>
+    <p>
+      Investment period:
+      <input type="number" id="period">
+      <select id="periodSelect">
+        <option value="365.25">days</option>
+        <option value="52.17857142857">weeks</option>
+        <option value="12">months</option>
+        <option value="1" selected>years</option>
+      </select>
+    </p>
+    <p>
+      Income tax:
+      <input type="number" id="incomeTax" value="12">%
+    <p>
+      Annual inflation rate:
+      <input type="number" id="infRate" value="2.5">%
+    </p>
+
+
+    <button id="calcBtn">Calculate</button>
+    <button id="resetBtn">Reset</button>
+    <hr>
+    <div>
+      <h3>Result:</h3>
+      <h3 id="calcResults">Result will appear here...</h3>
+    </div>
+
+    <script>
+      // Get required elements from the HTML
+      const moneyToSpendEl = document.getElementById("moneyToSpend");
+      const annualReturnEl = document.getElementById("annualReturn");
+      const periodEl = document.getElementById("period");
+      const infRateEl = document.getElementById("infRate");
+      const incomeTaxEl = document.getElementById("incomeTax");
+      const periodSelectEl = document.getElementById("periodSelect");
+
+      const calcBtnEl = document.getElementById('calcBtn');
+      const resetBtnEl = document.getElementById('resetBtn');
+      const calcResultsEl = document.getElementById('calcResults') 
+
+      function createElement() {
+        const newDiv = `
+            <p>
+              <label for="i11-span">Total savings (after tax): &nbsp;</label>
+              <span
+                data-id="i11"
+                step="any"
+                id="i11-span"
+                class="spans"
+              ></span>
+            </p>
+            <p>
+              <label for="i12-span">Opportunity cost — inflation adjusted: &nbsp;</label>
+              <span
+                data-id="i12"
+                step="any"
+                id="i12-span"
+                class="spans"
+              ></span>
+            </p>
+        `
+        return newDiv
+      }
+
+      function setResult(resultObj) {
+        for (key of Object.keys(resultObj)) {
+          let val = resultObj[key].result;
+          let id = resultObj[key].type;
+
+          if (isNaN(val)) {
+           alert("Your input resulted in NAN.\n 0/0 \n Try again with valid input.");
+            return;
+          }
+          if (Math.abs(val) === Infinity) {
+            alert("Your input resulted in Infinity. \nDivision by zero. \nTry again with valid input.");
+            return;
+          }
+          const span = document.getElementById(`${id}-span`);
+          span.textContent = `${parseFloat(val)}`;
+        }
+      }
+
+      function calculateResults() {
+          // Retrieve input values
+          const moneyToSpend = parseFloat(moneyToSpendEl.value);
+          const annualReturn = parseFloat(annualReturnEl.value);
+          const period = parseFloat(periodEl.value);
+          const infRate = parseFloat(infRateEl.value);
+          const incomeTax = parseFloat(incomeTaxEl.value)
+          const periodSelect = parseFloat(periodSelectEl.value)
+
+          if (isNaN(moneyToSpend) || moneyToSpend < 0 || isNaN(annualReturn) || annualReturn < 0 || isNaN(period) || period < 0 ||
+            isNaN(infRate) || infRate < 0 || isNaN(incomeTax) || incomeTax < 0
+          ) {
+            alert("Please Enter All Details.");
+            return;
+          } else if (infRate > annualReturn) {
+            alert("The return cannot be lower than inflation, or you will lose money!");
+            return;
+          }
+
+          try {
+            const resultElement = createElement()
+            calcResultsEl.innerHTML = resultElement 
+
+            const nomOC = moneyToSpend * (((1 + ((annualReturn / 12) / 100)) ** ((period / periodSelect) * 12)) - 1)
+            const capGainTax = nomOC * (incomeTax / 100)
+            const nomGAT = nomOC - capGainTax
+            const TS = nomGAT + moneyToSpend
+            const OC = TS * ((1 - ((infRate) / 100)) ** (period / periodSelect))
+
+            const results = {
+              1: { result: Math.abs(TS) > 1 ? TS.toFixed(2) : TS.toPrecision(2), type: "i11" },
+              2: { result: Math.abs(OC) > 1 ? OC.toFixed(2) : OC.toPrecision(2), type: "i12" },
+            }
+            setResult(results)
+
+          } catch (error) {
+            alert("Something Went Wrong!!!");
+            resetResult()
+            return;
+          }
+      }
+
+      function resetForm() {
+        moneyToSpendEl.value = ""
+        annualReturnEl.value = "3"
+        periodEl.value = ""
+        infRateEl.value = "2.5"
+        incomeTaxEl.value = "12"
+        periodSelectEl.selectedIndex = "3"
+      }
+
+      function resetResult() {
+        calcResultsEl.innerHTML = "<p>Result will appear here...</p>";
+      } 
+
+      function resethandler() {
+        resetForm();
+        resetResult();
+      }
+
+      resetBtnEl.addEventListener("click", resethandler);
+      calcBtnEl.addEventListener("click", calculateResults);
+      [moneyToSpendEl, annualReturnEl, periodEl, infRateEl, incomeTaxEl].forEach((el) => {
+        el.addEventListener("input", resetResult);
+      });  
+
+      periodSelectEl.addEventListener("change", resetResult);
+
+    </script>
+</body>
+</html>

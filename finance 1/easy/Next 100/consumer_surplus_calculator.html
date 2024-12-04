@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Consumer Surplus Calculator</title>
+</head>
+<body>
+    <h1>Consumer Surplus Calculator</h1>
+    <p>
+      Actual price:
+      <input type="number" id="actPrice">
+    </p>
+    <p>
+      Willing price:
+      <input type="number" id="willPrice">
+    </p>
+
+    <div id="amInputs" style="display: none;">
+      <p>
+        Equilibrium price:
+        <input type="number" id="equilPrice">
+      </p>
+      <p>
+        Equilibrium quantity:
+        <input type="number" id="equilQuantity">
+      </p>
+    </div>
+
+    <p>
+      Mode:
+      <select id="modeUnit">
+        <option value="am">Advanced</option>
+        <option value="sm" selected>Simple</option>
+      </select>
+    </p>
+
+    <button id="calcBtn">Calculate</button>
+    <button id="resetBtn">Reset</button>
+    <hr>
+    <div>
+      <h3>Result:</h3>
+      <h3 id="calcResults">Result will appear here...</h3>
+    </div>
+
+    <script>
+      // Get required elements from the HTML
+      const actPriceEl = document.getElementById("actPrice");
+      const willPriceEl = document.getElementById("willPrice");
+      const modeUnitEl = document.getElementById("modeUnit");
+      const amInputsEl = document.getElementById("amInputs");
+      const equilPriceEl = document.getElementById("equilPrice");
+      const equilQuantityEl = document.getElementById("equilQuantity");
+
+      const calcBtnEl = document.getElementById('calcBtn');
+      const resetBtnEl = document.getElementById('resetBtn');
+      const calcResultsEl = document.getElementById('calcResults') 
+
+      function handleModeUnitChange(e) {
+        const value = e.target.value
+
+        amInputsEl.style.display = value === "am" ? "block" : "none"
+
+        resetResult()
+      }
+
+      function createElement() {
+        const newDiv = `
+            <p>
+              <label for="i11-span">Consumer surplus: &nbsp;</label>
+              <span
+                data-id="i11"
+                step="any"
+                id="i11-span"
+                class="spans"
+              ></span>
+            </p>
+        `
+        const newDiv2 = `
+            <p>
+              <label for="i12-span">Extended consumer surplus: &nbsp;</label>
+              <span
+                data-id="i12"
+                step="any"
+                id="i12-span"
+                class="spans"
+              ></span>
+            </p>
+        `
+        if (modeUnitEl.value === "am") {
+          return newDiv + newDiv2
+        }
+        return newDiv
+      }
+
+      function setResult(resultObj) {
+        for (key of Object.keys(resultObj)) {
+          let val = resultObj[key].result;
+          let id = resultObj[key].type;
+
+          if (isNaN(val)) {
+           alert("Your input resulted in NAN.\n 0/0 \n Try again with valid input.");
+            return;
+          }
+          if (Math.abs(val) === Infinity) {
+            alert("Your input resulted in Infinity. \nDivision by zero. \nTry again with valid input.");
+            return;
+          }
+          const span = document.getElementById(`${id}-span`);
+          span.textContent = `${parseFloat(val)}`;
+        }
+      }
+
+      function calculateResults() {
+          // Retrieve input values
+          const actPrice = parseFloat(actPriceEl.value);
+          const willPrice = parseFloat(willPriceEl.value);
+          const equilPrice = parseFloat(equilPriceEl.value);
+          const equilQuantity = parseFloat(equilQuantityEl.value);
+          const mode = modeUnitEl.value
+
+          if (isNaN(actPrice) || isNaN(willPrice) ) {
+            alert("Please Enter All Details.");
+            return;
+          }
+
+          if (mode === "am") {
+            if (isNaN(equilPrice) || isNaN(equilQuantity) ) {
+            alert("Please Enter All Details.");
+            return;
+          }
+          }
+
+          try {
+            const resultElement = createElement()
+            calcResultsEl.innerHTML = resultElement 
+
+            const CS = willPrice - actPrice
+            
+            const results = {
+              1: { result: Math.abs(CS) > 1 ? CS.toFixed(2) : CS.toPrecision(2), type: "i11" },
+            }
+            setResult(results)
+
+            if (mode === "am") {
+              const ECS = (0.5 * equilQuantity) * (willPrice - equilPrice)
+
+              const results = {
+                2: { result: Math.abs(ECS) > 1 ? ECS.toFixed(2) : ECS.toPrecision(2), type: "i12" },
+              }
+              setResult(results)
+            }
+
+          } catch (error) {
+            alert("Something Went Wrong!!!");
+            resetResult()
+            return;
+          }
+      }
+
+      function resetForm() {
+        actPriceEl.value = ""
+        willPriceEl.value = ""
+        equilPriceEl.value = ""
+        equilQuantityEl.value = ""
+        modeUnitEl.selectedIndex = "1"
+        amInputsEl.style.display = "none"
+      }
+
+      function resetResult() {
+        calcResultsEl.innerHTML = "<p>Result will appear here...</p>";
+      } 
+
+      function resethandler() {
+        resetForm();
+        resetResult();
+      }
+
+      resetBtnEl.addEventListener("click", resethandler);
+      calcBtnEl.addEventListener("click", calculateResults);
+
+      modeUnitEl.addEventListener("change", handleModeUnitChange)
+
+      [actPriceEl, willPriceEl, equilPriceEl, equilPriceEl].forEach((el) => {
+        el.addEventListener("input", resetResult);
+      });  
+    </script>
+</body>
+</html>

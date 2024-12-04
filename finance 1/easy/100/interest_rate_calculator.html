@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Interest Rate Calculator</title>
+</head>
+<body>
+    <h1>Interest Rate Calculator</h1>
+    <h3>Calculate the interest rate of a loan.</h3>
+    <p>
+      Loan Amount:
+      <input type="number" id="loanAmt" value="100000">
+    </p>
+    <p>
+      Loan Term:
+      <input type="number" id="loanTerm" value="20">years
+    </p>
+    <p>
+      Monthly Payment:
+      <input type="number" id="monthPmt" value="775">
+    </p>
+    
+
+    <button id="calcBtn">Calculate</button>
+    <button id="resetBtn">Reset</button>
+    <hr>
+    <div>
+      <h3>Result:</h3>
+      <h3 id="calcResults">Result will appear here...</h3>
+    </div>
+
+    <script>
+      // Get required elements from the HTML
+      const loanAmtEl = document.getElementById("loanAmt");
+      const loanTermEl = document.getElementById("loanTerm");
+      const monthPmtEl = document.getElementById("monthPmt");
+
+      const calcBtnEl = document.getElementById('calcBtn');
+      const resetBtnEl = document.getElementById('resetBtn');
+      const calcResultsEl = document.getElementById('calcResults') 
+
+      function createElement() {
+        const newDiv = `
+            <p>
+              <label for="i11-span">Real Annual Interest Rate: &nbsp;</label>
+              <span
+                data-id="i11"
+                step="any"
+                id="i11-span"
+                class="spans"
+              ></span>%
+            </p>
+        `
+        return newDiv
+      }
+
+      function setResult(resultObj) {
+        for (key of Object.keys(resultObj)) {
+          let val = resultObj[key].result;
+          let id = resultObj[key].type;
+
+          if (isNaN(val)) {
+           alert("Your input resulted in NAN.\n 0/0 \n Try again with valid input.");
+            return;
+          }
+          if (Math.abs(val) === Infinity) {
+            alert("Your input resulted in Infinity. \nDivision by zero. \nTry again with valid input.");
+            return;
+          }
+          const span = document.getElementById(`${id}-span`);
+          span.textContent = `${parseFloat(val)}`;
+        }
+      }
+
+      function calculateInterestRate(P, M, n) {
+        let low = 0;              // Minimum possible interest rate
+        let high = 1;             // Maximum possible interest rate (100% annually)
+        let epsilon = 0.000001;   // Precision for convergence
+
+        while (high - low > epsilon) {
+          let mid = (low + high) / 2; // Midpoint (monthly interest rate)
+          let calculatedPayment = (P * mid * Math.pow(1 + mid, n)) / (Math.pow(1 + mid, n) - 1);
+
+          if (calculatedPayment > M) {
+            high = mid; // Too high, so reduce upper bound
+          } else {
+            low = mid; // Too low, so increase lower bound
+          }
+        }
+
+        let monthlyRate = (low + high) / 2;
+        let annualRate = monthlyRate * 12; 
+        return annualRate * 100;          
+      }
+
+      function calculateResults() {
+          // Retrieve input values
+          const loanAmt = parseFloat(loanAmtEl.value);
+          const loanTerm = parseFloat(loanTermEl.value);
+          const monthPmt = parseFloat(monthPmtEl.value);
+
+          if (isNaN(loanAmt)  || loanAmt < 1 || isNaN(loanTerm) || loanTerm < 1 ||
+            isNaN(monthPmt) || monthPmt < 1
+          ) {
+            alert("Please Enter All Details.");
+            return;
+          }
+
+          try {
+            const resultElement = createElement()
+            calcResultsEl.innerHTML = resultElement 
+
+            
+            const RAIR = calculateInterestRate(loanAmt, monthPmt, loanTerm * 12)
+
+            const results = {
+              1: { result: Math.abs(RAIR) > 1 ? RAIR.toFixed(3) : RAIR.toPrecision(3), type: "i11" },
+            }
+            setResult(results)
+
+          } catch (error) {
+            alert("Something Went Wrong!!!");
+            resetResult()
+            return;
+          }
+      }
+
+      function resetForm() {
+        loanAmtEl.value = "100000"
+        loanTermEl.value = "20"
+        monthPmtEl.value = "775"
+      }
+
+      function resetResult() {
+        calcResultsEl.innerHTML = "<p>Result will appear here...</p>";
+      } 
+
+      function resethandler() {
+        resetForm();
+        resetResult();
+      }
+
+      resetBtnEl.addEventListener("click", resethandler);
+      calcBtnEl.addEventListener("click", calculateResults);
+
+      [loanAmtEl, loanTermEl, monthPmtEl].forEach((el) => {
+        el.addEventListener("input", resetResult);
+      });  
+    </script>
+</body>
+</html>

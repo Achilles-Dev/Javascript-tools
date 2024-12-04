@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Scrap Gold Calculator</title>
+</head>
+<body>
+    <h1>Scrap Gold Calculator</h1>
+    <p>
+      Weight of scrap gold:
+      <input type="number" id="assetVal">
+    </p>
+    <p>
+      Gold purity by karat:
+      <input type="number" id="fialVal">K
+    </p>
+    <p>
+      Price per unit weight:
+      <input type="number" id="depPeriod">
+    </p>
+    
+
+    <button id="calcBtn">Calculate</button>
+    <button id="resetBtn">Reset</button>
+    <hr>
+    <div>
+      <h3>Result:</h3>
+      <h3 id="calcResults">Result will appear here...</h3>
+    </div>
+
+    <script>
+      // Get required elements from the HTML
+      const assetValEl = document.getElementById("assetVal");
+      const fialValEl = document.getElementById("fialVal");
+      const depPeriodEl = document.getElementById("depPeriod");
+
+      const calcBtnEl = document.getElementById('calcBtn');
+      const resetBtnEl = document.getElementById('resetBtn');
+      const calcResultsEl = document.getElementById('calcResults') 
+
+      function createElement() {
+        const newDiv = `
+            <p>
+              <label for="i11-span">Depreciable Base: &nbsp;</label>
+              <span
+                data-id="i11"
+                step="any"
+                id="i11-span"
+                class="spans"
+              ></span>
+            </p>
+            <p>
+              <label for="i12-span">1st Year Depreciation Expense: &nbsp;</label>
+              <span
+                data-id="i12"
+                step="any"
+                id="i12-span"
+                class="spans"
+              ></span>
+            </p>
+            <p>
+              <label for="i13-span">Final Year Depreciation Expense: &nbsp;</label>
+              <span
+                data-id="i13"
+                step="any"
+                id="i13-span"
+                class="spans"
+              ></span>
+            </p>
+            <p>
+        `
+        return newDiv
+      }
+
+      function setResult(resultObj) {
+        for (key of Object.keys(resultObj)) {
+          let val = resultObj[key].result;
+          let id = resultObj[key].type;
+
+          if (isNaN(val)) {
+           alert("Your input resulted in NAN.\n 0/0 \n Try again with valid input.");
+            return;
+          }
+          if (Math.abs(val) === Infinity) {
+            alert("Your input resulted in Infinity. \nDivision by zero. \nTry again with valid input.");
+            return;
+          }
+          const span = document.getElementById(`${id}-span`);
+          span.textContent = `${parseFloat(val)}`;
+        }
+      }
+
+      function calculateResults() {
+          // Retrieve input values
+          const assetVal = parseFloat(assetValEl.value);
+          const fialVal = parseFloat(fialValEl.value);
+          const depPeriod = parseFloat(depPeriodEl.value);
+
+          if (isNaN(assetVal)  || assetVal <= 0 || isNaN(fialVal) || fialVal <= 0 ||
+            isNaN(depPeriod) || depPeriod <= 0
+          ) {
+            alert("Please Enter All Details.");
+            return;
+          }
+
+          try {
+            const resultElement = createElement()
+            calcResultsEl.innerHTML = resultElement 
+
+            const unitPrice = (assetVal / fialVal) / depPeriod 
+
+            const results = {
+              1: { result: Math.abs(unitPrice) > 1 ? unitPrice.toFixed(2) : unitPrice.toPrecision(2), type: "i11" },
+              2: { result: Math.abs(unitPrice) > 1 ? unitPrice.toFixed(2) : unitPrice.toPrecision(2), type: "i12" },
+              3: { result: Math.abs(unitPrice) > 1 ? unitPrice.toFixed(2) : unitPrice.toPrecision(2), type: "i13" },
+            }
+            setResult(results)
+
+          } catch (error) {
+            alert("Something Went Wrong!!!");
+            resetResult()
+            return;
+          }
+      }
+
+      function resetForm() {
+        assetValEl.value = ""
+        fialValEl.value = ""
+        depPeriodEl.value = ""
+      }
+
+      function resetResult() {
+        calcResultsEl.innerHTML = "<p>Result will appear here...</p>";
+      } 
+
+      function resethandler() {
+        resetForm();
+        resetResult();
+      }
+
+      resetBtnEl.addEventListener("click", resethandler);
+      calcBtnEl.addEventListener("click", calculateResults);
+
+      [assetValEl, fialValEl, depPeriodEl].forEach((el) => {
+        el.addEventListener("input", resetResult);
+      });  
+    </script>
+</body>
+</html>

@@ -170,23 +170,28 @@
             } 
             
             let cumulativeFreq = 0;
-            decileNumbers.forEach((num, index) => {      
-              cumulativeFreq += freqs[num] ? freqs[num] : 0  
+            let prevVal = -1000
+            decileNumbers.forEach((num, index) => {   
+              let freqVal = freqs[num] ? freqs[num] : 0  
+              freqVal = prevVal === num ? 0 : freqVal
+              prevVal = num
+              cumulativeFreq += freqVal 
               table.push(`
                 <tr>
                   <td style="border: 1px solid black; border-collapse: collapse;">${index + 1}</td>
                   <td style="border: 1px solid black; border-collapse: collapse;">${num}</td>
                   <td style="border: 1px solid black; border-collapse: collapse;">
-                    ${index == 0 ? sortedArray[index] : decileNumbers[index - 1]} to ${num}
+                    ${index === 0 ? `${sortedArray[index]}` : `${decileNumbers[index - 1]} to ${num}`}
                   </td>
-                  <td style="border: 1px solid black; border-collapse: collapse;"> ${freqs[num] ? freqs[num] : 0}</td>
+                  <td style="border: 1px solid black; border-collapse: collapse;"> ${freqVal}</td>
                   <td style="border: 1px solid black; border-collapse: collapse;">${cumulativeFreq}</td>
                 </tr>
               `)
             })
 
             const results = 0;
-            
+            table = table.join("")
+
             calcResultsEl.innerHTML = `<table style="border: 1px solid black; border-collapse: collapse;">
                   <tr>
                     <th style="border: 1px solid black; border-collapse: collapse;">Decile position</th>

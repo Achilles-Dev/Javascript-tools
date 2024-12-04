@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Cross Price Elasticity Calculator</title>
+</head>
+<body>
+    <h1>Cross Price Elasticity Calculator</h1>
+    <p>At time point 1:</p>
+    <p>
+      Price of product A:
+      <input type="number" id="prodPriceA1">
+    </p>
+    <p>
+      Demand for product B:
+      <input type="number" id="prodDemandB1">
+    </p>
+
+    <p>At time point 2:</p>
+    <p>
+      Price of product A:
+      <input type="number" id="prodPriceA2">
+    </p>
+    <p>
+      Demand for product B:
+      <input type="number" id="prodDemandB2">
+    </p>
+    
+
+    <button id="calcBtn">Calculate</button>
+    <button id="resetBtn">Reset</button>
+    <hr>
+    <div>
+      <h3>Result:</h3>
+      <h3 id="calcResults">Result will appear here...</h3>
+    </div>
+
+    <script>
+      // Get required elements from the HTML
+      const prodPriceA1El = document.getElementById("prodPriceA1");
+      const prodDemandB1El = document.getElementById("prodDemandB1");
+      const prodPriceA2El = document.getElementById("prodPriceA2");
+      const prodDemandB2El = document.getElementById("prodDemandB2");
+
+      const calcBtnEl = document.getElementById('calcBtn');
+      const resetBtnEl = document.getElementById('resetBtn');
+      const calcResultsEl = document.getElementById('calcResults') 
+
+      function createElement() {
+        const newDiv = `
+          <p>Cross price elasticity:</p>
+            <p>
+              <label for="i11-span">Elasticity: &nbsp;</label>
+              <span
+                data-id="i11"
+                step="any"
+                id="i11-span"
+                class="spans"
+              ></span>
+            </p>
+            <p>
+              <span
+                data-id="i12"
+                step="any"
+                id="i12-span"
+                class="spans"
+              ></span>
+            </p>
+            <p>
+              <span
+                data-id="i13"
+                step="any"
+                id="i13-span"
+                class="spans"
+              ></span>
+            </p>
+        `
+        return newDiv
+      }
+
+      function setResult(resultObj) {
+        for (key of Object.keys(resultObj)) {
+          let val = resultObj[key].result;
+          let id = resultObj[key].type;
+
+          if (id === "i13" || id === "i12") {
+            const span = document.getElementById(`${id}-span`);
+            span.textContent = val
+          } else {
+            if (isNaN(val)) {
+              alert("Your input resulted in NAN.\n 0/0 \n Try again with valid input.");
+              return;
+            }
+            if (Math.abs(val) === Infinity) {
+              alert("Your input resulted in Infinity. \nDivision by zero. \nTry again with valid input.");
+              return;
+            }
+            const span = document.getElementById(`${id}-span`);
+            span.textContent = `${parseFloat(val)}`;
+          }
+        }
+      }
+
+      function calculateResults() {
+          // Retrieve input values
+          const prodPriceA1 = parseFloat(prodPriceA1El.value);
+          const prodDemandB1 = parseFloat(prodDemandB1El.value);
+          const prodPriceA2 = parseFloat(prodPriceA2El.value);
+          const prodDemandB2 = parseFloat(prodDemandB2El.value);
+
+          if (isNaN(prodPriceA1)  || prodPriceA1 < 1 || isNaN(prodDemandB1) || prodDemandB1 < 1 ||
+            isNaN(prodPriceA2) || prodPriceA2 < 1 || isNaN(prodDemandB2) || prodDemandB2 < 1
+          ) {
+            alert("Please Enter All Details.");
+            return;
+          }
+
+          try {
+            const resultElement = createElement()
+            calcResultsEl.innerHTML = resultElement 
+            let demandType = ""
+            let goodsType = ""
+            const elasticity = ((prodPriceA1 + prodPriceA2) / (prodDemandB1 + prodDemandB2)) *
+              ((prodDemandB1 - prodDemandB2) / (prodPriceA1 - prodPriceA2))
+
+            if (Math.abs(elasticity) > 1) {
+              demandType = "Elastic demand."
+            } else if (Math.abs(elasticity) < 1) {
+              demandType = "Inelastic demand."
+            } else if (Math.abs(elasticity) === 1) {
+              demandType = "Unitary demand."
+            }
+            
+            if (elasticity > 0) {
+              goodsType = "The products are substitute goods."
+            } else if (elasticity < 0) {
+              goodsType = "The products are complementary goods."
+            } else {
+              goodsType = "The products are unrelated goods (neither complements nor substitutes)."
+            }
+
+            const results = {
+              1: { result: Math.abs(elasticity) > 1 ? elasticity.toFixed(2) : elasticity.toPrecision(2), type: "i11" },
+              2: { result: goodsType, type: "i12" },
+              3: { result: demandType, type: "i13" },
+            }
+            setResult(results)
+
+          } catch (error) {
+            alert("Something Went Wrong!!!");
+            resetResult()
+            return;
+          }
+      }
+
+      function resetForm() {
+        prodPriceA1El.value = ""
+        prodDemandB1El.value = ""
+        prodPriceA2El.value = ""
+        prodDemandB2El.value = ""
+      }
+
+      function resetResult() {
+        calcResultsEl.innerHTML = "<p>Result will appear here...</p>";
+      } 
+
+      function resethandler() {
+        resetForm();
+        resetResult();
+      }
+
+      resetBtnEl.addEventListener("click", resethandler);
+      calcBtnEl.addEventListener("click", calculateResults);
+
+      [prodPriceA1El, prodDemandB1El, prodPriceA2El, prodDemandB2El].forEach((el) => {
+        el.addEventListener("input", resetResult);
+      });  
+    </script>
+</body>
+</html>

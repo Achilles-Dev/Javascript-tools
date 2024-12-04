@@ -1,0 +1,618 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Centripetal Force Calculator</title>
+  </head>
+  <body>
+    <h1>Centripetal Force Calculator</h1>
+      <p>
+        <label for="i1-input">Objective's diameter (Dₒ)</label>
+        <input
+          type="number"
+          step="any"
+          id="i1-input"
+          class="inputs"
+          min="0"
+          autocomplete="off"
+          data-id="i1"
+          step="any"
+          data-name="Objective's diameter (Dₒ)"
+        />
+        <select 
+          class="selects"
+          id="i1-select"
+          data-type="distance"
+          data-prev="mm"
+          data-id="i1"
+        >
+          <option value="mm" selected>millimeters (mm)</option>
+          <option value="cm">centimeters (cm)</option>
+          <option value="m">meters (m)</option>
+          <option value="in">inches (in)</option>
+          <option value="ft">feet (ft)</option>
+          <option value="yd">yards (yd)</option>
+        </select>
+      </p>
+      <p>
+        <label for="i2-input">f-ratio (fᵣ) </label>
+        <input
+          type="number"
+          step="any"
+          id="i2-input"
+          class="inputs"
+          min="0"
+          autocomplete="off"
+          data-id="i2"
+          step="any"
+          data-name="f-ratio (fᵣ)"
+        />
+        <select
+          class="selects"
+          id="i2-select"
+          data-type="exp"
+          data-prev="exp"
+          data-id="i2"
+          style="display: none;"
+        >
+          <option value="exp" selected></option>
+        </select>
+      </p>
+      <p>
+        <label for="i3-input">Eyepiece focal length (fₑ) </label>
+        <input
+          type="number"
+          step="any"
+          id="i3-input"
+          class="inputs"
+          min="0"
+          autocomplete="off"
+          data-id="i3"
+          step="any"
+          data-name="Eyepiece focal length (fₑ)"
+        />
+        <select 
+          class="selects"
+          id="i3-select"
+          data-type="distance"
+          data-prev="mm"
+          data-id="i3"
+        >
+        <option value="mm" selected>millimeters (mm)</option>
+        <option value="cm">centimeters (cm)</option>
+        <option value="m">meters (m)</option>
+        <option value="in">inches (in)</option>
+        <option value="ft">feet (ft)</option>
+        <option value="yd">yards (yd)</option>
+        </select>
+      </p>
+
+      <p id="advancedInput" style="display: none;">
+        <label for="i4-input">f-ratio (fᵣ) </label>
+        <input
+          type="number"
+          step="any"
+          id="i4-input"
+          class="inputs"
+          min="0"
+          autocomplete="off"
+          data-id="i4"
+          step="any"
+          data-name="f-ratio (fᵣ)"
+        />
+        <select 
+          class="selects"
+          id="i4-select"
+          data-type="angle"
+          data-prev="deg"
+          data-id="i4"
+        >
+          <option value="deg" selected>degrees (deg)</option>
+          <option value="rad">radians (rad)</option>
+          <option value="arcmin">minutes of arc (arcmin)</option>
+          <option value="arcsec">seconds of arc (arcsec)</option>
+          <option value="mrad">milliradians (mrad)</option>
+        </select>
+      </p>
+      <p>
+        Mode:
+        <select id="modeUnit">
+          <option value="am">Advanced mode</option>
+          <option value="sm" selected>Simple mode</option>
+        </select>
+      </p>
+      
+      <button id="calcBtn">Calculate</button>
+      <button id="resetBtn">Reset</button>
+      <hr>
+      <div>
+        <h3>Result:</h3>
+        <h3 id="calcResults">Result will appear here...</h3>
+      </div>
+    <script>
+      /*************** ELEMENTS ***************/
+      const modeUnitEl = document.getElementById("modeUnit")
+      const containersEl = document.querySelectorAll('.containers')
+      const inputs = document.querySelectorAll('.inputs')
+      const selects = document.querySelectorAll('.selects')
+
+      const advancedInputEl = document.getElementById("advancedInput");
+
+      const calcBtnEl = document.getElementById('calcBtn');
+      const resetBtnEl = document.getElementById('resetBtn');
+      const calcResultsEl = document.getElementById('calcResults')
+
+      /*************** GLOBAL VARIABLES ***************/
+      const UNITS = {
+        angularFrequency: {
+          rpm: 9.5492965855137,
+          "rad/s": 1,
+          Hz: 0.1591549430919,
+        },
+        mass: {
+          g: 1e3,
+          dag: 1e2,
+          kg: 1,
+          gr: 15432.35835294143,
+          dr: 564.3833911932867,
+          oz: 35.27396194958042,
+          lb: 2.204622621848776,
+          st: 0.15747304441776971,
+        },
+        time: {
+          sec: 1,
+          min: 0.016666666666666666,
+          hrs: 0.0002777777777777778,
+          days: 0.000011574074074074075,
+          wks: 0.0000016534391534391535,
+          mos: 3.8025705376834745e-7,
+          yrs: 3.1688087814028954e-8,
+        },
+        distance: {
+          mm: 1,
+          cm: 0.1,
+          m: 0.001,
+          in: 0.03937007874015748,
+          ft: 0.0032808398950131235,
+          yd: 0.0010936132983377078,
+        },
+        speed: {
+          "m/s": 1,
+          "km/h": 3.6,
+          "ft/s": 3.280839895,
+          mph: 2.2369362921,
+          "ft/min": 196.8503937,
+          "m/min": 60,
+        },
+        angle: {
+          deg: 57.29577951308232,
+          rad: 1,
+          arcmin: 3437.746770784939,
+          arcsec: 206264.80624709636,
+          mrad: 1000,
+        },
+        angle2: {
+          deg: 0.00028,
+          arcmin: 0.0167,
+          arcsec: 1,
+        },
+        acceleration: {
+          "m/s²": 1,
+          g: 0.10197162129779,
+        },
+        force: {
+          N: 1,
+          kN: 1e-3,
+          pdl: 7.23301146432317,
+          lbf: 0.22480894387096184,
+        },
+        exp: {
+          exp: 1
+        }
+      };
+      /*************** FUNCTIONS ***************/
+      function toSIUnit(type, unit, value) {
+        return value / UNITS[type][unit];
+      }
+
+      function fromSIUnit(type, unit, value) {
+        return value * UNITS[type][unit];
+      }
+
+      function handleModeUnitChange(e) {
+        const value = e.target.value
+        advancedInputEl.style.display = value === "am" ? "block" : "none"
+
+        resetResult()
+      }
+
+      function createElement() {
+        const newDiv = `
+            <h3>Image properties:</h3>
+            
+            <p>
+              <label for="i55-span">Magnification (M): &nbsp;</label>
+              <span
+                data-id="i55"
+                step="any"
+                id="i55-span"
+                class="spans"
+                data-name="Magnification (M)"
+              ></span>
+              <select
+                class="selects"
+                id="i55-select"
+                data-type="exp"
+                data-prev="exp"
+                data-id="i55"
+                style="display: none;"
+              >
+                <option value="exp" selected></option>
+              </select>
+            </p>
+
+            <p>
+              <label for="i56-span">Resolving power (Pᵣ): &nbsp;</label>
+              <span
+                data-id="i56"
+                step="any"
+                id="i56-span"
+                class="spans"
+                data-name="Resolving power (Pᵣ)"
+              ></span>
+              <select
+                class="selectsResult"
+                id="i56-select"
+                data-type="angle2"
+                data-prev="arcsec"
+                data-id="i56"
+              >
+                <option value="deg">degrees (deg)</option>
+                <option value="arcmin">minutes of arc (arcmin)</option>
+                <option value="arcsec" selected>seconds of arc (arcsec)</option>
+              </select>
+            </p>
+
+            <p>
+              <label for="i57-span">Scope field of view (FOVₛ): &nbsp;</label>
+              <span
+                type="number"
+                step="any"
+                id="i57-span"
+                class="spans"
+                min="0"
+                autocomplete="off"
+                data-id="i57"
+                step="any"
+                data-name="Scope field of view (FOVₛ)"
+              ></span>
+              <select 
+                class="selects"
+                id="i57-select"
+                data-type="angle"
+                data-prev="deg"
+                data-id="i57"
+              >
+                <option value="deg" selected>degrees (deg)</option>
+                <option value="rad">radians (rad)</option>
+                <option value="arcmin">minutes of arc (arcmin)</option>
+                <option value="arcsec">seconds of arc (arcsec)</option>
+                <option value="mrad">milliradians (mrad)</option>
+              </select>
+            </p>
+
+            <p>
+              <label for="i58-span">Surface Brigthness (SB): &nbsp;</label>
+              <span
+                data-id="i58"
+                step="any"
+                id="i58-span"
+                class="spans"
+                data-name="Surface Brigthness (SB)"
+              ></span><span>%</span>
+              <select
+                class="selects"
+                id="i58-select"
+                data-type="exp"
+                data-prev="exp"
+                data-id="i58"
+                style="display: none;"
+              >
+                <option value="exp" selected></option>
+              </select>
+            </p>
+
+            <p>
+              <label for="i59-span">Star magnitude limit (Lₘ): &nbsp;</label>
+              <span
+                type="number"
+                step="any"
+                id="i59-span"
+                class="spans"
+                min="0"
+                autocomplete="off"
+                data-id="i59"
+                step="any"
+                data-name="Star magnitude limit (Lₘ)"
+              ></span>
+              <select
+                class="selects"
+                id="i59-select"
+                data-type="exp"
+                data-prev="exp"
+                data-id="i59"
+                style="display: none;"
+              >
+                <option value="exp" selected></option>
+              </select>
+            </p>
+
+            <h3>Additional Parameters:</h3>
+
+            <p>
+              <label for="i51-span">Objective focal point (fₒ): &nbsp;</label>
+              <span
+                data-id="i51"
+                step="any"
+                id="i51-span"
+                class="spans"
+                data-name="Objective focal point (fₒ)"
+              ></span>
+              <select
+                class="selectsResult"
+                id="i51-select"
+                data-type="distance"
+                data-prev="mm"
+                data-id="i51"
+              >
+                <option value="mm" selected>millimeters (mm)</option>
+                <option value="cm">centimeters (cm)</option>
+                <option value="m">meters (m)</option>
+                <option value="in">inches (in)</option>
+                <option value="ft">feet (ft)</option>
+                <option value="yd">yards (yd)</option>
+              </select>
+            </p>
+
+            <p>
+              <label for="i52-span">Exit pupil diameter (Dₑₚ): &nbsp;</label>
+              <span
+                data-id="i52"
+                step="any"
+                id="i52-span"
+                class="spans"
+                data-name="Exit pupil diameter (Dₑₚ)"
+              ></span>
+              <select
+                class="selectsResult"
+                id="i52-select"
+                data-type="distance"
+                data-prev="mm"
+                data-id="i52"
+              >
+                <option value="mm" selected>millimeters (mm)</option>
+                <option value="cm">centimeters (cm)</option>
+                <option value="m">meters (m)</option>
+                <option value="in">inches (in)</option>
+                <option value="ft">feet (ft)</option>
+                <option value="yd">yards (yd)</option>
+              </select>
+            </p>
+
+            <p>
+              <label for="i54-span">Minimum magnification (Mₘᵢₙ): &nbsp;</label>
+              <span
+                type="number"
+                step="any"
+                id="i54-span"
+                class="spans"
+                min="0"
+                autocomplete="off"
+                data-id="i54"
+                step="any"
+                data-name="Minimum magnification (Mₘᵢₙ)"
+              ></span>
+              <select
+                class="selects"
+                id="i54-select"
+                data-type="exp"
+                data-prev="exp"
+                data-id="i54"
+                style="display: none;"
+              >
+                <option value="exp" selected></option>
+              </select>
+            </p>
+        `
+        return newDiv
+      }
+
+      // related to caculation
+      function prepareUnit(...args) {
+        const resultArr = [];
+        for (id of args) {
+          const input = document.getElementById(`${id}-input`);
+          const select = document.getElementById(`${id}-select`);
+          const type = select.getAttribute("data-type");
+          let val = parseFloat(input.value);
+
+          val = isNaN(val) ? 0 : val;
+          let inUnit = select.value;
+
+          val = toSIUnit(type, inUnit, val);
+
+          resultArr.push(val);
+        }
+
+        return resultArr;
+      }
+
+      function setResult(resultObj) {
+        for (key of Object.keys(resultObj)) {
+          let val = resultObj[key].result;
+          let id = resultObj[key].type;
+
+          if (isNaN(val)) {
+           alert("Your input resulted in NAN.\n 0/0 \n Try again with valid input.");
+            return;
+          }
+          if (Math.abs(val) === Infinity) {
+            alert("Your input resulted in Infinity. \nDivision by zero. \nTry again with valid input.");
+            return;
+          }
+          const span = document.getElementById(`${id}-span`);
+          const select = document.getElementById(`${id}-select`);
+          const type = select.getAttribute("data-type");
+          let outUnit = select.value;
+          val = fromSIUnit(type, outUnit, val);
+          
+          span.textContent = parseFloat(val);
+        }
+      }
+
+      function calculateResult() {       
+        function calculateIPs() {
+          let [val1, val2, val3] = prepareUnit("i1", "i2", "i3");
+          let oFp = val1 * val2  
+          let mag = oFp / val3   
+          let ePd = val1 / mag
+          let mmag = val1 / 7
+          let reP = 115.8 / val1;
+          let sBr = (2 * (ePd ** 2)).toFixed(2) * 1;
+          
+          let sML = 2 + (5 * (Math.log(val1) / Math.log(10)))
+
+          let allResults = {
+            1: { result: oFp > 1 ? oFp.toFixed(4) * 1 : oFp, type: "i51" },
+            2: { result: ePd > 1 ? ePd.toFixed(4) * 1 : ePd, type: "i52"},
+            3: { result: mmag > 1 ? mmag.toFixed(4) * 1 : mmag, type: "i54"},
+            4: { result: mag > 1 ? mag.toFixed(4) * 1 : mag, type: "i55" },
+            5: { result: reP > 1 ? reP.toFixed(4) * 1 : reP, type: "i56"},
+            7: { result: sBr > 1 ? sBr.toFixed(4) * 1 : sBr, type: "i58"},
+            8: { result: sML > 1 ? sML.toFixed(4) * 1 : sML, type: "i59"},
+          }
+          if (modeUnitEl.value === 'am') {
+            let [val4] = prepareUnit("i4")
+            let sFV = val4 / mag
+            return {
+              ...allResults,
+              6: { result: sFV > 1 ? sFV.toFixed(4) * 1 : sFV, type: "i57"},
+            }
+          } else {
+            return {
+              ...allResults
+            }
+          }
+        }
+
+        return calculateIPs()
+      }
+
+      function validateInput(id) {
+        const input = document.getElementById(`${id}-input`);
+        const label = input.getAttribute("data-name").trim();
+        let value = parseFloat(input.value);
+        if (isNaN(value)) {
+          alert(`${label} value cannot be empty.`);
+          return false;
+        } 
+
+        if (value < 0) {
+          alert(`${label} value cannot be negative.`);
+          return false;
+        }
+
+        return true;
+      }
+
+      function handleResultsChange(e) {
+        let select = e.target;
+        let id = select.getAttribute("data-id");
+        let span = document.getElementById(`${id}-span`);
+
+        let prevUnit = select.getAttribute("data-prev");
+        let currentUnit = select.value;
+        select.setAttribute("data-prev", currentUnit);
+
+        if (span.textContent === "") {
+          return;
+        }
+
+        let type = select.getAttribute("data-type");
+
+        let value = parseFloat(span.textContent);
+        value = parseFloat(value);
+        if (isNaN(value)) value = 0.0;
+
+        let si = toSIUnit(type, prevUnit, value);
+        let result = fromSIUnit(type, currentUnit, si);
+        span.textContent = parseFloat(result).toFixed(5) * 1;
+      }
+
+      function calculateResults() {
+        for (el of ["i1", "i2", "i3"]) {
+          if (!validateInput(el)) return;
+        }
+        if (modeUnitEl.value === "am") {
+          if (!validateInput("i4")) return;
+        }
+        
+        try {
+          const resultElement = createElement()
+          calcResultsEl.innerHTML = resultElement
+
+          const newSelects = document.querySelectorAll(".selectsResult");
+
+          newSelects.forEach((select) => {
+            select.addEventListener("change", handleResultsChange);
+          });
+        
+          const result = calculateResult();
+          setResult(result)
+          
+
+        } catch(error) {
+          alert("An error ocurred. Try again with valid input.");
+          resetResult()
+          return;
+        }
+      }
+
+      function resetForm() {
+        selects.forEach((select) => {
+          select.selectedIndex = '0'
+        });
+
+        inputs.forEach((input) => {
+          input.value = ""
+        });
+        modeUnitEl.selectedIndex = "1"
+        advancedInputEl.style.display = "none"
+
+      }
+
+      function resetResult() {
+        calcResultsEl.innerHTML = "<p>Result will appear here...</p>";
+      } 
+
+      function resethandler() {
+        resetForm();
+        resetResult();
+      }
+
+      /*************** EVENTLISTINERS ***************/
+      inputs.forEach((el) => {
+        el.addEventListener("input", resetResult);
+      });
+
+      selects.forEach((el) => {
+        el.addEventListener("change", resetResult);
+      });
+      modeUnitEl.addEventListener("change", handleModeUnitChange)
+
+      resetBtnEl.addEventListener("click", resethandler);
+      calcBtnEl.addEventListener("click", calculateResults);
+    </script>
+  </body>
+</html>

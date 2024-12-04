@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Histogram Calculator</title>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.6.5/dist/sweetalert2.all.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11.6.5/dist/sweetalert2.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        canvas {
+            max-width: 600px;
+            max-height: 400px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <h1>Histogram Calculator</h1>
+
+    <div>
+        <p>
+            <label for="dataSet">Enter your dataset (comma, space, or newline separated): </label>
+            <textarea id="dataSet" rows="4" cols="50" placeholder="Example: 1, 2, 3 or 1 2 3 or&#10;1&#10;2&#10;3"></textarea>
+        </p>
+        <p>
+            <label for="numBins">Number of bins: </label>
+            <input type="number" id="numBins" value="6"/>
+        </p>
+
+        <button id="calculate" class="page-button">Calculate</button>&nbsp;&nbsp;&nbsp;
+        <button id="reset" class="page-button white">Reset</button>
+
+        <hr>
+
+        <div id="result">
+            <p>Results will appear here....</p>
+        </div>
+
+        <canvas id="histogramChart" width="400" height="200"></canvas>
+
+    </div>
+
+    <script>
+        // Get all elements
+        const dataSetEl = document.getElementById('dataSet');
+        const numBinsEl = document.getElementById('numBins');
+        const calculateEl = document.getElementById('calculate');
+        const resetEl = document.getElementById('reset');
+        const resultsEl = document.getElementById('result');
+        const histogramChartEl = document.getElementById('histogramChart');
+
+        let histogramChart;
+
+        // Function to calculate and draw histogram
+        function calculateHistogram() {
+            try {
+                // Retrieve input values and convert to array of numbers
+                const data = dataSetEl.value
+                    .split(/[\s,]+/)
+                    .map(Number)
+                    .filter(n => !isNaN(n))
+                    .sort((a, b) => a - b);
+                
+                const numBins = parseFloat(numBinsEl.value)
+
+                // Validate input values
+                if (data.length < 2) {
+                    throw new Error('Please enter at least two valid numbers separated by commas, spaces, or new lines.');
+                } else if (isNaN(numBins) || numBins < 2) {
+                    throw new Error('Number of bins should be at least two');
+                }
+
+                // Calculate the number of bins using Sturges' formula
+                // const numBins = Math.ceil(Math.log2(data.length) + 1)*2;
+
+                // Calculate bin width
+                const min = data[0];
+                const max = data[data.length - 1];
+                const binWidth = (max - min) / numBins;
+
+                
+
+                // Generate bins and frequencies
+                const bins = [];
+                for (let i = 0; i < numBins; i++) {
+                    bins.push({
+                        start: min + i * binWidth,
+                        end: min + (i + 1) * binWidth,
+                        count: 0
+                    });
+                }
+
+                data.forEach(value => {
+                    const binIndex = Math.min(
+                        Math.floor((value - min) / binWidth),
+                        bins.length - 1
+                    );
+                    bins[binIndex].count += 1;
+                });
+
+                const labels = bins.map(bin => ((bin.start + bin.end) / 2).toFixed(2));
+                const frequencies = bins.map(bin => bin.count);
+                const inclusiveValues = (parseFloat(bins[0].end - ((parseFloat(bins[0].start) + parseFloat(bins[0].end)) / 2))).toFixed(2)
+
+                resultsEl.innerHTML = `
+                <p>
+                    Histogram data calculated. Check the chart below.
+                </p>
+                <p><strong>Note: </strong>Each bin is labelled by its central value and includes values <strong>±${inclusiveValues}</strong></p>
+                `;
+                resultsEl.style.display = 'block';
+
+                if (histogramChart) histogramChart.destroy();
+                const ctx = histogramChartEl.getContext('2d');
+                histogramChart = new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            label: 'Frequency',
+                            data: frequencies,
+                            backgroundColor: 'rgba(75, 192, 192, 1)'
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        scales: {
+                            x: {
+                                title: {
+                                    display: true,
+                                    text: 'Bins'
+                                }
+                            },
+                            y: {
+                                title: {
+                                    display: true,
+                                    text: 'Frequency'
+                                }
+                            }
+                        }
+                    }
+                });
+
+            } catch (error) {
+                showError(error.message);
+            }
+        }
+
+        function showError(errorMessage) {
+            Swal.fire({
+                icon: "error",
+                title: "Error",
+                text: errorMessage,
+            });
+        }
+
+        function resetResultContainer() {
+            resultsEl.innerHTML = "<p>Results will appear here....</p>";
+            if (histogramChart) histogramChart.destroy();
+        }
+
+        function resetHandler() {
+            resetForm();
+            resetResultContainer();
+        }
+        
+        // Reset function
+        function resetForm() {
+            dataSetEl.value = "";
+        }
+
+        // Event listeners
+        calculateEl.addEventListener("click", calculateHistogram);
+        resetEl.addEventListener("click", resetHandler);
+
+        dataSetEl.addEventListener("input", () => {
+            resetResultContainer();
+        });
+
+    </script>
+</body>
+
+</html>

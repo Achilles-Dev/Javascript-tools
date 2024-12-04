@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Tip Calculator</title>
+</head>
+<body>
+    <h1>Tip Calculator</h1>
+    <p>
+      Bill:
+      <input type="number" id="bill">
+    </p>
+    <p>
+      Tax (%):
+      <input type="number" id="tax">%
+    </p>
+    <p>
+      Tip (%):
+      <input type="number" id="tip" value="15">%
+    </p>
+    <p>
+      Split:
+      <input type="number" id="split" value="1">
+    </p>
+    <p>
+      Tip Method:
+      <select id="methodSelect">
+        <option value="before" selected>Tip Before Tax</option>
+        <option value="after">Tip After Tax</option>
+      </select>
+    </p>
+
+    <button id="calcBtn">Calculate</button>
+    <button id="resetBtn">Reset</button>
+    <hr>
+    <div>
+      <h3>Result:</h3>
+      <h3 id="calcResults">Result will appear here...</h3>
+    </div>
+
+    <script>
+      // Get required elements from the HTML
+      const billEl = document.getElementById("bill");
+      const taxEl = document.getElementById("tax");
+      const tipEl = document.getElementById("tip");
+      const splitEl = document.getElementById("split");
+      const methodSelectEl = document.getElementById("methodSelect")
+
+      const calcBtnEl = document.getElementById('calcBtn');
+      const resetBtnEl = document.getElementById('resetBtn');
+      const calcResultsEl = document.getElementById('calcResults') 
+
+      function createElement() {
+        const newDiv = `
+            <p>
+              <label for="i11-span">Total Tip Amount: &nbsp;</label>
+              <span
+                data-id="i11"
+                step="any"
+                id="i11-span"
+                class="spans"
+              ></span>
+            </p>
+            <p>
+              <label for="i12-span">Total Check: &nbsp;</label>
+              <span
+                data-id="i12"
+                step="any"
+                id="i12-span"
+                class="spans"
+              ></span>%
+            </p>
+            <p>
+              <label for="i13-span">Each Tip Amount: &nbsp;</label>
+              <span
+                data-id="i13"
+                step="any"
+                id="i13-span"
+                class="spans"
+              ></span>
+            </p>
+            <p>
+              <label for="i14-span">Each Pay: &nbsp;</label>
+              <span
+                data-id="i14"
+                step="any"
+                id="i14-span"
+                class="spans"
+              ></span>
+            </p>
+        `
+        return newDiv
+      }
+
+      function setResult(resultObj) {
+        for (key of Object.keys(resultObj)) {
+          let val = resultObj[key].result;
+          let id = resultObj[key].type;
+
+          if (id === "i14") {
+            const span = document.getElementById(`${id}-span`);
+            span.textContent = val;
+          } else {
+            if (isNaN(val)) {
+              alert("Your input resulted in NAN.\n 0/0 \n Try again with valid input.");
+              return;
+            }
+            if (Math.abs(val) === Infinity) {
+              alert("Your input resulted in Infinity. \nDivision by zero. \nTry again with valid input.");
+              return;
+            }
+            const span = document.getElementById(`${id}-span`);
+            span.textContent = `${parseFloat(val)}`;
+          }
+        }
+      }
+
+      function calculateResults() {
+          // Retrieve input values
+          const bill = parseFloat(billEl.value);
+          const tax = parseFloat(taxEl.value);
+          const tip = parseFloat(tipEl.value);
+          const split = parseFloat(splitEl.value);
+          const methodSelect = methodSelectEl.value
+
+          if (isNaN(bill)  || bill < 0 || isNaN(tax) || tax < 0 ||
+            isNaN(tip) || tip <= 0 || isNaN(split) || split <= 0
+          ) {
+            alert("Please Enter All Details.");
+            return;
+          } 
+
+          try {
+            const resultElement = createElement()
+            calcResultsEl.innerHTML = resultElement 
+
+            let totalTip = 0
+            let totalCheck = 0
+            const taxAmt = (tax / 100) * bill
+            if (methodSelect === "before") {
+              totalTip = (tip / 100) * bill
+              totalCheck = bill + totalTip + tax
+            } else {
+              totalTip = (tip / 100) * (bill + tax)
+              totalCheck = bill + totalTip + tax
+            }
+            const eachTip = totalTip / split
+            const eachPay = totalCheck / split
+            
+
+            const results = {
+              1: { result: Math.abs(totalTip) > 1 ? totalTip.toFixed(2) : totalTip.toPrecision(2), type: "i11" },
+              2: { result: Math.abs(totalCheck) > 1 ? totalCheck.toFixed(2) : totalCheck.toPrecision(2), type: "i12" },
+              3: { result: Math.abs(eachTip) > 1 ? eachTip.toFixed(2) : eachTip.toPrecision(2), type: "i13" },
+              4: { result: Math.abs(eachPay) > 1 ? eachPay.toFixed(2) : eachPay.toPrecision(2), type: "i14" },
+            }
+            setResult(results)
+
+          } catch (error) {
+            alert("Something Went Wrong!!!");
+            resetResult()
+            return;
+          }
+      }
+
+      function resetForm() {
+        billEl.value = ""
+        taxEl.value = ""
+        tipEl.value = "15"
+        splitEl.value = "1"
+        methodSelectEl.selectedIndex = "0"
+      }
+
+      function resetResult() {
+        calcResultsEl.innerHTML = "<p>Result will appear here...</p>";
+      } 
+
+      function resethandler() {
+        resetForm();
+        resetResult();
+      }
+
+      resetBtnEl.addEventListener("click", resethandler);
+      calcBtnEl.addEventListener("click", calculateResults);
+
+      [billEl, taxEl, tipEl, splitEl].forEach((el) => {
+        el.addEventListener("input", resetResult);
+      });  
+
+      methodSelectEl.addEventListener("change", resetResult);
+    </script>
+</body>
+</html>

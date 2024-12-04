@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>GDP per Capita Calculator</title>
+</head>
+<body>
+    <h1>GDP per Capita Calculator</h1>
+    <p>
+      Real GDP:
+      <input type="number" id="gdp">
+      <select
+        class="selects"
+        id="gdpSelect"
+      >
+        <option value="0.001">thousands (thousand)</option>
+        <option value="1" selected>millions (million)</option>
+        <option value="1000">billions (billion)</option>
+        <option value="1000000">trillions (trillion)</option>
+      </select>
+    </p>
+    <p>
+      Population:
+      <input type="number" id="population">
+      <select
+        class="selects"
+        id="populationSelect"
+      >
+        <option value="0.001">thousands (thousand)</option>
+        <option value="1" selected>millions (million)</option>
+        <option value="1000">billions (billion)</option>
+        <option value="1000000">trillions (trillion)</option>
+      </select>
+    </p>
+
+    <button id="calcBtn">Calculate</button>
+    <button id="resetBtn">Reset</button>
+    <hr>
+    <div>
+      <h3>Result:</h3>
+      <h3 id="calcResults">Result will appear here...</h3>
+    </div>
+
+    <script>
+      // Get required elements from the HTML
+      const gdpEl = document.getElementById("gdp");
+      const populationEl = document.getElementById("population");
+      const gdpSelectEl = document.getElementById("gdpSelect");
+      const populationSelectEl = document.getElementById("populationSelect");
+
+      const calcBtnEl = document.getElementById('calcBtn');
+      const resetBtnEl = document.getElementById('resetBtn');
+      const calcResultsEl = document.getElementById('calcResults') 
+
+      function createElement() {
+        const newDiv = `
+            <p>
+              <label for="i11-span">Gini coefficient: &nbsp;</label>
+              <span
+                data-id="i11"
+                step="any"
+                id="i11-span"
+                class="spans"
+              ></span> per capita
+            </p>
+        `
+        return newDiv
+      }
+
+      function setResult(resultObj) {
+        for (key of Object.keys(resultObj)) {
+          let val = resultObj[key].result;
+          let id = resultObj[key].type;
+
+          if (isNaN(val)) {
+           alert("Your input resulted in NAN.\n 0/0 \n Try again with valid input.");
+            return;
+          }
+          if (Math.abs(val) === Infinity) {
+            alert("Your input resulted in Infinity. \nDivision by zero. \nTry again with valid input.");
+            return;
+          }
+          const span = document.getElementById(`${id}-span`);
+          span.textContent = `${parseFloat(val)}`;
+        }
+      }
+
+      function calculateResults() {
+          // Retrieve input values
+          const gdpSelect = parseFloat(gdpSelectEl.value)
+          const populationSelect = parseFloat(populationSelectEl.value)
+          const gdp = parseFloat(gdpEl.value) * gdpSelect;
+          const population = parseFloat(populationEl.value) * populationSelect
+
+          if (isNaN(gdp)  || gdp < 0 || isNaN(population) || population <= 0
+          ) {
+            alert("Please Enter All Details.");
+            return;
+          }
+
+          try {
+            const resultElement = createElement()
+            calcResultsEl.innerHTML = resultElement 
+
+            const GDPPC = gdp / population
+
+            const results = {
+              1: { result: Math.abs(GDPPC) > 1 ? GDPPC.toFixed(3) : GDPPC.toPrecision(4), type: "i11" },
+            }
+            setResult(results)
+
+          } catch (error) {
+            alert("Something Went Wrong!!!");
+            resetResult()
+            return;
+          }
+      }
+
+      function resetForm() {
+        gdpEl.value = ""
+        populationEl.value = ""
+        gdpSelectEl.selectedIndex = "1"
+        populationSelectEl.selectedIndex = "1"
+      }
+
+      function resetResult() {
+        calcResultsEl.innerHTML = "<p>Result will appear here...</p>";
+      } 
+
+      function resethandler() {
+        resetForm();
+        resetResult();
+      }
+
+      resetBtnEl.addEventListener("click", resethandler);
+      calcBtnEl.addEventListener("click", calculateResults);
+
+      [gdpSelectEl, populationSelectEl].forEach((el) => {
+        el.addEventListener("change", resetResult);
+      }); 
+
+      [gdpEl, populationEl].forEach((el) => {
+        el.addEventListener("input", resetResult);
+      });  
+
+    </script>
+</body>
+</html>

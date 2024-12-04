@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>College Savings Calculator</title>
+</head>
+<body>
+    <h1>College Savings Calculator</h1>
+    <p>
+      Annual College Costs:
+      <input type="number" id="collegeCost" value="25000">
+    </p>
+    <p>
+      Current Savings: 
+      <input type="number" id="currSavings">
+    </p>
+    <p>
+      Years Until Enrollment:
+      <input type="number" id="untilYears" value="18">
+    </p>
+    <p>
+      Annual Return Rate (%):
+      <input type="number" id="returnRate" value="5"> %
+    </p>
+    <p>
+      Number of Years Enrolled:
+      <input type="number" id="years" value="4">
+    </p>
+    <p>
+      Annual Inflation Rate (%):
+      <input type="number" id="infRate" value="3.8">%
+    </p>
+    <p>
+      Inflation Contribution:
+      <select id="contribSelect">
+        <option value="yes">Yes</option>
+        <option value="no" selected>No</option>
+      </select>
+    </p>
+
+    <button id="calcBtn">Calculate</button>
+    <button id="resetBtn">Reset</button>
+    <hr>
+    <div>
+      <h3>Result:</h3>
+      <h3 id="calcResults">Result will appear here...</h3>
+    </div>
+
+    <script>
+      // Get required elements from the HTML
+      const collegeCostEl = document.getElementById("collegeCost");
+      const currSavingsEl = document.getElementById("currSavings");
+      const untilYearsEl = document.getElementById("untilYears");
+      const returnRateEl = document.getElementById("returnRate");
+      const yearsEl = document.getElementById("years");
+      const infRateEl = document.getElementById("infRate");
+      const contribSelectEl = document.getElementById("contribSelect");
+
+      const calcBtnEl = document.getElementById('calcBtn');
+      const resetBtnEl = document.getElementById('resetBtn');
+      const calcResultsEl = document.getElementById('calcResults') 
+
+      function createElement() {
+        const newDiv = `
+            <p>
+              <label for="i11-span">Annual Contribution: &nbsp;</label>
+              <span
+                data-id="i11"
+                step="any"
+                id="i11-span"
+                class="spans"
+              ></span>
+            </p>
+            <p>
+              <label for="i12-span">Projected Total Cost: &nbsp;</label>
+              <span
+                data-id="i12"
+                step="any"
+                id="i12-span"
+                class="spans"
+              ></span>
+            </p>
+        `
+        return newDiv
+      }
+
+      function setResult(resultObj) {
+        for (key of Object.keys(resultObj)) {
+          let val = resultObj[key].result;
+          let id = resultObj[key].type;
+
+          if (isNaN(val)) {
+           alert("Your input resulted in NAN.\n 0/0 \n Try again with valid input.");
+            return;
+          }
+          if (Math.abs(val) === Infinity) {
+            alert("Your input resulted in Infinity. \nDivision by zero. \nTry again with valid input.");
+            return;
+          }
+          const span = document.getElementById(`${id}-span`);
+          span.textContent = `${val * 1}`;
+        }
+      }
+
+      function calculateResults() {
+          // Retrieve input values
+          const collegeCost = parseFloat(collegeCostEl.value);
+          const currSavings = parseFloat(currSavingsEl.value);
+          const untilYears = parseFloat(untilYearsEl.value);
+          const returnRate = parseFloat(returnRateEl.value);
+          const years = parseFloat(yearsEl.value);
+          const infRate = parseFloat(infRateEl.value);
+          const contribSelect = contribSelectEl.value
+
+          if (isNaN(collegeCost) || collegeCost <= 0 || isNaN(untilYears) || untilYears <= 0 ||
+            isNaN(returnRate) || returnRate < 0 || isNaN(years) || years < 0 || isNaN(infRate) || infRate < 0
+          ) {
+            alert("Please Enter All Details.");
+            return;
+          }
+
+          try {
+            const resultElement = createElement()
+            calcResultsEl.innerHTML = resultElement 
+
+            const annualCont = 0
+            const totslCost = 0
+
+            const results = {
+              1: { result: Math.abs(annualCont) > 1 ? annualCont.toFixed(2) : annualCont.toPrecision(2), type: "i11" },
+              2: { result: Math.abs(totslCost) > 1 ? totslCost.toFixed(2) : totslCost.toPrecision(2), type: "i12" },
+            }
+            setResult(results)
+
+          } catch (error) {
+            alert("Something Went Wrong!!!");
+            resetResult()
+            return;
+          }
+      }
+
+      function resetForm() {
+        collegeCostEl.value = "25000"
+        currSavingsEl.value = ""
+        untilYearsEl.value = "18"
+        returnRateEl.value = "5"
+        yearsEl.value = "4"
+        infRateEl.value = "3.8"
+        contribSelectEl.selectedIndex = "1"
+      }
+
+      function resetResult() {
+        calcResultsEl.innerHTML = "<p>Result will appear here...</p>";
+      } 
+
+      function resethandler() {
+        resetForm();
+        resetResult();
+      }
+
+      resetBtnEl.addEventListener("click", resethandler);
+      calcBtnEl.addEventListener("click", calculateResults);
+      [collegeCostEl, currSavingsEl, untilYearsEl, returnRateEl, 
+        yearsEl, infRateEl].forEach((el) => {
+        el.addEventListener("input", resetResult);
+      });  
+
+      contribSelectEl.addEventListener("change", resetResult);
+
+    </script>
+</body>
+</html>

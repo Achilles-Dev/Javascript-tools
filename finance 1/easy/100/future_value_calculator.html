@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Future Value Calculator</title>
+</head>
+<body>
+    <h1>Future Value Calculator</h1>
+    <h3>Calculate the future value of investments.</h3>
+    <p>
+      Present value:
+      <input type="number" id="presentVal">
+    </p>
+    <p>
+      Interest rate per time period:
+      <input type="number" id="intRate">%
+    </p>
+    <p>
+      Number of time periods:
+      <input type="number" id="timePeriodNum">
+    </p>
+    
+
+    <button id="calcBtn">Calculate</button>
+    <button id="resetBtn">Reset</button>
+    <hr>
+    <div>
+      <h3>Result:</h3>
+      <h3 id="calcResults">Result will appear here...</h3>
+    </div>
+
+    <script>
+      // Get required elements from the HTML
+      const presentValEl = document.getElementById("presentVal");
+      const intRateEl = document.getElementById("intRate");
+      const timePeriodNumEl = document.getElementById("timePeriodNum");
+
+      const calcBtnEl = document.getElementById('calcBtn');
+      const resetBtnEl = document.getElementById('resetBtn');
+      const calcResultsEl = document.getElementById('calcResults') 
+
+      function createElement() {
+        const newDiv = `
+            <p>
+              <label for="i11-span">Future Value: &nbsp;</label>
+              <span
+                data-id="i11"
+                step="any"
+                id="i11-span"
+                class="spans"
+              ></span>
+            </p>
+        `
+        return newDiv
+      }
+
+      function setResult(resultObj) {
+        for (key of Object.keys(resultObj)) {
+          let val = resultObj[key].result;
+          let id = resultObj[key].type;
+
+          if (isNaN(val)) {
+           alert("Your input resulted in NAN.\n 0/0 \n Try again with valid input.");
+            return;
+          }
+          if (Math.abs(val) === Infinity) {
+            alert("Your input resulted in Infinity. \nDivision by zero. \nTry again with valid input.");
+            return;
+          }
+          const span = document.getElementById(`${id}-span`);
+          span.textContent = `${parseFloat(val)}`;
+        }
+      }
+
+      function calculateResults() {
+          // Retrieve input values
+          const presentVal = parseFloat(presentValEl.value);
+          const intRate = parseFloat(intRateEl.value);
+          const timePeriodNum = parseFloat(timePeriodNumEl.value);
+
+          if (isNaN(presentVal)  || presentVal < 0 || isNaN(intRate) || intRate < 1 ||
+            isNaN(timePeriodNum) || timePeriodNum < 1
+          ) {
+            alert("Please Enter All Details.");
+            return;
+          } else if (intRate > 100) {
+            alert("Ensure this value is less than or equal to 100.");
+            return;
+          }
+
+          try {
+            const resultElement = createElement()
+            calcResultsEl.innerHTML = resultElement 
+
+            const FV = presentVal * ((1 + (intRate / 100)) ** timePeriodNum)
+
+            const results = {
+              1: { result: Math.abs(FV) > 1 ? FV.toFixed(2) : FV.toPrecision(2), type: "i11" },
+            }
+            setResult(results)
+
+          } catch (error) {
+            alert("Something Went Wrong!!!");
+            resetResult()
+            return;
+          }
+      }
+
+      function resetForm() {
+        presentValEl.value = ""
+        intRateEl.value = ""
+        timePeriodNumEl.value = ""
+      }
+
+      function resetResult() {
+        calcResultsEl.innerHTML = "<p>Result will appear here...</p>";
+      } 
+
+      function resethandler() {
+        resetForm();
+        resetResult();
+      }
+
+      resetBtnEl.addEventListener("click", resethandler);
+      calcBtnEl.addEventListener("click", calculateResults);
+
+      [presentValEl, intRateEl, timePeriodNumEl].forEach((el) => {
+        el.addEventListener("input", resetResult);
+      });  
+    </script>
+</body>
+</html>

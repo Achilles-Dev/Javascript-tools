@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Adjustable Rate Mortgage Calculator</title>
+</head>
+<body>
+    <h1>Adjustable Rate Mortgage Calculator</h1>
+    <p>
+      Loan Amount:
+      <input type="number" id="loanAmt" value="200000">
+    </p>
+    <p>
+      Annual Interest Rate (%): 
+      <input type="number" id="annIntRate" value="3">
+    </p>
+    <p>
+      Loan Term:
+      <input type="number" id="termYear" value="30"> Years
+      &nbsp;&nbsp;
+      <input type="number" id="termMonth"> Months
+    </p>
+    <p>
+      Months before 1st Adjustment:
+      <input type="number" id="firstAdjMth" value="60">
+    </p>
+    <p>
+      Months between Adjustments: 
+      <input type="number" id="adjMthBtn" value="12">
+    </p>
+    <p>
+      Expected Adjustment (%):
+      <input type="number" id="expAdj" value="0.25">
+    </p>
+    <p>
+      Interest Rate Cap (%): 
+      <input type="number" id="intRateCap" value="12">
+    </p>
+
+    <button id="calcBtn">Calculate</button>
+    <button id="resetBtn">Reset</button>
+    <hr>
+    <div>
+      <h3>Result:</h3>
+      <h3 id="calcResults">Result will appear here...</h3>
+    </div>
+
+    <script>
+      // Get required elements from the HTML
+      const loanAmtEl = document.getElementById("loanAmt");
+      const annIntRateEl = document.getElementById("annIntRate");
+      const termYearEl = document.getElementById("termYear");
+      const termMonthEl = document.getElementById("termMonth");
+      const firstAdjMthEl = document.getElementById("firstAdjMth");
+      const adjMthBtnEl = document.getElementById("adjMthBtn");
+      const expAdjEl = document.getElementById("expAdj");
+      const intRateCapEl = document.getElementById("intRateCap");
+
+      const calcBtnEl = document.getElementById('calcBtn');
+      const resetBtnEl = document.getElementById('resetBtn');
+      const calcResultsEl = document.getElementById('calcResults') 
+
+      function createElement() {
+        const newDiv = `
+            <p>
+              <label for="i11-span">Initial Monthly Payment: &nbsp;</label>
+              <span
+                data-id="i11"
+                step="any"
+                id="i11-span"
+                class="spans"
+                data-name="Initial Monthly Payment"
+              ></span>
+            </p>
+            <p>
+              <label for="i12-span">Max Monthly Payment: &nbsp;</label>
+              <span
+                data-id="i12"
+                step="any"
+                id="i12-span"
+                class="spans"
+                data-name="Max Monthly Payment"
+              ></span>
+            </p>
+            <p>
+              <label for="i13-span">Total Payment: &nbsp;</label>
+              <span
+                data-id="i13"
+                step="any"
+                id="i13-span"
+                class="spans"
+                data-name="Total Payment"
+              ></span>
+            </p>
+            <p>
+              <label for="i14-span">Total Interest: &nbsp;</label>
+              <span
+                data-id="i14"
+                step="any"
+                id="i14-span"
+                class="spans"
+                data-name="Total Interest"
+              ></span>
+            </p>
+        `
+        return newDiv
+      }
+
+      function setResult(resultObj) {
+        for (key of Object.keys(resultObj)) {
+          let val = resultObj[key].result;
+          let id = resultObj[key].type;
+
+          if (isNaN(val)) {
+           alert("Your input resulted in NAN.\n 0/0 \n Try again with valid input.");
+            return;
+          }
+          if (Math.abs(val) === Infinity) {
+            alert("Your input resulted in Infinity. \nDivision by zero. \nTry again with valid input.");
+            return;
+          }
+          const span = document.getElementById(`${id}-span`);
+          span.textContent = parseFloat(val);
+        }
+      }
+
+      function calculateResults() {
+          // Retrieve input values
+          const loanAmt = parseFloat(loanAmtEl.value);
+          const annIntRate = parseFloat(annIntRateEl.value);
+          const termYear = parseFloat(termYearEl.value);
+          const termMonth = parseFloat(termMonthEl.value);
+          const firstAdjMth = parseFloat(firstAdjMthEl.value);
+          const adjMthBtn = parseFloat(adjMthBtnEl.value);
+          const expAdj = parseFloat(expAdjEl.value);
+          const intRateCap = parseFloat(intRateCapEl.value);
+
+          if (isNaN(loanAmt) || isNaN(annIntRate) || isNaN(termYear) || 
+            isNaN(firstAdjMth) || isNaN(adjMthBtn) || isNaN(expAdj) || isNaN(intRateCap)
+          ) {
+            alert("Please Enter All Details.");
+            return;
+          } 
+          // else if (expLife < currAge  ) {
+          //   alert("Expected life of the item should be greater than current age of the item.");
+          //   return;
+          // }
+
+          try {
+            const resultElement = createElement()
+            calcResultsEl.innerHTML = resultElement 
+
+            let totTerm = isNaN(termMonth) ? (termYear * 12) : termMonth + (termYear * 12)
+            const iniMonthPay = (loanAmt * ((annIntRate / 100) / 12) * ((1 + ((annIntRate / 100) / 12)) ** totTerm)) / (((1 + ((annIntRate / 100) / 12)) ** totTerm) - 1)
+            console.log(iniMonthPay, totTerm)
+
+            const results = {
+              1: { result: Math.abs(iniMonthPay) > 1 ? iniMonthPay.toFixed(2) : iniMonthPay.toPrecision(2), type: "i11" },
+              // 2: { result: Math.abs(avgWage * 12) > 1 ? (avgWage * 12).toFixed(2) : (avgWage * 12).toPrecision(2) , type: "i12" },
+              // 3: { result: Math.abs(avgWage * 12 * 5) > 1 ? (avgWage * 12 * 5).toFixed(2) : (avgWage * 12 * 5).toPrecision(2) , type: "i13" },
+              // 4: { result: Math.abs(avgWage * 12 * 22) > 1 ? (avgWage * 12 * 22).toFixed(2) : (avgWage * 12 * 22).toPrecision(2), type: "i14" },
+            }
+            setResult(results)
+
+          } catch (error) {
+            alert("Something Went Wrong!!!");
+            resetResult()
+            return;
+          }
+      }
+
+      function resetForm() {
+        loanAmtEl.value = ""
+        annIntRateEl.value = ""
+        termYearEl.value = ""
+        termMonthEl.value = ""
+        firstAdjMthEl.value = ""
+        adjMthBtnEl.value = ""
+        expAdjEl.value = ""
+        intRateCapEl.value = ""
+      }
+
+      function resetResult() {
+        calcResultsEl.innerHTML = "<p>Result will appear here...</p>";
+      } 
+
+      function resethandler() {
+        resetForm();
+        resetResult();
+      }
+
+      resetBtnEl.addEventListener("click", resethandler);
+      calcBtnEl.addEventListener("click", calculateResults);
+
+      [loanAmtEl, annIntRateEl, termYearEl, termMonthEl, 
+        firstAdjMthEl, adjMthBtnEl, expAdjEl, intRateCapEl
+      ].forEach((el) => {
+        el.addEventListener("input", resetResult);
+      });  
+    </script>
+</body>
+</html>
